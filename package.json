@@ -1,0 +1,63 @@
+{
+  "name": "cspot-dashboard",
+  "version": "0.0.1",
+  "description": "CSpot web configuration dashboard",
+  "main": "src/index.ts",
+  "type": "module",
+  "dependencies": {
+    "babel-plugin-auto-import": "^1.0.5",
+    "icon-font-loader": "^2.1.0",
+    "less": "^3.9.0",
+    "milligram": "^1.4.1",
+    "milligram-less": "^1.4.1",
+    "preact": "^10.0.0-rc.0",
+    "preact-compat": "^3.19.0",
+    "tslib": "^1.10.0",
+    "webfonts-loader": "^4.4.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-transform-react-jsx": "^7.3.0",
+    "@types/html-webpack-plugin": "^3.2.1",
+    "@types/node": "^12.6.9",
+    "@types/webpack": "^4.32.1",
+    "@types/webpack-dev-server": "^3.1.7",
+    "@types/webpack-merge": "^4.1.5",
+    "babel-loader": "^8.0.6",
+    "babel-minify-webpack-plugin": "^0.3.1",
+    "babel-plugin-react-css-modules": "^5.2.6",
+    "clean-webpack-plugin": "^3.0.0",
+    "cross-env": "^5.2.0",
+    "css-loader": "^3.1.0",
+    "html-webpack-plugin": "^4.0.0-beta.8",
+    "ignore-loader": "^0.1.2",
+    "image-webpack-loader": "^5.0.0",
+    "less-loader": "^5.0.0",
+    "mini-css-extract-plugin": "^0.8.0",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "postcss-less": "^3.1.4",
+    "style-loader": "^1.0.0",
+    "svg-inline-loader": "^0.8.0",
+    "ts-loader": "^6.0.4",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.5.3",
+    "url-loader": "^2.1.0",
+    "webapp-webpack-plugin": "^2.7.1",
+    "webpack": "^4.39.1",
+    "webpack-bundle-analyzer": "^3.4.1",
+    "webpack-cli": "^3.3.6",
+    "webpack-dev-server": "^3.7.2",
+    "webpack-merge": "^4.2.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "cross-env TS_NODE_PROJECT=\"config/tsconfig.webpack.json\" webpack --config webpack.config.prod.ts",
+    "dev": "cross-env TS_NODE_PROJECT=\"config/tsconfig.webpack.json\" webpack-dev-server --config webpack.config.dev.ts",
+    "now-build": "npm run build"
+  },
+  "engines": {
+    "node": ">=10.x"
+  },
+  "author": "",
+  "license": "MIT"
+}
