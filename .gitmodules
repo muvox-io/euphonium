@@ -1,0 +1,6 @@
+[submodule "picoaudio/cpp-reflection"]
+	path = picoaudio/cpp-reflection
+	url = git@github.com:alufers/cpp-reflection.git
+[submodule "picoaudio/cJSON"]
+	path = picoaudio/cJSON
+	url = https://github.com/DaveGamble/cJSON
