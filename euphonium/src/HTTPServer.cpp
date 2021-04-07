@@ -28,10 +28,28 @@ void HTTPServer::registerHandler(RequestType requestType, std::string routeUrl, 
                                    }});
 }
 
+// @TODO: Implement a proper http server here. It's currently a huge mess of an implementation, and will most likely 
+// mess something up when more than 1 clients connect at once
 void HTTPServer::listen()
 {
     printf("Starting configuration server at port %d\n", this->serverPort);
 
+    // master filedescriptor
+    fd_set master;
+    fd_set readFds;
+    int fdMax; // maximum current fd
+    int readBytes;
+
+    int yes = 1; // used for setsockopt
+    struct sockaddr_storage remoteaddr; // client address
+    socklen_t addrlen;
+    // stores http method + path
+    std::string httpMethod;
+
+    // input data buffer
+    std::vector<uint8_t> bufferVec(128);
+
+    // setup address
     struct addrinfo hints, *server;
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET;
@@ -41,87 +59,107 @@ void HTTPServer::listen()
 
     int sockfd = socket(server->ai_family,
                         server->ai_socktype, server->ai_protocol);
+
+    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
     bind(sockfd, server->ai_addr, server->ai_addrlen);
     ::listen(sockfd, 10);
 
-    struct sockaddr_storage client_addr;
-    socklen_t addr_size = sizeof client_addr;
-
+    FD_SET(sockfd, &master);
+    fdMax = sockfd; // listener socket is the highest descriptor rn
+    auto currentString = std::string();
     for (;;)
     {
-        int clientFd = accept(sockfd, (struct sockaddr *)&client_addr, &addr_size);
-        std::cout << "Corn part 0: acceptanmce \n";
-        if (fcntl(clientFd, F_SETFL, SOCK_NONBLOCK) == -1)
+        readFds = master; // copy it
+        if (select(fdMax + 1, &readFds, NULL, NULL, NULL) == -1)
         {
-            perror("failed to fcntl(clientFd, F_SETFL, O_NONBLOCK);");
-            continue;
-        };
-        std::string httpMethod;
-        int readBytes = 0;
-        std::vector<uint8_t> bufferVec(128);
+            perror("select");
+            exit(4);
+        }
 
-        auto currentString = std::string();
-
-        fd_set set;
-        struct timeval timeout;
-        timeout.tv_sec = 0;
-        timeout.tv_usec = 30000;
-        FD_ZERO(&set);
-        FD_SET(clientFd, &set);
-
-        std::cout << "Corn part 1 \n";
-
-        for (;;)
+        // run through the existing connections looking for data to read
+        for (int i = 0; i <= fdMax; i++)
         {
-
-            int rv = select(clientFd + 1, &set, NULL, NULL, &timeout);
-        std::cout << "Corn selection: yes \n";
-            if (rv == -1)
-            {
-                perror("select"); /* an error occured */
-                break;
-            }
-            else if (rv == 0)
-            {
-                break;
-            }
-            else
-            {
-                readBytes = read(clientFd, bufferVec.data(), 128);
-            }
-
-            // Read entire response so lets yeeeet
-            if (readBytes <= 0)
-                break;
-            currentString += std::string(bufferVec.data(), bufferVec.data() + readBytes);
-
-            while (currentString.find("\r\n") != std::string::npos)
-            {
-                auto line = currentString.substr(0, currentString.find("\r\n"));
-                std::cout << line << "\n";
-                currentString = currentString.substr(currentString.find("\r\n") + 2, currentString.size());
-                if (line.find("GET ") != std::string::npos || line.find("POST ") != std::string::npos)
+            if (FD_ISSET(i, &readFds))
+            { // we got one!!
+                if (i == sockfd)
                 {
-                    httpMethod = line;
+                    // handle new connections
+                    addrlen = sizeof remoteaddr;
+                    int newFd = accept(sockfd,
+                                   (struct sockaddr *)&remoteaddr,
+                                   &addrlen);
+
+                    if (newFd == -1)
+                    {
+                        perror("accept");
+                    }
+                    else
+                    {
+                        FD_SET(newFd, &master); // add to master set
+                        if (newFd > fdMax)
+                        {
+                            fdMax = newFd;
+                        }
+                        std::cout << "New connection\n";
+                        currentString = std::string();
+                    }
+                }
+                else
+                {
+                    // Receive data
+                    if ((readBytes = recv(i, bufferVec.data(), 128, 0)) <= 0)
+                    {
+                        // got error or connection closed by client
+                        if (readBytes == 0)
+                        {
+                            // connection closed
+                            std::cout << "Socket " << i << "hung up\n";
+                        }
+                        else
+                        {
+                            perror("recv");
+                        }
+                        close(i);
+                        FD_CLR(i, &master);
+                    }
+                    else
+                    {
+                        currentString += std::string(bufferVec.data(), bufferVec.data() + readBytes);
+
+                        while (currentString.find("\r\n") != std::string::npos)
+                        {
+                            auto line = currentString.substr(0, currentString.find("\r\n"));
+
+                            currentString = currentString.substr(currentString.find("\r\n") + 2, currentString.size());
+                            if (line.find("GET ") != std::string::npos || line.find("POST ") != std::string::npos)
+                            {
+                                std::cout << "Got method!" << std::endl;
+                                httpMethod = line;
+                            }
+
+                            if (line.size() == 0)
+                            {
+                                auto response = findAndHandleRoute(httpMethod);
+
+                                std::stringstream stream;
+                                stream << "HTTP/1.1 " << response.status << " OK\r\n";
+                                stream << "Server: EUPHONIUM\r\n";
+                                stream << "Connection: close\r\n";
+                                stream << "Content-type: text/html\r\n";
+                                stream << "Content-length:" << response.body.size() << "\r\n";
+                                stream << "\r\n";
+                                stream << response.body;
+
+                                auto responseStr = stream.str();
+                                write(i, responseStr.c_str(), responseStr.size());
+                                close(i);
+                                FD_CLR(i, &master);
+                            }
+                        }
+                    }
                 }
             }
         }
-
-        auto response = findAndHandleRoute(httpMethod);
-
-        std::stringstream stream;
-        stream << "HTTP/1.1 " << response.status << " OK\r\n";
-        stream << "Server: EUPHONIUM\r\n";
-        stream << "Connection: close\r\n";
-        stream << "Content-type: text/html\r\n";
-        stream << "Content-length:" << response.body.size() << "\r\n";
-        stream << "\r\n";
-        stream << response.body;
-
-        auto responseStr = stream.str();
-        write(clientFd, responseStr.c_str(), responseStr.size());
-        shutdown(clientFd, SHUT_RDWR);
-        close(clientFd);
     }
 }
 
@@ -181,7 +219,6 @@ HTTPResponse HTTPServer::findAndHandleRoute(std::string &url)
 
         if (matches)
         {
-            printf("dupsko\n");
             HTTPRequest req = {
                 .urlParams = pathParams,
             };
