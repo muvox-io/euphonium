@@ -111,7 +111,7 @@ void HTTPServer::listen()
 
         std::stringstream stream;
         stream << "HTTP/1.1 " << response.status << " OK\r\n";
-        stream << "Server: picoaudio\r\n";
+        stream << "Server: EUPHONIUM\r\n";
         stream << "Connection: close\r\n";
         stream << "Content-type: text/html\r\n";
         stream << "Content-length:" << response.body.size() << "\r\n";

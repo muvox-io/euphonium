@@ -65,6 +65,8 @@
         "unordered_map": "cpp",
         "utility": "cpp",
         "regex": "cpp",
-        "deque": "cpp"
+        "deque": "cpp",
+        "queue": "cpp",
+        "any": "cpp"
     }
 }

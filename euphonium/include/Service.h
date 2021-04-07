@@ -1,5 +1,5 @@
-#ifndef PICOAUDIO_SERVICE_H
-#define PICOAUDIO_SERVICE_H
+#ifndef EUPHONIUM_SERVICE_H
+#define EUPHONIUM_SERVICE_H
 
 #include <string>
 #include <memory>

@@ -1,5 +1,5 @@
-#ifndef PICOAUDIO_CORE_H
-#define PICOAUDIO_CORE_H
+#ifndef EUPHONIUM_CORE_H
+#define EUPHONIUM_CORE_H
 
 #include <vector>
 #include <memory>

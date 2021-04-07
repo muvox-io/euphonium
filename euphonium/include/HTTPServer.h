@@ -1,6 +1,6 @@
 
-#ifndef PICOAUDIO_HTTP_SERVER_H
-#define PICOAUDIO_HTTP_SERVER_H
+#ifndef EUPHONIUM_HTTP_SERVER_H
+#define EUPHONIUM_HTTP_SERVER_H
 
 #include <functional>
 #include <map>

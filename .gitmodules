@@ -1,6 +1,6 @@
-[submodule "picoaudio/cpp-reflection"]
-	path = picoaudio/cpp-reflection
-	url = git@github.com:alufers/cpp-reflection.git
-[submodule "picoaudio/cJSON"]
-	path = picoaudio/cJSON
+[submodule "euphonium/cpp-reflection"]
+	path = euphonium/cpp-reflection
+	url = https://github.com/alufers/cpp-reflection
+[submodule "euphonium/cJSON"]
+	path = euphonium/cJSON
 	url = https://github.com/DaveGamble/cJSON

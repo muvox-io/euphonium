@@ -1,5 +1,5 @@
-#ifndef PICOAUDIO_JSON_H
-#define PICOAUDIO_JSON_H
+#ifndef EUPHONIUM_JSON_H
+#define EUPHONIUM_JSON_H
 
 #include <iostream>
 #include <iomanip>

@@ -1,4 +1,4 @@
-project(picoaudio)
+project(euphonium)
 
 cmake_minimum_required(VERSION 2.8.9)
 set (CMAKE_CXX_STANDARD 17)
@@ -23,7 +23,7 @@ include_directories("protos")
 execute_process(COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/cmake/generate_protos.sh" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 set(SOURCES ${SOURCES} "protos/AnyRefImpl.cpp" "protos/ReflectTypeInfo.cpp")
 
-add_library(picoaudio STATIC ${SOURCES})
-target_link_libraries(picoaudio PRIVATE ${EXTRA_REQ_LIBS})
+add_library(euphonium STATIC ${SOURCES})
+target_link_libraries(euphonium PRIVATE ${EXTRA_REQ_LIBS})
 
-target_include_directories(picoaudio PUBLIC "include" "protos" ${EXTRA_REQ_LIBS} ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(euphonium PUBLIC "include" "protos" ${EXTRA_REQ_LIBS} ${CMAKE_CURRENT_BINARY_DIR})
