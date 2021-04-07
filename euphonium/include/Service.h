@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include <optional>
 #include "protobuf.h"
 #include "Core.h"
 

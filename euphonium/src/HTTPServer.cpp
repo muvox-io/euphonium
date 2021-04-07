@@ -51,7 +51,7 @@ void HTTPServer::listen()
     {
         int clientFd = accept(sockfd, (struct sockaddr *)&client_addr, &addr_size);
         std::cout << "Corn part 0: acceptanmce \n";
-        if (fcntl(clientFd, F_SETFL, O_NONBLOCK) == -1)
+        if (fcntl(clientFd, F_SETFL, SOCK_NONBLOCK) == -1)
         {
             perror("failed to fcntl(clientFd, F_SETFL, O_NONBLOCK);");
             continue;

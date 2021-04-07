@@ -13,7 +13,7 @@ else()
 endif()
 
 if(UNIX AND NOT APPLE)
-    set(EXTRA_REQ_LIBS ${EXTRA_REQ_LIBS} dns_sd)
+    set(EXTRA_REQ_LIBS ${EXTRA_REQ_LIBS})
 endif()
 
 include_directories("include")

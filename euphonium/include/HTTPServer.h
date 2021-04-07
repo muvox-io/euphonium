@@ -7,6 +7,7 @@
 #include <optional>
 #include <memory>
 #include <regex>
+#include <optional>
 #include "Core.h"
 #include "Service.h"
 #include "protobuf.h"
@@ -18,8 +19,8 @@
 #include <sys/socket.h>
 #include <string>
 #include <netdb.h>
-#ifndef SOCK_NONBLOCK
 #include <fcntl.h>
+#ifndef SOCK_NONBLOCK
 #define SOCK_NONBLOCK O_NONBLOCK
 #endif
 
@@ -42,8 +43,8 @@ struct HTTPResponse {
 typedef std::function<HTTPResponse(HTTPRequest&)> httpHandler;
 
 struct HTTPRoute {
-    const httpHandler& handler;
     RequestType requestType;
+    const httpHandler& handler;
 };
 
 class HTTPServer {

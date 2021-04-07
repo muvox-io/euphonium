@@ -2,6 +2,7 @@
 #define EUPHONIUM_EVENTBUS_H
 
 #include <memory>
+#include <functional>
 #include <queue>
 #include <any>
 #include <map>

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <optional>
 #include "Core.h"
 #include "HTTPServer.h"
 
