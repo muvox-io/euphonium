@@ -5,7 +5,9 @@
 #include <memory>
 #include <optional>
 #include "protobuf.h"
-#include "Core.h"
+#include "SystemInfo.h"
+#include "EventBus.h"
+
 
 class Service {
     public:
@@ -13,7 +15,6 @@ class Service {
     virtual ~Service() {}
 
     std::string serviceName;
-    std::shared_ptr<Core> core;
 
     virtual AnyRef getConfigurationRef() = 0;
     virtual void init() = 0;

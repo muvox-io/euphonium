@@ -2,6 +2,7 @@ project(euphonium)
 
 cmake_minimum_required(VERSION 2.8.9)
 set (CMAKE_CXX_STANDARD 17)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lua ${CMAKE_CURRENT_BINARY_DIR}/lua)
 
 file(GLOB SOURCES "src/*.cpp" "src/*.c")
 
@@ -24,6 +25,6 @@ execute_process(COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/cmake/generate_protos.sh" W
 set(SOURCES ${SOURCES} "protos/AnyRefImpl.cpp" "protos/ReflectTypeInfo.cpp")
 
 add_library(euphonium STATIC ${SOURCES})
-target_link_libraries(euphonium PRIVATE ${EXTRA_REQ_LIBS})
+target_link_libraries(euphonium PRIVATE lua ${EXTRA_REQ_LIBS})
 
 target_include_directories(euphonium PUBLIC "include" "protos" ${EXTRA_REQ_LIBS} ${CMAKE_CURRENT_BINARY_DIR})

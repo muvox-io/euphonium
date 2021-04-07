@@ -1,6 +1,13 @@
 #include "Core.h"
 #include "DupaService.h"
 #include "ConfigurationApiService.h"
+#include "SystemInfo.h"
+#include <string.h>
+extern "C" {
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+}
 
 Core::Core() {
 }
@@ -11,18 +18,20 @@ void Core::registerChildren() {
 }
 
 void Core::logAvailableServices() {
-    for (const auto& service : this->registeredServices) {
-        // std::cout << service->serviceName << std::endl;
-        service->init();
-    }
+    lua_State *L = luaL_newstate();
+    luaL_openlibs(L);
+    
+    int r = luaL_loadstring(L, "print(\"Hello World\")");
+    r = lua_pcall(L, 0, 0, 0);
+    lua_close(L);
 }
 
 std::shared_ptr<Service> Core::getServiceWithName(std::string& name) {
-    for (const auto& service : this->registeredServices) {
-        if (service->serviceName == name) {
-            return service;
-        }
-    }
+    // for (const auto& service : this->registeredServices) {
+    //     if (service->serviceName == name) {
+    //         return service;
+    //     }
+    // }
 
-    return nullptr;
+    // return nullptr;
 }

@@ -5,7 +5,7 @@
 #include <functional>
 #include <queue>
 #include <any>
-#include <map>
+#include <unordered_map>
 #include <set>
 
 enum class EventType : uint32_t {
@@ -26,7 +26,7 @@ public:
 class EventBus {
 private:
     std::queue<std::unique_ptr<Event>> eventQueue;
-    std::map<EventType, std::set<std::unique_ptr<EventSubscriber>>> registeredListeners;
+    std::unordered_map<EventType, std::set<std::unique_ptr<EventSubscriber>>> registeredListeners;
 public:
     EventBus();
     void update();
