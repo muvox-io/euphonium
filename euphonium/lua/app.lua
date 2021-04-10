@@ -1,5 +1,6 @@
 App = {plugins = {}}
 App.__index = App
+http = HttpServer.new(2137)
 
 function App.new()
     local self = setmetatable({plugins = {}}, App)
@@ -11,13 +12,18 @@ function App.registerPlugin(self, plugin)
 end
 
 function App.printRegisteredPlugins(self)
-    print("corn")
+    http:registerHandler(RequestType.GET, "/plugin", function (request)
+        local response = HTTPResponse.new()
+
+        response.body = json.encode(self.plugins)
+        response.status = 200
+        response.contentType = "application/json"
+        http:respond(response, request.connection)
+    end)
 
     for k, v in pairs(self.plugins) do
         print(k)
     end
-
-    local c = HttpServer:new(5)
 end
 
 app = App.new()

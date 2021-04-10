@@ -19,7 +19,7 @@ std::vector<std::string> HTTPServer::splitUrl(const std::string &url)
     return seglist;
 }
 
-void HTTPServer::registerHandler(RequestType requestType, std::string routeUrl, httpHandler &handler)
+void HTTPServer::registerHandler(RequestType requestType, const std::string &routeUrl, httpHandler handler)
 {
 
     this->routes.insert({routeUrl, HTTPRoute{
@@ -35,8 +35,7 @@ void HTTPServer::listen()
     printf("Starting configuration server at port %d\n", this->serverPort);
 
     // master filedescriptor
-    fd_set master;
-    fd_set readFds;
+
     int fdMax; // maximum current fd
     int readBytes;
 
@@ -139,21 +138,7 @@ void HTTPServer::listen()
 
                             if (line.size() == 0)
                             {
-                                auto response = findAndHandleRoute(httpMethod);
-
-                                std::stringstream stream;
-                                stream << "HTTP/1.1 " << response.status << " OK\r\n";
-                                stream << "Server: EUPHONIUM\r\n";
-                                stream << "Connection: close\r\n";
-                                stream << "Content-type: text/html\r\n";
-                                stream << "Content-length:" << response.body.size() << "\r\n";
-                                stream << "\r\n";
-                                stream << response.body;
-
-                                auto responseStr = stream.str();
-                                write(i, responseStr.c_str(), responseStr.size());
-                                close(i);
-                                FD_CLR(i, &master);
+                                findAndHandleRoute(httpMethod, i);
                             }
                         }
                     }
@@ -163,7 +148,24 @@ void HTTPServer::listen()
     }
 }
 
-HTTPResponse HTTPServer::findAndHandleRoute(std::string &url)
+void HTTPServer::respond(const HTTPResponse &response, int connectionFd)
+{
+    std::stringstream stream;
+    stream << "HTTP/1.1 " << response.status << " OK\r\n";
+    stream << "Server: EUPHONIUM\r\n";
+    stream << "Connection: close\r\n";
+    stream << "Content-type: " << response.contentType << "\r\n";
+    stream << "Content-length:" << response.body.size() << "\r\n";
+    stream << "\r\n";
+    stream << response.body;
+
+    auto responseStr = stream.str();
+    write(connectionFd, responseStr.c_str(), responseStr.size());
+    close(connectionFd);
+    FD_CLR(connectionFd, &master);
+}
+
+void HTTPServer::findAndHandleRoute(std::string &url, int connectionFd)
 {
 
     std::map<std::string, std::string> pathParams;
@@ -219,86 +221,16 @@ HTTPResponse HTTPServer::findAndHandleRoute(std::string &url)
 
         if (matches)
         {
-            HTTPRequest req = {
+            const HTTPRequest req = {
                 .urlParams = pathParams,
-            };
+                .connection = connectionFd};
             return route.second.handler(req);
         }
     }
 
-    return HTTPResponse{
-        .status = 404,
-        .body = "Not found",
-    };
-}
-
-static int newLuaHttpServer(lua_State *L)
-{
-    int n = lua_gettop(L);
-    if (n != 2)
-        return luaL_error(L, "Not enough arguments");
-    luaL_checktype(L, 1, LUA_TTABLE); // make sure first arg is table
-
-    lua_newtable(L);
-
-    // Set first argument of new to metatable of instance
-    lua_pushvalue(L, 1);
-    lua_setmetatable(L, -2);
-
-    // Do function lookups in metatable
-    lua_pushvalue(L, 1);
-    lua_setfield(L, 1, "__index");
-
-    // Allocate memory for a pointer to to object
-    HTTPServer **s = (HTTPServer **)lua_newuserdata(L, sizeof(HTTPServer *));
-
-    int port = luaL_checknumber(L, 2);
-
-    *s = new HTTPServer(port);
-
-    luaL_getmetatable(L, "Lua.HttpServer");
-    lua_setmetatable(L, -2);
-    lua_setfield(L, -2, "__self");
-
-    return 1;
-}
-
-static int callFunction(lua_State *L)
-{
-    HTTPServer **pmPtr = (HTTPServer **)luaL_checkudata(
-        L, 1, "Lua.HttpServer");
-    std::cout << "Corn :)" << std::endl;
-    return 0;
-}
-
-static int destroyHttpServer(lua_State *L)
-{
-    HTTPServer **pmPtr = (HTTPServer **)luaL_checkudata(
-        L, 1, "Lua.HttpServer");
-    // c->Release();
-    return 0;
-}
-
-// Functions that will show up in our Lua environment
-static const luaL_Reg gMyClassFuncs[] = {
-    // Creation
-    {"new", newLuaHttpServer},
-    {"hello", callFunction},
-    {NULL, NULL}};
-
-static const luaL_Reg gDestroyMyClassFuncs[] = {
-    {"__gc", destroyHttpServer},
-    {NULL, NULL}};
-
-void registerHttpServer(lua_State *L)
-{
-    // Register metatable for user data in registry
-    luaL_newmetatable(L, "Lua.HttpServer");
-    luaL_register(L, 0, gDestroyMyClassFuncs);
-    luaL_register(L, 0, gMyClassFuncs);
-    lua_pushvalue(L, -1);
-    lua_setfield(L, -2, "__index");
-
-    // Register the base class for instances of Sprite
-    // luaL_register(L, "HttpServer", gSpriteFuncs);
+    respond(HTTPResponse{
+                .status = 404,
+                .body = "Not found",
+            },
+            connectionFd);
 }

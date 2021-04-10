@@ -39,35 +39,38 @@ enum class RequestType {
 struct HTTPRequest {
     std::map<std::string, std::string> urlParams;
     std::string body;
+    int connection;
 };
 
 struct HTTPResponse {
     int status;
     std::string body;
+    std::string contentType;
 };
 
-typedef std::function<HTTPResponse(HTTPRequest&)> httpHandler;
+typedef std::function<void(const HTTPRequest&)> httpHandler;
 
 struct HTTPRoute {
     RequestType requestType;
-    const httpHandler& handler;
+    httpHandler handler;
 };
 
 class HTTPServer {
 private:
     std::regex routerPattern = std::regex(":([^\\/]+)?");
     int serverPort;
+    fd_set master;
+    fd_set readFds;
     std::map<std::string, HTTPRoute> routes;
-    HTTPResponse findAndHandleRoute(std::string&);
+    void findAndHandleRoute(std::string&, int connectionFd);
     std::vector<std::string> splitUrl(const std::string& url);
 
 public:
     HTTPServer(int serverPort);
-    void registerHandler(RequestType, std::string, httpHandler& handler);
+    void registerHandler(RequestType requestType, const std::string&, httpHandler);
+    void respond(const HTTPResponse&, int connection);
     void listen();
 };
-
-void registerHttpServer(lua_State *L);
 
 #endif
 
