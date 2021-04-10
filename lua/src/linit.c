@@ -1,6 +1,6 @@
 /*
-** $Id: linit.c $
-** Initialization of libraries for lua.c and other clients
+** $Id: linit.c,v 1.14.1.1 2007/12/27 13:02:25 roberto Exp $
+** Initialization of libraries for lua.c
 ** See Copyright Notice in lua.h
 */
 
@@ -8,58 +8,151 @@
 #define linit_c
 #define LUA_LIB
 
-/*
-** If you embed Lua in your program and need to open the standard
-** libraries, call luaL_openlibs in your program. If you need a
-** different set of libraries, copy this file to your project and edit
-** it to suit your needs.
-**
-** You can also *preload* libraries, so that a later 'require' can
-** open the library, which is already linked to the application.
-** For that, do the following code:
-**
-**  luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_PRELOAD_TABLE);
-**  lua_pushcfunction(L, luaopen_modname);
-**  lua_setfield(L, -2, modname);
-**  lua_pop(L, 1);  // remove PRELOAD table
-*/
-
-#include "lprefix.h"
-
-
-#include <stddef.h>
-
 #include "lua.h"
 
 #include "lualib.h"
 #include "lauxlib.h"
+#include "lrotable.h"
+#include "luaconf.h"
+#ifndef LUA_CROSS_COMPILER
+#include "platform_conf.h"
+#endif
+
+#ifdef LUA_RPC
+#include "desktop_conf.h"
+#endif
+
+#ifdef EXTRA_LIBS_INCLUDE
+#include "extra_libs.h"
+#endif
+
+LUALIB_API int luaopen_platform (lua_State *L);
+int luaopen_dummy(lua_State *L);
+
+// Declare table
+#if defined(LUA_PLATFORM_LIBS_ROM) && LUA_OPTIMIZE_MEMORY == 2
+#undef _ROM
+#define _ROM( name, openf, table ) extern const luaR_entry table[];
+LUA_PLATFORM_LIBS_ROM;
+#endif
+
+// ****************************************************************************
+// Platform module handling
+// Automatically generate all the data required for platform modules
+
+#if defined( PLATFORM_MODULES_ENABLE )
+
+#if LUA_OPTIMIZE_MEMORY == 2
+#undef _ROM
+#define _ROM( name, openf, table ) extern const luaR_entry table[];
+PLATFORM_MODULES_LIBS_ROM
+#else // #if LUA_OPTIMIZE_MEMORY == 2
+#undef _ROM
+#define _ROM( name, openf, table ) extern const luaL_reg table[];
+PLATFORM_MODULES_LIBS_ROM
+#endif // #if LUA_OPTIMIZE_MEMORY == 2
+
+#if LUA_OPTIMIZE_MEMORY == 2
+const luaR_entry platform_map[] = {
+#undef _ROM
+#define _ROM( name, openf, table ) { LRO_STRKEY( name ), LRO_ROVAL( table ) },
+  PLATFORM_MODULES_LIBS_ROM
+  { LRO_NILKEY, LRO_NILVAL }
+};
+#else // #if LUA_OPTIMIZE_MEMORY == 2
+typedef struct {
+  const char *name;
+  const luaL_reg *table;
+} PLATFORM_MODULE_ENTRY;
+
+static const PLATFORM_MODULE_ENTRY platform_map_tables[] = {
+#undef _ROM
+#define _ROM( name, openf, table ) { name, table },
+  PLATFORM_MODULES_LIBS_ROM
+  { NULL, NULL }
+};
+#endif // #if LUA_OPTIMIZE_MEMORY == 2
+
+#undef _ROM
+#define _ROM( name, openf, table ) int openf (lua_State*);
+PLATFORM_MODULES_LIBS_ROM
+static const lua_CFunction platform_open_funcs[] = {
+#undef _ROM
+#define _ROM( name, openf, table ) openf,
+  PLATFORM_MODULES_LIBS_ROM
+  luaopen_dummy
+};
+
+LUALIB_API int luaopen_platform (lua_State *L)
+{
+#if LUA_OPTIMIZE_MEMORY == 0
+  // Register the platform table first and each of the platform module's tables
+  const PLATFORM_MODULE_ENTRY *plibs = platform_map_tables;
+
+  lua_newtable(L);
+  lua_pushvalue(L, -1);
+  lua_setfield(L, LUA_GLOBALSINDEX, PS_LIB_TABLE_NAME);
+  for(; plibs->name; plibs ++) {
+    lua_newtable(L);
+    luaL_register(L, NULL, plibs->table);
+    lua_setfield(L, -2, plibs->name);
+  }
+  lua_pop(L, 1);
+#endif // #if LUA_OPTIMIZE_MEMORY == 0
+  // In any case, call each platform module's initialization function if present
+  unsigned i;
+  for (i = 0; i < sizeof(platform_open_funcs) / sizeof(lua_CFunction); i++) {
+    lua_pushcfunction(L, platform_open_funcs[i]);
+    lua_call(L, 0, 0);
+  }
+  return 0;
+}
+#endif // #if defined( PLATFORM_MODULES_ENABLE )
+
+// End of platform module section
+// ****************************************************************************
 
 
-/*
-** these libs are loaded by lua.c and are readily available to any Lua
-** program
-*/
-static const luaL_Reg loadedlibs[] = {
-  {LUA_GNAME, luaopen_base},
-  {LUA_LOADLIBNAME, luaopen_package},
-  {LUA_COLIBNAME, luaopen_coroutine},
-  {LUA_TABLIBNAME, luaopen_table},
-  {LUA_IOLIBNAME, luaopen_io},
-  {LUA_OSLIBNAME, luaopen_os},
-  {LUA_STRLIBNAME, luaopen_string},
-  {LUA_MATHLIBNAME, luaopen_math},
-  {LUA_UTF8LIBNAME, luaopen_utf8},
-  {LUA_DBLIBNAME, luaopen_debug},
+// Dummy open function
+int luaopen_dummy(lua_State *L)
+{
+  return 0;
+}
+
+#undef _ROM
+#define _ROM( name, openf, table ) { name, openf },
+
+static const luaL_Reg lualibs[] = {
+  {"", luaopen_base},
+#ifdef LUA_PLATFORM_LIBS_REG
+  LUA_PLATFORM_LIBS_REG,
+#endif 
+#if defined(LUA_PLATFORM_LIBS_ROM)
+  LUA_PLATFORM_LIBS_ROM
+#endif
+#if defined(LUA_LIBS_NOLTR)
+  LUA_LIBS_NOLTR
+#endif
   {NULL, NULL}
 };
 
+const luaR_table lua_rotable[] = 
+{
+#if defined(LUA_PLATFORM_LIBS_ROM) && LUA_OPTIMIZE_MEMORY == 2
+#undef _ROM
+#define _ROM( name, openf, table ) { name, table },
+  LUA_PLATFORM_LIBS_ROM
+#endif
+  {NULL, NULL}
+};
 
 LUALIB_API void luaL_openlibs (lua_State *L) {
-  const luaL_Reg *lib;
-  /* "require" functions from 'loadedlibs' and set results to global table */
-  for (lib = loadedlibs; lib->func; lib++) {
-    luaL_requiref(L, lib->name, lib->func, 1);
-    lua_pop(L, 1);  /* remove lib */
-  }
+  const luaL_Reg *lib = lualibs;
+  for (; lib->name; lib++)
+    if (lib->func) {
+      lua_pushcfunction(L, lib->func);
+      lua_pushstring(L, lib->name);
+      lua_call(L, 1, 0);
+    }
 }
 

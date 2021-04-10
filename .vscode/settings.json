@@ -67,6 +67,16 @@
         "regex": "cpp",
         "deque": "cpp",
         "queue": "cpp",
-        "any": "cpp"
+        "any": "cpp",
+        "condition_variable": "cpp",
+        "forward_list": "cpp",
+        "fstream": "cpp",
+        "list": "cpp",
+        "numeric": "cpp",
+        "set": "cpp",
+        "stack": "cpp",
+        "thread": "cpp",
+        "unordered_set": "cpp",
+        "variant": "cpp"
     }
 }

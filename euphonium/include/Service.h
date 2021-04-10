@@ -11,7 +11,7 @@
 
 class Service {
     public:
-    Service() {};
+    // Service(std::shared_ptr<SystemInfo> systemInfo, std::shared_ptr<SystemInfo> ) {};
     virtual ~Service() {}
 
     std::string serviceName;

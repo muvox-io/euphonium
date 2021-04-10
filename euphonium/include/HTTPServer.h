@@ -20,6 +20,12 @@
 #include <string>
 #include <netdb.h>
 #include <fcntl.h>
+extern "C" {
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+}
+
 #ifndef SOCK_NONBLOCK
 #define SOCK_NONBLOCK O_NONBLOCK
 #endif
@@ -60,6 +66,8 @@ public:
     void registerHandler(RequestType, std::string, httpHandler& handler);
     void listen();
 };
+
+void registerHttpServer(lua_State *L);
 
 #endif
 

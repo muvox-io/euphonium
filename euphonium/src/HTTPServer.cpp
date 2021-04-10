@@ -28,7 +28,7 @@ void HTTPServer::registerHandler(RequestType requestType, std::string routeUrl, 
                                    }});
 }
 
-// @TODO: Implement a proper http server here. It's currently a huge mess of an implementation, and will most likely 
+// @TODO: Implement a proper http server here. It's currently a huge mess of an implementation, and will most likely
 // mess something up when more than 1 clients connect at once
 void HTTPServer::listen()
 {
@@ -40,7 +40,7 @@ void HTTPServer::listen()
     int fdMax; // maximum current fd
     int readBytes;
 
-    int yes = 1; // used for setsockopt
+    int yes = 1;                        // used for setsockopt
     struct sockaddr_storage remoteaddr; // client address
     socklen_t addrlen;
     // stores http method + path
@@ -86,8 +86,8 @@ void HTTPServer::listen()
                     // handle new connections
                     addrlen = sizeof remoteaddr;
                     int newFd = accept(sockfd,
-                                   (struct sockaddr *)&remoteaddr,
-                                   &addrlen);
+                                       (struct sockaddr *)&remoteaddr,
+                                       &addrlen);
 
                     if (newFd == -1)
                     {
@@ -230,4 +230,75 @@ HTTPResponse HTTPServer::findAndHandleRoute(std::string &url)
         .status = 404,
         .body = "Not found",
     };
+}
+
+static int newLuaHttpServer(lua_State *L)
+{
+    int n = lua_gettop(L);
+    if (n != 2)
+        return luaL_error(L, "Not enough arguments");
+    luaL_checktype(L, 1, LUA_TTABLE); // make sure first arg is table
+
+    lua_newtable(L);
+
+    // Set first argument of new to metatable of instance
+    lua_pushvalue(L, 1);
+    lua_setmetatable(L, -2);
+
+    // Do function lookups in metatable
+    lua_pushvalue(L, 1);
+    lua_setfield(L, 1, "__index");
+
+    // Allocate memory for a pointer to to object
+    HTTPServer **s = (HTTPServer **)lua_newuserdata(L, sizeof(HTTPServer *));
+
+    int port = luaL_checknumber(L, 2);
+
+    *s = new HTTPServer(port);
+
+    luaL_getmetatable(L, "Lua.HttpServer");
+    lua_setmetatable(L, -2);
+    lua_setfield(L, -2, "__self");
+
+    return 1;
+}
+
+static int callFunction(lua_State *L)
+{
+    HTTPServer **pmPtr = (HTTPServer **)luaL_checkudata(
+        L, 1, "Lua.HttpServer");
+    std::cout << "Corn :)" << std::endl;
+    return 0;
+}
+
+static int destroyHttpServer(lua_State *L)
+{
+    HTTPServer **pmPtr = (HTTPServer **)luaL_checkudata(
+        L, 1, "Lua.HttpServer");
+    // c->Release();
+    return 0;
+}
+
+// Functions that will show up in our Lua environment
+static const luaL_Reg gMyClassFuncs[] = {
+    // Creation
+    {"new", newLuaHttpServer},
+    {"hello", callFunction},
+    {NULL, NULL}};
+
+static const luaL_Reg gDestroyMyClassFuncs[] = {
+    {"__gc", destroyHttpServer},
+    {NULL, NULL}};
+
+void registerHttpServer(lua_State *L)
+{
+    // Register metatable for user data in registry
+    luaL_newmetatable(L, "Lua.HttpServer");
+    luaL_register(L, 0, gDestroyMyClassFuncs);
+    luaL_register(L, 0, gMyClassFuncs);
+    lua_pushvalue(L, -1);
+    lua_setfield(L, -2, "__index");
+
+    // Register the base class for instances of Sprite
+    // luaL_register(L, "HttpServer", gSpriteFuncs);
 }
