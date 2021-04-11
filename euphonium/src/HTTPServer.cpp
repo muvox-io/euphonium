@@ -3,7 +3,6 @@
 HTTPServer::HTTPServer(int serverPort)
 {
     this->serverPort = serverPort;
-    this->routes = std::map<std::string, HTTPRoute>();
 }
 
 std::vector<std::string> HTTPServer::splitUrl(const std::string &url)
@@ -21,11 +20,13 @@ std::vector<std::string> HTTPServer::splitUrl(const std::string &url)
 
 void HTTPServer::registerHandler(RequestType requestType, const std::string &routeUrl, httpHandler handler)
 {
-
-    this->routes.insert({routeUrl, HTTPRoute{
-                                       .requestType = requestType,
-                                       .handler = handler,
-                                   }});
+    if (routes.find(routeUrl) == routes.end()) {
+        routes.insert({routeUrl, std::vector<HTTPRoute>()});
+    }
+    this->routes[routeUrl].push_back(HTTPRoute{
+        .requestType = requestType,
+        .handler = handler,
+    });
 }
 
 // @TODO: Implement a proper http server here. It's currently a huge mess of an implementation, and will most likely
@@ -44,6 +45,9 @@ void HTTPServer::listen()
     socklen_t addrlen;
     // stores http method + path
     std::string httpMethod;
+    std::string body;
+    int contentLength = 0;
+    bool readingBody = false;
 
     // input data buffer
     std::vector<uint8_t> bufferVec(128);
@@ -124,21 +128,47 @@ void HTTPServer::listen()
                     else
                     {
                         currentString += std::string(bufferVec.data(), bufferVec.data() + readBytes);
-
-                        while (currentString.find("\r\n") != std::string::npos)
+HANDLEBODY:
+                        if (readingBody && body.size() < contentLength)
                         {
-                            auto line = currentString.substr(0, currentString.find("\r\n"));
-
-                            currentString = currentString.substr(currentString.find("\r\n") + 2, currentString.size());
-                            if (line.find("GET ") != std::string::npos || line.find("POST ") != std::string::npos)
+                            body += currentString;
+                            currentString = "";
+                            if (body.size() >= contentLength)
                             {
-                                std::cout << "Got method!" << std::endl;
-                                httpMethod = line;
+                                readingBody = false;
+                                std::cout << body << std::endl;
+                                findAndHandleRoute(httpMethod, body, i);
+                                contentLength = 0;
+                                body = "";
                             }
+                        }
+                        else if (!readingBody)
+                        {
 
-                            if (line.size() == 0)
+                            while (currentString.find("\r\n") != std::string::npos)
                             {
-                                findAndHandleRoute(httpMethod, i);
+                                auto line = currentString.substr(0, currentString.find("\r\n"));
+                                currentString = currentString.substr(currentString.find("\r\n") + 2, currentString.size());
+                                if (line.find("GET ") != std::string::npos || line.find("POST ") != std::string::npos)
+                                {
+                                    std::cout << "Got method!" << std::endl;
+                                    httpMethod = line;
+                                }
+
+                                if (line.find("Content-Length: ") != std::string::npos)
+                                {
+                                    contentLength = std::stoi(line.substr(16, line.size() - 1));
+                                    readingBody = true;
+                                    goto HANDLEBODY;
+                                    break;
+                                }
+
+                                if (line.size() == 0)
+                                {
+                                    findAndHandleRoute(httpMethod, body, i);
+                                    readingBody = false;
+                                    body = "";
+                                }
                             }
                         }
                     }
@@ -165,69 +195,70 @@ void HTTPServer::respond(const HTTPResponse &response, int connectionFd)
     FD_CLR(connectionFd, &master);
 }
 
-void HTTPServer::findAndHandleRoute(std::string &url, int connectionFd)
+void HTTPServer::findAndHandleRoute(std::string &url, std::string &body, int connectionFd)
 {
 
     std::map<std::string, std::string> pathParams;
-    for (const auto &route : this->routes)
+    for (const auto &routeSet : this->routes)
     {
-        std::string path = url;
-        if (url.find("GET ") != std::string::npos)
+        for (const auto &route : routeSet.second)
         {
-            path = path.substr(4);
-        }
-        else if (url.find("GET ") != std::string::npos && route.second.requestType == RequestType::POST)
-        {
-            path = path.substr(5);
-        }
-        else
-        {
-            continue;
-        }
 
-        path = path.substr(0, path.find(" "));
-
-        std::cout << path << std::endl;
-        std::cout << route.first << std::endl;
-
-        auto routeSplit = splitUrl(route.first);
-        auto urlSplit = splitUrl(path);
-        bool matches = true;
-
-        pathParams.clear();
-
-        if (routeSplit.size() == urlSplit.size())
-        {
-            for (int x = 0; x < routeSplit.size(); x++)
+            std::string path = url;
+            if (url.find("GET ") != std::string::npos && route.requestType == RequestType::GET)
             {
-                if (routeSplit[x] != urlSplit[x])
+                path = path.substr(4);
+            }
+            else if (url.find("POST ") != std::string::npos && route.requestType == RequestType::POST)
+            {
+                path = path.substr(5);
+            }
+            else
+            {
+                continue;
+            }
+
+            path = path.substr(0, path.find(" "));
+
+            auto routeSplit = splitUrl(routeSet.first);
+            auto urlSplit = splitUrl(path);
+            bool matches = true;
+
+            pathParams.clear();
+
+            if (routeSplit.size() == urlSplit.size())
+            {
+                for (int x = 0; x < routeSplit.size(); x++)
                 {
-                    if (routeSplit[x][0] == ':')
+                    if (routeSplit[x] != urlSplit[x])
                     {
-                        std::cout << "Found param " << routeSplit[x].substr(1) << ": " << urlSplit[x] << std::endl;
-                        pathParams.insert({routeSplit[x].substr(1), urlSplit[x]});
-                    }
-                    else
-                    {
-                        matches = false;
+                        if (routeSplit[x][0] == ':')
+                        {
+                            std::cout << "Found param " << routeSplit[x].substr(1) << ": " << urlSplit[x] << std::endl;
+                            pathParams.insert({routeSplit[x].substr(1), urlSplit[x]});
+                        }
+                        else
+                        {
+                            matches = false;
+                        }
                     }
                 }
             }
-        }
-        else
-        {
-            matches = false;
-        }
+            else
+            {
+                matches = false;
+            }
 
-        if (matches)
-        {
-            const HTTPRequest req = {
-                .urlParams = pathParams,
-                .connection = connectionFd};
-            return route.second.handler(req);
+            if (matches)
+            {
+                const HTTPRequest req = {
+                    .urlParams = pathParams,
+                    .body = body,
+                    .connection = connectionFd};
+                return route.handler(req);
+            }
         }
     }
-
     respond(HTTPResponse{
                 .status = 404,
                 .body = "Not found",

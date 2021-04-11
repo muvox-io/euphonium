@@ -18,6 +18,14 @@ void Core::registerChildren()
     this->registeredServices.push_back(std::make_shared<ConfigurationApiService>(shared_from_this()));
 }
 
+void checkResult(sol::protected_function_result result)
+{
+    if (!result.valid())
+    {
+        std::cout << ((sol::error)result).what() << std::endl;
+    }
+}
+
 void Core::logAvailableServices()
 {
     sol::state lua;
@@ -42,10 +50,14 @@ void Core::logAvailableServices()
     serverType["registerHandler"] = &HTTPServer::registerHandler;
 
     lua.open_libraries(sol::lib::base, sol::lib::string, sol::lib::math, sol::lib::table);
-    lua.script_file("../../../euphonium/lua/json.lua");
-    lua.script_file("../../../euphonium/lua/app.lua");
-    lua.script_file("../../../euphonium/lua/cspot_plugin.lua");
-    lua.script("app:printRegisteredPlugins()");
+    std::vector<std::string> registeredPlugins({"json", "http", "app", "cspot_plugin"});
+
+    for (auto const &value : registeredPlugins)
+    {
+        checkResult(lua.script_file("../../../euphonium/lua/" + value + ".lua"));
+    }
+
+    checkResult(lua.script("app:printRegisteredPlugins()"));
 }
 
 std::shared_ptr<Service> Core::getServiceWithName(std::string &name)

@@ -11,6 +11,7 @@
 #include "Core.h"
 #include "Service.h"
 #include "protobuf.h"
+#include <set>
 
 #include <sstream>
 #include <sys/select.h>
@@ -61,8 +62,8 @@ private:
     int serverPort;
     fd_set master;
     fd_set readFds;
-    std::map<std::string, HTTPRoute> routes;
-    void findAndHandleRoute(std::string&, int connectionFd);
+    std::map<std::string, std::vector<HTTPRoute>> routes;
+    void findAndHandleRoute(std::string&, std::string&, int connectionFd);
     std::vector<std::string> splitUrl(const std::string& url);
 
 public:

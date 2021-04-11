@@ -132,7 +132,6 @@ end
 
 
 function json.encode(val)
-print("CORN s")
   return ( encode(val) )
 end
 
