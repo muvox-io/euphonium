@@ -19,11 +19,8 @@ endif()
 
 include_directories("include")
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories("protos")
 include_directories("sol")
 
-execute_process(COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/cmake/generate_protos.sh" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
-set(SOURCES ${SOURCES} "protos/AnyRefImpl.cpp" "protos/ReflectTypeInfo.cpp")
 
 add_library(euphonium STATIC ${SOURCES})
 target_link_libraries(euphonium PRIVATE lua ${EXTRA_REQ_LIBS})

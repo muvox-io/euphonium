@@ -1,8 +1,5 @@
 #include "Core.h"
-#include "DupaService.h"
-#include "ConfigurationApiService.h"
 #include "HTTPServer.h"
-#include "SystemInfo.h"
 #include <string.h>
 #define SOL_ALL_SAFETIES_ON 1
 #include <sol.hpp>
@@ -10,12 +7,11 @@
 
 Core::Core()
 {
+    audioBuffer = std::make_shared<CircularBuffer>(AUDIO_BUFFER_SIZE);
 }
 
 void Core::registerChildren()
 {
-    this->registeredServices.push_back(std::make_shared<DupaService>(shared_from_this()));
-    this->registeredServices.push_back(std::make_shared<ConfigurationApiService>(shared_from_this()));
 }
 
 void checkResult(sol::protected_function_result result)
@@ -60,13 +56,6 @@ void Core::logAvailableServices()
     checkResult(lua.script("app:printRegisteredPlugins()"));
 }
 
-std::shared_ptr<Service> Core::getServiceWithName(std::string &name)
-{
-    // for (const auto& service : this->registeredServices) {
-    //     if (service->serviceName == name) {
-    //         return service;
-    //     }
-    // }
-
-    // return nullptr;
+void Core::selectAudioOutput(std::shared_ptr<AudioOutput> output) {
+    currentOutput = output;
 }
