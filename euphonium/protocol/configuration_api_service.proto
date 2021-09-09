@@ -1,3 +1,0 @@
-message ConfigurationApiServiceConfiguration {
-    required string dupaValue = 1;
-}

@@ -1,5 +1,4 @@
 #include "Core.h"
-#include "HTTPServer.h"
 #include <string.h>
 #define SOL_ALL_SAFETIES_ON 1
 #include <sol.hpp>
@@ -8,10 +7,11 @@
 Core::Core()
 {
     audioBuffer = std::make_shared<CircularBuffer>(AUDIO_BUFFER_SIZE);
-}
-
-void Core::registerChildren()
-{
+    luaState = std::make_shared<sol::state>();
+    registeredPlugins = {
+        std::make_shared<CSpotPlugin>()};
+    requiredModules = {
+        std::make_shared<HTTPModule>()};
 }
 
 void checkResult(sol::protected_function_result result)
@@ -22,40 +22,34 @@ void checkResult(sol::protected_function_result result)
     }
 }
 
-void Core::logAvailableServices()
+void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader)
 {
-    sol::state lua;
+    luaState->open_libraries(sol::lib::base, sol::lib::string, sol::lib::math, sol::lib::table);
+    std::vector<std::string> luaModules({"json", "app"});
 
-    lua.new_enum("RequestType",
-                 "GET", RequestType::GET,
-                 "POST", RequestType::POST);
-
-    sol::usertype<HTTPRequest> requestType = lua.new_usertype<HTTPRequest>("HTTPRequest", sol::constructors<HTTPRequest()>());
-    requestType["body"] = &HTTPRequest::body;
-    requestType["urlParams"] = &HTTPRequest::urlParams;
-    requestType["connection"] = &HTTPRequest::connection;
-
-    sol::usertype<HTTPResponse> responseType = lua.new_usertype<HTTPResponse>("HTTPResponse", sol::constructors<HTTPResponse()>());
-    responseType["status"] = &HTTPResponse::status;
-    responseType["body"] = &HTTPResponse::body;
-    responseType["contentType"] = &HTTPResponse::contentType;
-
-    sol::usertype<HTTPServer> serverType = lua.new_usertype<HTTPServer>("HttpServer", sol::constructors<HTTPServer(int)>());
-    serverType["listen"] = &HTTPServer::listen;
-    serverType["respond"] = &HTTPServer::respond;
-    serverType["registerHandler"] = &HTTPServer::registerHandler;
-
-    lua.open_libraries(sol::lib::base, sol::lib::string, sol::lib::math, sol::lib::table);
-    std::vector<std::string> registeredPlugins({"json", "http", "app", "cspot_plugin"});
-
-    for (auto const &value : registeredPlugins)
+    for (auto const &module : this->requiredModules)
     {
-        checkResult(lua.script_file("../../../euphonium/lua/" + value + ".lua"));
+        std::cout << "[" << module->name << "]: Initializing" << std::endl;
+        module->setupLuaBindings(this->luaState);
+        module->loadScript(loader, this->luaState);
     }
 
-    checkResult(lua.script("app:printRegisteredPlugins()"));
+    for (auto const &value : luaModules)
+    {
+        loader->loadScript(value, luaState);
+    }
+
+    for (auto const &plugin : this->registeredPlugins)
+    {
+        std::cout << "[" << plugin->name << "]: Initializing" << std::endl;
+        plugin->setupLuaBindings(this->luaState);
+        plugin->loadScript(loader, this->luaState);
+    }
+
+    checkResult(luaState->script("app:printRegisteredPlugins()"));
 }
 
-void Core::selectAudioOutput(std::shared_ptr<AudioOutput> output) {
+void Core::selectAudioOutput(std::shared_ptr<AudioOutput> output)
+{
     currentOutput = output;
 }

@@ -1,5 +1,6 @@
 .DS_Store
 euphonium/protos
+targets/cli/build
 build/
 py/
 authBlob.json

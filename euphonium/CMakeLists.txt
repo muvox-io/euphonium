@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.8.9)
 set (CMAKE_CXX_STANDARD 17)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lua ${CMAKE_CURRENT_BINARY_DIR}/lua)
 
-file(GLOB SOURCES "src/*.cpp" "src/*.c")
+file(GLOB SOURCES "src/*.cpp" "src/*.c" "src/plugins/*.cpp" "src/plugins/*.c")
 
 if(${ESP_PLATFORM})
 else()
@@ -17,6 +17,7 @@ if(UNIX AND NOT APPLE)
     set(EXTRA_REQ_LIBS ${EXTRA_REQ_LIBS})
 endif()
 
+include_directories("include/plugins")
 include_directories("include")
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories("sol")

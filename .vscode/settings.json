@@ -77,6 +77,7 @@
         "stack": "cpp",
         "thread": "cpp",
         "unordered_set": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "__memory": "cpp"
     }
 }

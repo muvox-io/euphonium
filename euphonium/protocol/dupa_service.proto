@@ -1,4 +1,0 @@
-message DupaServiceConfiguration {
-    required string dupaValue = 1;
-    required string dupaValue2 = 2;
-}
