@@ -72,10 +72,11 @@ void Core::handleEvent(std::unique_ptr<Event> event) {
     luaState["handleEvent"](event->luaEventType, event->toLua(luaState));
 }
 
-void Core::startAudioThreadForPlugin(std::string pluginName) {
+void Core::startAudioThreadForPlugin(std::string pluginName, sol::table config) {
     for (auto const &plugin : this->registeredPlugins) {
         if (plugin->name == pluginName) {
             std::cout << "[" << plugin->name << "]: Starting audio thread" << std::endl;
+            plugin->config = config;
             plugin->startAudioThread();
             return;
         }
@@ -84,6 +85,7 @@ void Core::startAudioThreadForPlugin(std::string pluginName) {
     for (auto const &module : this->requiredModules) {
         if (module->name == pluginName) {
             std::cout << "[" << module->name << "]: Starting audio thread" << std::endl;
+            module->config = config;
             module->startAudioThread();
             return;
         }

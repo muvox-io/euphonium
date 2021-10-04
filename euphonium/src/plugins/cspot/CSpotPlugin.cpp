@@ -12,8 +12,6 @@ std::shared_ptr<ConfigJSON> configMan;
 
 void audioThread()
 {
-    configMan->format = AudioFormat::OGG_VORBIS_320;
-    configMan->deviceName = "CSpot (euphonium)";
     auto authenticator = std::make_shared<ZeroconfAuthenticator>();
     auto blob = authenticator->listenForRequests();
     auto session = std::make_unique<Session>();
@@ -52,7 +50,20 @@ void CSpotPlugin::setupLuaBindings()
 
 void CSpotPlugin::startAudioThread()
 {
+    configMan->deviceName = config["receiverName"];
+    std::string bitrateString = config["audioBitrate"];
+    switch(std::stoi(bitrateString)) {
+        case 160:
+            configMan->format = AudioFormat::OGG_VORBIS_160;
+            break;
+        case 96:
+            configMan->format = AudioFormat::OGG_VORBIS_96;
+            break;
+        default:
+            configMan->format = AudioFormat::OGG_VORBIS_320;
+            break;
+    } 
+
     std::thread newThread(audioThread);
     newThread.detach();
-    // newThread.join();
 }

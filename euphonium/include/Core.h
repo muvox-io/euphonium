@@ -31,7 +31,7 @@ public:
     void handleAudioOutputThread();
     void handleEvent(std::unique_ptr<Event> event);
     void setupBindings();
-    void startAudioThreadForPlugin(std::string pluginName);
+    void startAudioThreadForPlugin(std::string pluginName, sol::table config);
 
     std::shared_ptr<EventBus> luaEventBus;
     std::shared_ptr<CircularBuffer> audioBuffer;

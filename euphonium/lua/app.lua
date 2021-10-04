@@ -37,8 +37,24 @@ function handleEvent(eventType, eventData)
     app:handleEvent(eventType, eventData)
 end
 
+function App.enablePlugin(plugin)
+    bareConfig = {}
+
+    if app.plugins[plugin].configScheme then
+        for k, v in pairs(app.plugins[plugin].configScheme) do
+            if v.value == nil then
+                v.value = v.defaultValue
+            end
+
+            bareConfig[k] = v.value
+        end
+    end
+    startAudioThreadForPlugin(plugin, bareConfig)
+end
+
 function App.printRegisteredPlugins(self)
-    startAudioThreadForPlugin("http")
+    startAudioThreadForPlugin("http", {})
+    self.enablePlugin("cspot")
 end
 
 app = App.new()

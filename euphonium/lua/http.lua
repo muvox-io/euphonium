@@ -9,8 +9,9 @@ function Http.handleIncomingRequest(self, request)
 end
 
 function Http.new()
-    local self = setmetatable({}, Http)
+    local self = setmetatable({ name = "http" }, Http)
     self.handlers = {}
+    self.configScheme = {}
     self.registeredHandlers = 0
     self.GET = RequestType.GET
     self.POST = RequestType.POST

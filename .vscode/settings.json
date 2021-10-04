@@ -80,6 +80,7 @@
         "variant": "cpp",
         "__memory": "cpp",
         "random": "cpp",
-        "clocale": "cpp"
+        "clocale": "cpp",
+        "filesystem": "cpp"
     }
 }
