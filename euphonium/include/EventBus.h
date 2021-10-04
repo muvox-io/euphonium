@@ -5,17 +5,21 @@
 #include <functional>
 #include <queue>
 #include <any>
+#include <sol.hpp>
 #include <unordered_map>
 #include <set>
 
 enum class EventType : uint32_t {
-    EVENT_FETCH_SERVICES,
-    AUDIO_PACKET_EVENT
+    LUA_MAIN_EVENT
 };
 
-struct Event {
+class Event {
+    public:
+    Event() {};
+    virtual ~Event() {};
     EventType eventType;
-    std::any eventValue;
+    std::string luaEventType;
+    virtual sol::object toLua(lua_State* state) = 0;
 };
 
 class EventSubscriber {

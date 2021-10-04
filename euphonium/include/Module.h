@@ -3,13 +3,16 @@
 
 #include "ScriptLoader.h"
 #include <sol.hpp>
+#include "EventBus.h"
 
 class Module {
     public:
     Module() {}
     std::string name;
-    virtual void loadScript(std::shared_ptr<ScriptLoader> scriptLoader, std::shared_ptr<sol::state> luaState) = 0;
-    virtual void setupLuaBindings(std::shared_ptr<sol::state> luaState) = 0;
+    lua_State* luaState;
+    std::shared_ptr<EventBus> luaEventBus;
+    virtual void loadScript(std::shared_ptr<ScriptLoader> scriptLoader) = 0;
+    virtual void setupLuaBindings() = 0;
     virtual void startAudioThread() = 0;
 };
 

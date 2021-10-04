@@ -7,7 +7,7 @@
 class ScriptLoader {
 public:
     ScriptLoader() {};
-    virtual void loadScript(std::string scriptName, std::shared_ptr<sol::state> luaState) = 0;
+    virtual void loadScript(std::string scriptName, lua_State* luaState) = 0;
 };
 
 #endif

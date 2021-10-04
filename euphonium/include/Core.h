@@ -5,8 +5,8 @@
 #include <memory>
 #include <iostream>
 #include "AudioOutput.h"
-#include "HTTPModule.h"
-#include "plugins/CSpotPlugin.h"
+#include "plugins/http/HTTPModule.h"
+#include "plugins/cspot/CSpotPlugin.h"
 #include "Module.h"
 #include "ScriptLoader.h"
 #include "EventBus.h"
@@ -16,7 +16,7 @@
 class Core: public EventSubscriber {
 private:
     std::shared_ptr<AudioOutput> currentOutput;
-    std::shared_ptr<sol::state> luaState;
+    sol::state luaState;
     std::vector<std::shared_ptr<Module>> requiredModules;
     std::vector<std::shared_ptr<Module>> registeredPlugins;
     bool outputConnected = false;

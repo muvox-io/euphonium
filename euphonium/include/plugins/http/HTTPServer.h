@@ -8,8 +8,8 @@
 #include <memory>
 #include <regex>
 #include <optional>
-#include "Core.h"
 #include <set>
+#include <iostream>
 
 #include <sstream>
 #include <sys/select.h>
@@ -38,6 +38,7 @@ enum class RequestType {
 struct HTTPRequest {
     std::map<std::string, std::string> urlParams;
     std::string body;
+    int handlerId;
     int connection;
 };
 
@@ -47,7 +48,7 @@ struct HTTPResponse {
     std::string contentType;
 };
 
-typedef std::function<void(const HTTPRequest&)> httpHandler;
+typedef std::function<void(HTTPRequest&)> httpHandler;
 
 struct HTTPRoute {
     RequestType requestType;
@@ -60,6 +61,7 @@ private:
     int serverPort;
     fd_set master;
     fd_set readFds;
+    bool writingResponse = false;
     std::map<std::string, std::vector<HTTPRoute>> routes;
     void findAndHandleRoute(std::string&, std::string&, int connectionFd);
     std::vector<std::string> splitUrl(const std::string& url);

@@ -10,14 +10,8 @@ Core::Core()
     luaEventBus = std::make_shared<EventBus>();
 
     auto subscriber = dynamic_cast<EventSubscriber*>(this);
-    luaEventBus->addListener(EventType::EVENT_FETCH_SERVICES, *subscriber);
-
-    std::unique_ptr<Event> eventPtr(new Event);
-    eventPtr->eventType = EventType::EVENT_FETCH_SERVICES;
-
-    luaEventBus->postEvent(std::move(eventPtr));
-    luaEventBus->update();
-    luaState = std::make_shared<sol::state>();
+    luaEventBus->addListener(EventType::LUA_MAIN_EVENT, *subscriber);
+    // luaState = std::make_shared<sol::state>();
     this->setupBindings();
     registeredPlugins = {
         std::make_shared<CSpotPlugin>()};
@@ -35,14 +29,16 @@ void checkResult(sol::protected_function_result result)
 
 void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader)
 {
-    luaState->open_libraries(sol::lib::base, sol::lib::string, sol::lib::math, sol::lib::table);
+    luaState.open_libraries(sol::lib::base, sol::lib::string, sol::lib::math, sol::lib::table);
     std::vector<std::string> luaModules({"json", "app"});
 
     for (auto const &module : this->requiredModules)
     {
         std::cout << "[" << module->name << "]: Initializing" << std::endl;
-        module->setupLuaBindings(this->luaState);
-        module->loadScript(loader, this->luaState);
+        module->luaEventBus = this->luaEventBus;
+        module->luaState = luaState;
+        module->setupLuaBindings();
+        module->loadScript(loader);
     }
 
     for (auto const &value : luaModules)
@@ -53,11 +49,17 @@ void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader)
     for (auto const &plugin : this->registeredPlugins)
     {
         std::cout << "[" << plugin->name << "]: Initializing" << std::endl;
-        plugin->setupLuaBindings(this->luaState);
-        plugin->loadScript(loader, this->luaState);
+        plugin->luaState = this->luaState;
+        plugin->luaEventBus = this->luaEventBus;
+        plugin->setupLuaBindings();
+        plugin->loadScript(loader);
     }
+    
+    checkResult(luaState.script("app:printRegisteredPlugins()"));
 
-    checkResult(luaState->script("app:printRegisteredPlugins()"));
+    while(true) {
+        luaEventBus->update();
+    }
 }
 
 void Core::selectAudioOutput(std::shared_ptr<AudioOutput> output)
@@ -67,6 +69,7 @@ void Core::selectAudioOutput(std::shared_ptr<AudioOutput> output)
 
 void Core::handleEvent(std::unique_ptr<Event> event) {
     std::cout << "Got event!" << std::endl;
+    luaState["handleEvent"](event->luaEventType, event->toLua(luaState));
 }
 
 void Core::startAudioThreadForPlugin(std::string pluginName) {
@@ -77,10 +80,18 @@ void Core::startAudioThreadForPlugin(std::string pluginName) {
             return;
         }
     }
+
+    for (auto const &module : this->requiredModules) {
+        if (module->name == pluginName) {
+            std::cout << "[" << module->name << "]: Starting audio thread" << std::endl;
+            module->startAudioThread();
+            return;
+        }
+    }
 }
 
 void Core::setupBindings() {
-    luaState->set_function("startAudioThreadForPlugin", &Core::startAudioThreadForPlugin, this);
+    luaState.set_function("startAudioThreadForPlugin", &Core::startAudioThreadForPlugin, this);
 }
 
 void Core::handleAudioOutputThread() {

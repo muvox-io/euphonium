@@ -151,7 +151,6 @@ HANDLEBODY:
                                 currentString = currentString.substr(currentString.find("\r\n") + 2, currentString.size());
                                 if (line.find("GET ") != std::string::npos || line.find("POST ") != std::string::npos)
                                 {
-                                    std::cout << "Got method!" << std::endl;
                                     httpMethod = line;
                                 }
 
@@ -193,6 +192,7 @@ void HTTPServer::respond(const HTTPResponse &response, int connectionFd)
     write(connectionFd, responseStr.c_str(), responseStr.size());
     close(connectionFd);
     FD_CLR(connectionFd, &master);
+    writingResponse = false;
 }
 
 void HTTPServer::findAndHandleRoute(std::string &url, std::string &body, int connectionFd)
@@ -251,11 +251,15 @@ void HTTPServer::findAndHandleRoute(std::string &url, std::string &body, int con
 
             if (matches)
             {
-                const HTTPRequest req = {
+                HTTPRequest req = {
                     .urlParams = pathParams,
                     .body = body,
+                    .handlerId = 0,
                     .connection = connectionFd};
-                return route.handler(req);
+                writingResponse = true;
+                route.handler(req);
+                while(writingResponse);
+                return;
             }
         }
     }

@@ -7,7 +7,7 @@ class FileScriptLoader : public ScriptLoader
 public:
     FileScriptLoader();
     ~FileScriptLoader() {}
-    void loadScript(std::string scriptName, std::shared_ptr<sol::state> luaState);
+    void loadScript(std::string scriptName, lua_State* luaState);
 
 private:
 };

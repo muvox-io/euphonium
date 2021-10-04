@@ -5,7 +5,7 @@ set (CMAKE_CXX_STANDARD 17)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lua ${CMAKE_CURRENT_BINARY_DIR}/lua)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cspot/cspot ${CMAKE_CURRENT_BINARY_DIR}/cspot)
 
-file(GLOB SOURCES "src/*.cpp" "src/*.c" "src/plugins/*.cpp" "src/plugins/*.c")
+file(GLOB SOURCES "src/*.cpp" "src/*.c" "src/plugins/cspot/*.cpp"  "src/plugins/http/*.cpp")
 
 if(${ESP_PLATFORM})
 else()
@@ -18,8 +18,9 @@ if(UNIX AND NOT APPLE)
     set(EXTRA_REQ_LIBS ${EXTRA_REQ_LIBS})
 endif()
 
-include_directories("include/plugins")
 include_directories("include")
+include_directories("include/plugins/cspot")
+include_directories("include/plugins/http")
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories("sol")
 

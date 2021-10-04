@@ -2,11 +2,18 @@ App = {
     plugins = {}
 }
 App.__index = App
-http = Http.new(2137)
+http = Http.new()
+
+function handleRouteEvent(request)
+    http:handleIncomingRequest(request)
+end
 
 function App.new()
     local self = setmetatable({
-        plugins = {}
+        plugins = {},
+        eventHandlers = {
+            handleRouteEvent = handleRouteEvent
+        }
     }, App)
     return self
 end
@@ -15,9 +22,23 @@ function App.registerPlugin(self, plugin)
     self.plugins[plugin.name] = plugin
 end
 
+function App.registerHandler(self, eventType, handler)
+    self.eventHandlers[eventType] = handler
+end
+
+function App.handleEvent(self, eventType, eventData)
+    if self.eventHandlers[eventType] then
+        self.eventHandlers[eventType](eventData)
+    end
+end
+
+function handleEvent(eventType, eventData)
+    print("Received event: " .. eventType)
+    app:handleEvent(eventType, eventData)
+end
+
 function App.printRegisteredPlugins(self)
-    startAudioThreadForPlugin("cspot")
-    http:listen()
+    startAudioThreadForPlugin("http")
 end
 
 app = App.new()

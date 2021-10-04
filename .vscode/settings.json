@@ -79,6 +79,7 @@
         "unordered_set": "cpp",
         "variant": "cpp",
         "__memory": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "clocale": "cpp"
     }
 }
