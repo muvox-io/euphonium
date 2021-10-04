@@ -17,7 +17,7 @@ void EventBus::update()
         {
             for (auto &&subscriber : (*it).second)
             {
-                subscriber->handleEvent(std::move(localPtr));
+                subscriber.get().handleEvent(std::move(localPtr));
             }
         }
     }
@@ -28,7 +28,7 @@ void EventBus::postEvent(std::unique_ptr<Event> event)
     eventQueue.push(std::move(event));
 }
 
-void EventBus::addListener(EventType eventType, std::unique_ptr<EventSubscriber> eventSubscriber)
+void EventBus::addListener(EventType eventType, EventSubscriber& eventSubscriber)
 {
-    registeredListeners[eventType].insert(std::move(eventSubscriber));
+    registeredListeners[eventType].push_back(eventSubscriber);
 }

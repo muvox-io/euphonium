@@ -3,6 +3,7 @@ project(euphonium)
 cmake_minimum_required(VERSION 2.8.9)
 set (CMAKE_CXX_STANDARD 17)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lua ${CMAKE_CURRENT_BINARY_DIR}/lua)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cspot/cspot ${CMAKE_CURRENT_BINARY_DIR}/cspot)
 
 file(GLOB SOURCES "src/*.cpp" "src/*.c" "src/plugins/*.cpp" "src/plugins/*.c")
 
@@ -24,6 +25,6 @@ include_directories("sol")
 
 
 add_library(euphonium STATIC ${SOURCES})
-target_link_libraries(euphonium PRIVATE lua ${EXTRA_REQ_LIBS})
+target_link_libraries(euphonium PRIVATE cspot lua ${EXTRA_REQ_LIBS})
 
-target_include_directories(euphonium PUBLIC "include" "sol" "protos" ${EXTRA_REQ_LIBS} ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(euphonium PUBLIC "include" "sol" "protos" cspot ${EXTRA_REQ_LIBS} ${CMAKE_CURRENT_BINARY_DIR})

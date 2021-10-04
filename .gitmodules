@@ -4,3 +4,6 @@
 [submodule "euphonium/cJSON"]
 	path = euphonium/cJSON
 	url = https://github.com/DaveGamble/cJSON
+[submodule "euphonium/cspot"]
+	path = euphonium/cspot
+	url = https://github.com/feelfreelinux/cspot

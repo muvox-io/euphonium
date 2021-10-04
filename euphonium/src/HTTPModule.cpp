@@ -28,3 +28,7 @@ void HTTPModule::setupLuaBindings(std::shared_ptr<sol::state> luaState) {
     serverType["respond"] = &HTTPServer::respond;
     serverType["registerHandler"] = &HTTPServer::registerHandler;
 }
+
+void HTTPModule::startAudioThread() {
+    
+}

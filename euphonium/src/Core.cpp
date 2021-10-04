@@ -7,7 +7,18 @@
 Core::Core()
 {
     audioBuffer = std::make_shared<CircularBuffer>(AUDIO_BUFFER_SIZE);
+    luaEventBus = std::make_shared<EventBus>();
+
+    auto subscriber = dynamic_cast<EventSubscriber*>(this);
+    luaEventBus->addListener(EventType::EVENT_FETCH_SERVICES, *subscriber);
+
+    std::unique_ptr<Event> eventPtr(new Event);
+    eventPtr->eventType = EventType::EVENT_FETCH_SERVICES;
+
+    luaEventBus->postEvent(std::move(eventPtr));
+    luaEventBus->update();
     luaState = std::make_shared<sol::state>();
+    this->setupBindings();
     registeredPlugins = {
         std::make_shared<CSpotPlugin>()};
     requiredModules = {
@@ -52,4 +63,30 @@ void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader)
 void Core::selectAudioOutput(std::shared_ptr<AudioOutput> output)
 {
     currentOutput = output;
+}
+
+void Core::handleEvent(std::unique_ptr<Event> event) {
+    std::cout << "Got event!" << std::endl;
+}
+
+void Core::startAudioThreadForPlugin(std::string pluginName) {
+    for (auto const &plugin : this->registeredPlugins) {
+        if (plugin->name == pluginName) {
+            std::cout << "[" << plugin->name << "]: Starting audio thread" << std::endl;
+            plugin->startAudioThread();
+            return;
+        }
+    }
+}
+
+void Core::setupBindings() {
+    luaState->set_function("startAudioThreadForPlugin", &Core::startAudioThreadForPlugin, this);
+}
+
+void Core::handleAudioOutputThread() {
+    while (true) {
+        if (audioBuffer->size() > 0 && outputConnected) {
+            this->currentOutput->update(audioBuffer);
+        }
+    }
 }

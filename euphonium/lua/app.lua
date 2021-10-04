@@ -16,6 +16,7 @@ function App.registerPlugin(self, plugin)
 end
 
 function App.printRegisteredPlugins(self)
+    startAudioThreadForPlugin("cspot")
     http:listen()
 end
 

@@ -10,6 +10,7 @@ class Module {
     std::string name;
     virtual void loadScript(std::shared_ptr<ScriptLoader> scriptLoader, std::shared_ptr<sol::state> luaState) = 0;
     virtual void setupLuaBindings(std::shared_ptr<sol::state> luaState) = 0;
+    virtual void startAudioThread() = 0;
 };
 
 #endif

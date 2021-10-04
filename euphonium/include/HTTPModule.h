@@ -12,6 +12,7 @@ class HTTPModule: public Module {
     HTTPModule();
     void loadScript(std::shared_ptr<ScriptLoader> scriptLoader, std::shared_ptr<sol::state> luaState);
     void setupLuaBindings(std::shared_ptr<sol::state> luaState);
+    void startAudioThread();
 };
 
 #endif

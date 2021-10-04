@@ -78,6 +78,7 @@
         "thread": "cpp",
         "unordered_set": "cpp",
         "variant": "cpp",
-        "__memory": "cpp"
+        "__memory": "cpp",
+        "random": "cpp"
     }
 }
