@@ -22,12 +22,12 @@
     &__itemwrapper {
         color: var(--text-primary);
         text-decoration: none;
-        box-sizing: content-box;
+        box-sizing: border-box;
         padding: 0px 22px 0px 22px;
     }
 
     &__itemselected {
-        border-right: 3px solid var(--accent-color);
+        box-shadow: 3px 0px 0px 0px var(--accent-color);
     }
 
     &__item {

@@ -13,6 +13,7 @@ export default () => {
         <div className={css.confWrapper__card}>
             <Input tooltip="Speaker's name" value="Main room"/>
             <Input tooltip="Audio quality" value="Highest (320 kbps)"/>
+            {/* <Checkbox tooltip="Keep zeroconf server alive"/> */}
         </div>
         <div className={css.confWrapper__actionButton}>
             <Button/>
