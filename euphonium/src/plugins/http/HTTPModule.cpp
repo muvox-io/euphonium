@@ -1,16 +1,19 @@
 #include "HTTPModule.h"
 #include "HTTPEvents.h"
 
-HTTPModule::HTTPModule() {
+HTTPModule::HTTPModule()
+{
     name = "http";
     server = std::make_shared<HTTPServer>(2137);
 }
 
-void HTTPModule::loadScript(std::shared_ptr<ScriptLoader> scriptLoader) {
+void HTTPModule::loadScript(std::shared_ptr<ScriptLoader> scriptLoader)
+{
     scriptLoader->loadScript("http", luaState);
 }
 
-void HTTPModule::setupLuaBindings() {
+void HTTPModule::setupLuaBindings()
+{
     sol::state_view lua(luaState);
 
     lua.new_enum("RequestType",
@@ -35,22 +38,59 @@ void HTTPModule::setupLuaBindings() {
     lua.set_function("httpRespond", &HTTPServer::respond, server);
 }
 
-void HTTPModule::registerHandler(const std::string &routeUrl, RequestType reqType, int handlerId) {
-    auto handler = [handlerId, this](HTTPRequest& request) {
+void HTTPModule::registerHandler(const std::string &routeUrl, RequestType reqType, int handlerId)
+{
+    auto handler = [handlerId, this](HTTPRequest &request)
+    {
         request.handlerId = handlerId;
         auto event = std::make_unique<HandleRouteEvent>(request);
         this->luaEventBus->postEvent(std::move(event));
     };
-    
-    std::cout << "Rehistering handler for " << routeUrl << std::endl;
+
+    std::cout << "Registering handler for " << routeUrl << std::endl;
     server->registerHandler(reqType, routeUrl, handler);
 }
 
-void HTTPModule::listen() {
+void HTTPModule::listen()
+{
+    auto assetHandler = [this](HTTPRequest &request)
+    {
+        auto fileName = request.urlParams.at("asset");
+        auto extension = fileName.substr(fileName.size() - 3, fileName.size());
+        auto contentType = "text/css";
+        if (extension == ".js") {
+            contentType = "application/javascript";
+        }
+
+        std::ifstream indexFile("web/assets/" + fileName);
+        std::string indexContent((std::istreambuf_iterator<char>(indexFile)),
+                               std::istreambuf_iterator<char>());
+        HTTPResponse response = {
+            .body = indexContent,
+            .contentType = contentType,
+            .status = 200};
+        server->respond(response, request.connection);
+    };
+
+    auto indexHandler = [this](HTTPRequest &request)
+    {
+        std::ifstream indexFile("web/index.html");
+        std::string indexContent((std::istreambuf_iterator<char>(indexFile)),
+                               std::istreambuf_iterator<char>());
+
+        HTTPResponse response = {
+            .body = indexContent,
+            .contentType = "text/html",
+            .status = 200};
+        server->respond(response, request.connection);
+    };
+    server->registerHandler(RequestType::GET, "/assets/:asset", assetHandler);
+    server->registerHandler(RequestType::GET, "/web", indexHandler);
     server->listen();
 }
 
-void HTTPModule::startAudioThread() {
+void HTTPModule::startAudioThread()
+{
     std::thread newThread(&HTTPModule::listen, this);
     newThread.detach();
 }

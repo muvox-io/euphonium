@@ -3,6 +3,8 @@
 
 #include "ScriptLoader.h"
 #include <sol.hpp>
+#include <iostream>
+#include <fstream>
 #include <thread>
 #include "Module.h"
 #include "plugins/http/HTTPServer.h"

@@ -1,4 +1,3 @@
-
 #ifndef EUPHONIUM_HTTP_SERVER_H
 #define EUPHONIUM_HTTP_SERVER_H
 
@@ -10,7 +9,8 @@
 #include <optional>
 #include <set>
 #include <iostream>
-
+#include <stdio.h>
+#include <unistd.h>
 #include <sstream>
 #include <sys/select.h>
 #include <sys/types.h>
@@ -61,6 +61,7 @@ private:
     int serverPort;
     fd_set master;
     fd_set readFds;
+    bool isClosed = true;
     bool writingResponse = false;
     std::map<std::string, std::vector<HTTPRoute>> routes;
     void findAndHandleRoute(std::string&, std::string&, int connectionFd);

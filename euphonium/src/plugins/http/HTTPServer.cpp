@@ -20,7 +20,8 @@ std::vector<std::string> HTTPServer::splitUrl(const std::string &url)
 
 void HTTPServer::registerHandler(RequestType requestType, const std::string &routeUrl, httpHandler handler)
 {
-    if (routes.find(routeUrl) == routes.end()) {
+    if (routes.find(routeUrl) == routes.end())
+    {
         routes.insert({routeUrl, std::vector<HTTPRoute>()});
     }
     this->routes[routeUrl].push_back(HTTPRoute{
@@ -86,25 +87,29 @@ void HTTPServer::listen()
             { // we got one!!
                 if (i == sockfd)
                 {
-                    // handle new connections
-                    addrlen = sizeof remoteaddr;
-                    int newFd = accept(sockfd,
-                                       (struct sockaddr *)&remoteaddr,
-                                       &addrlen);
+                    if (isClosed)
+                    {
+                        // handle new connections
+                        addrlen = sizeof remoteaddr;
+                        int newFd = accept(sockfd,
+                                           (struct sockaddr *)&remoteaddr,
+                                           &addrlen);
 
-                    if (newFd == -1)
-                    {
-                        perror("accept");
-                    }
-                    else
-                    {
-                        FD_SET(newFd, &master); // add to master set
-                        if (newFd > fdMax)
+                        if (newFd == -1)
                         {
-                            fdMax = newFd;
+                            perror("accept");
                         }
-                        std::cout << "New connection\n";
-                        currentString = std::string();
+                        else
+                        {
+                            FD_SET(newFd, &master); // add to master set
+                            if (newFd > fdMax)
+                            {
+                                fdMax = newFd;
+                            }
+                            std::cout << "New connection\n";
+                            isClosed = false;
+                            currentString = std::string();
+                        }
                     }
                 }
                 else
@@ -122,13 +127,14 @@ void HTTPServer::listen()
                         {
                             perror("recv");
                         }
+                        isClosed = true;
                         close(i);
                         FD_CLR(i, &master);
                     }
                     else
                     {
                         currentString += std::string(bufferVec.data(), bufferVec.data() + readBytes);
-HANDLEBODY:
+                    HANDLEBODY:
                         if (readingBody && body.size() < contentLength)
                         {
                             body += currentString;
@@ -193,6 +199,7 @@ void HTTPServer::respond(const HTTPResponse &response, int connectionFd)
     write(connectionFd, responseStr.c_str(), responseStr.size());
     close(connectionFd);
     FD_CLR(connectionFd, &master);
+    isClosed = true;
     writingResponse = false;
 }
 
@@ -259,7 +266,7 @@ void HTTPServer::findAndHandleRoute(std::string &url, std::string &body, int con
                     .connection = connectionFd};
                 writingResponse = true;
                 route.handler(req);
-                while(writingResponse);
+                usleep(300 * 1000);
                 return;
             }
         }
