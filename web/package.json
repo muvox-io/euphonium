@@ -2,12 +2,13 @@
   "name": "web",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 3001",
     "build": "tsc && vite build",
     "serve": "vite preview"
   },
   "dependencies": {
-    "preact": "^10.5.13"
+    "preact": "^10.5.13",
+    "preact-router": "^3.2.1"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.0.0",

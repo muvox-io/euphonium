@@ -62,8 +62,40 @@ app = App.new()
 http:handle(http.GET, "/plugins", function(request)
     local pluginNames = {}
     for k, _ in pairs(app.plugins) do
-        table.insert(pluginNames, k)
+        local value = {
+            name = k,
+            displayName = app.plugins[k].displayName,
+            type = app.plugins[k].type
+        }
+        table.insert(pluginNames, value)
     end
+    -- mock
+    table.insert(pluginNames, {
+        name = "airplay",
+        displayName = "AirPlay integration",
+        type = "plugin"
+    })
+
+    -- mock
+    table.insert(pluginNames, {
+        name = "system",
+        displayName = "System configuration",
+        type = "system"
+    })
+
+    -- mock
+    table.insert(pluginNames, {
+        name = "portaudio",
+        displayName = "PortAudio output",
+        type = "system"
+    })
+
+    -- mock
+    table.insert(pluginNames, {
+        name = "bluetooth",
+        displayName = "Bluetooth sink",
+        type = "plugin"
+    })
 
     http:sendJSON(pluginNames, request.connection)
 end)

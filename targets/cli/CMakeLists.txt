@@ -6,6 +6,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../euphonium ${CMAKE_CURRENT_BINARY_DIR}/euphonium)
 
+find_package( portaudio REQUIRED )
+include_directories( ${PORTAUDIO_INCLUDE_DIRS} )
+set(THINGS_TO_LINK ${THINGS_TO_LINK} ${PORTAUDIO_LIBRARIES})
+
 file(GLOB SOURCES "*.cpp")
 include_directories(".")
 

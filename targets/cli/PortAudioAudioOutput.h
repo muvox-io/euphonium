@@ -3,14 +3,17 @@
 #include <AudioOutput.h>
 #include <vector>
 #include <iostream>
-
+#include "portaudio.h"
+#include <stdint.h>
 class PortAudioAudioOutput : public AudioOutput
 {
 public:
     PortAudioAudioOutput();
+    ~PortAudioAudioOutput();
     void update(std::shared_ptr<CircularBuffer> audioBuffer);
 
 private:
+    PaStream *stream;
 };
 
 #endif

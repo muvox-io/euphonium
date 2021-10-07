@@ -10,6 +10,7 @@
 #include "Module.h"
 #include "ScriptLoader.h"
 #include "EventBus.h"
+#include <thread>
 
 #define AUDIO_BUFFER_SIZE 4096 * 16
 

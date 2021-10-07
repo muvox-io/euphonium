@@ -11,6 +11,7 @@ class CSpotPlugin: public Module {
     CSpotPlugin();
     void loadScript(std::shared_ptr<ScriptLoader> scriptLoader);
     void setupLuaBindings();
+    void startCSpot();
     void startAudioThread();
 };
 

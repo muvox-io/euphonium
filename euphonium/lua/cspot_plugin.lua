@@ -2,14 +2,14 @@ CSpotPlugin = {name = "cspot"}
 CSpotPlugin.__index = CSpotPlugin
 
 function CSpotPlugin.new()
-    local self = setmetatable({name = "cspot"}, CSpotPlugin)
+    local self = setmetatable({name = "cspot", displayName = "Spotify integration", type="plugin"}, CSpotPlugin)
 
     -- Plugin configuration schema
     self.configScheme = {
         receiverName = {
             tooltip = "Speaker's name",
             type = "string",
-            defaultValue = "CSpot"
+            defaultValue = "CSpot (Euphonium)"
         },
         audioBitrate = {
             tooltip = "Audio bitrate",

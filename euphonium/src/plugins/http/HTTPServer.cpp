@@ -185,6 +185,7 @@ void HTTPServer::respond(const HTTPResponse &response, int connectionFd)
     stream << "Connection: close\r\n";
     stream << "Content-type: " << response.contentType << "\r\n";
     stream << "Content-length:" << response.body.size() << "\r\n";
+    stream << "Access-Control-Allow-Origin: *\r\n";
     stream << "\r\n";
     stream << response.body;
 

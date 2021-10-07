@@ -10,28 +10,6 @@
 
 std::shared_ptr<ConfigJSON> configMan;
 
-void audioThread()
-{
-    auto authenticator = std::make_shared<ZeroconfAuthenticator>();
-    auto blob = authenticator->listenForRequests();
-    auto session = std::make_unique<Session>();
-    session->connectWithRandomAp();
-    auto token = session->authenticate(blob);
-    if (token.size() > 0)
-    {
-        // @TODO Actually store this token somewhere
-        auto mercuryManager = std::make_shared<MercuryManager>(std::move(session));
-        mercuryManager->startTask();
-        auto audioSink = std::make_shared<FakeAudioSink>();
-        auto spircController = std::make_shared<SpircController>(mercuryManager, blob->username, audioSink);
-        mercuryManager->reconnectedCallback = [spircController]()
-        {
-            return spircController->subscribe();
-        };
-        mercuryManager->handleQueue();
-    }
-}
-
 CSpotPlugin::CSpotPlugin()
 {
     auto file = std::make_shared<CliFile>();
@@ -46,6 +24,27 @@ void CSpotPlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader)
 
 void CSpotPlugin::setupLuaBindings()
 {
+}
+
+void CSpotPlugin::startCSpot() {
+    auto authenticator = std::make_shared<ZeroconfAuthenticator>();
+    auto blob = authenticator->listenForRequests();
+    auto session = std::make_unique<Session>();
+    session->connectWithRandomAp();
+    auto token = session->authenticate(blob);
+    if (token.size() > 0)
+    {
+        // @TODO Actually store this token somewhere
+        auto mercuryManager = std::make_shared<MercuryManager>(std::move(session));
+        mercuryManager->startTask();
+        auto audioSink = std::make_shared<FakeAudioSink>(this->audioBuffer);
+        auto spircController = std::make_shared<SpircController>(mercuryManager, blob->username, audioSink);
+        mercuryManager->reconnectedCallback = [spircController]()
+        {
+            return spircController->subscribe();
+        };
+        mercuryManager->handleQueue();
+    }
 }
 
 void CSpotPlugin::startAudioThread()
@@ -64,6 +63,6 @@ void CSpotPlugin::startAudioThread()
             break;
     } 
 
-    std::thread newThread(audioThread);
+    std::thread newThread(&CSpotPlugin::startCSpot, this);
     newThread.detach();
 }

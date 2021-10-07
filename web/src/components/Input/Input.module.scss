@@ -1,0 +1,17 @@
+.input {
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-weight: 400;
+    font-size: 12px;
+    min-width: 250px;
+    margin: 8px 0px 12px 0px;
+    color: var(--text-primary);
+    background-color: var(--secondary-color);
+
+    &__tooltip {
+        color: var(--text-secondary);
+        font-size: 13px;
+        font-weight: 600;
+    }
+}

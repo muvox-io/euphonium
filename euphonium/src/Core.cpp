@@ -57,6 +57,9 @@ void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader)
     
     checkResult(luaState.script("app:printRegisteredPlugins()"));
 
+    std::thread newThread(&Core::handleAudioOutputThread, this);
+    newThread.detach();
+
     while(true) {
         luaEventBus->update();
     }
@@ -65,6 +68,7 @@ void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader)
 void Core::selectAudioOutput(std::shared_ptr<AudioOutput> output)
 {
     currentOutput = output;
+    this->outputConnected = true;
 }
 
 void Core::handleEvent(std::unique_ptr<Event> event) {
@@ -77,6 +81,7 @@ void Core::startAudioThreadForPlugin(std::string pluginName, sol::table config) 
         if (plugin->name == pluginName) {
             std::cout << "[" << plugin->name << "]: Starting audio thread" << std::endl;
             plugin->config = config;
+            plugin->audioBuffer = audioBuffer;
             plugin->startAudioThread();
             return;
         }
@@ -86,6 +91,7 @@ void Core::startAudioThreadForPlugin(std::string pluginName, sol::table config) 
         if (module->name == pluginName) {
             std::cout << "[" << module->name << "]: Starting audio thread" << std::endl;
             module->config = config;
+            module->audioBuffer = audioBuffer;
             module->startAudioThread();
             return;
         }
@@ -97,6 +103,7 @@ void Core::setupBindings() {
 }
 
 void Core::handleAudioOutputThread() {
+    std::cout << "Audio thread started" << std::endl;
     while (true) {
         if (audioBuffer->size() > 0 && outputConnected) {
             this->currentOutput->update(audioBuffer);
