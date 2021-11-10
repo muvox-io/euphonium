@@ -11,6 +11,7 @@ class HandleRouteEvent: public Event {
     HandleRouteEvent(const HTTPRequest& request) {
         this->request = request;
         this->luaEventType = "handleRouteEvent";
+        this->eventType = EventType::LUA_MAIN_EVENT;
     };
 
     sol::object toLua(lua_State* state) {

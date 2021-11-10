@@ -29,5 +29,6 @@ function Http.sendJSON(self, body, conn, status)
     response.body = json.encode(body or { status = "error" })
     response.status = status or 200
     response.contentType = "application/json"
-    httpRespond(response, conn)
+    response.connectionFd = conn
+    httpRespond(response)
 end

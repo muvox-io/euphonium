@@ -17,7 +17,7 @@ interface ConfigurationField {
     type: ConfigurationFieldType,
     defaultValue: string;
     value: string;
-    listValue: string[];
+    listValues: string[];
     tooltip: string;
     key: string;
 }

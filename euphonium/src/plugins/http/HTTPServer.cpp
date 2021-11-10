@@ -20,6 +20,7 @@ std::vector<std::string> HTTPServer::splitUrl(const std::string &url)
 
 void HTTPServer::registerHandler(RequestType requestType, const std::string &routeUrl, httpHandler handler)
 {
+    EUPH_LOG(info, "http", routeUrl.c_str());
     if (routes.find(routeUrl) == routes.end())
     {
         routes.insert({routeUrl, std::vector<HTTPRoute>()});
@@ -30,28 +31,12 @@ void HTTPServer::registerHandler(RequestType requestType, const std::string &rou
     });
 }
 
-// @TODO: Implement a proper http server here. It's currently a huge mess of an implementation, and will most likely
-// mess something up when more than 1 clients connect at once
 void HTTPServer::listen()
 {
-    printf("Starting configuration server at port %d\n", this->serverPort);
+    EUPH_LOG(info, "http", "Starting configuration server at port %d", this->serverPort);
 
-    // master filedescriptor
-
-    int fdMax; // maximum current fd
-    int readBytes;
-
-    int yes = 1;                        // used for setsockopt
-    struct sockaddr_storage remoteaddr; // client address
+    int fdMax;
     socklen_t addrlen;
-    // stores http method + path
-    std::string httpMethod;
-    std::string body;
-    int contentLength = 0;
-    bool readingBody = false;
-
-    // input data buffer
-    std::vector<uint8_t> bufferVec(128);
 
     // setup address
     struct addrinfo hints, *server;
@@ -63,127 +48,139 @@ void HTTPServer::listen()
 
     int sockfd = socket(server->ai_family,
                         server->ai_socktype, server->ai_protocol);
-
+    pipe(pipeFd);
+    struct sockaddr_in clientname;
+    socklen_t incomingSockSize;
+    int i;
+    int yes = true;
     setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
     bind(sockfd, server->ai_addr, server->ai_addrlen);
     ::listen(sockfd, 10);
 
-    FD_SET(sockfd, &master);
-    fdMax = sockfd; // listener socket is the highest descriptor rn
-    auto currentString = std::string();
+    FD_ZERO(&activeFdSet);
+    FD_SET(sockfd, &activeFdSet);
+    FD_SET(pipeFd[0], &activeFdSet);
+
     for (;;)
     {
-        readFds = master; // copy it
-        if (select(fdMax + 1, &readFds, NULL, NULL, NULL) == -1)
+        /* Block until input arrives on one or more active sockets. */
+        readFdSet = activeFdSet;
+        if (select(FD_SETSIZE, &readFdSet, NULL, NULL, NULL) < 0)
         {
+            EUPH_LOG(error, "http", "Error in select");
             perror("select");
-            exit(4);
+            exit(EXIT_FAILURE);
         }
 
-        // run through the existing connections looking for data to read
-        for (int i = 0; i <= fdMax; i++)
-        {
-            if (FD_ISSET(i, &readFds))
-            { // we got one!!
+        /* Service all the sockets with input pending. */
+        for (i = 0; i < FD_SETSIZE; ++i)
+            if (FD_ISSET(i, &readFdSet))
+            {
                 if (i == sockfd)
                 {
-                    if (isClosed)
+                    /* Connection request on original socket. */
+                    int newFd;
+                    incomingSockSize = sizeof(clientname);
+                    newFd = accept(sockfd, (struct sockaddr *)&clientname, &incomingSockSize);
+                    if (newFd < 0)
                     {
-                        // handle new connections
-                        addrlen = sizeof remoteaddr;
-                        int newFd = accept(sockfd,
-                                           (struct sockaddr *)&remoteaddr,
-                                           &addrlen);
+                        perror("accept");
+                        exit(EXIT_FAILURE);
+                    }
 
-                        if (newFd == -1)
-                        {
-                            perror("accept");
-                        }
-                        else
-                        {
-                            FD_SET(newFd, &master); // add to master set
-                            if (newFd > fdMax)
-                            {
-                                fdMax = newFd;
-                            }
-                            std::cout << "New connection\n";
-                            isClosed = false;
-                            currentString = std::string();
-                        }
+                    FD_SET(newFd, &activeFdSet);
+
+                    HTTPConnection conn = {
+                        .buffer = std::vector<uint8_t>(128)};
+
+                    this->connections.insert({newFd, conn});
+                }
+                else if (i == pipeFd[0])
+                {
+                    EUPH_LOG(info, "http", "Pipe has data");
+                    char dummy;
+                    read(pipeFd[0], &dummy, 1);
+
+                    if (responseQueue.size() > 0)
+                    {
+                        auto response = responseQueue.front();
+                        responseQueue.pop();
+                        writeResponse(response);
                     }
                 }
                 else
                 {
-                    // Receive data
-                    if ((readBytes = recv(i, bufferVec.data(), 128, 0)) <= 0)
-                    {
-                        // got error or connection closed by client
-                        if (readBytes == 0)
-                        {
-                            // connection closed
-                            std::cout << "Socket " << i << "hung up\n";
-                        }
-                        else
-                        {
-                            perror("recv");
-                        }
-                        isClosed = true;
-                        close(i);
-                        FD_CLR(i, &master);
-                    }
-                    else
-                    {
-                        currentString += std::string(bufferVec.data(), bufferVec.data() + readBytes);
-                    HANDLEBODY:
-                        if (readingBody && body.size() < contentLength)
-                        {
-                            body += currentString;
-                            currentString = "";
-                            if (body.size() >= contentLength)
-                            {
-                                readingBody = false;
-                                std::cout << body << std::endl;
-                                findAndHandleRoute(httpMethod, body, i);
-                                contentLength = 0;
-                                body = "";
-                            }
-                        }
-                        else if (!readingBody)
-                        {
-
-                            while (currentString.find("\r\n") != std::string::npos)
-                            {
-                                auto line = currentString.substr(0, currentString.find("\r\n"));
-                                currentString = currentString.substr(currentString.find("\r\n") + 2, currentString.size());
-                                if (line.find("GET ") != std::string::npos || line.find("POST ") != std::string::npos)
-                                {
-                                    httpMethod = line;
-                                }
-
-                                if (line.find("Content-Length: ") != std::string::npos)
-                                {
-                                    contentLength = std::stoi(line.substr(16, line.size() - 1));
-                                    readingBody = true;
-                                    goto HANDLEBODY;
-                                    break;
-                                }
-
-                                if (line.size() == 0)
-                                {
-                                    findAndHandleRoute(httpMethod, body, i);
-                                    readingBody = false;
-                                    body = "";
-                                }
-                            }
-                        }
-                    }
+                    /* Data arriving on an already-connected socket. */
+                    readFromClient(i);
                 }
+            }
+    }
+}
+
+void HTTPServer::readFromClient(int clientFd)
+{
+    HTTPConnection &conn = this->connections[clientFd];
+
+    int nbytes = recv(clientFd, &conn.buffer[0], conn.buffer.size(), 0);
+    if (nbytes < 0)
+    {
+        EUPH_LOG(error, "http", "Error reading from client");
+        perror("recv");
+        exit(EXIT_FAILURE);
+    }
+    else if (nbytes == 0)
+    {
+        EUPH_LOG(info, "http", "Read the body");
+        this->closeConnection(clientFd);
+    }
+    else
+    {
+        conn.currentLine += std::string(conn.buffer.data(), conn.buffer.data() + nbytes);
+        if (!conn.isReadingBody)
+        {
+            while (conn.currentLine.find("\r\n") != std::string::npos)
+            {
+                auto line = conn.currentLine.substr(0, conn.currentLine.find("\r\n"));
+                conn.currentLine = conn.currentLine.substr(conn.currentLine.find("\r\n") + 2, conn.currentLine.size());
+                if (line.find("GET ") != std::string::npos || line.find("POST ") != std::string::npos)
+                {
+                    EUPH_LOG(info, "http", "Found method line request");
+                    conn.httpMethod = line;
+                }
+
+                if (line.find("Content-Length: ") != std::string::npos)
+                {
+                    EUPH_LOG(info, "http", "Found Content-Length");
+                    conn.contentLength = std::stoi(line.substr(16, line.size() - 1));
+                    conn.isReadingBody = true;
+                }
+                if (line.size() == 0)
+                {
+                    EUPH_LOG(info, "http", "Found end of headers");
+                    EUPH_LOG(info, "http", conn.httpMethod.c_str());
+                    findAndHandleRoute(conn.httpMethod, conn.currentLine, clientFd);
+                }
+            }
+        }
+        else
+        {
+            if (conn.currentLine.size() == conn.contentLength)
+            {
+                EUPH_LOG(info, "http", "Read the body");
+                findAndHandleRoute(conn.httpMethod, conn.currentLine, clientFd);
             }
         }
     }
 }
 
-void HTTPServer::respond(const HTTPResponse &response, int connectionFd)
+void HTTPServer::closeConnection(int connection)
+{
+    close(connection);
+    FD_CLR(connection, &activeFdSet);
+    this->connections.erase(connection);
+}
+
+void HTTPServer::writeResponse(const HTTPResponse &response)
 {
     std::stringstream stream;
     stream << "HTTP/1.1 " << response.status << " OK\r\n";
@@ -196,11 +193,18 @@ void HTTPServer::respond(const HTTPResponse &response, int connectionFd)
     stream << response.body;
 
     auto responseStr = stream.str();
-    write(connectionFd, responseStr.c_str(), responseStr.size());
-    close(connectionFd);
-    FD_CLR(connectionFd, &master);
-    isClosed = true;
-    writingResponse = false;
+    write(response.connectionFd, responseStr.c_str(), responseStr.size());
+    this->closeConnection(response.connectionFd);
+}
+
+void HTTPServer::respond(const HTTPResponse &response)
+{
+    // add response to response queue
+    responseQueue.push(response);
+
+    // write one byte to pipeFd[1]
+    int dummy = 1;
+    write(pipeFd[1], &dummy, 1);
 }
 
 void HTTPServer::findAndHandleRoute(std::string &url, std::string &body, int connectionFd)
@@ -242,7 +246,6 @@ void HTTPServer::findAndHandleRoute(std::string &url, std::string &body, int con
                     {
                         if (routeSplit[x][0] == ':')
                         {
-                            std::cout << "Found param " << routeSplit[x].substr(1) << ": " << urlSplit[x] << std::endl;
                             pathParams.insert({routeSplit[x].substr(1), urlSplit[x]});
                         }
                         else
@@ -264,16 +267,15 @@ void HTTPServer::findAndHandleRoute(std::string &url, std::string &body, int con
                     .body = body,
                     .handlerId = 0,
                     .connection = connectionFd};
-                writingResponse = true;
+
                 route.handler(req);
-                usleep(300 * 1000);
                 return;
             }
         }
     }
-    respond(HTTPResponse{
+    writeResponse(HTTPResponse{
                 .status = 404,
                 .body = "Not found",
-            },
-            connectionFd);
+                .connectionFd = connectionFd
+            });
 }

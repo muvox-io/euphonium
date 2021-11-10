@@ -1,11 +1,5 @@
 #include "CSpotPlugin.h"
-#include "ConfigJSON.h"
-#include "MercuryManager.h"
-#include "ZeroconfAuthenticator.h"
-#include "Session.h"
-#include "SpircController.h"
-#include "FakeAudioSink.h"
-#include "CliFile.h"
+
 #include <thread>
 
 std::shared_ptr<ConfigJSON> configMan;
@@ -15,6 +9,7 @@ CSpotPlugin::CSpotPlugin()
     auto file = std::make_shared<CliFile>();
     configMan = std::make_shared<ConfigJSON>("test.json", file);
     name = "cspot";
+    cspotGlobalLogger = std::make_shared<CSpotEuphLogger>();
 }
 
 void CSpotPlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader)
@@ -24,45 +19,80 @@ void CSpotPlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader)
 
 void CSpotPlugin::setupLuaBindings()
 {
+    sol::state_view lua(luaState);
+    lua.set_function("cspotConfigUpdated", &CSpotPlugin::configurationUpdated, this);
 }
 
-void CSpotPlugin::startCSpot() {
-    auto authenticator = std::make_shared<ZeroconfAuthenticator>();
-    auto blob = authenticator->listenForRequests();
+void CSpotPlugin::configurationUpdated() {
+    std::cout << "CSpotPlugin::configurationUpdated()" << std::endl;
+    this->isRunning = false;
+    std::scoped_lock(this->runningMutex);
+    mercuryManager->stop();
+    spircController->stopPlayer();
+    usleep(500000);
+    spircController.reset();
+    mercuryManager.reset();
+    usleep(500000);
+    //startAudioThread();
+}
+
+void CSpotPlugin::startCSpot()
+{
+    std::scoped_lock lock(runningMutex);
+    this->isRunning = true;
+
+    if (authBlob == nullptr) {
+        auto authenticator = std::make_shared<ZeroconfAuthenticator>();
+        authBlob = authenticator->listenForRequests();
+    }
+
     auto session = std::make_unique<Session>();
     session->connectWithRandomAp();
-    auto token = session->authenticate(blob);
+    auto token = session->authenticate(authBlob);
     if (token.size() > 0)
     {
         // @TODO Actually store this token somewhere
-        auto mercuryManager = std::make_shared<MercuryManager>(std::move(session));
+        mercuryManager = std::make_shared<MercuryManager>(std::move(session));
         mercuryManager->startTask();
         auto audioSink = std::make_shared<FakeAudioSink>(this->audioBuffer);
-        auto spircController = std::make_shared<SpircController>(mercuryManager, blob->username, audioSink);
-        mercuryManager->reconnectedCallback = [spircController]()
+        spircController = std::make_shared<SpircController>(mercuryManager, authBlob->username, audioSink);
+        spircController->setTrackChangedCallback([](TrackInfo& track) {
+        });
+        
+        mercuryManager->reconnectedCallback = [this]()
         {
-            return spircController->subscribe();
+            return this->spircController->subscribe();
         };
-        mercuryManager->handleQueue();
+
+        while (this->isRunning)
+        {
+            mercuryManager->updateQueue();
+        }
+        std::cout << "DONE" << std::endl;
+    }
+}
+
+void CSpotPlugin::mapConfig()
+{
+    configMan->deviceName = config["receiverName"];
+    std::string bitrateString = config["audioBitrate"];
+    switch (std::stoi(bitrateString))
+    {
+    case 160:
+        configMan->format = AudioFormat::OGG_VORBIS_160;
+        break;
+    case 96:
+        configMan->format = AudioFormat::OGG_VORBIS_96;
+        break;
+    default:
+        configMan->format = AudioFormat::OGG_VORBIS_320;
+        break;
     }
 }
 
 void CSpotPlugin::startAudioThread()
 {
-    configMan->deviceName = config["receiverName"];
-    std::string bitrateString = config["audioBitrate"];
-    switch(std::stoi(bitrateString)) {
-        case 160:
-            configMan->format = AudioFormat::OGG_VORBIS_160;
-            break;
-        case 96:
-            configMan->format = AudioFormat::OGG_VORBIS_96;
-            break;
-        default:
-            configMan->format = AudioFormat::OGG_VORBIS_320;
-            break;
-    } 
-
+    this->mapConfig();
     std::thread newThread(&CSpotPlugin::startCSpot, this);
     newThread.detach();
 }

@@ -3,6 +3,7 @@
 #define SOL_ALL_SAFETIES_ON 1
 #include <sol.hpp>
 #include <cassert>
+#include <EuphoniumLog.h>
 
 Core::Core()
 {
@@ -29,12 +30,12 @@ void checkResult(sol::protected_function_result result)
 
 void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader)
 {
-    luaState.open_libraries(sol::lib::base, sol::lib::string, sol::lib::math, sol::lib::table);
+    luaState.open_libraries(sol::lib::base, sol::lib::string, sol::lib::math, sol::lib::table, sol::lib::debug);
     std::vector<std::string> luaModules({"json", "app"});
 
     for (auto const &module : this->requiredModules)
     {
-        std::cout << "[" << module->name << "]: Initializing" << std::endl;
+        EUPH_LOG(info, module->name, "Initializing");
         module->luaEventBus = this->luaEventBus;
         module->luaState = luaState;
         module->setupLuaBindings();
@@ -48,7 +49,7 @@ void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader)
 
     for (auto const &plugin : this->registeredPlugins)
     {
-        std::cout << "[" << plugin->name << "]: Initializing" << std::endl;
+        EUPH_LOG(info, plugin->name, "Initializing");
         plugin->luaState = this->luaState;
         plugin->luaEventBus = this->luaEventBus;
         plugin->setupLuaBindings();
@@ -60,6 +61,7 @@ void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader)
     std::thread newThread(&Core::handleAudioOutputThread, this);
     newThread.detach();
 
+    EUPH_LOG(info, "core", "Lua thread listening");
     while(true) {
         luaEventBus->update();
     }
@@ -72,14 +74,14 @@ void Core::selectAudioOutput(std::shared_ptr<AudioOutput> output)
 }
 
 void Core::handleEvent(std::unique_ptr<Event> event) {
-    std::cout << "Got event!" << std::endl;
+    EUPH_LOG(debug, "core", "Got event");
     luaState["handleEvent"](event->luaEventType, event->toLua(luaState));
 }
 
 void Core::startAudioThreadForPlugin(std::string pluginName, sol::table config) {
     for (auto const &plugin : this->registeredPlugins) {
         if (plugin->name == pluginName) {
-            std::cout << "[" << plugin->name << "]: Starting audio thread" << std::endl;
+            EUPH_LOG(info, plugin->name, "Starting audio thread");
             plugin->config = config;
             plugin->audioBuffer = audioBuffer;
             plugin->startAudioThread();
@@ -89,7 +91,7 @@ void Core::startAudioThreadForPlugin(std::string pluginName, sol::table config) 
 
     for (auto const &module : this->requiredModules) {
         if (module->name == pluginName) {
-            std::cout << "[" << module->name << "]: Starting audio thread" << std::endl;
+            EUPH_LOG(info, module->name, "Starting audio thread");
             module->config = config;
             module->audioBuffer = audioBuffer;
             module->startAudioThread();
@@ -100,10 +102,14 @@ void Core::startAudioThreadForPlugin(std::string pluginName, sol::table config) 
 
 void Core::setupBindings() {
     luaState.set_function("startAudioThreadForPlugin", &Core::startAudioThreadForPlugin, this);
+    luaState.set_function("luaLogError", luaLogError);
+    luaState.set_function("luaLogDebug", luaLogDebug);
+    luaState.set_function("luaLogInfo", luaLogInfo);
+    luaState.set_function("luaLog", luaLog);
 }
 
 void Core::handleAudioOutputThread() {
-    std::cout << "Audio thread started" << std::endl;
+    EUPH_LOG(info, "core", "Audio output started");
     while (true) {
         if (audioBuffer->size() > 0 && outputConnected) {
             this->currentOutput->update(audioBuffer);

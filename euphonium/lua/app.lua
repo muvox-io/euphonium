@@ -4,6 +4,7 @@ App = {
 App.__index = App
 http = Http.new()
 
+
 function handleRouteEvent(request)
     http:handleIncomingRequest(request)
 end
@@ -32,22 +33,43 @@ function App.handleEvent(self, eventType, eventData)
     end
 end
 
+function logInfo(msg)
+    luaLogInfo(debug.getinfo(2,'S').source, debug.getinfo(2, 'l').currentline, msg)
+end
+
+
+function logDebug(msg)
+    luaLogDebug(debug.getinfo(2,'S').source, debug.getinfo(2, 'l').currentline, msg)
+end
+
+
+function logError(msg)
+    luaLogError(debug.getinfo(2,'S').source, debug.getinfo(2, 'l').currentline, msg)
+end
+
 function handleEvent(eventType, eventData)
-    print("Received event: " .. eventType)
+    logDebug("Received event: " .. eventType)
     app:handleEvent(eventType, eventData)
+end
+
+function getBareConfig(configSchema) 
+    bareConfig = {}
+    for k, v in pairs(configSchema) do
+        if v.value == nil then
+            v.value = v.defaultValue
+        end
+
+        bareConfig[k] = v.value
+    end
+
+    return bareConfig
 end
 
 function App.enablePlugin(plugin)
     bareConfig = {}
 
     if app.plugins[plugin].configScheme then
-        for k, v in pairs(app.plugins[plugin].configScheme) do
-            if v.value == nil then
-                v.value = v.defaultValue
-            end
-
-            bareConfig[k] = v.value
-        end
+        bareConfig = getBareConfig(app.plugins[plugin].configScheme)
     end
     startAudioThreadForPlugin(plugin, bareConfig)
 end
@@ -126,7 +148,7 @@ http:handle(http.POST, "/plugins/:name", function(request)
             end
         end
 
-        app.plugins[plugin]:configurationChanged()
         http:sendJSON(app.plugins[plugin].configScheme, request.connection)
+        app.plugins[plugin]:configurationChanged()
     end
 end)

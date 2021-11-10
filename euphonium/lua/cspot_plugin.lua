@@ -23,6 +23,8 @@ end
 
 function CSpotPlugin.configurationChanged(self)
     print("CSpot: Configuration changed")
+    cspotConfigUpdated()
+    startAudioThreadForPlugin("cspot", getBareConfig(self.configScheme))
 end
 
 app:registerPlugin(CSpotPlugin.new())
