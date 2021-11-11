@@ -93,6 +93,7 @@
         "stop_token": "cpp",
         "cfenv": "cpp",
         "cinttypes": "cpp",
-        "cassert": "cpp"
+        "cassert": "cpp",
+        "__functional_03": "cpp"
     }
 }

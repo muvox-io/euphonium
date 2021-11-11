@@ -9,11 +9,26 @@ function handleRouteEvent(request)
     http:handleIncomingRequest(request)
 end
 
+function handleSongChangedEvent(song)
+    logInfo("Song changed: ")
+    app.playbackState.songName = song.songName
+    app.playbackState.artistName = song.artistName
+    app.playbackState.sourceName = song.sourceName
+    app.playbackState.albumName = song.albumName
+end
+
 function App.new()
     local self = setmetatable({
         plugins = {},
         eventHandlers = {
-            handleRouteEvent = handleRouteEvent
+            handleRouteEvent = handleRouteEvent,
+            songChangedEvent = handleSongChangedEvent
+        },
+        playbackState = {
+            songName = "",
+            artistName = "",
+            sourceName = "",
+            albumName = ""
         }
     }, App)
     return self
@@ -134,6 +149,10 @@ http:handle(http.GET, "/plugins/:name", function(request)
         end
         http:sendJSON(app.plugins[plugin].configScheme, request.connection)
     end
+end)
+
+http:handle(http.GET, "/playback", function(request)
+    http:sendJSON(app.playbackState, request.connection)
 end)
 
 http:handle(http.POST, "/plugins/:name", function(request)

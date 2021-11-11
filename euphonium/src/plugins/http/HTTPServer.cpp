@@ -97,7 +97,6 @@ void HTTPServer::listen()
                 }
                 else if (i == pipeFd[0])
                 {
-                    EUPH_LOG(info, "http", "Pipe has data");
                     char dummy;
                     read(pipeFd[0], &dummy, 1);
 
@@ -130,7 +129,6 @@ void HTTPServer::readFromClient(int clientFd)
     }
     else if (nbytes == 0)
     {
-        EUPH_LOG(info, "http", "Read the body");
         this->closeConnection(clientFd);
     }
     else
@@ -144,19 +142,18 @@ void HTTPServer::readFromClient(int clientFd)
                 conn.currentLine = conn.currentLine.substr(conn.currentLine.find("\r\n") + 2, conn.currentLine.size());
                 if (line.find("GET ") != std::string::npos || line.find("POST ") != std::string::npos)
                 {
-                    EUPH_LOG(info, "http", "Found method line request");
+                    EUPH_LOG(info, "http", "Got following request");
+                    EUPH_LOG(info, "http", line.c_str());
                     conn.httpMethod = line;
                 }
 
                 if (line.find("Content-Length: ") != std::string::npos)
                 {
-                    EUPH_LOG(info, "http", "Found Content-Length");
                     conn.contentLength = std::stoi(line.substr(16, line.size() - 1));
                     conn.isReadingBody = true;
                 }
                 if (line.size() == 0)
                 {
-                    EUPH_LOG(info, "http", "Found end of headers");
                     EUPH_LOG(info, "http", conn.httpMethod.c_str());
                     findAndHandleRoute(conn.httpMethod, conn.currentLine, clientFd);
                 }
@@ -166,7 +163,6 @@ void HTTPServer::readFromClient(int clientFd)
         {
             if (conn.currentLine.size() == conn.contentLength)
             {
-                EUPH_LOG(info, "http", "Read the body");
                 findAndHandleRoute(conn.httpMethod, conn.currentLine, clientFd);
             }
         }

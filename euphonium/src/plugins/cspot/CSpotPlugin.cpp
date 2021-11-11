@@ -23,7 +23,8 @@ void CSpotPlugin::setupLuaBindings()
     lua.set_function("cspotConfigUpdated", &CSpotPlugin::configurationUpdated, this);
 }
 
-void CSpotPlugin::configurationUpdated() {
+void CSpotPlugin::configurationUpdated()
+{
     std::cout << "CSpotPlugin::configurationUpdated()" << std::endl;
     this->isRunning = false;
     std::scoped_lock(this->runningMutex);
@@ -41,7 +42,8 @@ void CSpotPlugin::startCSpot()
     std::scoped_lock lock(runningMutex);
     this->isRunning = true;
 
-    if (authBlob == nullptr) {
+    if (authBlob == nullptr)
+    {
         auto authenticator = std::make_shared<ZeroconfAuthenticator>();
         authBlob = authenticator->listenForRequests();
     }
@@ -56,9 +58,13 @@ void CSpotPlugin::startCSpot()
         mercuryManager->startTask();
         auto audioSink = std::make_shared<FakeAudioSink>(this->audioBuffer);
         spircController = std::make_shared<SpircController>(mercuryManager, authBlob->username, audioSink);
-        spircController->setTrackChangedCallback([](TrackInfo& track) {
+        spircController->setTrackChangedCallback([this](TrackInfo &track) {
+            auto sourceName = std::string("cspot");
+            auto event = std::make_unique<SongChangedEvent>(track.name, track.album, track.artist, sourceName);
+            EUPH_LOG(info, "cspot", "Song name changed");
+            this->luaEventBus->postEvent(std::move(event));
         });
-        
+
         mercuryManager->reconnectedCallback = [this]()
         {
             return this->spircController->subscribe();

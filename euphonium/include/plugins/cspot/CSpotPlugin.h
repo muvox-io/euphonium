@@ -9,6 +9,7 @@
 #include "Logger.h"
 #include "ZeroconfAuthenticator.h"
 #include "Session.h"
+#include "CoreEvents.h"
 #include "SpircController.h"
 #include "FakeAudioSink.h"
 #include "CliFile.h"

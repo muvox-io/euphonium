@@ -22,6 +22,13 @@ interface ConfigurationField {
     key: string;
 }
 
+interface PlaybackState {
+    artistName: string;
+    songName: string;
+    sourceName: string;
+    albumName: string;
+}
 
-export type { PluginEntry, ConfigurationField }
+
+export type { PluginEntry, ConfigurationField, PlaybackState }
 export { ConfigurationFieldType, PluginEntryType }

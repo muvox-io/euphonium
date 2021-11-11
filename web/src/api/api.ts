@@ -1,9 +1,15 @@
-import { ConfigurationField, PluginEntry } from "./models";
+import { ConfigurationField, PlaybackState, PluginEntry } from "./models";
 
 const getPlugins = async (): Promise<PluginEntry[]> => {
     return await fetch("http://localhost:2137/plugins")
         .then((e) => e.json())
         .then((e) => e.map((e: any) => e as PluginEntry));
+}
+
+const getPlaybackState = async (): Promise<PlaybackState> => {
+    return await fetch("http://localhost:2137/playback")
+        .then((e) => e.json())
+        .then((e) => e as PlaybackState);
 }
 
 const getPluginConfiguration = async (pluginName: string): Promise<ConfigurationField[]> => {
@@ -19,4 +25,4 @@ const getPluginConfiguration = async (pluginName: string): Promise<Configuration
         })
 }
 
-export { getPlugins, getPluginConfiguration }
+export { getPlugins, getPluginConfiguration, getPlaybackState }

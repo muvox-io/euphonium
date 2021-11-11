@@ -106,6 +106,12 @@ void Core::setupBindings() {
     luaState.set_function("luaLogDebug", luaLogDebug);
     luaState.set_function("luaLogInfo", luaLogInfo);
     luaState.set_function("luaLog", luaLog);
+
+    sol::usertype<PlaybackInfo> playbackType = luaState.new_usertype<PlaybackInfo>("PlaybackInfo", sol::constructors<PlaybackInfo()>());
+    playbackType["albumName"] = &PlaybackInfo::albumName;
+    playbackType["artistName"] = &PlaybackInfo::artistName;
+    playbackType["songName"] = &PlaybackInfo::songName;
+    playbackType["sourceName"] = &PlaybackInfo::sourceName;
 }
 
 void Core::handleAudioOutputThread() {
