@@ -16,35 +16,6 @@
 #include "Module.h"
 #include <atomic>
 #include <mutex>
-
-class CSpotEuphLogger : public AbstractLogger
-{
-public:
-    CSpotEuphLogger() {};
-    void debug(std::string filename, int line, const char *format, ...)
-    {
-        va_list args;
-        va_start(args, format);
-        euphoniumLogger->debug(filename, line, "cspot", format, args);
-        va_end(args);
-    };
-
-    void error(std::string filename, int line, const char *format, ...)
-    {
-        va_list argp;
-        va_start(argp, format);
-        euphoniumLogger->error(filename, line, "cspot", format, argp);
-        va_end(argp);
-    };
-
-    void info(std::string filename, int line, const char *format, ...)
-    {
-        va_list argp;
-        va_start(argp, format);
-        euphoniumLogger->info(filename, line, "cspot", format, argp);
-        va_end(argp);
-    };
-};
 class CSpotPlugin : public Module
 {
 private:

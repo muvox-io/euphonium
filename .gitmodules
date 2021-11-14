@@ -7,3 +7,6 @@
 [submodule "euphonium/cspot"]
 	path = euphonium/cspot
 	url = https://github.com/feelfreelinux/cspot
+[submodule "euphonium/bell"]
+	path = euphonium/bell
+	url = https://github.com/feelfreelinux/bell

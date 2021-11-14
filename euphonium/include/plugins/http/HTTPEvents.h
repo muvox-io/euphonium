@@ -3,12 +3,12 @@
 
 #include <EventBus.h>
 #include <memory.h>
-#include <plugins/http/HTTPServer.h>
+#include <HTTPServer.h>
 
 class HandleRouteEvent: public Event {
     public:
-    HTTPRequest request;
-    HandleRouteEvent(const HTTPRequest& request) {
+    bell::HTTPRequest request;
+    HandleRouteEvent(const bell::HTTPRequest& request) {
         this->request = request;
         this->luaEventType = "handleRouteEvent";
         this->eventType = EventType::LUA_MAIN_EVENT;

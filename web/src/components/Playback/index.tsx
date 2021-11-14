@@ -38,7 +38,7 @@ const PlaybackBar = () => {
 const PlaybackProgress = () => {
   return (
     <div className={css.progressBar}>
-      <div className={css.progressBar__inner}></div>
+      {/* <div className={css.progressBar__inner}></div> */}
     </div>
   );
 };

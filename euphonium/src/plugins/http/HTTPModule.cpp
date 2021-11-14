@@ -4,7 +4,7 @@
 HTTPModule::HTTPModule()
 {
     name = "http";
-    server = std::make_shared<HTTPServer>(2137);
+    server = std::make_shared<bell::HTTPServer>(2137);
 }
 
 void HTTPModule::loadScript(std::shared_ptr<ScriptLoader> loader)
@@ -18,31 +18,31 @@ void HTTPModule::setupLuaBindings()
     sol::state_view lua(luaState);
 
     lua.new_enum("RequestType",
-                 "GET", RequestType::GET,
-                 "POST", RequestType::POST);
+                 "GET", bell::RequestType::GET,
+                 "POST", bell::RequestType::POST);
 
-    sol::usertype<HTTPRequest> requestType = lua.new_usertype<HTTPRequest>("HTTPRequest", sol::constructors<HTTPRequest()>());
-    requestType["body"] = &HTTPRequest::body;
-    requestType["urlParams"] = &HTTPRequest::urlParams;
-    requestType["connection"] = &HTTPRequest::connection;
-    requestType["handlerId"] = &HTTPRequest::handlerId;
+    sol::usertype<bell::HTTPRequest> requestType = lua.new_usertype<bell::HTTPRequest>("HTTPRequest", sol::constructors<bell::HTTPRequest()>());
+    requestType["body"] = &bell::HTTPRequest::body;
+    requestType["urlParams"] = &bell::HTTPRequest::urlParams;
+    requestType["connection"] = &bell::HTTPRequest::connection;
+    requestType["handlerId"] = &bell::HTTPRequest::handlerId;
 
-    sol::usertype<HTTPResponse> responseType = lua.new_usertype<HTTPResponse>("HTTPResponse", sol::constructors<HTTPResponse()>());
-    responseType["status"] = &HTTPResponse::status;
-    responseType["body"] = &HTTPResponse::body;
-    responseType["contentType"] = &HTTPResponse::contentType;
-    responseType["connectionFd"] = &HTTPResponse::connectionFd;
+    sol::usertype<bell::HTTPResponse> responseType = lua.new_usertype<bell::HTTPResponse>("HTTPResponse", sol::constructors<bell::HTTPResponse()>());
+    responseType["status"] = &bell::HTTPResponse::status;
+    responseType["body"] = &bell::HTTPResponse::body;
+    responseType["contentType"] = &bell::HTTPResponse::contentType;
+    responseType["connectionFd"] = &bell::HTTPResponse::connectionFd;
 
-    sol::usertype<HTTPServer> serverType = lua.new_usertype<HTTPServer>("HttpServer", sol::constructors<HTTPServer(int)>());
-    serverType["respond"] = &HTTPServer::respond;
+    sol::usertype<bell::HTTPServer> serverType = lua.new_usertype<bell::HTTPServer>("HttpServer", sol::constructors<bell::HTTPServer(int)>());
+    serverType["respond"] = &bell::HTTPServer::respond;
 
     lua.set_function("httpRegisterHandler", &HTTPModule::registerHandler, this);
-    lua.set_function("httpRespond", &HTTPServer::respond, server);
+    lua.set_function("httpRespond", &bell::HTTPServer::respond, server);
 }
 
-void HTTPModule::registerHandler(const std::string &routeUrl, RequestType reqType, int handlerId)
+void HTTPModule::registerHandler(const std::string &routeUrl, bell::RequestType reqType, int handlerId)
 {
-    auto handler = [handlerId, this](HTTPRequest &request)
+    auto handler = [handlerId, this](bell::HTTPRequest &request)
     {
         request.handlerId = handlerId;
         auto event = std::make_unique<HandleRouteEvent>(request);
@@ -56,7 +56,7 @@ void HTTPModule::registerHandler(const std::string &routeUrl, RequestType reqTyp
 
 void HTTPModule::listen()
 {
-    auto assetHandler = [this](HTTPRequest &request)
+    auto assetHandler = [this](bell::HTTPRequest &request)
     {
         auto fileName = request.urlParams.at("asset");
         auto extension = fileName.substr(fileName.size() - 3, fileName.size());
@@ -66,7 +66,7 @@ void HTTPModule::listen()
         }
 
         auto indexContent = scriptLoader->loadFile("web/assets/" + fileName);
-        HTTPResponse response = {
+        bell::HTTPResponse response = {
             .body = indexContent,
             .contentType = contentType,
             .connectionFd = request.connection,
@@ -74,19 +74,19 @@ void HTTPModule::listen()
         server->respond(response);
     };
 
-    auto indexHandler = [this](HTTPRequest &request)
+    auto indexHandler = [this](bell::HTTPRequest &request)
     {
         auto indexContent = scriptLoader->loadFile("web/index.html");
 
-        HTTPResponse response = {
+        bell::HTTPResponse response = {
             .body = indexContent,
             .contentType = "text/html",
             .connectionFd = request.connection,
             .status = 200};
         server->respond(response);
     };
-    server->registerHandler(RequestType::GET, "/assets/:asset", assetHandler);
-    server->registerHandler(RequestType::GET, "/web", indexHandler);
+    server->registerHandler(bell::RequestType::GET, "/assets/:asset", assetHandler);
+    server->registerHandler(bell::RequestType::GET, "/web", indexHandler);
     server->listen();
 }
 

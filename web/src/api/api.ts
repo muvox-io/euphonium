@@ -25,4 +25,17 @@ const getPluginConfiguration = async (pluginName: string): Promise<Configuration
         })
 }
 
+const updateConfiguration = async (pluginName: string): Promise<ConfigurationField[]> => {
+    return await fetch(`http://localhost:2137/plugins/${pluginName}`)
+        .then((e) => e.json())
+        .then((e) => {
+            return Object.keys(e).map((key) => {
+                return {
+                    ...e[key],
+                    key
+                } as ConfigurationField
+            });
+        })
+}
+
 export { getPlugins, getPluginConfiguration, getPlaybackState }

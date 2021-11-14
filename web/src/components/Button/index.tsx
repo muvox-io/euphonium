@@ -1,7 +1,7 @@
 import css from "./Button.module.scss";
 
-export default () => {
+export default (onClick: () => void) => {
         return (
-            <button className={css.button}>Save changes</button>
+            <button className={css.button} onClick={(e) => onClick()}>Save changes</button>
         )
 }
