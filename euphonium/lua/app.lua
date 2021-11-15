@@ -86,7 +86,9 @@ function App.enablePlugin(plugin)
     if app.plugins[plugin].configScheme then
         bareConfig = getBareConfig(app.plugins[plugin].configScheme)
     end
+    logInfo("Enabling plugin: " .. plugin)
     startAudioThreadForPlugin(plugin, bareConfig)
+    logInfo("Plugin enabled: " .. plugin)
 end
 
 function App.printRegisteredPlugins(self)

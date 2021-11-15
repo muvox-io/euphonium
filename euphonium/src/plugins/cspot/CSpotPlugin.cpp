@@ -41,39 +41,40 @@ void CSpotPlugin::startCSpot()
     std::scoped_lock lock(runningMutex);
     this->isRunning = true;
 
-    // if (authBlob == nullptr)
-    // {
-    //     auto authenticator = std::make_shared<ZeroconfAuthenticator>();
-    //     authBlob = authenticator->listenForRequests();
-    // }
+    EUPH_LOG(info, "cspot", "Starting CSpot");
 
-    // auto session = std::make_unique<Session>();
-    // session->connectWithRandomAp();
-    // auto token = session->authenticate(authBlob);
-    // if (token.size() > 0)
-    // {
-    //     // @TODO Actually store this token somewhere
-    //     mercuryManager = std::make_shared<MercuryManager>(std::move(session));
-    //     mercuryManager->startTask();
-    //     auto audioSink = std::make_shared<FakeAudioSink>(this->audioBuffer);
-    //     spircController = std::make_shared<SpircController>(mercuryManager, authBlob->username, audioSink);
-    //     spircController->setTrackChangedCallback([this](TrackInfo &track) {
-    //         auto sourceName = std::string("cspot");
-    //         auto event = std::make_unique<SongChangedEvent>(track.name, track.album, track.artist, sourceName);
-    //         EUPH_LOG(info, "cspot", "Song name changed");
-    //         this->luaEventBus->postEvent(std::move(event));
-    //     });
+    auto session = std::make_unique<Session>();
+    session->connectWithRandomAp();
 
-    //     mercuryManager->reconnectedCallback = [this]()
-    //     {
-    //         return this->spircController->subscribe();
-    //     };
+    EUPH_LOG(info, "cspot", "Got session");
+    auto token = session->authenticate(authBlob);
 
-    //     while (this->isRunning)
-    //     {
-    //         mercuryManager->updateQueue();
-    //     }
-    //}
+    EUPH_LOG(info, "cspot", "Auth");
+    if (token.size() > 0)
+    {
+        // @TODO Actually store this token somewhere
+        mercuryManager = std::make_shared<MercuryManager>(std::move(session));
+        mercuryManager->startTask();
+        auto audioSink = std::make_shared<FakeAudioSink>(this->audioBuffer);
+        spircController = std::make_shared<SpircController>(mercuryManager, authBlob->username, audioSink);
+        spircController->setTrackChangedCallback([this](TrackInfo &track)
+                                                 {
+                                                     auto sourceName = std::string("cspot");
+                                                     auto event = std::make_unique<SongChangedEvent>(track.name, track.album, track.artist, sourceName);
+                                                     EUPH_LOG(info, "cspot", "Song name changed");
+                                                     this->luaEventBus->postEvent(std::move(event));
+                                                 });
+
+        mercuryManager->reconnectedCallback = [this]()
+        {
+            return this->spircController->subscribe();
+        };
+
+        while (this->isRunning)
+        {
+            mercuryManager->updateQueue();
+        }
+    }
 }
 
 void CSpotPlugin::mapConfig()
@@ -96,7 +97,23 @@ void CSpotPlugin::mapConfig()
 
 void CSpotPlugin::startAudioThread()
 {
-    this->mapConfig();
-    std::thread newThread(&CSpotPlugin::startCSpot, this);
-    newThread.detach();
+    mapConfig();
+    if (this->authenticator == nullptr)
+    {
+        createPlayerCallback = [this](std::shared_ptr<LoginBlob> blob)
+        {
+            if (this->isRunning) {
+                configurationUpdated();
+            }
+
+            this->authBlob = blob;
+            EUPH_LOG(info, "cspot", "Authenticated");
+            std::thread newThread(&CSpotPlugin::startCSpot, this);
+            newThread.detach();
+            EUPH_LOG(info, "cspot", "Detached");
+        };
+
+        authenticator = std::make_shared<ZeroconfAuthenticator>(createPlayerCallback, mainServer);
+        authenticator->registerHandlers();
+    }
 }

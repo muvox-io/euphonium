@@ -13,6 +13,7 @@
 #include "SpircController.h"
 #include "FakeAudioSink.h"
 #include "CliFile.h"
+#include "plugins/http/HTTPModule.h"
 #include "Module.h"
 #include <atomic>
 #include <mutex>
@@ -24,7 +25,9 @@ private:
     std::shared_ptr<FakeAudioSink> fakeAudioSink;
     std::atomic<bool> isRunning = false;
     std::mutex runningMutex;
+    authCallback createPlayerCallback;
     std::shared_ptr<LoginBlob> authBlob;
+    std::shared_ptr<ZeroconfAuthenticator> authenticator = nullptr;
     void mapConfig();
 
 public:

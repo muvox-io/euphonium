@@ -1,10 +1,12 @@
 #include "HTTPModule.h"
 #include "HTTPEvents.h"
 
+std::shared_ptr<bell::HTTPServer> mainServer;
+
 HTTPModule::HTTPModule()
 {
     name = "http";
-    server = std::make_shared<bell::HTTPServer>(2137);
+    mainServer = std::make_shared<bell::HTTPServer>(2137);
 }
 
 void HTTPModule::loadScript(std::shared_ptr<ScriptLoader> loader)
@@ -32,12 +34,9 @@ void HTTPModule::setupLuaBindings()
     responseType["body"] = &bell::HTTPResponse::body;
     responseType["contentType"] = &bell::HTTPResponse::contentType;
     responseType["connectionFd"] = &bell::HTTPResponse::connectionFd;
-
-    sol::usertype<bell::HTTPServer> serverType = lua.new_usertype<bell::HTTPServer>("HttpServer", sol::constructors<bell::HTTPServer(int)>());
-    serverType["respond"] = &bell::HTTPServer::respond;
-
+    
     lua.set_function("httpRegisterHandler", &HTTPModule::registerHandler, this);
-    lua.set_function("httpRespond", &bell::HTTPServer::respond, server);
+    lua.set_function("httpRespond", &bell::HTTPServer::respond, mainServer);
 }
 
 void HTTPModule::registerHandler(const std::string &routeUrl, bell::RequestType reqType, int handlerId)
@@ -51,7 +50,7 @@ void HTTPModule::registerHandler(const std::string &routeUrl, bell::RequestType 
     };
 
     EUPH_LOG(debug, "http", "Registering handler for %s", routeUrl.c_str());
-    server->registerHandler(reqType, routeUrl, handler);
+    mainServer->registerHandler(reqType, routeUrl, handler);
 }
 
 void HTTPModule::listen()
@@ -71,7 +70,7 @@ void HTTPModule::listen()
             .contentType = contentType,
             .connectionFd = request.connection,
             .status = 200};
-        server->respond(response);
+        mainServer->respond(response);
     };
 
     auto indexHandler = [this](bell::HTTPRequest &request)
@@ -83,11 +82,11 @@ void HTTPModule::listen()
             .contentType = "text/html",
             .connectionFd = request.connection,
             .status = 200};
-        server->respond(response);
+        mainServer->respond(response);
     };
-    server->registerHandler(bell::RequestType::GET, "/assets/:asset", assetHandler);
-    server->registerHandler(bell::RequestType::GET, "/web", indexHandler);
-    server->listen();
+    mainServer->registerHandler(bell::RequestType::GET, "/assets/:asset", assetHandler);
+    mainServer->registerHandler(bell::RequestType::GET, "/web", indexHandler);
+    mainServer->listen();
 }
 
 void HTTPModule::startAudioThread()

@@ -10,10 +10,10 @@
 #include "EuphoniumLog.h"
 #include "HTTPServer.h"
 
+extern std::shared_ptr<bell::HTTPServer> mainServer;
 class HTTPModule: public Module {
     public:
     HTTPModule();
-    std::shared_ptr<bell::HTTPServer> server;
     std::shared_ptr<ScriptLoader> scriptLoader;
     void loadScript(std::shared_ptr<ScriptLoader> scriptLoader);
     void setupLuaBindings();

@@ -64,7 +64,7 @@ export default () => {
         )}
       </div>
       <div className={css.confWrapper__actionButton}>
-        <Button onClick={}/>
+        <Button onClick={() => {}}/>
       </div>
     </div>
   );
