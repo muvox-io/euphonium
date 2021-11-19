@@ -69,13 +69,12 @@ void HTTPModule::runTask()
         prefix = "/spiffs";
         #endif
 
-        auto indexContent = scriptLoader->loadFile(prefix + "/assets/" + fileName);
         bell::HTTPResponse response = {
             .connectionFd = request.connection,
             .status = 200,
-            .body = indexContent,
             .contentType = contentType,
         };
+        response.responseReader = std::make_unique<bell::FileResponseReader>(prefix + "/assets/" + fileName);
         mainServer->respond(response);
     };
 
@@ -86,14 +85,12 @@ void HTTPModule::runTask()
         prefix = "/spiffs";
         #endif
 
-        auto indexContent = scriptLoader->loadFile(prefix + "/index.html");
-
         bell::HTTPResponse response = {
             .connectionFd = request.connection,
             .status = 200,
-            .body = indexContent,
             .contentType = "text/html",
-    };
+        };
+        response.responseReader = std::make_unique<bell::FileResponseReader>(prefix + "/index.html");
         mainServer->respond(response);
     };
     mainServer->registerHandler(bell::RequestType::GET, "/assets/:asset", assetHandler);

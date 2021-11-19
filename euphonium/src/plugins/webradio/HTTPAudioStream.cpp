@@ -129,4 +129,6 @@ void HTTPAudioStream::decodeFrame(std::shared_ptr<MainAudioBuffer> audioBuffer)
     {
         decodeFrameAAC(audioBuffer);
     }
+
+    BELL_SLEEP_MS(1);
 }
