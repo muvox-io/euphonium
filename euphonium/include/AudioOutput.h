@@ -1,7 +1,7 @@
 #ifndef EUPHONIUM_AUDIO_OUTPUT_H
 #define EUPHONIUM_AUDIO_OUTPUT_H
 
-#include <memory.h>
+#include <memory>
 #include <CircularBuffer.h>
 
 class AudioOutput

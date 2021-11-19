@@ -1,4 +1,17 @@
-.input {
+.inputContainer {
+    display: flex;
+    flex-direction: column;
+
+  &__icon {
+      margin-top: -45px;
+      margin-bottom: 10px;
+      z-index: 2;
+      pointer-events: none;
+      color: var(--text-secondary);
+      margin-left: 4px;
+  }
+  
+  &__input {
     border: none;
     border-radius: 8px;
     padding: 14px;
@@ -8,10 +21,15 @@
     margin: 8px 0px 12px 0px;
     color: var(--text-primary);
     background-color: var(--secondary-color);
+  }
 
-    &__tooltip {
-        color: var(--text-secondary);
-        font-size: 14px;
-        font-weight: 600;
-    }
+  &__input_icon {
+    padding-left: 43px;
+  }
+
+  &__tooltip {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+  }
 }

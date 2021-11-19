@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <mutex>
+#include <cstring>
 
 class CircularBuffer
 {

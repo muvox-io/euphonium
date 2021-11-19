@@ -3,7 +3,7 @@
 
 std::shared_ptr<bell::HTTPServer> mainServer;
 
-HTTPModule::HTTPModule()
+HTTPModule::HTTPModule() : bell::Task("http", 1024 * 4, 1)
 {
     name = "http";
     mainServer = std::make_shared<bell::HTTPServer>(2137);
@@ -53,7 +53,7 @@ void HTTPModule::registerHandler(const std::string &routeUrl, bell::RequestType 
     mainServer->registerHandler(reqType, routeUrl, handler);
 }
 
-void HTTPModule::listen()
+void HTTPModule::runTask()
 {
     auto assetHandler = [this](bell::HTTPRequest &request)
     {
@@ -64,24 +64,36 @@ void HTTPModule::listen()
             contentType = "application/javascript";
         }
 
-        auto indexContent = scriptLoader->loadFile("web/assets/" + fileName);
+        std::string prefix = "../../../web/dist";
+        #ifdef ESP_PLATFORM
+        prefix = "/spiffs";
+        #endif
+
+        auto indexContent = scriptLoader->loadFile(prefix + "/assets/" + fileName);
         bell::HTTPResponse response = {
+            .connectionFd = request.connection,
+            .status = 200,
             .body = indexContent,
             .contentType = contentType,
-            .connectionFd = request.connection,
-            .status = 200};
+        };
         mainServer->respond(response);
     };
 
     auto indexHandler = [this](bell::HTTPRequest &request)
     {
-        auto indexContent = scriptLoader->loadFile("web/index.html");
+        std::string prefix = "../../../web/dist";
+        #ifdef ESP_PLATFORM
+        prefix = "/spiffs";
+        #endif
+
+        auto indexContent = scriptLoader->loadFile(prefix + "/index.html");
 
         bell::HTTPResponse response = {
+            .connectionFd = request.connection,
+            .status = 200,
             .body = indexContent,
             .contentType = "text/html",
-            .connectionFd = request.connection,
-            .status = 200};
+    };
         mainServer->respond(response);
     };
     mainServer->registerHandler(bell::RequestType::GET, "/assets/:asset", assetHandler);
@@ -91,6 +103,5 @@ void HTTPModule::listen()
 
 void HTTPModule::startAudioThread()
 {
-    std::thread newThread(&HTTPModule::listen, this);
-    newThread.detach();
+    startTask();
 }

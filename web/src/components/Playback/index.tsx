@@ -1,6 +1,6 @@
 import css from "./Playback.module.scss";
-import { PlaybackState } from "../../api/models";
-import { getPlaybackState } from "../../api/api";
+import { PlaybackState } from "../../api/euphonium/models";
+import { getPlaybackState } from "../../api/euphonium/api";
 import Icon from "../Icon";
 import { useEffect, useState } from "preact/hooks";
 
@@ -14,7 +14,7 @@ const PlaybackBar = () => {
     <div className={css.wrapper}>
       <img
         className={css.wrapper__cover}
-        src="https://developer.spotify.com/assets/branding-guidelines/icon4@2x.png"
+        src="https://patronite.pl/upload/user/399444/avatar_orig.jpg"
       ></img>
       <div className={css.wrapper__playbackContainer}>
         <div className={css.wrapper__songContainer}>
@@ -25,10 +25,10 @@ const PlaybackBar = () => {
           </div>
         </div>
         <div className={css.wrapper__controlsContainer}>
-          <div className={css.wrapper__timeContainer}>2:00/2:40</div>
-          <Icon name="prev" />
+          {/* <div className={css.wrapper__timeContainer}>2:00/2:40</div> */}
+          {/* <Icon name="prev" /> */}
           <Icon name="pause" />
-          <Icon name="next" />
+          {/* <Icon name="next" /> */}
         </div>
       </div>
     </div>

@@ -55,7 +55,7 @@ void CSpotPlugin::startCSpot()
         // @TODO Actually store this token somewhere
         mercuryManager = std::make_shared<MercuryManager>(std::move(session));
         mercuryManager->startTask();
-        auto audioSink = std::make_shared<FakeAudioSink>(this->audioBuffer);
+        auto audioSink = std::make_shared<FakeAudioSink>(this->audioBuffer->audioBuffer);
         spircController = std::make_shared<SpircController>(mercuryManager, authBlob->username, audioSink);
         spircController->setTrackChangedCallback([this](TrackInfo &track)
                                                  {

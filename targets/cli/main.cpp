@@ -8,6 +8,7 @@
 int main(int argc, char *argv[])
 {
     bell::setDefaultLogger();
+    bell::enableSubmoduleLogging();
     auto core = std::make_shared<Core>();
     auto loader = std::make_shared<FileScriptLoader>();
     auto output = std::make_shared<PortAudioAudioOutput>();

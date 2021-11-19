@@ -6,6 +6,7 @@ http = Http.new()
 
 
 function handleRouteEvent(request)
+    logInfo("handling incoming request")
     http:handleIncomingRequest(request)
 end
 
@@ -35,6 +36,7 @@ function App.new()
 end
 
 function App.registerPlugin(self, plugin)
+    logInfo("Registering plugin: " .. plugin.name)
     self.plugins[plugin.name] = plugin
 end
 
@@ -49,7 +51,7 @@ function App.handleEvent(self, eventType, eventData)
 end
 
 function logInfo(msg)
-    luaLogInfo(debug.getinfo(2,'S').source, debug.getinfo(2, 'l').currentline, msg)
+    luaLogInfo(debug.getinfo(1,'S').source, debug.getinfo(2, 'l').currentline, msg)
 end
 
 
@@ -93,7 +95,8 @@ end
 
 function App.printRegisteredPlugins(self)
     startAudioThreadForPlugin("http", {})
-    self.enablePlugin("cspot")
+    --self.enablePlugin("cspot")
+    self.enablePlugin("webradio")
 end
 
 app = App.new()
@@ -149,7 +152,12 @@ http:handle(http.GET, "/plugins/:name", function(request)
                 v.value = v.defaultValue
             end
         end
-        http:sendJSON(app.plugins[plugin].configScheme, request.connection)
+        local body = {
+            configSchema = app.plugins[plugin].configScheme,
+            displayName = app.plugins[plugin].displayName
+        }
+
+        http:sendJSON(body, request.connection)
     end
 end)
 
@@ -168,8 +176,12 @@ http:handle(http.POST, "/plugins/:name", function(request)
                 app.plugins[plugin].configScheme[k].value = v
             end
         end
+        local body = {
+            configSchema = app.plugins[plugin].configScheme,
+            displayName = app.plugins[plugin].displayName
+        }
 
-        http:sendJSON(app.plugins[plugin].configScheme, request.connection)
+        http:sendJSON(body, request.connection)
         app.plugins[plugin]:configurationChanged()
     end
 end)

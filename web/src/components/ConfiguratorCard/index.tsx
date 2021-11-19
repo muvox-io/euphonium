@@ -1,11 +1,12 @@
-import { useState, useEffect, StateUpdater } from "preact/hooks";
+import { useState, useEffect } from "preact/hooks";
 
 import css from "./ConfiguratorCard.module.scss";
 import Input from "../Input";
 import Select from "../Select";
 import Button from "../Button";
-import { ConfigurationField, ConfigurationFieldType } from "../../api/models";
-import { getPluginConfiguration } from "../../api/api";
+import { ConfigurationField, ConfigurationFieldType } from "../../api/euphonium/models";
+import { getPluginConfiguration, updatePluginConfiguration } from "../../api/euphonium/api";
+import RadioBrowser from "../../apps/radiobrowser/RadioBrowser";
 
 const renderConfigurationField = (
   field: ConfigurationField,
@@ -15,7 +16,7 @@ const renderConfigurationField = (
   const onChange = (e: string) => updateField(field, e);
   switch (type) {
     case ConfigurationFieldType.String:
-      return <Input tooltip={tooltip} value={value} onChange={onChange}/>;
+      return <Input tooltip={tooltip} value={value} onChange={onChange} />;
     case ConfigurationFieldType.StringList:
       return (
         <Select
@@ -30,17 +31,24 @@ const renderConfigurationField = (
   }
 };
 
-export default () => {
+export default ({ plugin = "" }) => {
+  const [displayName, setDisplayName] = useState<string>("");
   const [configurationFields, setConfigurationFields] = useState<
     ConfigurationField[]
   >([]);
 
   useEffect(() => {
-    getPluginConfiguration("cspot").then((e) => setConfigurationFields(e));
-  }, []);
+    getPluginConfiguration(plugin).then((e) => {
+      setConfigurationFields(e.fields);
+      setDisplayName(e.displayName);
+    });
+  }, [plugin]);
 
   const updateConfiguration = () => {
-      
+    updatePluginConfiguration(plugin, configurationFields).then((e) => {
+      setConfigurationFields(e.fields);
+      setDisplayName(e.displayName);
+    });
   };
 
   const updateField = (field: ConfigurationField, value: string) => {
@@ -56,15 +64,16 @@ export default () => {
 
   return (
     <div className={css.confWrapper}>
-      <div className={css.confWrapper__header}>Spotify (cspot)</div>
+      <div className={css.confWrapper__header}>{displayName} ({plugin})</div>
       <div className={css.confWrapper__subheader}>plugin configuration</div>
       <div className={css.confWrapper__card}>
-        {configurationFields.map((field) =>
+        {/* {configurationFields.map((field) =>
           renderConfigurationField(field, updateField)
-        )}
+        )} */}
+        <RadioBrowser></RadioBrowser>
       </div>
       <div className={css.confWrapper__actionButton}>
-        <Button onClick={() => {}}/>
+        {/* <Button onClick={() => { updateConfiguration() }} /> */}
       </div>
     </div>
   );

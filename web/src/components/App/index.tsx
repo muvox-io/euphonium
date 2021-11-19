@@ -16,7 +16,7 @@ export function App() {
           <SideBar />
           <div className={css.mainWrapper__mainContent}>
             <Router>
-              <Route path="/plugin/:plugin" component={ConfiguratorCard}/>
+              <Route path="/web/plugin/:plugin" component={ConfiguratorCard}/>
             </Router>
             <Playback/>
           </div>

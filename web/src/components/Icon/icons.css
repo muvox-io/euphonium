@@ -1,15 +1,14 @@
 @font-face {
-  font-family: "icomoon";
-  src: url("../../assets/icons.ttf?q1gvfy") format("truetype");
+  font-family: 'icomoon';
+  src:  url('../../assets/icons.ttf');
   font-weight: normal;
   font-style: normal;
   font-display: block;
 }
 
-[class^="icon-"],
-[class*=" icon-"] {
+[class^="icon-"], [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: "icomoon" !important;
+  font-family: 'icomoon' !important;
   speak: never;
   font-style: normal;
   font-weight: normal;
@@ -23,7 +22,13 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-down:before {
+.icon-save:before {
+  content: "\e908";
+}
+.icon-sun:before {
+  content: "\e906";
+}
+.icon-moon:before {
   content: "\e900";
 }
 .icon-prev:before {
@@ -32,15 +37,12 @@
 .icon-next:before {
   content: "\e902";
 }
-.icon-moon:before {
+.icon-play:before {
   content: "\e903";
 }
-.icon-sun:before {
+.icon-pause:before {
   content: "\e904";
 }
-.icon-pause:before {
+.icon-search:before {
   content: "\e905";
-}
-.icon-play:before {
-  content: "\e906";
 }

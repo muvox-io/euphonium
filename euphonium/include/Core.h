@@ -7,14 +7,13 @@
 #include "AudioOutput.h"
 #include "plugins/http/HTTPModule.h"
 #include "plugins/cspot/CSpotPlugin.h"
+#include "plugins/webradio/WebRadioPlugin.h"
+#include "MainAudioBuffer.h"
 #include "Module.h"
 #include "ScriptLoader.h"
 #include "EventBus.h"
 #include <thread>
-
-#define AUDIO_BUFFER_SIZE 4096 * 16
-
-class Core: public EventSubscriber {
+class Core: public bell::Task, public EventSubscriber {
 private:
     std::shared_ptr<AudioOutput> currentOutput;
     sol::state luaState;
@@ -29,13 +28,13 @@ public:
     void loadPlugins(std::shared_ptr<ScriptLoader> loader);
     void handleLuaThread();
     void handleServerThread();
-    void handleAudioOutputThread();
+    void runTask();
     void handleEvent(std::unique_ptr<Event> event);
     void setupBindings();
     void startAudioThreadForPlugin(std::string pluginName, sol::table config);
 
     std::shared_ptr<EventBus> luaEventBus;
-    std::shared_ptr<CircularBuffer> audioBuffer;
+    std::shared_ptr<MainAudioBuffer> audioBuffer;
 };
 
 #endif

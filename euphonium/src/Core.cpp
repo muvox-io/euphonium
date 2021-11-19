@@ -5,17 +5,20 @@
 #include <cassert>
 #include <EuphoniumLog.h>
 
-Core::Core()
+Core::Core() : bell::Task("Core", 4 * 1024, 1)
 {
-    audioBuffer = std::make_shared<CircularBuffer>(AUDIO_BUFFER_SIZE);
+    audioBuffer = std::make_shared<MainAudioBuffer>();
     luaEventBus = std::make_shared<EventBus>();
 
+    // Prepare lua event thread
     auto subscriber = dynamic_cast<EventSubscriber*>(this);
     luaEventBus->addListener(EventType::LUA_MAIN_EVENT, *subscriber);
-    // luaState = std::make_shared<sol::state>();
+
     this->setupBindings();
     registeredPlugins = {
-        std::make_shared<CSpotPlugin>()};
+        std::make_shared<CSpotPlugin>(),
+        std::make_shared<WebRadioPlugin>()
+    };
     requiredModules = {
         std::make_shared<HTTPModule>()};
 }
@@ -58,11 +61,11 @@ void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader)
     
     checkResult(luaState.script("app:printRegisteredPlugins()"));
 
-    std::thread newThread(&Core::handleAudioOutputThread, this);
-    newThread.detach();
+    startTask();
 
     EUPH_LOG(info, "core", "Lua thread listening");
     while(true) {
+        usleep(10000);
         luaEventBus->update();
     }
 }
@@ -114,11 +117,13 @@ void Core::setupBindings() {
     playbackType["sourceName"] = &PlaybackInfo::sourceName;
 }
 
-void Core::handleAudioOutputThread() {
+void Core::runTask() {
     EUPH_LOG(info, "core", "Audio output started");
     while (true) {
-        if (audioBuffer->size() > 0 && outputConnected) {
-            this->currentOutput->update(audioBuffer);
+        if (audioBuffer->audioBuffer->size() > 0 && outputConnected) {
+            this->currentOutput->update(audioBuffer->audioBuffer);
+        } else {
+            audioBuffer->audioBufferSemaphore->wait();
         }
     }
 }

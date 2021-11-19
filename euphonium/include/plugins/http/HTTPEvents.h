@@ -3,6 +3,7 @@
 
 #include <EventBus.h>
 #include <memory.h>
+#include "Task.h"
 #include <HTTPServer.h>
 
 class HandleRouteEvent: public Event {
