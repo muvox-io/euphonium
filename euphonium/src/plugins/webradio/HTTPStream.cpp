@@ -21,12 +21,15 @@ HTTPStream::HTTPStream()
 
 HTTPStream::~HTTPStream()
 {
-    close();
+    //close();
 }
 
 void HTTPStream::close() {
-    status = StreamStatus::CLOSED;
-    ::close(this->sockFd);
+    if (status != StreamStatus::CLOSED) {
+        status = StreamStatus::CLOSED;
+        EUPH_LOG(info, "httpStream", "Closing socket");
+        ::close(this->sockFd);
+    }
 }
 
 void HTTPStream::connectToUrl(std::string url)
@@ -158,14 +161,15 @@ size_t HTTPStream::read(uint8_t *buf, size_t nbytes) {
     int nread = recv(sockFd, buf, nbytes, 0);
     if (nread < 0)
     {
-        EUPH_LOG(error, "http", "Error reading from client");
+        EUPH_LOG(error, "http", "Error reading from client %d", sockFd);
+        close();
+
         perror("recv");
         exit(EXIT_FAILURE);
     }
     else if (nread == 0)
     {
         EUPH_LOG(error, "http", "Client disconnected");
-        close();
     }
     return nread;
 }

@@ -90,11 +90,12 @@ void app_main(void)
     }
     ESP_ERROR_CHECK(ret);
 
-    init_spiffs();
 
     esp_wifi_set_ps(WIFI_PS_NONE);
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
+    init_spiffs();
+
     ESP_ERROR_CHECK(example_connect());
 
     ESP_LOGI("TAG", "Connected to AP, start euphonium");
