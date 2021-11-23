@@ -2,21 +2,15 @@ WebRadioPlugin = {name = "webradio"}
 WebRadioPlugin.__index = WebRadioPlugin
 
 function WebRadioPlugin.new()
-    local self = setmetatable({name = "webradio", displayName = "Web Radio", type="plugin"}, WebRadioPlugin)
+    local self = setmetatable({name = "webradio", displayName = "Web Radio", type="plugin", registerWebApp = true}, WebRadioPlugin)
 
     -- Plugin configuration schema
     self.configScheme = {
         stationUrl = {
-            tooltip = "Station's url",
+            tooltip = "RadioBrowser instance",
             type = "string",
-            defaultValue = "none"
+            defaultValue = "https://de1.api.radio-browser.info/"
         },
-        stationCodec = {
-            tooltip = "Station codec",
-            type = "stringList",
-            listValues = {"AAC", "MP3", "OPUS"},
-            defaultValue = "AAC"
-        }
     }
     return self
 end
@@ -28,12 +22,18 @@ end
 
 http:handle(http.POST, "/webradio", function(request)
     local body = json.decode(request.body)
-    local response = {
-        status = "playing"
-    }
-    
     webradioQueueUrl(body.stationUrl, body["codec"] == "AAC" or body["codec"] == "AAC+")
-    http:sendJSON(response, request.connection)
+    http:sendJSON({ status = "playing" }, request.connection)
+
+    -- update playback status
+    local song = {
+        songName = body["stationName"],
+        artistName = "Internet Radio",
+        sourceName = "webradio",
+        icon = body["favicon"],
+        albumName = body["codec"]
+    }
+    handleSongChangedEvent(song)
 end)
 
 app:registerPlugin(WebRadioPlugin.new())

@@ -21,6 +21,15 @@ Core::Core() : bell::Task("Core", 4 * 1024, 1)
     };
     requiredModules = {
         std::make_shared<HTTPModule>()};
+
+    audioBuffer->shutdownListener = [this](std::string exceptPlugin) {
+        for (auto& plugin : registeredPlugins) {
+            if (plugin->name != exceptPlugin && plugin->status == ModuleStatus::RUNNING) {
+                EUPH_LOG(info, "core", "Shutting down %s", plugin->name.c_str());
+                plugin->shutdown();
+            }
+        }
+    };
 }
 
 void checkResult(sol::protected_function_result result)
@@ -28,6 +37,12 @@ void checkResult(sol::protected_function_result result)
     if (!result.valid())
     {
         std::cout << ((sol::error)result).what() << std::endl;
+    }
+}
+
+void Core::changeVolume(int volume) {
+    if (outputConnected) {
+        audioBuffer->setVolume(volume);
     }
 }
 
@@ -109,10 +124,12 @@ void Core::setupBindings() {
     luaState.set_function("luaLogDebug", luaLogDebug);
     luaState.set_function("luaLogInfo", luaLogInfo);
     luaState.set_function("luaLog", luaLog);
+    luaState.set_function("setVolume", &Core::changeVolume, this);
 
     sol::usertype<PlaybackInfo> playbackType = luaState.new_usertype<PlaybackInfo>("PlaybackInfo", sol::constructors<PlaybackInfo()>());
     playbackType["albumName"] = &PlaybackInfo::albumName;
     playbackType["artistName"] = &PlaybackInfo::artistName;
+    playbackType["icon"] = &PlaybackInfo::icon;
     playbackType["songName"] = &PlaybackInfo::songName;
     playbackType["sourceName"] = &PlaybackInfo::sourceName;
 }

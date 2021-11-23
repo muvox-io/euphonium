@@ -12,6 +12,7 @@ HTTPAudioStream::HTTPAudioStream()
 HTTPAudioStream::~HTTPAudioStream()
 {
     AACFreeDecoder(decoder);
+    MP3FreeDecoder(mp3Decoder);
 }
 
 void HTTPAudioStream::querySongFromUrl(std::string url, AudioCodec audioCodec)
@@ -49,7 +50,7 @@ void HTTPAudioStream::decodeFrameMP3(std::shared_ptr<MainAudioBuffer> audioBuffe
                 size_t bytesWritten = 0;
                 while (bytesWritten < sizeData)
                 {
-                    bytesWritten += audioBuffer->audioBuffer->write(audioData + bytesWritten, sizeData - bytesWritten);
+                    bytesWritten += audioBuffer->write(audioData + bytesWritten, sizeData - bytesWritten);
                 }
                 audioBuffer->audioBufferSemaphore->give();
             }
@@ -97,7 +98,7 @@ void HTTPAudioStream::decodeFrameAAC(std::shared_ptr<MainAudioBuffer> audioBuffe
                 size_t bytesWritten = 0;
                 while (bytesWritten < sizeData)
                 {
-                    bytesWritten += audioBuffer->audioBuffer->write(audioData + bytesWritten, sizeData - bytesWritten);
+                    bytesWritten += audioBuffer->write(audioData + bytesWritten, sizeData - bytesWritten);
                 }
                 audioBuffer->audioBufferSemaphore->give();
             }

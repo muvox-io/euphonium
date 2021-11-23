@@ -8,9 +8,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../euphonium ${CMAKE_CURRENT_BIN
 
 
 message(${CMAKE_CURRENT_SOURCE_DIR}/cmake/build_web.sh)
-execute_process(
-    COMMAND echo "Hello"
-    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/cmake/build_web.sh" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+execute_process(COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/cmake/build_web.sh" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
 find_package( portaudio REQUIRED )
 include_directories( ${PORTAUDIO_INCLUDE_DIRS} )

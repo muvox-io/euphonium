@@ -4,7 +4,7 @@
 
 std::shared_ptr<ConfigJSON> configMan;
 
-CSpotPlugin::CSpotPlugin()
+CSpotPlugin::CSpotPlugin() : bell::Task("cspot", 4 * 1024, 1)
 {
     auto file = std::make_shared<CliFile>();
     configMan = std::make_shared<ConfigJSON>("test.json", file);
@@ -33,15 +33,30 @@ void CSpotPlugin::configurationUpdated()
     spircController.reset();
     mercuryManager.reset();
     usleep(500000);
+    status = ModuleStatus::SHUTDOWN;
     //startAudioThread();
 }
 
-void CSpotPlugin::startCSpot()
+void CSpotPlugin::shutdown() {
+    this->isRunning = false;
+    std::scoped_lock(this->runningMutex);
+    mercuryManager->stop();
+    spircController->stopPlayer();
+    usleep(500000);
+    spircController.reset();
+    mercuryManager.reset();
+    usleep(500000);
+    status = ModuleStatus::SHUTDOWN;
+}
+
+void CSpotPlugin::runTask()
 {
+    status = ModuleStatus::RUNNING;
     std::scoped_lock lock(runningMutex);
     this->isRunning = true;
 
     EUPH_LOG(info, "cspot", "Starting CSpot");
+    this->audioBuffer->shutdownExcept(name);
 
     auto session = std::make_unique<Session>();
     session->connectWithRandomAp();
@@ -60,7 +75,7 @@ void CSpotPlugin::startCSpot()
         spircController->setTrackChangedCallback([this](TrackInfo &track)
                                                  {
                                                      auto sourceName = std::string("cspot");
-                                                     auto event = std::make_unique<SongChangedEvent>(track.name, track.album, track.artist, sourceName);
+                                                     auto event = std::make_unique<SongChangedEvent>(track.name, track.album, track.artist, sourceName, track.imageUrl);
                                                      EUPH_LOG(info, "cspot", "Song name changed");
                                                      this->luaEventBus->postEvent(std::move(event));
                                                  });
@@ -79,6 +94,7 @@ void CSpotPlugin::startCSpot()
 
 void CSpotPlugin::mapConfig()
 {
+    configMan->volume = 255;
     configMan->deviceName = config["receiverName"];
     std::string bitrateString = config["audioBitrate"];
     switch (std::stoi(bitrateString))
@@ -102,14 +118,14 @@ void CSpotPlugin::startAudioThread()
     {
         createPlayerCallback = [this](std::shared_ptr<LoginBlob> blob)
         {
-            if (this->isRunning) {
+            if (this->isRunning)
+            {
                 configurationUpdated();
             }
 
             this->authBlob = blob;
             EUPH_LOG(info, "cspot", "Authenticated");
-            std::thread newThread(&CSpotPlugin::startCSpot, this);
-            newThread.detach();
+            startTask();
             EUPH_LOG(info, "cspot", "Detached");
         };
 

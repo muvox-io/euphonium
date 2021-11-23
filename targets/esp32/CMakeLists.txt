@@ -6,6 +6,9 @@ cmake_minimum_required(VERSION 3.5)
 # see https://github.com/platformio/platform-espressif32/issues/341
 list(APPEND EXTRA_COMPONENT_DIRS $ENV{IDF_PATH}/examples/common_components/protocol_examples_common)
 
+message(${CMAKE_CURRENT_SOURCE_DIR}/cmake/build_web.sh)
+execute_process(COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/cmake/build_web.sh" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(euphonium-esp32)
 

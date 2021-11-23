@@ -7,6 +7,7 @@
 #include "MercuryManager.h"
 #include "EuphoniumLog.h"
 #include "Logger.h"
+#include "Task.h"
 #include "ZeroconfAuthenticator.h"
 #include "Session.h"
 #include "CoreEvents.h"
@@ -17,7 +18,7 @@
 #include "Module.h"
 #include <atomic>
 #include <mutex>
-class CSpotPlugin : public Module
+class CSpotPlugin : public Module, public bell::Task
 {
 private:
     std::shared_ptr<MercuryManager> mercuryManager;
@@ -34,9 +35,10 @@ public:
     CSpotPlugin();
     void loadScript(std::shared_ptr<ScriptLoader> scriptLoader);
     void setupLuaBindings();
-    void startCSpot();
     void configurationUpdated();
+    void shutdown();
     void startAudioThread();
+    void runTask();
 };
 
 #endif

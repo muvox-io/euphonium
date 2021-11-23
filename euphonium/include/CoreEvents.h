@@ -5,18 +5,19 @@
 #include <memory.h>
 
 struct PlaybackInfo {
-    std::string songName, albumName, artistName, sourceName;
+    std::string songName, albumName, artistName, sourceName, icon;
 };
 
 class SongChangedEvent: public Event {
     public:
     PlaybackInfo playbackInfo;
-    SongChangedEvent(std::string& songName, std::string& albumName, std::string& artistName, std::string& sourceName) {
+    SongChangedEvent(std::string& songName, std::string& albumName, std::string& artistName, std::string& sourceName, std::string icon) {
         this->playbackInfo = {
             .songName = songName,
             .albumName = albumName,
             .artistName = artistName,
-            .sourceName = sourceName
+            .sourceName = sourceName,
+            .icon = icon
         };
         this->luaEventType = "songChangedEvent";
         this->eventType = EventType::LUA_MAIN_EVENT;

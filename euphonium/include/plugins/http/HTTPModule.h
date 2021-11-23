@@ -22,6 +22,7 @@ class HTTPModule: public bell::Task, public Module {
     void runTask();
     void startAudioThread();
     void listen();
+    void shutdown() {};
 };
 
 #endif

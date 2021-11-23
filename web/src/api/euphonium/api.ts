@@ -5,25 +5,20 @@ import {
   PluginEntry,
 } from "./models";
 
-let apiUrl = "http://localhost:2137";
+let apiUrl = "";
+
+let eventsUrl = apiUrl + "/events";
 
 const getPlugins = async (): Promise<PluginEntry[]> => {
-  return await fetch(apiUrl + "/plugins")
+  return await fetch("/plugins")
     .then((e) => e.json())
     .then((e) => e.map((e: any) => e as PluginEntry));
 };
 
 const getPlaybackState = async (): Promise<PlaybackState> => {
-  return await fetch(apiUrl + "/playback")
+  return await fetch("/playback")
     .then((e) => e.json())
-    .then((e) => {
-      return {
-        songName: "Radio 357",
-        artistName: "Internet radio",
-        albumName: "AAC Codec",
-        sourceName: "webradio",
-      } as PlaybackState;
-    });
+    .then((e) => e as PlaybackState);
 };
 
 const getPluginConfiguration = async (
@@ -55,10 +50,10 @@ const updatePluginConfiguration = async (
   });
 
   return await fetch(`${apiUrl}/plugins/${pluginName}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
+      Accept: "application/json",
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(mappedConfig),
   })
@@ -76,20 +71,24 @@ const updatePluginConfiguration = async (
     });
 };
 
-const playRadio = async (
-  stationUrl: string,
-  codec: string,
-): Promise<any> => {
-  return await fetch(`${apiUrl}/webradio`, {
-    method: 'POST',
+const playRadio = async (stationName: string, favicon: string, stationUrl: string, codec: string): Promise<any> => {
+  return await fetch("/webradio", {
+    method: "POST",
     headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
+      Accept: "application/json",
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify({stationUrl, codec}),
-  })
-    .then((e) => e.json());
+    body: JSON.stringify({ stationUrl, codec, stationName, favicon }),
+  }).then((e) => e.json());
 };
 
+let eventSource = new EventSource("/events");
 
-export { getPlugins, updatePluginConfiguration, playRadio, getPluginConfiguration, getPlaybackState };
+export {
+  getPlugins,
+  eventSource,
+  updatePluginConfiguration,
+  playRadio,
+  getPluginConfiguration,
+  getPlaybackState,
+};

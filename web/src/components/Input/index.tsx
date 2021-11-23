@@ -18,7 +18,7 @@ export default ({
 }: InputProps) => {
   return (
     <div class={css.inputContainer}>
-      {tooltip && <div class={css.input__tooltip}>{tooltip}</div>}
+      {tooltip && <div class={css.inputContainer__tooltip}>{tooltip}</div>}
 
       <input
         placeholder={placeholder}

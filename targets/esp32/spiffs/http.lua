@@ -32,3 +32,7 @@ function Http.sendJSON(self, body, conn, status)
     response.connectionFd = conn
     httpRespond(response)
 end
+
+function Http.publishEvent(self, type, body)
+    httpPublishEvent(type, json.encode(body or {}))
+end

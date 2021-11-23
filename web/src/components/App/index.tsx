@@ -7,6 +7,7 @@ import Light from "../../theme/Light";
 import Dark from "../../theme/Dark";
 import Router, { Route } from "preact-router";
 import "../../theme/main.scss";
+import RadioBrowser from "../../apps/radiobrowser/RadioBrowser";
 
 export function App() {
   return (
@@ -17,6 +18,7 @@ export function App() {
           <div className={css.mainWrapper__mainContent}>
             <Router>
               <Route path="/web/plugin/:plugin" component={ConfiguratorCard}/>
+              <Route path="/web/apps/webradio" component={RadioBrowser}/>
             </Router>
             <Playback/>
           </div>

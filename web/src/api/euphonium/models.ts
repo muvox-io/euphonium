@@ -1,6 +1,7 @@
 enum PluginEntryType {
     Plugin = "plugin",
-    System = "system"
+    System = "system",
+    App = "app"
 }
 
 interface PluginEntry {
@@ -32,6 +33,7 @@ interface PlaybackState {
     songName: string;
     sourceName: string;
     albumName: string;
+    icon: string;
 }
 
 

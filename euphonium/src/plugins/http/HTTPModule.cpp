@@ -6,7 +6,7 @@ std::shared_ptr<bell::HTTPServer> mainServer;
 HTTPModule::HTTPModule() : bell::Task("http", 1024 * 4, 1)
 {
     name = "http";
-    mainServer = std::make_shared<bell::HTTPServer>(2137);
+    mainServer = std::make_shared<bell::HTTPServer>(2138);
 }
 
 void HTTPModule::loadScript(std::shared_ptr<ScriptLoader> loader)
@@ -37,6 +37,7 @@ void HTTPModule::setupLuaBindings()
     
     lua.set_function("httpRegisterHandler", &HTTPModule::registerHandler, this);
     lua.set_function("httpRespond", &bell::HTTPServer::respond, mainServer);
+    lua.set_function("httpPublishEvent", &bell::HTTPServer::publishEvent, mainServer);
 }
 
 void HTTPModule::registerHandler(const std::string &routeUrl, bell::RequestType reqType, int handlerId)

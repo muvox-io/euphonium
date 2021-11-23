@@ -16,6 +16,9 @@ function handleSongChangedEvent(song)
     app.playbackState.artistName = song.artistName
     app.playbackState.sourceName = song.sourceName
     app.playbackState.albumName = song.albumName
+    app.playbackState.icon = song.icon
+
+    http:publishEvent("playback", app.playbackState)
 end
 
 function App.new()
@@ -29,7 +32,8 @@ function App.new()
             songName = "",
             artistName = "",
             sourceName = "",
-            albumName = ""
+            albumName = "",
+            icon = "https://d338t8kmirgyke.cloudfront.net/icons/icon_pngs/000/002/026/original/disc.png"
         }
     }, App)
     return self
@@ -95,7 +99,7 @@ end
 
 function App.printRegisteredPlugins(self)
     startAudioThreadForPlugin("http", {})
-    --self.enablePlugin("cspot")
+    self.enablePlugin("cspot")
     self.enablePlugin("webradio")
 end
 
@@ -109,14 +113,16 @@ http:handle(http.GET, "/plugins", function(request)
             displayName = app.plugins[k].displayName,
             type = app.plugins[k].type
         }
+
+        if app.plugins[k].registerWebApp then
+            table.insert(pluginNames, {
+                name = k,
+                displayName = app.plugins[k].displayName,
+                type = "app"
+            })
+        end
         table.insert(pluginNames, value)
     end
-    -- mock
-    table.insert(pluginNames, {
-        name = "airplay",
-        displayName = "AirPlay integration",
-        type = "plugin"
-    })
 
     -- mock
     table.insert(pluginNames, {
@@ -184,4 +190,13 @@ http:handle(http.POST, "/plugins/:name", function(request)
         http:sendJSON(body, request.connection)
         app.plugins[plugin]:configurationChanged()
     end
+end)
+
+
+http:handle(http.POST, "/volume", function(request)
+    local body = json.decode(request.body)
+
+    http:sendJSON(body, request.connection)
+
+    changeVolume(body.volume)
 end)

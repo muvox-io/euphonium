@@ -29,13 +29,27 @@ void WebRadioPlugin::playRadioUrl(std::string url, bool isAAC)
     radioUrlQueue.push({isAAC, url});
 }
 
+void WebRadioPlugin::shutdown() {
+    EUPH_LOG(info, "webradio", "Shutting down...");
+    isRunning = false;
+    std::lock_guard lock(runningMutex);
+    status = ModuleStatus::SHUTDOWN;
+}
+
 void WebRadioPlugin::runTask()
 {
     std::pair<bool, std::string> url;
 
     while (true) {
         if (this->radioUrlQueue.wpop(url)) {
+            std::lock_guard lock(runningMutex);
             isRunning = true;
+            status = ModuleStatus::RUNNING;
+
+            EUPH_LOG(info, "webradio", "Starting WebRadio");
+            // Shutdown all other modules
+            audioBuffer->shutdownExcept(name);
+
             if (url.first) {
                 audioStream->querySongFromUrl(url.second, AudioCodec::AAC);
             } else {

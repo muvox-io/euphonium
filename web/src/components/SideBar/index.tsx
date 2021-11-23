@@ -1,7 +1,7 @@
 import { Link } from "preact-router/match";
 import { useState, useEffect } from "preact/hooks";
 import { getPlugins } from "../../api/euphonium/api";
-import { PluginEntry } from "../../api/euphonium/models";
+import { PluginEntry, PluginEntryType } from "../../api/euphonium/models";
 import css from "./SideBar.module.scss";
 
 const SideBarItem = ({ displayName = "", name = "", type = "" }) => {
@@ -9,7 +9,7 @@ const SideBarItem = ({ displayName = "", name = "", type = "" }) => {
     <Link
       activeClassName={css.sideBar__itemselected}
       className={css.sideBar__itemwrapper}
-      href={`/web/plugin/${name}`}
+      href={ type == "app" ? `/web/apps/${name}` : `/web/plugin/${name}` }
     >
       <div className={css.sideBar__item}>{displayName}</div>
     </Link>
@@ -17,13 +17,11 @@ const SideBarItem = ({ displayName = "", name = "", type = "" }) => {
 };
 
 export default () => {
-  const [systemPlugins, setSystemPlugins] = useState<PluginEntry[]>([]);
   const [plugins, setPlugins] = useState<PluginEntry[]>([]);
 
   useEffect(() => {
     getPlugins().then((data) => {
-      setSystemPlugins(data.filter((e) => e.type == "system"));
-      setPlugins(data.filter((e) => e.type == "plugin"));
+      setPlugins(data);
     });
   }, []);
 
@@ -31,14 +29,17 @@ export default () => {
     <div className={css.sideBar}>
       <div className={css.sideBar__header}>Euphonium 🎺</div>
       <div className={css.sideBar__subheader}>available apps</div>
-      <SideBarItem name="webradio2" displayName="Web Radio" />
+      {plugins.filter((e) => e.type == PluginEntryType.App).map((result) => (
+        <SideBarItem {...result} />
+      ))}
+
       <div className={css.sideBar__subheader}>system modules</div>
-      {systemPlugins.map((result) => (
+      {plugins.filter((e) => e.type == PluginEntryType.System).map((result) => (
         <SideBarItem {...result} />
       ))}
 
       <div className={css.sideBar__subheader}>installed plugins</div>
-      {plugins.map((result) => (
+      {plugins.filter((e) => e.type == PluginEntryType.Plugin).map((result) => (
         <SideBarItem {...result} />
       ))}
     </div>

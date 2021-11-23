@@ -2,6 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import { playRadio } from "../../../api/euphonium/api";
 import { getStationsByName } from "../../../api/radiobrowser/api";
 import { Station } from "../../../api/radiobrowser/models";
+import Card from "../../../components/Card";
 import Icon from "../../../components/Icon";
 import Input from "../../../components/Input";
 import css from "./RadioBrowser.module.scss";
@@ -28,7 +29,7 @@ const Radio = ({
         {codec} Codec • {bitrate} kbps • {countrycode}
       </div>
       <div className={css.stationContainer__controls}>
-          <Icon onClick={() => playRadio(url_resolved, codec)} name="play" />
+        <Icon onClick={() => playRadio(name, favicon, url_resolved, codec)} name="play" />
         <Icon name="save" />
       </div>
     </div>
@@ -39,7 +40,7 @@ export default () => {
   const [radios, setRadios] = useState<Station[]>([]);
 
   return (
-    <div>
+    <Card title="Web radio" subtitle="application">
       <Input
         onChange={(e) => {
           getStationsByName(e).then(setRadios);
@@ -54,6 +55,6 @@ export default () => {
           <Radio {...radio}></Radio>
         ))}
       </div>
-    </div>
+    </Card >
   );
 };

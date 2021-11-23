@@ -1,12 +1,10 @@
 import { useState, useEffect } from "preact/hooks";
 
-import css from "./ConfiguratorCard.module.scss";
 import Input from "../Input";
 import Select from "../Select";
-import Button from "../Button";
 import { ConfigurationField, ConfigurationFieldType } from "../../api/euphonium/models";
 import { getPluginConfiguration, updatePluginConfiguration } from "../../api/euphonium/api";
-import RadioBrowser from "../../apps/radiobrowser/RadioBrowser";
+import Card from "../Card";
 
 const renderConfigurationField = (
   field: ConfigurationField,
@@ -59,22 +57,13 @@ export default ({ plugin = "" }) => {
       return f;
     });
     setConfigurationFields(newFields);
-    console.log(newFields);
   };
 
   return (
-    <div className={css.confWrapper}>
-      <div className={css.confWrapper__header}>{displayName} ({plugin})</div>
-      <div className={css.confWrapper__subheader}>plugin configuration</div>
-      <div className={css.confWrapper__card}>
-        {/* {configurationFields.map((field) =>
-          renderConfigurationField(field, updateField)
-        )} */}
-        <RadioBrowser></RadioBrowser>
-      </div>
-      <div className={css.confWrapper__actionButton}>
-        {/* <Button onClick={() => { updateConfiguration() }} /> */}
-      </div>
-    </div>
+    <Card title={displayName} subtitle={"plugin configuration"}>
+      {configurationFields.map((field) =>
+        renderConfigurationField(field, updateField)
+      )}
+    </Card>
   );
 };
