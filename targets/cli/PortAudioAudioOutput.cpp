@@ -34,8 +34,6 @@ PortAudioAudioOutput::~PortAudioAudioOutput()
     Pa_Terminate();
 }
 
-void PortAudioAudioOutput::update(std::shared_ptr<CircularBuffer> audioBuffer) {
-    auto buffer = std::vector<uint8_t>(4096);
-    auto readNumber = audioBuffer->read(buffer.data(), 4096);
-    Pa_WriteStream(stream, &buffer[0], buffer.size() / 4);
+void PortAudioAudioOutput::feedPCMFrames(uint8_t* data, size_t nBytes) {
+    Pa_WriteStream(stream, data, nBytes / 4);
 }

@@ -2,14 +2,20 @@
 #define EUPHONIUM_CSPOT_AUDIO_SINK_H
 
 #include "AudioSink.h"
-#include "CircularBuffer.h"
+#include "MainAudioBuffer.h"
 #include <memory>
+#include "EuphoniumLog.h"
+#include "EventBus.h"
+#include "CoreEvents.h"
+#include "ConstantParameters.h"
 
 class FakeAudioSink: public AudioSink {
     public:
-    std::shared_ptr<CircularBuffer> buffer;
-    FakeAudioSink(std::shared_ptr<CircularBuffer> buffer);
+    std::shared_ptr<MainAudioBuffer> buffer;
+    std::shared_ptr<EventBus> eventBus;
+    FakeAudioSink(std::shared_ptr<MainAudioBuffer> buffer, std::shared_ptr<EventBus> eventBus);
     void feedPCMFrames(std::vector<uint8_t> &data);
+    void volumeChanged(uint16_t volume);
 };
 
 #endif

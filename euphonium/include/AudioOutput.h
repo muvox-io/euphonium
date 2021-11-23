@@ -9,7 +9,7 @@ class AudioOutput
     public:
     AudioOutput() {}
     virtual ~AudioOutput() {}
-    virtual void update(std::shared_ptr<CircularBuffer> audioBuffer) = 0;
+    virtual void feedPCMFrames(uint8_t* data, size_t nBytes) = 0;
 };
 
 #endif

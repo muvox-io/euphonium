@@ -11,14 +11,19 @@
 #include "MainAudioBuffer.h"
 #include "Module.h"
 #include "ScriptLoader.h"
+#include "SoftwareVolumeProcessor.h"
 #include "EventBus.h"
+#include "AudioProcessors.h"
 #include <thread>
+#define PCMBUF_SIZE (1024*4)
+
 class Core: public bell::Task, public EventSubscriber {
 private:
     std::shared_ptr<AudioOutput> currentOutput;
     sol::state luaState;
     std::vector<std::shared_ptr<Module>> requiredModules;
     std::vector<std::shared_ptr<Module>> registeredPlugins;
+    std::shared_ptr<AudioProcessors> audioProcessor;
     bool outputConnected = false;
 
 public:
@@ -29,7 +34,6 @@ public:
     void handleLuaThread();
     void handleServerThread();
     void runTask();
-    void changeVolume(int volume);
     void handleEvent(std::unique_ptr<Event> event);
     void setupBindings();
     void startAudioThreadForPlugin(std::string pluginName, sol::table config);

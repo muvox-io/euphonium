@@ -29,4 +29,19 @@ class SongChangedEvent: public Event {
     }
 };
 
+class VolumeChangedEvent: public Event {
+    private:
+    int volume;
+    public:
+    VolumeChangedEvent(int volume) {
+        this->volume = volume;
+        this->luaEventType = "volumeChangedEvent";
+        this->eventType = EventType::LUA_MAIN_EVENT;
+    };
+
+    sol::object toLua(lua_State* state) {
+        return sol::make_object(state, this->volume);
+    }
+};
+
 #endif

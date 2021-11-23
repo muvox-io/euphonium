@@ -25,27 +25,20 @@ void CSpotPlugin::setupLuaBindings()
 void CSpotPlugin::configurationUpdated()
 {
     std::cout << "CSpotPlugin::configurationUpdated()" << std::endl;
-    this->isRunning = false;
-    std::scoped_lock(this->runningMutex);
-    mercuryManager->stop();
-    spircController->stopPlayer();
-    usleep(500000);
-    spircController.reset();
-    mercuryManager.reset();
-    usleep(500000);
-    status = ModuleStatus::SHUTDOWN;
+    shutdown();
     //startAudioThread();
 }
 
 void CSpotPlugin::shutdown() {
     this->isRunning = false;
     std::scoped_lock(this->runningMutex);
-    mercuryManager->stop();
     spircController->stopPlayer();
-    usleep(500000);
+
+    mercuryManager->stop();
+    BELL_SLEEP_MS(50);
     spircController.reset();
     mercuryManager.reset();
-    usleep(500000);
+    BELL_SLEEP_MS(50);
     status = ModuleStatus::SHUTDOWN;
 }
 
@@ -70,7 +63,7 @@ void CSpotPlugin::runTask()
         // @TODO Actually store this token somewhere
         mercuryManager = std::make_shared<MercuryManager>(std::move(session));
         mercuryManager->startTask();
-        auto audioSink = std::make_shared<FakeAudioSink>(this->audioBuffer->audioBuffer);
+        auto audioSink = std::make_shared<FakeAudioSink>(this->audioBuffer, this->luaEventBus);
         spircController = std::make_shared<SpircController>(mercuryManager, authBlob->username, audioSink);
         spircController->setTrackChangedCallback([this](TrackInfo &track)
                                                  {

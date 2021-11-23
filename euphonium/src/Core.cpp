@@ -9,6 +9,8 @@ Core::Core() : bell::Task("Core", 4 * 1024, 1)
 {
     audioBuffer = std::make_shared<MainAudioBuffer>();
     luaEventBus = std::make_shared<EventBus>();
+    audioProcessor = std::make_shared<AudioProcessors>();
+    audioProcessor->addProcessor(std::make_unique<SoftwareVolumeProcessor>());
 
     // Prepare lua event thread
     auto subscriber = dynamic_cast<EventSubscriber*>(this);
@@ -40,16 +42,12 @@ void checkResult(sol::protected_function_result result)
     }
 }
 
-void Core::changeVolume(int volume) {
-    if (outputConnected) {
-        audioBuffer->setVolume(volume);
-    }
-}
-
 void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader)
 {
     luaState.open_libraries(sol::lib::base, sol::lib::string, sol::lib::math, sol::lib::table, sol::lib::debug);
     std::vector<std::string> luaModules({"json", "app"});
+
+    audioProcessor->setLuaBindings(luaState);
 
     for (auto const &module : this->requiredModules)
     {
@@ -124,7 +122,6 @@ void Core::setupBindings() {
     luaState.set_function("luaLogDebug", luaLogDebug);
     luaState.set_function("luaLogInfo", luaLogInfo);
     luaState.set_function("luaLog", luaLog);
-    luaState.set_function("setVolume", &Core::changeVolume, this);
 
     sol::usertype<PlaybackInfo> playbackType = luaState.new_usertype<PlaybackInfo>("PlaybackInfo", sol::constructors<PlaybackInfo()>());
     playbackType["albumName"] = &PlaybackInfo::albumName;
@@ -136,11 +133,15 @@ void Core::setupBindings() {
 
 void Core::runTask() {
     EUPH_LOG(info, "core", "Audio output started");
+    std::vector<uint8_t> pcmBuf(PCMBUF_SIZE);
+
     while (true) {
         if (audioBuffer->audioBuffer->size() > 0 && outputConnected) {
-            this->currentOutput->update(audioBuffer->audioBuffer);
+            auto readNumber = audioBuffer->audioBuffer->read(pcmBuf.data(), PCMBUF_SIZE);
+            audioProcessor->process(pcmBuf.data(), readNumber);
+            currentOutput->feedPCMFrames(pcmBuf.data(), readNumber);
         } else {
-            audioBuffer->audioBufferSemaphore->wait();
+            BELL_SLEEP_MS(1000);
         }
     }
 }

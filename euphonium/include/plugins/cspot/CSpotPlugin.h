@@ -16,8 +16,10 @@
 #include "CliFile.h"
 #include "plugins/http/HTTPModule.h"
 #include "Module.h"
+#include "BellUtils.h"
 #include <atomic>
 #include <mutex>
+
 class CSpotPlugin : public Module, public bell::Task
 {
 private:

@@ -10,7 +10,7 @@ class PortAudioAudioOutput : public AudioOutput
 public:
     PortAudioAudioOutput();
     ~PortAudioAudioOutput();
-    void update(std::shared_ptr<CircularBuffer> audioBuffer);
+    void feedPCMFrames(uint8_t* data, size_t nBytes);
 
 private:
     PaStream *stream;

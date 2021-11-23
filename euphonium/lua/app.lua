@@ -10,6 +10,11 @@ function handleRouteEvent(request)
     http:handleIncomingRequest(request)
 end
 
+function handleVolumeChangedEvent(volume) 
+    logInfo("handling volume changed event")
+    setVolume(volume)
+end
+
 function handleSongChangedEvent(song)
     logInfo("Song changed: ")
     app.playbackState.songName = song.songName
@@ -26,7 +31,8 @@ function App.new()
         plugins = {},
         eventHandlers = {
             handleRouteEvent = handleRouteEvent,
-            songChangedEvent = handleSongChangedEvent
+            songChangedEvent = handleSongChangedEvent,
+            volumeChangedEvent = handleVolumeChangedEvent
         },
         playbackState = {
             songName = "",
@@ -198,5 +204,5 @@ http:handle(http.POST, "/volume", function(request)
 
     http:sendJSON(body, request.connection)
 
-    changeVolume(body.volume)
+    handleVolumeChangedEvent(body.volume)
 end)
