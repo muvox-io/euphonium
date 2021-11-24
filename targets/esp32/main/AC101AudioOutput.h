@@ -20,7 +20,7 @@ class AC101AudioOutput : public AudioOutput
 public:
     AC101AudioOutput();
     ~AC101AudioOutput();
-    void update(std::shared_ptr<CircularBuffer> audioBuffer);
+    void feedPCMFrames(uint8_t* data, size_t nBytes);
 private:
     adac_s *dac;
 };

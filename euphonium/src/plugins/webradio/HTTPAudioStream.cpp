@@ -47,12 +47,12 @@ void HTTPAudioStream::decodeFrameMP3(std::shared_ptr<MainAudioBuffer> audioBuffe
             {
                 const uint8_t *audioData = reinterpret_cast<const uint8_t *>(outputBuffer.data());
                 auto sizeData = (mp3FrameInfo.bitsPerSample / 8) * mp3FrameInfo.outputSamps;
+
                 size_t bytesWritten = 0;
                 while (bytesWritten < sizeData)
                 {
                     bytesWritten += audioBuffer->write(audioData + bytesWritten, sizeData - bytesWritten);
                 }
-                audioBuffer->audioBufferSemaphore->give();
             }
             else
             {
@@ -100,7 +100,8 @@ void HTTPAudioStream::decodeFrameAAC(std::shared_ptr<MainAudioBuffer> audioBuffe
                 {
                     bytesWritten += audioBuffer->write(audioData + bytesWritten, sizeData - bytesWritten);
                 }
-                audioBuffer->audioBufferSemaphore->give();
+
+                // audioBuffer->audioBufferSemaphore->give();
             }
             else
             {
@@ -130,6 +131,4 @@ void HTTPAudioStream::decodeFrame(std::shared_ptr<MainAudioBuffer> audioBuffer)
     {
         decodeFrameAAC(audioBuffer);
     }
-
-    BELL_SLEEP_MS(1);
 }

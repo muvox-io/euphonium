@@ -5,12 +5,13 @@
 #include <cassert>
 #include <EuphoniumLog.h>
 
-Core::Core() : bell::Task("Core", 4 * 1024, 1)
+Core::Core() : bell::Task("Core", 4 * 1024, 0, false)
 {
     audioBuffer = std::make_shared<MainAudioBuffer>();
     luaEventBus = std::make_shared<EventBus>();
     audioProcessor = std::make_shared<AudioProcessors>();
     audioProcessor->addProcessor(std::make_unique<SoftwareVolumeProcessor>());
+    audioProcessor->addProcessor(std::make_unique<EqualizerProcessor>());
 
     // Prepare lua event thread
     auto subscriber = dynamic_cast<EventSubscriber*>(this);
@@ -78,7 +79,7 @@ void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader)
 
     EUPH_LOG(info, "core", "Lua thread listening");
     while(true) {
-        usleep(10000);
+        BELL_SLEEP_MS(100);
         luaEventBus->update();
     }
 }
@@ -141,6 +142,7 @@ void Core::runTask() {
             audioProcessor->process(pcmBuf.data(), readNumber);
             currentOutput->feedPCMFrames(pcmBuf.data(), readNumber);
         } else {
+            EUPH_LOG(info, "core", "No data");
             BELL_SLEEP_MS(1000);
         }
     }

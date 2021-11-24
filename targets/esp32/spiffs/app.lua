@@ -10,6 +10,11 @@ function handleRouteEvent(request)
     http:handleIncomingRequest(request)
 end
 
+function handleVolumeChangedEvent(volume) 
+    logInfo("handling volume changed event")
+    setVolume(volume)
+end
+
 function handleSongChangedEvent(song)
     logInfo("Song changed: ")
     app.playbackState.songName = song.songName
@@ -26,7 +31,8 @@ function App.new()
         plugins = {},
         eventHandlers = {
             handleRouteEvent = handleRouteEvent,
-            songChangedEvent = handleSongChangedEvent
+            songChangedEvent = handleSongChangedEvent,
+            volumeChangedEvent = handleVolumeChangedEvent
         },
         playbackState = {
             songName = "",
@@ -55,7 +61,7 @@ function App.handleEvent(self, eventType, eventData)
 end
 
 function logInfo(msg)
-    luaLogInfo(debug.getinfo(1,'S').source, debug.getinfo(2, 'l').currentline, msg)
+    luaLogInfo("app.lua", debug.getinfo(2, 'l').currentline, msg)
 end
 
 
@@ -198,5 +204,14 @@ http:handle(http.POST, "/volume", function(request)
 
     http:sendJSON(body, request.connection)
 
-    changeVolume(body.volume)
+    handleVolumeChangedEvent(body.volume)
+end)
+
+
+http:handle(http.POST, "/eq", function(request)
+    local body = json.decode(request.body)
+
+    http:sendJSON(body, request.connection)
+
+    eqSetBands(body.low, body.mid, body.high)
 end)

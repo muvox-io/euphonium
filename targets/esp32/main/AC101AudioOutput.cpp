@@ -27,20 +27,18 @@ AC101AudioOutput::AC101AudioOutput()
     dac->init(0, 0, &i2s_config);
     dac->speaker(false);
     dac->power(ADAC_ON);
+
+    dac->volume(200, 200);
 }
 
 AC101AudioOutput::~AC101AudioOutput()
 {
 }
 
-void AC101AudioOutput::update(std::shared_ptr<CircularBuffer> audioBuffer)
-{
-    auto buffer = std::vector<uint8_t>(4096);
-    auto readNumber = audioBuffer->read(buffer.data(), 4096);
-
+void AC101AudioOutput::feedPCMFrames(uint8_t* data, size_t nBytes) {
     size_t written = 0;
-    while (written < readNumber)
+    while (written < nBytes)
     {
-        i2s_write((i2s_port_t)0, buffer.data()+written, readNumber - written, &written, portMAX_DELAY);
+        i2s_write((i2s_port_t)0, data+written, nBytes - written, &written, portMAX_DELAY);
     }
 }

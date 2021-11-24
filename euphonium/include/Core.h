@@ -14,6 +14,7 @@
 #include "SoftwareVolumeProcessor.h"
 #include "EventBus.h"
 #include "AudioProcessors.h"
+#include "EqualizerProcessor.h"
 #include <thread>
 #define PCMBUF_SIZE (1024*4)
 

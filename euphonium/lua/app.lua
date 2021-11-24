@@ -61,7 +61,7 @@ function App.handleEvent(self, eventType, eventData)
 end
 
 function logInfo(msg)
-    luaLogInfo(debug.getinfo(1,'S').source, debug.getinfo(2, 'l').currentline, msg)
+    luaLogInfo("app.lua", debug.getinfo(2, 'l').currentline, msg)
 end
 
 
@@ -205,4 +205,13 @@ http:handle(http.POST, "/volume", function(request)
     http:sendJSON(body, request.connection)
 
     handleVolumeChangedEvent(body.volume)
+end)
+
+
+http:handle(http.POST, "/eq", function(request)
+    local body = json.decode(request.body)
+
+    http:sendJSON(body, request.connection)
+
+    eqSetBands(body.low, body.mid, body.high)
 end)

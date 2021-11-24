@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <sstream>
 #include <fstream>
+#include <netinet/tcp.h>
 
 HTTPStream::HTTPStream()
 {
@@ -24,8 +25,10 @@ HTTPStream::~HTTPStream()
     //close();
 }
 
-void HTTPStream::close() {
-    if (status != StreamStatus::CLOSED) {
+void HTTPStream::close()
+{
+    if (status != StreamStatus::CLOSED)
+    {
         status = StreamStatus::CLOSED;
         EUPH_LOG(info, "httpStream", "Closing socket");
         ::close(this->sockFd);
@@ -43,7 +46,8 @@ void HTTPStream::connectToUrl(std::string url)
 
     std::string portString = "80";
     // check if hostUrl contains ':'
-    if (hostUrl.find(':') != std::string::npos) {
+    if (hostUrl.find(':') != std::string::npos)
+    {
         // split by ':'
         std::string host = hostUrl.substr(0, hostUrl.find(':'));
         portString = hostUrl.substr(hostUrl.find(':') + 1);
@@ -57,9 +61,8 @@ void HTTPStream::connectToUrl(std::string url)
     //fine-tune hints according to which socket you want to open
     hints.ai_family = domain;
     hints.ai_socktype = socketType;
-    hints.ai_protocol = 0; // no enum : possible value can be read in /etc/protocols
+    hints.ai_protocol = IPPROTO_IP; // no enum : possible value can be read in /etc/protocols
     hints.ai_flags = AI_CANONNAME | AI_ALL | AI_ADDRCONFIG;
-
 
     EUPH_LOG(info, "http", "%s %s", hostUrl.c_str(), portString.c_str());
 
@@ -77,6 +80,13 @@ void HTTPStream::connectToUrl(std::string url)
         EUPH_LOG(error, "http", "Could not connect to %s", url.c_str());
         throw std::runtime_error("Resolve failed");
     }
+
+    int flag = 1;
+    setsockopt(sockFd,  /* socket affected */
+               IPPROTO_TCP,   /* set option at TCP level */
+               TCP_NODELAY,   /* name of option */
+               (char *)&flag, /* the cast is historical cruft */
+               sizeof(int));  /* length of option value */
 
     freeaddrinfo(addr);
 
@@ -151,7 +161,8 @@ void HTTPStream::connectToUrl(std::string url)
     }
 }
 
-size_t HTTPStream::read(uint8_t *buf, size_t nbytes) {
+size_t HTTPStream::read(uint8_t *buf, size_t nbytes)
+{
     if (status != StreamStatus::READING_DATA)
     {
         EUPH_LOG(error, "http", "Not ready to read data");
@@ -174,7 +185,8 @@ size_t HTTPStream::read(uint8_t *buf, size_t nbytes) {
     return nread;
 }
 
-size_t HTTPStream::skip(size_t nbytes) {
+size_t HTTPStream::skip(size_t nbytes)
+{
     return 0;
 }
 
