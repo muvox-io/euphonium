@@ -107,6 +107,7 @@ function App.printRegisteredPlugins(self)
     startAudioThreadForPlugin("http", {})
     self.enablePlugin("cspot")
     self.enablePlugin("webradio")
+    self.enablePlugin("youtube")
 end
 
 app = App.new()

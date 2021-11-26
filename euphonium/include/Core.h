@@ -5,9 +5,6 @@
 #include <memory>
 #include <iostream>
 #include "AudioOutput.h"
-#include "plugins/http/HTTPModule.h"
-#include "plugins/cspot/CSpotPlugin.h"
-#include "plugins/webradio/WebRadioPlugin.h"
 #include "MainAudioBuffer.h"
 #include "Module.h"
 #include "ScriptLoader.h"
@@ -16,6 +13,15 @@
 #include "AudioProcessors.h"
 #include "EqualizerProcessor.h"
 #include <thread>
+#include "be_vm.h"
+
+// Plugins 
+#include "plugins/http/HTTPModule.h"
+#include "plugins/cspot/CSpotPlugin.h"
+#include "plugins/webradio/WebRadioPlugin.h"
+#include "plugins/youtube/YouTubePlugin.h"
+
+
 #define PCMBUF_SIZE (1024*4)
 
 class Core: public bell::Task, public EventSubscriber {
@@ -26,6 +32,7 @@ private:
     std::vector<std::shared_ptr<Module>> registeredPlugins;
     std::shared_ptr<AudioProcessors> audioProcessor;
     bool outputConnected = false;
+    bvm *beVm;
 
 public:
     Core();

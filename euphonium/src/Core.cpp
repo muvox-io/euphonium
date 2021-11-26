@@ -5,8 +5,30 @@
 #include <cassert>
 #include <EuphoniumLog.h>
 
-Core::Core() : bell::Task("Core", 4 * 1024, 0, false)
+int my_add_func(bvm *vm)
 {
+    /* check the arguments are all integers */
+    if (be_isint(vm, 1) && be_isint(vm, 2)) {
+        bint a = be_toint(vm, 1); /* get the first argument */
+        bint b = be_toint(vm, 2); /* get the second argument */
+        be_pushint(vm, a + b); /* push the result to the stack */
+    } else if (be_isnumber(vm, 1) && be_isnumber(vm, 2)) { /* check the arguments are all numbers */
+        breal a = be_toreal(vm, 1); /* get the first argument */
+        breal b = be_toreal(vm, 1); /* get the second argument */
+        be_pushreal(vm, a + b); /* push the result to the stack */
+    } else { /* unacceptable parameters */
+        be_pushnil(vm); /* push the nil to the stack */
+    }
+    be_return(vm); /* return calculation result */
+}
+
+Core::Core() : bell::Task("Core", 4 * 1024, 0, false) {
+    // beVm = be_vm_new();
+    // be_regfunc(beVm, "add", my_add_func);
+    // be_loadstring(beVm, "print(add(1, 2))");
+    // be_pcall(beVm, 0);
+
+    // return;
     audioBuffer = std::make_shared<MainAudioBuffer>();
     luaEventBus = std::make_shared<EventBus>();
     audioProcessor = std::make_shared<AudioProcessors>();
@@ -20,7 +42,8 @@ Core::Core() : bell::Task("Core", 4 * 1024, 0, false)
     this->setupBindings();
     registeredPlugins = {
         std::make_shared<CSpotPlugin>(),
-        std::make_shared<WebRadioPlugin>()
+        std::make_shared<WebRadioPlugin>(),
+        std::make_shared<YouTubePlugin>()
     };
     requiredModules = {
         std::make_shared<HTTPModule>()};

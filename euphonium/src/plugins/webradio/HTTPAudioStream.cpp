@@ -2,8 +2,8 @@
 
 HTTPAudioStream::HTTPAudioStream()
 {
-    decoder = AACInitDecoder();
-    mp3Decoder = MP3InitDecoder();
+    bell::decodersInstance->ensureAAC();
+    bell::decodersInstance->ensureMP3();
     inputBuffer = std::vector<uint8_t>(AAC_READBUF_SIZE * 2);
     outputBuffer = std::vector<short>(AAC_MAX_NCHANS * AAC_MAX_NSAMPS * 2 * 4);
     decodePtr = inputBuffer.data();
@@ -11,14 +11,12 @@ HTTPAudioStream::HTTPAudioStream()
 
 HTTPAudioStream::~HTTPAudioStream()
 {
-    AACFreeDecoder(decoder);
-    MP3FreeDecoder(mp3Decoder);
 }
 
 void HTTPAudioStream::querySongFromUrl(std::string url, AudioCodec audioCodec)
 {
     codec = audioCodec;
-    httpStream = std::make_shared<HTTPStream>();
+    httpStream = std::make_shared<bell::HTTPStream>();
     httpStream->connectToUrl(url);
     decodePtr = inputBuffer.data();
     bytesLeft = 0;
@@ -41,8 +39,8 @@ void HTTPAudioStream::decodeFrameMP3(std::shared_ptr<MainAudioBuffer> audioBuffe
             bytesLeft -= offset;
             decodePtr += offset;
 
-            int decodeStatus = MP3Decode(mp3Decoder, &decodePtr, &bytesLeft, outputBuffer.data(), 0);
-            MP3GetLastFrameInfo(mp3Decoder, &mp3FrameInfo);
+            int decodeStatus = MP3Decode(bell::decodersInstance->mp3Decoder, &decodePtr, &bytesLeft, outputBuffer.data(), 0);
+            MP3GetLastFrameInfo(bell::decodersInstance->mp3Decoder, &mp3FrameInfo);
             if (decodeStatus == ERR_MP3_NONE)
             {
                 const uint8_t *audioData = reinterpret_cast<const uint8_t *>(outputBuffer.data());
@@ -88,8 +86,8 @@ void HTTPAudioStream::decodeFrameAAC(std::shared_ptr<MainAudioBuffer> audioBuffe
             bytesLeft -= offset;
             decodePtr += offset;
 
-            int decodeStatus = AACDecode(decoder, &decodePtr, &bytesLeft, outputBuffer.data());
-            AACGetLastFrameInfo(decoder, &aacFrameInfo);
+            int decodeStatus = AACDecode(bell::decodersInstance->aacDecoder, &decodePtr, &bytesLeft, outputBuffer.data());
+            AACGetLastFrameInfo(bell::decodersInstance->aacDecoder, &aacFrameInfo);
             if (decodeStatus == ERR_AAC_NONE)
             {
                 const uint8_t *audioData = reinterpret_cast<const uint8_t *>(outputBuffer.data());
@@ -100,8 +98,6 @@ void HTTPAudioStream::decodeFrameAAC(std::shared_ptr<MainAudioBuffer> audioBuffe
                 {
                     bytesWritten += audioBuffer->write(audioData + bytesWritten, sizeData - bytesWritten);
                 }
-
-                // audioBuffer->audioBufferSemaphore->give();
             }
             else
             {
