@@ -5,41 +5,23 @@
 #include <cassert>
 #include <EuphoniumLog.h>
 
-int my_add_func(bvm *vm)
-{
-    /* check the arguments are all integers */
-    if (be_isint(vm, 1) && be_isint(vm, 2)) {
-        bint a = be_toint(vm, 1); /* get the first argument */
-        bint b = be_toint(vm, 2); /* get the second argument */
-        be_pushint(vm, a + b); /* push the result to the stack */
-    } else if (be_isnumber(vm, 1) && be_isnumber(vm, 2)) { /* check the arguments are all numbers */
-        breal a = be_toreal(vm, 1); /* get the first argument */
-        breal b = be_toreal(vm, 1); /* get the second argument */
-        be_pushreal(vm, a + b); /* push the result to the stack */
-    } else { /* unacceptable parameters */
-        be_pushnil(vm); /* push the nil to the stack */
-    }
-    be_return(vm); /* return calculation result */
-}
-
 Core::Core() : bell::Task("Core", 4 * 1024, 0, false) {
-    // beVm = be_vm_new();
-    // be_regfunc(beVm, "add", my_add_func);
-    // be_loadstring(beVm, "print(add(1, 2))");
-    // be_pcall(beVm, 0);
-
-    // return;
     audioBuffer = std::make_shared<MainAudioBuffer>();
     luaEventBus = std::make_shared<EventBus>();
     audioProcessor = std::make_shared<AudioProcessors>();
     audioProcessor->addProcessor(std::make_unique<SoftwareVolumeProcessor>());
     audioProcessor->addProcessor(std::make_unique<EqualizerProcessor>());
+    berry = std::make_shared<Berry>();
+    berry->execute_string("import json");
+    berry->execute_string("import global");
 
     // Prepare lua event thread
     auto subscriber = dynamic_cast<EventSubscriber*>(this);
     luaEventBus->addListener(EventType::LUA_MAIN_EVENT, *subscriber);
 
+    BELL_LOG(info, "core", "Core initialized");
     this->setupBindings();
+    BELL_LOG(info, "core", "Core initialized 2");
     registeredPlugins = {
         std::make_shared<CSpotPlugin>(),
         std::make_shared<WebRadioPlugin>(),
@@ -47,6 +29,7 @@ Core::Core() : bell::Task("Core", 4 * 1024, 0, false) {
     };
     requiredModules = {
         std::make_shared<HTTPModule>()};
+    BELL_LOG(info, "core", "Core initialized 3");
 
     audioBuffer->shutdownListener = [this](std::string exceptPlugin) {
         for (auto& plugin : registeredPlugins) {
@@ -68,35 +51,33 @@ void checkResult(sol::protected_function_result result)
 
 void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader)
 {
-    luaState.open_libraries(sol::lib::base, sol::lib::string, sol::lib::math, sol::lib::table, sol::lib::debug);
-    std::vector<std::string> luaModules({"json", "app"});
+    std::vector<std::string> berryModules({"app"});
 
-    audioProcessor->setLuaBindings(luaState);
+    audioProcessor->setBindings(berry);
 
     for (auto const &module : this->requiredModules)
     {
-        EUPH_LOG(info, module->name, "Initializing");
         module->luaEventBus = this->luaEventBus;
-        module->luaState = luaState;
-        module->setupLuaBindings();
+        module->berry = berry;
+        module->setupBindings();
         module->loadScript(loader);
     }
 
-    for (auto const &value : luaModules)
+    for (auto const &value : berryModules)
     {
-        loader->loadScript(value, luaState);
+        loader->loadScript(value, berry);
     }
 
     for (auto const &plugin : this->registeredPlugins)
     {
         EUPH_LOG(info, plugin->name, "Initializing");
-        plugin->luaState = this->luaState;
+        plugin->berry = this->berry;
         plugin->luaEventBus = this->luaEventBus;
-        plugin->setupLuaBindings();
+        plugin->setupBindings();
         plugin->loadScript(loader);
     }
     
-    checkResult(luaState.script("app:printRegisteredPlugins()"));
+    berry->execute_string("printRegisteredPlugins()");
 
     startTask();
 
@@ -115,14 +96,24 @@ void Core::selectAudioOutput(std::shared_ptr<AudioOutput> output)
 
 void Core::handleEvent(std::unique_ptr<Event> event) {
     EUPH_LOG(debug, "core", "Got event");
-    luaState["handleEvent"](event->luaEventType, event->toLua(luaState));
+
+    // Load function
+    berry->get_global("handleEvent");
+
+    // Arg 1
+    berry->string(event->subType);
+    
+    // Arg 2
+    berry->map(event->toBerry());
+
+    berry->pcall(2);
 }
 
-void Core::startAudioThreadForPlugin(std::string pluginName, sol::table config) {
+void Core::startAudioThreadForPlugin(std::string pluginName, berry_map config) {
     for (auto const &plugin : this->registeredPlugins) {
         if (plugin->name == pluginName) {
-            EUPH_LOG(info, plugin->name, "Starting audio thread");
             plugin->config = config;
+            EUPH_LOG(info, plugin->name, "Starting audio thread");
             plugin->audioBuffer = audioBuffer;
             plugin->startAudioThread();
             return;
@@ -141,18 +132,12 @@ void Core::startAudioThreadForPlugin(std::string pluginName, sol::table config) 
 }
 
 void Core::setupBindings() {
-    luaState.set_function("startAudioThreadForPlugin", &Core::startAudioThreadForPlugin, this);
-    luaState.set_function("luaLogError", luaLogError);
-    luaState.set_function("luaLogDebug", luaLogDebug);
-    luaState.set_function("luaLogInfo", luaLogInfo);
-    luaState.set_function("luaLog", luaLog);
 
-    sol::usertype<PlaybackInfo> playbackType = luaState.new_usertype<PlaybackInfo>("PlaybackInfo", sol::constructors<PlaybackInfo()>());
-    playbackType["albumName"] = &PlaybackInfo::albumName;
-    playbackType["artistName"] = &PlaybackInfo::artistName;
-    playbackType["icon"] = &PlaybackInfo::icon;
-    playbackType["songName"] = &PlaybackInfo::songName;
-    playbackType["sourceName"] = &PlaybackInfo::sourceName;
+    berry->export_this("startAudioThreadForPlugin", this, &Core::startAudioThreadForPlugin);
+    berry->export_function("logError", &luaLogError);
+    berry->export_function("logDebug", &luaLogDebug);
+    berry->export_function("logInfo", &luaLogInfo);
+    berry->export_function("log", &luaLog);
 }
 
 void Core::runTask() {

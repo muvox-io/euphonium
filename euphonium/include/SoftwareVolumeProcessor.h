@@ -47,10 +47,9 @@ public:
         }
     }
 
-    void setLuaBindings(lua_State *L)
+    void setBindings(std::shared_ptr<Berry> berry)
     {
-        sol::state_view lua(L);
-        lua.set_function("setVolume", &SoftwareVolumeProcessor::setVolume, this);
+        berry->export_this("setVolume", this, &SoftwareVolumeProcessor::setVolume);
     }
 };
 

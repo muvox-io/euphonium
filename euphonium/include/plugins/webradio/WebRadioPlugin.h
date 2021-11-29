@@ -24,7 +24,7 @@ private:
 public:
     WebRadioPlugin();
     void loadScript(std::shared_ptr<ScriptLoader> scriptLoader);
-    void setupLuaBindings();
+    void setupBindings();
     void shutdown();
     void configurationUpdated();
     void startAudioThread();

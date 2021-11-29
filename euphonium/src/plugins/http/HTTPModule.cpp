@@ -11,36 +11,35 @@ HTTPModule::HTTPModule() : bell::Task("http", 1024 * 4, 0, false)
 
 void HTTPModule::loadScript(std::shared_ptr<ScriptLoader> loader)
 {
-    loader->loadScript("http", luaState);
+    loader->loadScript("http", berry);
     this->scriptLoader = loader;
 }
 
-void HTTPModule::setupLuaBindings()
+void HTTPModule::setupBindings()
 {
-    sol::state_view lua(luaState);
-
-    lua.new_enum("RequestType",
-                 "GET", bell::RequestType::GET,
-                 "POST", bell::RequestType::POST);
-
-    sol::usertype<bell::HTTPRequest> requestType = lua.new_usertype<bell::HTTPRequest>("HTTPRequest", sol::constructors<bell::HTTPRequest()>());
-    requestType["body"] = &bell::HTTPRequest::body;
-    requestType["urlParams"] = &bell::HTTPRequest::urlParams;
-    requestType["connection"] = &bell::HTTPRequest::connection;
-    requestType["handlerId"] = &bell::HTTPRequest::handlerId;
-
-    sol::usertype<bell::HTTPResponse> responseType = lua.new_usertype<bell::HTTPResponse>("HTTPResponse", sol::constructors<bell::HTTPResponse()>());
-    responseType["status"] = &bell::HTTPResponse::status;
-    responseType["body"] = &bell::HTTPResponse::body;
-    responseType["contentType"] = &bell::HTTPResponse::contentType;
-    responseType["connectionFd"] = &bell::HTTPResponse::connectionFd;
-    
-    lua.set_function("httpRegisterHandler", &HTTPModule::registerHandler, this);
-    lua.set_function("httpRespond", &bell::HTTPServer::respond, mainServer);
-    lua.set_function("httpPublishEvent", &bell::HTTPServer::publishEvent, mainServer);
+    BELL_LOG(info, "http", "Registering handlers");
+    berry->export_this("httpRegisterHandler", this, &HTTPModule::registerHandler);
+    berry->export_this("httpRespond", this, &HTTPModule::respond);
+    berry->export_this("httpPublishEvent", this, &HTTPModule::publishEvent);
 }
 
-void HTTPModule::registerHandler(const std::string &routeUrl, bell::RequestType reqType, int handlerId)
+void HTTPModule::publishEvent(std::string event, std::string data)
+{
+    mainServer->publishEvent(event, data);
+}
+
+void HTTPModule::respond(int connectionFd, int status, std::string body, std::string contentType)
+{
+    bell::HTTPResponse response = {
+        .status = status,
+        .body = body,
+        .contentType = contentType,
+        .connectionFd = connectionFd};
+
+    mainServer->respond(response);
+}
+
+void HTTPModule::registerHandler(std::string routeUrl, std::string requestType, int handlerId)
 {
     auto handler = [handlerId, this](bell::HTTPRequest &request)
     {
@@ -51,6 +50,11 @@ void HTTPModule::registerHandler(const std::string &routeUrl, bell::RequestType 
     };
 
     EUPH_LOG(debug, "http", "Registering handler for %s", routeUrl.c_str());
+    auto reqType = bell::RequestType::GET;
+    if (requestType == "POST")
+    {
+        reqType = bell::RequestType::POST;
+    }
     mainServer->registerHandler(reqType, routeUrl, handler);
 }
 
@@ -61,14 +65,15 @@ void HTTPModule::runTask()
         auto fileName = request.urlParams.at("asset");
         auto extension = fileName.substr(fileName.size() - 3, fileName.size());
         auto contentType = "text/css";
-        if (extension == ".js") {
+        if (extension == ".js")
+        {
             contentType = "application/javascript";
         }
 
         std::string prefix = "../../../web/dist";
-        #ifdef ESP_PLATFORM
+#ifdef ESP_PLATFORM
         prefix = "/spiffs";
-        #endif
+#endif
 
         bell::HTTPResponse response = {
             .connectionFd = request.connection,
@@ -82,9 +87,9 @@ void HTTPModule::runTask()
     auto indexHandler = [this](bell::HTTPRequest &request)
     {
         std::string prefix = "../../../web/dist";
-        #ifdef ESP_PLATFORM
+#ifdef ESP_PLATFORM
         prefix = "/spiffs";
-        #endif
+#endif
 
         bell::HTTPResponse response = {
             .connectionFd = request.connection,

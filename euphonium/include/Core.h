@@ -13,7 +13,7 @@
 #include "AudioProcessors.h"
 #include "EqualizerProcessor.h"
 #include <thread>
-#include "be_vm.h"
+#include "BerryBind.h"
 
 // Plugins 
 #include "plugins/http/HTTPModule.h"
@@ -32,7 +32,7 @@ private:
     std::vector<std::shared_ptr<Module>> registeredPlugins;
     std::shared_ptr<AudioProcessors> audioProcessor;
     bool outputConnected = false;
-    bvm *beVm;
+    std::shared_ptr<Berry> berry;
 
 public:
     Core();
@@ -44,7 +44,7 @@ public:
     void runTask();
     void handleEvent(std::unique_ptr<Event> event);
     void setupBindings();
-    void startAudioThreadForPlugin(std::string pluginName, sol::table config);
+    void startAudioThreadForPlugin(std::string pluginName, berry_map config);
 
     std::shared_ptr<EventBus> luaEventBus;
     std::shared_ptr<MainAudioBuffer> audioBuffer;

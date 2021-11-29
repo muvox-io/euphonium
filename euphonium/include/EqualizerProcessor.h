@@ -6,6 +6,7 @@
 #include "BiquadFilter.h"
 #include <memory>
 #include <vector>
+#include "BerryBind.h"
 
 #define SAMPLE_FREQUENCY 44100.0 // Hz
 
@@ -90,10 +91,9 @@ public:
         }
     }
 
-    void setLuaBindings(lua_State *L)
+    void setBindings(std::shared_ptr<Berry> berry)
     {
-        sol::state_view lua(L);
-        lua.set_function("eqSetBands", &EqualizerProcessor::setBands, this);
+        berry->export_this("eqSetBands", this, &EqualizerProcessor::setBands);
     }
 };
 

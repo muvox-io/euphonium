@@ -13,13 +13,12 @@ CSpotPlugin::CSpotPlugin() : bell::Task("cspot", 4 * 1024, 1)
 
 void CSpotPlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader)
 {
-    scriptLoader->loadScript("cspot_plugin", luaState);
+    scriptLoader->loadScript("cspot_plugin", berry);
 }
 
-void CSpotPlugin::setupLuaBindings()
+void CSpotPlugin::setupBindings()
 {
-    sol::state_view lua(luaState);
-    lua.set_function("cspotConfigUpdated", &CSpotPlugin::configurationUpdated, this);
+    berry->export_this("cspotConfigUpdated", this, &CSpotPlugin::configurationUpdated);
 }
 
 void CSpotPlugin::configurationUpdated()
@@ -88,8 +87,8 @@ void CSpotPlugin::runTask()
 void CSpotPlugin::mapConfig()
 {
     configMan->volume = 255;
-    configMan->deviceName = config["receiverName"];
-    std::string bitrateString = config["audioBitrate"];
+    configMan->deviceName = std::any_cast<std::string>(config["receiverName"]);
+    std::string bitrateString = std::any_cast<std::string>(config["audioBitrate"]);
     switch (std::stoi(bitrateString))
     {
     case 160:

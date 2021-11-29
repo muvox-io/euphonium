@@ -131,26 +131,6 @@ http:handle(http.GET, "/plugins", function(request)
         table.insert(pluginNames, value)
     end
 
-    -- mock
-    table.insert(pluginNames, {
-        name = "system",
-        displayName = "System configuration",
-        type = "system"
-    })
-
-    -- mock
-    table.insert(pluginNames, {
-        name = "portaudio",
-        displayName = "PortAudio output",
-        type = "system"
-    })
-
-    -- mock
-    table.insert(pluginNames, {
-        name = "bluetooth",
-        displayName = "Bluetooth sink",
-        type = "plugin"
-    })
 
     http:sendJSON(pluginNames, request.connection)
 end)

@@ -12,17 +12,20 @@
 #include "HTTPServer.h"
 
 extern std::shared_ptr<bell::HTTPServer> mainServer;
-class HTTPModule: public bell::Task, public Module {
-    public:
+class HTTPModule : public bell::Task, public Module
+{
+public:
     HTTPModule();
     std::shared_ptr<ScriptLoader> scriptLoader;
     void loadScript(std::shared_ptr<ScriptLoader> scriptLoader);
-    void setupLuaBindings();
-    void registerHandler(const std::string &routeUrl, bell::RequestType reqType, int handlerId);
+    void setupBindings();
+    void registerHandler(std::string routeUrl, const std::string reqType, int handlerId);
+    void respond(int connectionFd, int status, std::string body, std::string contentType);
     void runTask();
+    void publishEvent(std::string eventName, std::string eventData);
     void startAudioThread();
     void listen();
-    void shutdown() {};
+    void shutdown(){};
 };
 
 #endif

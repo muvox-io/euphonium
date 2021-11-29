@@ -8,6 +8,7 @@
 #include <sol.hpp>
 #include <unordered_map>
 #include <set>
+#include <BerryBind.h>
 
 enum class EventType : uint32_t {
     LUA_MAIN_EVENT
@@ -18,8 +19,8 @@ class Event {
     Event() {};
     virtual ~Event() {};
     EventType eventType;
-    std::string luaEventType;
-    virtual sol::object toLua(lua_State* state) = 0;
+    std::string subType;
+    virtual berry_map toBerry() = 0;
 };
 
 class EventSubscriber {

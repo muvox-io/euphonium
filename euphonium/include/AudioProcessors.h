@@ -10,7 +10,7 @@ public:
     AudioProcessor() {};
     virtual ~AudioProcessor() {};
     virtual void process(uint8_t* data, size_t nBytes) = 0;
-    virtual void setLuaBindings(lua_State* L) = 0;
+    virtual void setBindings(std::shared_ptr<Berry>) = 0;
 };
 
 class AudioProcessors {
@@ -21,9 +21,9 @@ public:
     AudioProcessors() {};
     ~AudioProcessors() {};
 
-    void setLuaBindings(lua_State* L) {
+    void setBindings(std::shared_ptr<Berry> L) {
         for (auto& p : processors) {
-            p->setLuaBindings(L);
+            p->setBindings(L);
         }
     }
 

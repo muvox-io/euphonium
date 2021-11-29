@@ -6,6 +6,7 @@
 #include <map>
 #include "EventBus.h"
 #include "MainAudioBuffer.h"
+#include "BerryBind.h"
 
 enum class ModuleStatus {
     SHUTDOWN,
@@ -17,13 +18,13 @@ class Module {
     Module() {}
     std::string name;
     ModuleStatus status = ModuleStatus::SHUTDOWN;
-    lua_State* luaState;
+    std::shared_ptr<Berry> berry;
     std::shared_ptr<EventBus> luaEventBus;
     std::shared_ptr<MainAudioBuffer> audioBuffer;
 
-    sol::table config;
+    berry_map config;
     virtual void loadScript(std::shared_ptr<ScriptLoader> scriptLoader) = 0;
-    virtual void setupLuaBindings() = 0;
+    virtual void setupBindings() = 0;
     virtual void startAudioThread() = 0;
     virtual void shutdown() = 0;
 };

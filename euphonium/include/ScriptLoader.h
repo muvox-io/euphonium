@@ -2,12 +2,13 @@
 #define EUPHONIUM_SCRIPT_LOADER_H
 
 #include <string>
-#include <sol.hpp>
+#include <memory>
+#include <BerryBind.h>
 
 class ScriptLoader {
 public:
     ScriptLoader() {};
-    virtual void loadScript(std::string scriptName, lua_State* luaState) = 0;
+    virtual void loadScript(std::string scriptName, std::shared_ptr<Berry> luaState) = 0;
     virtual std::string loadFile(std::string fileName) = 0;
 };
 

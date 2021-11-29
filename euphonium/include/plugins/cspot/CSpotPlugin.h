@@ -36,7 +36,7 @@ private:
 public:
     CSpotPlugin();
     void loadScript(std::shared_ptr<ScriptLoader> scriptLoader);
-    void setupLuaBindings();
+    void setupBindings();
     void configurationUpdated();
     void shutdown();
     void startAudioThread();

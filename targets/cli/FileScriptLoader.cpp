@@ -3,13 +3,10 @@
 FileScriptLoader::FileScriptLoader() {
 }
 
-void FileScriptLoader::loadScript(std::string scriptName, lua_State* luaState) {
-    sol::state_view lua(luaState);
-    auto result = lua.script_file("../../../euphonium/lua/" + scriptName + ".lua");
-    if (!result.valid())
-    {
-        std::cout << ((sol::error)result).what() << std::endl;
-    }
+void FileScriptLoader::loadScript(std::string scriptName, std::shared_ptr<Berry> berry) {
+    BELL_LOG(info, "fileloader", "Loading script: %s ", scriptName.c_str());
+    auto content = loadFile("../../../euphonium/scripts/" + scriptName + ".be");
+    berry->execute_string(content);
 }
 
 std::string FileScriptLoader::loadFile(std::string fileName) {

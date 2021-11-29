@@ -11,7 +11,7 @@ struct PlaybackInfo {
 class SongChangedEvent: public Event {
     public:
     PlaybackInfo playbackInfo;
-    SongChangedEvent(std::string& songName, std::string& albumName, std::string& artistName, std::string& sourceName, std::string icon) {
+    SongChangedEvent(const std::string& songName, const std::string& albumName, const std::string& artistName, const std::string& sourceName, const std::string& icon) {
         this->playbackInfo = {
             .songName = songName,
             .albumName = albumName,
@@ -19,13 +19,18 @@ class SongChangedEvent: public Event {
             .sourceName = sourceName,
             .icon = icon
         };
-        this->luaEventType = "songChangedEvent";
+        this->subType = "songChangedEvent";
         this->eventType = EventType::LUA_MAIN_EVENT;
     };
 
-    sol::object toLua(lua_State* state) {
-        return sol::make_object(
-		     state, this->playbackInfo);
+    berry_map toBerry() {
+        berry_map result;
+        result["songName"] = this->playbackInfo.songName;
+        result["albumName"] = this->playbackInfo.albumName;
+        result["artistName"] = this->playbackInfo.artistName;
+        result["sourceName"] = this->playbackInfo.sourceName;
+        result["icon"] = this->playbackInfo.icon;
+        return result;
     }
 };
 
@@ -35,12 +40,14 @@ class VolumeChangedEvent: public Event {
     public:
     VolumeChangedEvent(int volume) {
         this->volume = volume;
-        this->luaEventType = "volumeChangedEvent";
+        this->subType = "volumeChangedEvent";
         this->eventType = EventType::LUA_MAIN_EVENT;
     };
 
-    sol::object toLua(lua_State* state) {
-        return sol::make_object(state, this->volume);
+    berry_map toBerry() {
+        berry_map result;
+        result["volume"] = this->volume;
+        return result;
     }
 };
 

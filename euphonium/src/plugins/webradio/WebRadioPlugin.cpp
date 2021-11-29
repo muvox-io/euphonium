@@ -10,13 +10,12 @@ WebRadioPlugin::WebRadioPlugin(): bell::Task("radio", 6 * 1024, 1, false)
 
 void WebRadioPlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader)
 {
-    scriptLoader->loadScript("webradio_plugin", luaState);
+    scriptLoader->loadScript("webradio_plugin", berry);
 }
 
-void WebRadioPlugin::setupLuaBindings()
+void WebRadioPlugin::setupBindings()
 {
-    sol::state_view lua(luaState);
-    lua.set_function("webradioQueueUrl", &WebRadioPlugin::playRadioUrl, this);
+    berry->export_this("webradioQueueUrl", this, &WebRadioPlugin::playRadioUrl);
 }
 
 void WebRadioPlugin::configurationUpdated()
@@ -25,6 +24,9 @@ void WebRadioPlugin::configurationUpdated()
 
 void WebRadioPlugin::playRadioUrl(std::string url, bool isAAC)
 {
+    if (isAAC) {
+        std::cout << "is aac" << std::endl;
+    }
     isRunning = false;
     radioUrlQueue.push({isAAC, url});
 }
