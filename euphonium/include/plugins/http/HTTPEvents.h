@@ -24,11 +24,6 @@ class HandleRouteEvent: public Event {
         result["urlParams"] = to_berry_map(this->request.urlParams);
         return result;
     }
-
-    sol::object toLua(lua_State* state) {
-        return sol::make_object(
-		     state, this->request);
-    }
 };
 
 #endif

@@ -31,21 +31,23 @@ void Berry::execute_string(const std::string &data)
     {
         be_dumpexcept(vm);
     }
+    be_pop(vm, 1);
 }
 
 void Berry::lambda(std::function<int(Berry &)> *function, const std::string &name)
 {
     lambdas.push_back(function);
-    closure(Berry::call);
+    closure(Berry::call, 1);
     comptr(function);
     be_setupval(vm, -2, 0);
     be_pop(vm, 1);
     setglobal(name);
+    be_pop(vm, 1);
 }
 
 void Berry::closure(int (*callback)(bvm *), const int i)
 {
-    be_pushntvclosure(vm, callback, 1);
+    be_pushntvclosure(vm, callback, i);
 }
 
 void Berry::boolean(const bool b)

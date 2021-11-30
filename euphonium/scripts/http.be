@@ -24,10 +24,11 @@ class HTTP
 
     # write bare json response to given connection
     def sendJSON(body, conn, status)
+        jsonBody = json.dump(body ? body : { 'status': 'error' })
         httpRespond(
             conn, 
             status ? status : 200, 
-            json.dump(body ? body : { 'status': 'error' }), 
+            jsonBody, 
             "application/json")
     end
 end

@@ -46,3 +46,6 @@
 .icon-search:before {
   content: "\e905";
 }
+.icon-close:before {
+  content: "\ea0f";
+}

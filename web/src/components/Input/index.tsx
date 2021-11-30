@@ -1,5 +1,4 @@
 import Icon from "../Icon";
-import css from "./Input.module.scss";
 
 type InputProps = {
   tooltip?: string;
@@ -17,17 +16,16 @@ export default ({
   placeholder,
 }: InputProps) => {
   return (
-    <div class={css.inputContainer}>
-      {tooltip && <div class={css.inputContainer__tooltip}>{tooltip}</div>}
-
+    <div class='lg:min-w-[400px] min-w-full relative'>
+      <div class='text-gray-400 text-s mb-1'>{tooltip}</div>
       <input
         placeholder={placeholder}
-        className={`${css.inputContainer__input} ${icon && css.inputContainer__input_icon}`}
+        className={`${icon ? "pl-10" : ""} bg-gray-600 p-3 rounded-xl min-w-full`}
         value={value}
         onChange={(e: any) => onChange(e.target.value)}
       ></input>
       {icon && (
-        <div class={css.inputContainer__icon}>
+        <div class='text-gray-400  left-1 top-3 absolute'>
           <Icon name="search" />
         </div>
       )}

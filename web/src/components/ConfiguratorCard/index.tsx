@@ -61,9 +61,11 @@ export default ({ plugin = "" }) => {
 
   return (
     <Card title={displayName} subtitle={"plugin configuration"}>
-      {configurationFields.map((field) =>
-        renderConfigurationField(field, updateField)
-      )}
+      <div class='flex flex-col items-start space-y-2'>
+        {configurationFields.map((field) =>
+          renderConfigurationField(field, updateField)
+        )}
+      </div>
     </Card>
   );
 };

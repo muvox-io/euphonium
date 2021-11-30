@@ -19,43 +19,30 @@ const PlaybackBar = () => {
   }, []);
 
   return (
-    <div className={css.wrapper}>
-      <img
-        className={css.wrapper__cover}
+    <div class='hidden flex flex-row bg-gray-700 h-13 rounded-r-xl items-center shadow-lg'>
+      <img class='rounded-xl h-22 w-22 -mt-2 -mb-2'
         src={playbackState?.icon}
       ></img>
-      <div className={css.wrapper__playbackContainer}>
-        <div className={css.wrapper__songContainer}>
-          <div className={css.wrapper__songName}>{playbackState?.songName}</div>
-          <div className={css.wrapper__songSubtitle}>
-            {playbackState?.artistName} • {playbackState?.albumName} • playback
-            from {playbackState?.sourceName}
-          </div>
-        </div>
-        <div className={css.wrapper__controlsContainer}>
-          {/* <div className={css.wrapper__timeContainer}>2:00/2:40</div> */}
-          {/* <Icon name="prev" /> */}
-          <Icon name="pause" />
-          {/* <Icon name="next" /> */}
+      <div class='flex flex-col justify-center ml-4'>
+        <div >{playbackState?.songName}</div>
+        <div class='text-gray-400'>
+          {playbackState?.artistName} • {playbackState?.albumName} • playback
+          from {playbackState?.sourceName}
         </div>
       </div>
+      <div >
+      </div>
+    <div class='mr-3 text-xl text-gray-400 ml-5'>
+      <Icon name="pause" />
     </div>
-  );
-};
-
-const PlaybackProgress = () => {
-  return (
-    <div className={css.progressBar}>
-      {/* <div className={css.progressBar__inner}></div> */}
     </div>
   );
 };
 
 export default () => {
   return (
-    <div className={css.playbackContainer}>
+    <div class='fixed bottom-0 p-6 right-0' >
       <PlaybackBar />
-      <PlaybackProgress />
     </div>
   );
 };

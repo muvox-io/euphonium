@@ -27,7 +27,6 @@
 class Core: public bell::Task, public EventSubscriber {
 private:
     std::shared_ptr<AudioOutput> currentOutput;
-    sol::state luaState;
     std::vector<std::shared_ptr<Module>> requiredModules;
     std::vector<std::shared_ptr<Module>> registeredPlugins;
     std::shared_ptr<AudioProcessors> audioProcessor;

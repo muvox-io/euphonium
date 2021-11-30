@@ -6,7 +6,7 @@ std::shared_ptr<bell::HTTPServer> mainServer;
 HTTPModule::HTTPModule() : bell::Task("http", 1024 * 4, 0, false)
 {
     name = "http";
-    mainServer = std::make_shared<bell::HTTPServer>(2138);
+    mainServer = std::make_shared<bell::HTTPServer>(80);
 }
 
 void HTTPModule::loadScript(std::shared_ptr<ScriptLoader> loader)
@@ -30,6 +30,9 @@ void HTTPModule::publishEvent(std::string event, std::string data)
 
 void HTTPModule::respond(int connectionFd, int status, std::string body, std::string contentType)
 {
+    BELL_LOG(info, "http", "Responding to connection");
+    BELL_LOG(info, "http", "Status: %d", status);
+    BELL_LOG(info, "http", "Body: %s", body.c_str());
     bell::HTTPResponse response = {
         .status = status,
         .body = body,
@@ -100,7 +103,7 @@ void HTTPModule::runTask()
         mainServer->respond(response);
     };
     mainServer->registerHandler(bell::RequestType::GET, "/assets/:asset", assetHandler);
-    mainServer->registerHandler(bell::RequestType::GET, "/web", indexHandler);
+    mainServer->registerHandler(bell::RequestType::GET, "/web/*", indexHandler);
     mainServer->listen();
 }
 

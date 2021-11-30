@@ -8,7 +8,7 @@
 class ScriptLoader {
 public:
     ScriptLoader() {};
-    virtual void loadScript(std::string scriptName, std::shared_ptr<Berry> luaState) = 0;
+    virtual void loadScript(std::string scriptName, std::shared_ptr<Berry> berry) = 0;
     virtual std::string loadFile(std::string fileName) = 0;
 };
 

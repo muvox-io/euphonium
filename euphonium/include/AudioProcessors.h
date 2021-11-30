@@ -2,7 +2,6 @@
 #define EUPHONIUM_AUDIO_PROCCESSORS_H
 
 #include <memory>
-#include <sol.hpp>
 
 class AudioProcessor
 {

@@ -2,7 +2,6 @@
 #define EUPHONIUM_MODULE_H
 
 #include "ScriptLoader.h"
-#include <sol.hpp>
 #include <map>
 #include "EventBus.h"
 #include "MainAudioBuffer.h"

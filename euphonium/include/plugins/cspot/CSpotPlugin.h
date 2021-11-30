@@ -2,7 +2,6 @@
 #define EUPHONIUM_CSPOT_PLUGIN_H
 
 #include "ScriptLoader.h"
-#include <sol.hpp>
 #include "ConfigJSON.h"
 #include "MercuryManager.h"
 #include "EuphoniumLog.h"

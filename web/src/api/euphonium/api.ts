@@ -5,18 +5,18 @@ import {
   PluginEntry,
 } from "./models";
 
-let apiUrl = "";
+let apiUrl = "http://localhost:80";
 
 let eventsUrl = apiUrl + "/events";
 
 const getPlugins = async (): Promise<PluginEntry[]> => {
-  return await fetch("/plugins")
+  return await fetch(apiUrl + "/plugins")
     .then((e) => e.json())
     .then((e) => e.map((e: any) => e as PluginEntry));
 };
 
 const getPlaybackState = async (): Promise<PlaybackState> => {
-  return await fetch("/playback")
+  return await fetch(apiUrl + "/playback")
     .then((e) => e.json())
     .then((e) => e as PlaybackState);
 };
@@ -72,7 +72,7 @@ const updatePluginConfiguration = async (
 };
 
 const playRadio = async (stationName: string, favicon: string, stationUrl: string, codec: string): Promise<any> => {
-  return await fetch("/webradio", {
+  return await fetch(apiUrl + "/webradio", {
     method: "POST",
     headers: {
       Accept: "application/json",

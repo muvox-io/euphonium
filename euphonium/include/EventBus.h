@@ -5,7 +5,6 @@
 #include <functional>
 #include <queue>
 #include <any>
-#include <sol.hpp>
 #include <unordered_map>
 #include <set>
 #include <BerryBind.h>

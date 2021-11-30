@@ -5,6 +5,8 @@
     display: flex;
     flex-direction: row;
     padding: 0px;
+    width: 100vw;
+    min-height: 100vh;
 
     &__mainContent {
         flex-grow: 1;

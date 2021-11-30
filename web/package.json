@@ -12,7 +12,10 @@
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.0.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.4",
     "sass": "^1.39.0",
+    "tailwindcss": "^2.2.19",
     "typescript": "^4.3.2",
     "vite": "^2.5.4"
   }

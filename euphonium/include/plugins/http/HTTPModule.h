@@ -2,7 +2,6 @@
 #define EUPHONIUM_HTTP_MODULE_H
 
 #include "ScriptLoader.h"
-#include <sol.hpp>
 #include <iostream>
 #include <fstream>
 #include <thread>

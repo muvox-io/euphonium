@@ -2,7 +2,6 @@
 #define EUPHONIUM_YOUTUBE_PLUGIN_H
 
 #include "ScriptLoader.h"
-#include <sol.hpp>
 #include "EuphoniumLog.h"
 #include "Logger.h"
 #include "CoreEvents.h"

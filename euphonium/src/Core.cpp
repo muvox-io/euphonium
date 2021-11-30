@@ -1,7 +1,5 @@
 #include "Core.h"
 #include <string.h>
-#define SOL_ALL_SAFETIES_ON 1
-#include <sol.hpp>
 #include <cassert>
 #include <EuphoniumLog.h>
 
@@ -39,14 +37,6 @@ Core::Core() : bell::Task("Core", 4 * 1024, 0, false) {
             }
         }
     };
-}
-
-void checkResult(sol::protected_function_result result)
-{
-    if (!result.valid())
-    {
-        std::cout << ((sol::error)result).what() << std::endl;
-    }
 }
 
 void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader)
@@ -96,6 +86,7 @@ void Core::selectAudioOutput(std::shared_ptr<AudioOutput> output)
 
 void Core::handleEvent(std::unique_ptr<Event> event) {
     EUPH_LOG(debug, "core", "Got event");
+    BELL_LOG(debug, "core", "pre %d", be_top(berry->rawPtr()));
 
     // Load function
     berry->get_global("handleEvent");
@@ -107,6 +98,7 @@ void Core::handleEvent(std::unique_ptr<Event> event) {
     berry->map(event->toBerry());
 
     berry->pcall(2);
+    BELL_LOG(debug, "core", "dd %d", be_top(berry->rawPtr()));
 }
 
 void Core::startAudioThreadForPlugin(std::string pluginName, berry_map config) {
@@ -134,10 +126,6 @@ void Core::startAudioThreadForPlugin(std::string pluginName, berry_map config) {
 void Core::setupBindings() {
 
     berry->export_this("startAudioThreadForPlugin", this, &Core::startAudioThreadForPlugin);
-    berry->export_function("logError", &luaLogError);
-    berry->export_function("logDebug", &luaLogDebug);
-    berry->export_function("logInfo", &luaLogInfo);
-    berry->export_function("log", &luaLog);
 }
 
 void Core::runTask() {
