@@ -20,6 +20,7 @@ class AC101AudioOutput : public AudioOutput
 public:
     AC101AudioOutput();
     ~AC101AudioOutput();
+    uint8_t *audioBuffer;
     void feedPCMFrames(uint8_t* data, size_t nBytes);
 private:
     adac_s *dac;

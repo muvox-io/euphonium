@@ -1,14 +1,15 @@
 @font-face {
-  font-family: 'icomoon';
-  src:  url('../../assets/icons.ttf');
+  font-family: "icomoon";
+  src: url("../../assets/icons.ttf");
   font-weight: normal;
   font-style: normal;
   font-display: block;
 }
 
-[class^="icon-"], [class*=" icon-"] {
+[class^="icon-"],
+[class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: 'icomoon' !important;
+  font-family: "icomoon" !important;
   speak: never;
   font-style: normal;
   font-weight: normal;
@@ -22,6 +23,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-eq:before {
+  content: "\e90a";
+}
+.icon-vol-up:before {
+  content: "\e907";
+}
+.icon-vol-down:before {
+  content: "\e909";
+}
 .icon-save:before {
   content: "\e908";
 }

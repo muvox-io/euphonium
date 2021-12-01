@@ -33,6 +33,7 @@ static void euphoniumTask(void *pvParameters)
 {
     bell::setDefaultLogger();
     bell::enableSubmoduleLogging();
+    bell::createDecoders();
     auto core = std::make_shared<Core>();
     auto loader = std::make_shared<SPIFFSScriptLoader>();
     auto output = std::make_shared<AC101AudioOutput>();

@@ -34,10 +34,11 @@ void HTTPModule::respond(int connectionFd, int status, std::string body, std::st
     BELL_LOG(info, "http", "Status: %d", status);
     BELL_LOG(info, "http", "Body: %s", body.c_str());
     bell::HTTPResponse response = {
+        .connectionFd = connectionFd,
         .status = status,
         .body = body,
-        .contentType = contentType,
-        .connectionFd = connectionFd};
+        .contentType = contentType
+    };
 
     mainServer->respond(response);
 }
@@ -67,20 +68,29 @@ void HTTPModule::runTask()
     {
         auto fileName = request.urlParams.at("asset");
         auto extension = fileName.substr(fileName.size() - 3, fileName.size());
+        auto useGzip = false;
         auto contentType = "text/css";
         if (extension == ".js")
         {
             contentType = "application/javascript";
         }
+        
 
         std::string prefix = "../../../web/dist";
 #ifdef ESP_PLATFORM
         prefix = "/spiffs";
 #endif
 
+        std::ifstream checkFile(prefix + "/assets/" + fileName + ".gz");
+        if (checkFile.good()) {
+            fileName += ".gz";
+            useGzip = true;
+        }
+        
         bell::HTTPResponse response = {
             .connectionFd = request.connection,
             .status = 200,
+            .useGzip = useGzip,
             .contentType = contentType,
         };
         response.responseReader = std::make_unique<bell::FileResponseReader>(prefix + "/assets/" + fileName);

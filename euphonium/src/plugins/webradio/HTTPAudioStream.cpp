@@ -17,7 +17,7 @@ void HTTPAudioStream::querySongFromUrl(std::string url, AudioCodec audioCodec)
 {
     codec = audioCodec;
     httpStream = std::make_shared<bell::HTTPStream>();
-    httpStream->connectToUrl(url);
+    httpStream->connectToUrl(url, true);
     decodePtr = inputBuffer.data();
     bytesLeft = 0;
     offset = 0;

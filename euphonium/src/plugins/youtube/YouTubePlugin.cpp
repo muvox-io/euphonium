@@ -26,7 +26,7 @@ std::vector<uint8_t> getAdtsHeader(int length)
     return res;
 }
 
-YouTubePlugin::YouTubePlugin() : bell::Task("youtube", 6 * 1024, 1, false)
+YouTubePlugin::YouTubePlugin() : bell::Task("youtube", 16 * 1024, 1)
 {
     name = "youtube";
     outputBuffer = std::vector<short>(AAC_MAX_NCHANS * AAC_MAX_NSAMPS * 2 * 4);
@@ -51,9 +51,7 @@ void YouTubePlugin::configurationUpdated()
 void YouTubePlugin::playYTUrl(std::string url)
 {
     isRunning = false;
-
-    auto resolvedUrl = getStreamForVideo(url);
-    ytUrlQueue.push(resolvedUrl);
+    ytUrlQueue.push(url);
 }
 
 void YouTubePlugin::shutdown()
@@ -135,7 +133,7 @@ void YouTubePlugin::runTask()
             std::lock_guard lock(runningMutex);
             isRunning = true;
             status = ModuleStatus::RUNNING;
-
+            audioBuffer->shutdownExcept(name);
             auto ytHandler = std::make_shared<bell::HTTPStream>();
             ytHandler->connectToUrl(url);
 

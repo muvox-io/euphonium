@@ -21,6 +21,7 @@ AC101AudioOutput::AC101AudioOutput()
         .data_out_num = 25,
         .data_in_num = -1 //Not used
     };
+    audioBuffer = (uint8_t*) heap_caps_malloc(4096, MALLOC_CAP_8BIT | MALLOC_CAP_DMA);
 
     dac = &dac_a1s;
 
@@ -36,9 +37,10 @@ AC101AudioOutput::~AC101AudioOutput()
 }
 
 void AC101AudioOutput::feedPCMFrames(uint8_t* data, size_t nBytes) {
+    memcpy(audioBuffer, data, nBytes);
     size_t written = 0;
     while (written < nBytes)
     {
-        i2s_write((i2s_port_t)0, data+written, nBytes - written, &written, portMAX_DELAY);
+        i2s_write((i2s_port_t)0, audioBuffer+written, nBytes - written, &written, portMAX_DELAY);
     }
 }

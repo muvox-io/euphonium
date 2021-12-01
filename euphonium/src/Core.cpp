@@ -3,7 +3,7 @@
 #include <cassert>
 #include <EuphoniumLog.h>
 
-Core::Core() : bell::Task("Core", 4 * 1024, 0, false) {
+Core::Core() : bell::Task("Core", 4 * 1024, 0) {
     audioBuffer = std::make_shared<MainAudioBuffer>();
     luaEventBus = std::make_shared<EventBus>();
     audioProcessor = std::make_shared<AudioProcessors>();

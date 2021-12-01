@@ -43,7 +43,7 @@ export default () => {
   }, []);
 
   return (
-    <div className="flex flex-col bg-gray-700 p-8 md:p-4 h-screen text-m space-y-2">
+    <div className="flex md:w-[220px] md:m-w-[220px] flex-col bg-gray-700 p-8 md:p-4 h-screen text-m space-y-2">
       <div className='text-3xl md:text-2xl'>Euphonium 🎺</div>
       <SideBarCategory plugins={plugins} filterType={PluginEntryType.App} header="available apps" />
       <SideBarCategory plugins={plugins} filterType={PluginEntryType.App} header="system configuration" />

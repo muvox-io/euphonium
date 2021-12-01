@@ -4,6 +4,11 @@ enum PluginEntryType {
     App = "app"
 }
 
+enum PlaybackStatus {
+    Playing = "playing",
+    Paused = "paused"
+}
+
 interface PluginEntry {
     type: PluginEntryType;
     name: string;
@@ -23,12 +28,25 @@ interface ConfigurationField {
     key: string;
 }
 
+interface EqSettings {
+    low: number;
+    mid: number;
+    high: number;
+}
+
 interface PluginConfiguration {
     fields: ConfigurationField[];
     displayName: string;
 }
 
 interface PlaybackState {
+    volume: number;
+    song: SongPlaybackState;
+    eq: EqSettings;
+    status: PlaybackStatus;
+}
+
+interface SongPlaybackState {
     artistName: string;
     songName: string;
     sourceName: string;
@@ -37,5 +55,5 @@ interface PlaybackState {
 }
 
 
-export type { PluginEntry, PluginConfiguration,  ConfigurationField, PlaybackState }
-export { ConfigurationFieldType, PluginEntryType }
+export type { PluginEntry, PluginConfiguration, EqSettings, ConfigurationField, PlaybackState }
+export { ConfigurationFieldType, PluginEntryType, PlaybackStatus }

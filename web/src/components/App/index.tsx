@@ -18,9 +18,8 @@ export function App() {
     <>
       <Dark/>
       <div className={css.mainWrapper}>
-        <div></div>
           { !isMobile ? <SideBar/> : null}
-          <div className={css.mainWrapper__mainContent}>
+          <div class='md:bg-grey-light bg-gray-700 h-screen overflow-auto flex-grow'>
             <Router>
               { isMobile ? <Route path="/web" component={SideBar} /> : null }
               <Route path="/web/plugin/:plugin" component={ConfiguratorCard}/>

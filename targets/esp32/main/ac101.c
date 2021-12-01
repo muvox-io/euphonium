@@ -49,7 +49,7 @@ const static char TAG[] = "AC101";
 		return b;                             \
 	}
 
-static bool speakerint i2c_port_num, int i2s_num, i2s_config_t *config);
+static bool init(int i2c_port_num, int i2s_num, i2s_config_t *config);
 static void deinit(void);
 static void speaker(bool active);
 static void headset(bool active);

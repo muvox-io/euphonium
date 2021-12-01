@@ -3,9 +3,15 @@ import {
   PlaybackState,
   PluginConfiguration,
   PluginEntry,
+  EqSettings
 } from "./models";
 
-let apiUrl = "http://localhost:80";
+let apiUrl = "";
+
+
+if (import.meta.env.MODE !== 'production') {
+    apiUrl = "http://localhost:80";
+}
 
 let eventsUrl = apiUrl + "/events";
 
@@ -71,7 +77,12 @@ const updatePluginConfiguration = async (
     });
 };
 
-const playRadio = async (stationName: string, favicon: string, stationUrl: string, codec: string): Promise<any> => {
+const playRadio = async (
+  stationName: string,
+  favicon: string,
+  stationUrl: string,
+  codec: string
+): Promise<any> => {
   return await fetch(apiUrl + "/webradio", {
     method: "POST",
     headers: {
@@ -79,6 +90,30 @@ const playRadio = async (stationName: string, favicon: string, stationUrl: strin
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ stationUrl, codec, stationName, favicon }),
+  }).then((e) => e.json());
+};
+
+const updateEq = async (
+  settings: EqSettings): Promise<any> => {
+  return await fetch(apiUrl + "/eq", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(settings),
+  }).then((e) => e.json());
+};
+
+const updateVolume = async (
+  volume: number): Promise<any> => {
+  return await fetch(apiUrl + "/volume", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ volume }),
   }).then((e) => e.json());
 };
 
@@ -91,4 +126,6 @@ export {
   playRadio,
   getPluginConfiguration,
   getPlaybackState,
+  updateEq,
+  updateVolume
 };

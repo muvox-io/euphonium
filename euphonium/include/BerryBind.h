@@ -10,6 +10,7 @@
 #include <EuphoniumLog.h>
 #include <exception>
 #include <iostream>
+#include <cstring>
 #include "be_vm.h"
 
 typedef std::map<std::string, std::any> berry_map;
@@ -205,31 +206,31 @@ public:
             std::string key = it->first;
             auto value = it->second;
 
-            if (value.type() == typeid(std::string))
+            if (auto x = std::any_cast<std::string>(&value))
             {
                 string(key);
                 string(std::any_cast<std::string>(value));
                 pushMapPair();
             }
-            else if (value.type() == typeid(const char *))
+            else if (auto x = std::any_cast<const char *>(&value))
             {
                 string(key);
                 be_pushstring(vm, std::any_cast<const char *>(value));
                 pushMapPair();
             }
-            else if (value.type() == typeid(bool))
+            else if (auto x = std::any_cast<bool>(&value))
             {
                 string(key);
                 boolean(std::any_cast<bool>(value));
                 pushMapPair();
             }
-            else if (value.type() == typeid(int))
+            else if (auto x = std::any_cast<int>(&value))
             {
                 string(key);
                 number(std::any_cast<int>(value));
                 pushMapPair();
             }
-            else if (value.type() == typeid(berry_map))
+            else if (auto x = std::any_cast<berry_map>(&value))
             {
                 string(key);
                 map(std::any_cast<berry_map>(value));

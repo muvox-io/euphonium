@@ -9,7 +9,7 @@ class SPIFFSScriptLoader : public ScriptLoader
 public:
     SPIFFSScriptLoader();
     ~SPIFFSScriptLoader() {}
-    void loadScript(std::string scriptName, lua_State* luaState);
+    void loadScript(std::string scriptName, std::shared_ptr<Berry> berry);
     std::string loadFile(std::string fileName);
 
 private:
