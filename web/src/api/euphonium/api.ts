@@ -3,14 +3,16 @@ import {
   PlaybackState,
   PluginConfiguration,
   PluginEntry,
-  EqSettings
+  EqSettings,
+  EuphoniumInfo,
+  WiFiState
 } from "./models";
 
 let apiUrl = "";
 
 
 if (import.meta.env.MODE !== 'production') {
-    apiUrl = "http://localhost:80";
+  apiUrl = "http://localhost:80";
 }
 
 let eventsUrl = apiUrl + "/events";
@@ -117,7 +119,28 @@ const updateVolume = async (
   }).then((e) => e.json());
 };
 
-let eventSource = new EventSource("/events");
+const scanWifi = async () => {
+  return await fetch(apiUrl + "/wifi/wifi_scan", { method: "GET" });
+}
+
+const connectToWifi = async (ssid: string, password: string) => {
+  return await fetch(apiUrl + "/wifi/connect",
+    {
+      method: "POST", body: JSON.stringify({
+        ssid,
+        password
+      }),
+    });
+}
+const getWifiStatus = async (): Promise<WiFiState> => {
+  return await fetch(apiUrl + "/wifi;/status", { method: "GET" }).then((e) => e.json());
+}
+
+const getInfo = async (): Promise<EuphoniumInfo> => {
+  return await fetch(apiUrl + "/info", { method: "GET" }).then((e) => e.json());
+}
+
+let eventSource = new EventSource(eventsUrl);
 
 export {
   getPlugins,
@@ -127,5 +150,9 @@ export {
   getPluginConfiguration,
   getPlaybackState,
   updateEq,
-  updateVolume
+  updateVolume,
+  getWifiStatus,
+  getInfo,
+  scanWifi,
+  connectToWifi
 };

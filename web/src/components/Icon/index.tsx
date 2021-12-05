@@ -1,7 +1,7 @@
 import './icons.css';
 
-export default ({name = "", ...others}) => {
+export default ({name = "", onClick = () => {},  ...others}) => {
   return (
-    <i {...others} className={'icon-' + name} />
+    <i {...others} onClick={(v) => onClick()} className={'icon-' + name} />
   );
 };

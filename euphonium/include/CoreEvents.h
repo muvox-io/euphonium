@@ -23,8 +23,8 @@ class SongChangedEvent: public Event {
         this->eventType = EventType::LUA_MAIN_EVENT;
     };
 
-    berry_map toBerry() {
-        berry_map result;
+    berry::map toBerry() {
+        berry::map result;
         result["songName"] = this->playbackInfo.songName;
         result["albumName"] = this->playbackInfo.albumName;
         result["artistName"] = this->playbackInfo.artistName;
@@ -44,8 +44,8 @@ class VolumeChangedEvent: public Event {
         this->eventType = EventType::LUA_MAIN_EVENT;
     };
 
-    berry_map toBerry() {
-        berry_map result;
+    berry::map toBerry() {
+        berry::map result;
         result["volume"] = this->volume;
         return result;
     }

@@ -1,10 +1,5 @@
 class WebRadioPlugin : Plugin
     def init()
-        self.name = "webradio"
-        self.displayName = "Web Radio"
-        self.type = "plugin"
-        self.exposeWebApp = true
-
         self.configSchema = {
             'radioBrowserApi': {
                 'tooltip': 'Radio Browser instance url',
@@ -12,6 +7,12 @@ class WebRadioPlugin : Plugin
                 'defaultValue': 'http://webradio.radiobrowser.com/api/v1/stations/'
             },
         }
+
+        self.applyDefaultValues()
+        self.name = "webradio"
+        self.displayName = "Web Radio"
+        self.type = "plugin"
+        self.exposeWebApp = true
     end
 end
 

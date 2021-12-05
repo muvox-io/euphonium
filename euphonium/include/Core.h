@@ -20,22 +20,23 @@
 #include "plugins/cspot/CSpotPlugin.h"
 #include "plugins/webradio/WebRadioPlugin.h"
 #include "plugins/youtube/YouTubePlugin.h"
-
+#include "plugins/persistor/ConfigPersistor.h"
 
 #define PCMBUF_SIZE (1024*4)
 
 class Core: public bell::Task, public EventSubscriber {
 private:
     std::shared_ptr<AudioOutput> currentOutput;
-    std::vector<std::shared_ptr<Module>> requiredModules;
-    std::vector<std::shared_ptr<Module>> registeredPlugins;
     std::shared_ptr<AudioProcessors> audioProcessor;
     bool outputConnected = false;
-    std::shared_ptr<Berry> berry;
+    std::shared_ptr<berry::VmState> berry;
 
 public:
     Core();
     ~Core() {};
+    std::vector<std::shared_ptr<Module>> requiredModules;
+    std::vector<std::shared_ptr<Module>> registeredPlugins;
+
     void selectAudioOutput(std::shared_ptr<AudioOutput> output);
     void loadPlugins(std::shared_ptr<ScriptLoader> loader);
     void handleLuaThread();
@@ -43,7 +44,7 @@ public:
     void runTask();
     void handleEvent(std::unique_ptr<Event> event);
     void setupBindings();
-    void startAudioThreadForPlugin(std::string pluginName, berry_map config);
+    void startAudioThreadForPlugin(std::string pluginName, berry::map config);
 
     std::shared_ptr<EventBus> luaEventBus;
     std::shared_ptr<MainAudioBuffer> audioBuffer;

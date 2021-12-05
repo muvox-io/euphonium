@@ -15,13 +15,13 @@ class HandleRouteEvent: public Event {
         this->eventType = EventType::LUA_MAIN_EVENT;
     };
 
-    berry_map toBerry() {
-        berry_map result;
+    berry::map toBerry() {
+        berry::map result;
         result["body"]  = this->request.body;
         result["connection"] = this->request.connection;
         result["handlerId"] = this->request.handlerId;
-        result["queryParams"] = to_berry_map(this->request.queryParams);
-        result["urlParams"] = to_berry_map(this->request.urlParams);
+        result["queryParams"] = berry::to_map(this->request.queryParams);
+        result["urlParams"] = berry::to_map(this->request.urlParams);
         return result;
     }
 };

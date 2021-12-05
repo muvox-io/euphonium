@@ -8,7 +8,7 @@ PortAudioAudioOutput::PortAudioAudioOutput() {
         printf("PortAudio: Default audio device not found!\n");
         // exit(0);
     }
-        printf("PortAudio: Default audio device not found!\n");
+    printf("PortAudio: Default audio device not found!\n");
 
     outputParameters.channelCount = 2;       /* stereo output */
     outputParameters.sampleFormat = paInt16; /* 32 bit floating point output */

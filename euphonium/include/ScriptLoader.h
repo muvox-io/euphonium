@@ -8,8 +8,9 @@
 class ScriptLoader {
 public:
     ScriptLoader() {};
-    virtual void loadScript(std::string scriptName, std::shared_ptr<Berry> berry) = 0;
+    virtual void loadScript(std::string scriptName, std::shared_ptr<berry::VmState> berry) = 0;
     virtual std::string loadFile(std::string fileName) = 0;
+    virtual void saveFile(const std::string& fileName, const std::string& content) = 0;
 };
 
 #endif

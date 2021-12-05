@@ -64,6 +64,9 @@ void HTTPModule::registerHandler(std::string routeUrl, std::string requestType, 
 
 void HTTPModule::runTask()
 {
+    if (taskRunning) return;
+    taskRunning = true;
+
     auto assetHandler = [this](bell::HTTPRequest &request)
     {
         auto fileName = request.urlParams.at("asset");
@@ -119,5 +122,6 @@ void HTTPModule::runTask()
 
 void HTTPModule::startAudioThread()
 {
+    if (taskRunning) return;
     startTask();
 }

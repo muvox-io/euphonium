@@ -1,12 +1,12 @@
 class YouTubePlugin : Plugin
     def init()
+        self.configSchema = {
+        }
+
+        self.applyDefaultValues()
         self.name = "youtube"
         self.displayName = "YouTube"
         self.type = "plugin"
-        self.exposeWebApp = false
-
-        self.configSchema = {
-        }
     end
 end
 
@@ -15,7 +15,6 @@ app.registerPlugin(YouTubePlugin())
 # HTTP Handlers
 http.handle('POST', '/youtube', def(request)
     var body = json.load(request['body'])
-    print("got info")
     app.updateSong({
         'songName': 'YouTube',
         'artistName': 'YouTube',

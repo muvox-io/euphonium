@@ -9,7 +9,8 @@ class FileScriptLoader : public ScriptLoader
 public:
     FileScriptLoader();
     ~FileScriptLoader() {}
-    void loadScript(std::string scriptName, std::shared_ptr<Berry> berry);
+    void loadScript(std::string scriptName, std::shared_ptr<berry::VmState> berry);
+    void saveFile(const std::string& fileName, const std::string& content);
     std::string loadFile(std::string fileName);
 
 private:

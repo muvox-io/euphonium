@@ -9,7 +9,7 @@ Core::Core() : bell::Task("Core", 4 * 1024, 0) {
     audioProcessor = std::make_shared<AudioProcessors>();
     audioProcessor->addProcessor(std::make_unique<SoftwareVolumeProcessor>());
     audioProcessor->addProcessor(std::make_unique<EqualizerProcessor>());
-    berry = std::make_shared<Berry>();
+    berry = std::make_shared<berry::VmState>();
     berry->execute_string("import json");
     berry->execute_string("import global");
 
@@ -17,17 +17,12 @@ Core::Core() : bell::Task("Core", 4 * 1024, 0) {
     auto subscriber = dynamic_cast<EventSubscriber*>(this);
     luaEventBus->addListener(EventType::LUA_MAIN_EVENT, *subscriber);
 
-    BELL_LOG(info, "core", "Core initialized");
-    this->setupBindings();
-    BELL_LOG(info, "core", "Core initialized 2");
     registeredPlugins = {
         std::make_shared<CSpotPlugin>(),
         std::make_shared<WebRadioPlugin>(),
         std::make_shared<YouTubePlugin>()
     };
-    requiredModules = {
-        std::make_shared<HTTPModule>()};
-    BELL_LOG(info, "core", "Core initialized 3");
+    requiredModules = {std::make_shared<HTTPModule>(), std::make_shared<ConfigPersistor>()};
 
     audioBuffer->shutdownListener = [this](std::string exceptPlugin) {
         for (auto& plugin : registeredPlugins) {
@@ -58,6 +53,8 @@ void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader)
         loader->loadScript(value, berry);
     }
 
+    currentOutput->setupBindings(berry);
+
     for (auto const &plugin : this->registeredPlugins)
     {
         EUPH_LOG(info, plugin->name, "Initializing");
@@ -67,7 +64,7 @@ void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader)
         plugin->loadScript(loader);
     }
     
-    berry->execute_string("printRegisteredPlugins()");
+    berry->execute_string("loadPlugins()");
 
     startTask();
 
@@ -86,8 +83,6 @@ void Core::selectAudioOutput(std::shared_ptr<AudioOutput> output)
 
 void Core::handleEvent(std::unique_ptr<Event> event) {
     EUPH_LOG(debug, "core", "Got event");
-    BELL_LOG(debug, "core", "pre %d", be_top(berry->rawPtr()));
-
     // Load function
     berry->get_global("handleEvent");
 
@@ -98,10 +93,13 @@ void Core::handleEvent(std::unique_ptr<Event> event) {
     berry->map(event->toBerry());
 
     berry->pcall(2);
-    BELL_LOG(debug, "core", "dd %d", be_top(berry->rawPtr()));
+
+    if (be_top(berry->raw_ptr()) > 0) {
+        BELL_LOG(error, "core", "Berry stack invalid, possible memory leak (%d > 0 !)", be_top(berry->raw_ptr()));
+    }
 }
 
-void Core::startAudioThreadForPlugin(std::string pluginName, berry_map config) {
+void Core::startAudioThreadForPlugin(std::string pluginName, berry::map config) {
     for (auto const &plugin : this->registeredPlugins) {
         if (plugin->name == pluginName) {
             plugin->config = config;
@@ -123,9 +121,13 @@ void Core::startAudioThreadForPlugin(std::string pluginName, berry_map config) {
     }
 }
 
-void Core::setupBindings() {
+void sleepMS(int ms) {
+    BELL_SLEEP_MS(ms);
+}
 
+void Core::setupBindings() {
     berry->export_this("startAudioThreadForPlugin", this, &Core::startAudioThreadForPlugin);
+    berry->export_function("sleep_ms", &sleepMS);
 }
 
 void Core::runTask() {

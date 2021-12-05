@@ -91,7 +91,7 @@ public:
         }
     }
 
-    void setBindings(std::shared_ptr<Berry> berry)
+    void setBindings(std::shared_ptr<berry::VmState> berry)
     {
         berry->export_this("eqSetBands", this, &EqualizerProcessor::setBands);
     }

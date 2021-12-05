@@ -19,7 +19,7 @@ class Event {
     virtual ~Event() {};
     EventType eventType;
     std::string subType;
-    virtual berry_map toBerry() = 0;
+    virtual berry::map toBerry() = 0;
 };
 
 class EventSubscriber {

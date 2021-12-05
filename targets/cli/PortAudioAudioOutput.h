@@ -10,6 +10,7 @@ class PortAudioAudioOutput : public AudioOutput
 public:
     PortAudioAudioOutput();
     ~PortAudioAudioOutput();
+    void setupBindings(std::shared_ptr<berry::VmState>) {};
     void feedPCMFrames(uint8_t* data, size_t nBytes);
 
 private:

@@ -2,16 +2,20 @@ import Icon from "../Icon";
 
 type InputProps = {
   tooltip?: string;
-  value: string;
+  value?: string;
   icon?: string;
+  type?: string;
   placeholder?: string;
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
+  onSubmit?: (value: string) => void;
 };
 
 export default ({
-  tooltip,
-  value,
+  tooltip = "",
+  value = "",
+  type = "text",
   onChange,
+  onSubmit,
   icon,
   placeholder,
 }: InputProps) => {
@@ -22,7 +26,9 @@ export default ({
         placeholder={placeholder}
         className={`${icon ? "pl-10" : ""} bg-gray-600 p-3 rounded-xl min-w-full`}
         value={value}
-        onChange={(e: any) => onChange(e.target.value)}
+        type={type}
+        onChange={(e: any) => onSubmit && onSubmit(e.target.value)}
+        onInput={(e: any) => onChange && onChange(e.target.value)}
       ></input>
       {icon && (
         <div class='text-gray-400  left-1 top-3 absolute'>

@@ -95,6 +95,7 @@
         "cinttypes": "cpp",
         "cassert": "cpp",
         "__functional_03": "cpp",
-        "*.inc": "cpp"
+        "*.inc": "cpp",
+        "__bits": "cpp"
     }
 }

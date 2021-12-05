@@ -17,11 +17,11 @@ class Module {
     Module() {}
     std::string name;
     ModuleStatus status = ModuleStatus::SHUTDOWN;
-    std::shared_ptr<Berry> berry;
+    std::shared_ptr<berry::VmState> berry;
     std::shared_ptr<EventBus> luaEventBus;
     std::shared_ptr<MainAudioBuffer> audioBuffer;
 
-    berry_map config;
+    berry::map config;
     virtual void loadScript(std::shared_ptr<ScriptLoader> scriptLoader) = 0;
     virtual void setupBindings() = 0;
     virtual void startAudioThread() = 0;

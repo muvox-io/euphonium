@@ -1,10 +1,5 @@
 class CSpotPlugin : Plugin
     def init()
-        self.name = "cspot"
-        self.displayName = "Spotify (cspot)"
-        self.type = "plugin"
-        self.exposeWebApp = false
-
         self.configSchema = {
             'receiverName': {
                 'tooltip': "Speaker's name",
@@ -18,6 +13,11 @@ class CSpotPlugin : Plugin
                 'defaultValue': '160'
             },
         }
+
+        self.applyDefaultValues()
+        self.name = "cspot"
+        self.displayName = "Spotify (cspot)"
+        self.type = "plugin"
     end
 end
 

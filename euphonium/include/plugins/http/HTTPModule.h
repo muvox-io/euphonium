@@ -13,6 +13,8 @@
 extern std::shared_ptr<bell::HTTPServer> mainServer;
 class HTTPModule : public bell::Task, public Module
 {
+private:
+    bool taskRunning = false;
 public:
     HTTPModule();
     std::shared_ptr<ScriptLoader> scriptLoader;

@@ -21,7 +21,8 @@
 #include <string>
 #include "SPIFFSScriptLoader.h"
 #include "Core.h"
-#include "AC101AudioOutput.h"
+#include "DACAudioOutput.h"
+#include "ESP32Platform.h"
 
 static const char *TAG = "euphonium";
 
@@ -35,9 +36,11 @@ static void euphoniumTask(void *pvParameters)
     bell::enableSubmoduleLogging();
     bell::createDecoders();
     auto core = std::make_shared<Core>();
+    core->registeredPlugins.push_back(std::make_shared<ESP32PlatformPlugin>());
     auto loader = std::make_shared<SPIFFSScriptLoader>();
-    auto output = std::make_shared<AC101AudioOutput>();
+    auto output = std::make_shared<DACAudioOutput>();
     core->selectAudioOutput(output);
+    core->setupBindings();
     core->loadPlugins(loader);
 }
 
@@ -96,10 +99,6 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     init_spiffs();
-
-    ESP_ERROR_CHECK(example_connect());
-
-    ESP_LOGI("TAG", "Connected to AP, start euphonium");
 
     auto taskHandle = xTaskCreatePinnedToCore(&euphoniumTask, "euphonium", 8192 * 8, NULL, 5, NULL, 0);
 }

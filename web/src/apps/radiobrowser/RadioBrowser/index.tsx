@@ -12,7 +12,7 @@ const Radio = ({
   favicon = "",
   bitrate = 0,
   countrycode = "",
-  url_resolved = ""
+  url_resolved = "",
 }) => {
   return (
     <div class="bg-grey shadow-m p-5 flex flex-col relative rounded-xl">
@@ -23,13 +23,16 @@ const Radio = ({
           "https://www.veryicon.com/download/png/media/music-series/sound-wave-1-2?s=256"
         }
       />
-      <div class='font-normal max-w-[80%] -mt-1 mb-2 truncate'>{name}</div>
-      <div class='font-thin text-sm truncate text-gray-400'>
+      <div class="font-normal max-w-[80%] -mt-1 mb-2 truncate">{name}</div>
+      <div class="font-thin text-sm truncate text-gray-400">
         {codec} Codec • {bitrate} kbps • {countrycode}
       </div>
-      <div class='bg-green-600 w-10 h-10 rounded-full absolute flex -bottom-2 -right-2'>
-        <div class='mt-[9px] ml-[5px]'>
-        <Icon onClick={() => playRadio(name, favicon, url_resolved, codec)} name="play" />
+      <div class="bg-green-600 w-10 h-10 rounded-full absolute flex -bottom-2 -right-2">
+        <div class="mt-[9px] ml-[5px]">
+          <Icon
+            onClick={() => playRadio(name, favicon, url_resolved, codec)}
+            name="play"
+          />
         </div>
         {/* <Icon name="save" /> */}
       </div>
@@ -41,20 +44,22 @@ export default () => {
   const [radios, setRadios] = useState<Station[]>([]);
 
   return (
-    <Card title="Web radio" subtitle="application">
-      <Input
-        onChange={(e) => {
-          getStationsByName(e).then(setRadios);
-        }}
-        value=""
-        placeholder="Search radio-browser.info"
-        icon="search"
-      />
-      <div class="grid md:grid-cols-2 grid-cols-1 xl:grid-cols-5 gap-8 mt-10">
-        {radios.map((radio) => (
-          <Radio {...radio}></Radio>
-        ))}
-      </div>
-    </Card >
+    <div class="mb-[150px]">
+      <Card title="Web radio" subtitle="application">
+        <Input
+          onSubmit={(e) => {
+            getStationsByName(e).then(setRadios);
+          }}
+          value=""
+          placeholder="Search radio-browser.info"
+          icon="search"
+        />
+        <div class="grid md:grid-cols-2 grid-cols-1 xl:grid-cols-5 gap-8 mt-10">
+          {radios.map((radio) => (
+            <Radio {...radio}></Radio>
+          ))}
+        </div>
+      </Card>
+    </div>
   );
 };

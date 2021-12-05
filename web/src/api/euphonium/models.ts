@@ -15,8 +15,25 @@ interface PluginEntry {
     displayName: string;
 }
 
+interface WiFiNetwork {
+    ssid: string;
+    open: boolean;
+}
+
+interface WiFiState {
+    ssids: WiFiNetwork[];
+    state: string;
+    ipAddress: string;
+}
+
+interface EuphoniumInfo {
+    version: string;
+    networkState: 'online' | 'offline';
+}
+
 enum ConfigurationFieldType {
     String = "string",
+    Number = "number",
     StringList = "stringList"
 }
 interface ConfigurationField {
@@ -55,5 +72,5 @@ interface SongPlaybackState {
 }
 
 
-export type { PluginEntry, PluginConfiguration, EqSettings, ConfigurationField, PlaybackState }
+export type { PluginEntry, PluginConfiguration, EqSettings, EuphoniumInfo, ConfigurationField, PlaybackState, WiFiNetwork, WiFiState }
 export { ConfigurationFieldType, PluginEntryType, PlaybackStatus }
