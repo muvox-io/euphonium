@@ -3,4 +3,5 @@ euphonium/protos
 targets/cli/build
 build/
 py/
+.cache/
 authBlob.json
