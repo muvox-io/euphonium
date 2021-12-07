@@ -17,20 +17,24 @@ import { getInfo } from "../../api/euphonium/api";
 
 export function App() {
   const [info, setInfo] = useState<EuphoniumInfo>();
+  const [isDark, setDark] = useState<boolean>(!(localStorage.getItem('theme') &&  localStorage.getItem('theme') == 'light'));
 
   useEffect(() => {
     getInfo().then(setInfo);
   }, []);
   const isMobile = useIsMobile();
 
+  const toggleTheme = () => {
+  }
+
   return (
     <>
-      <Dark />
+      <Dark/>
       <div className={css.mainWrapper}>
-        <div class='md:bg-grey-light bg-gray-700 h-screen w-screen'>
+        <div class='md:bg-app-secondary bg-app-primary h-screen w-screen'>
           {info?.networkState == 'online' ? (
             <div class="flex-row flex">
-              {!isMobile ? <SideBar /> : null}
+              {!isMobile ? <SideBar version={info?.version} onThemeChange={() => toggleTheme()} /> : null}
               <div class="flex-grow h-screen overflow-y-auto">
                 <Router>
                   {isMobile ? <Route path="/web" component={SideBar} /> : null}

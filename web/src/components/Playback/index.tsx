@@ -1,6 +1,7 @@
 import {
   eventSource,
   getPlaybackState,
+  setPaused,
   updateVolume,
 } from "../../api/euphonium/api";
 import Icon from "../Icon";
@@ -31,21 +32,21 @@ const PlaybackBar = () => {
   const isMobile = useIsMobile();
 
   return (
-    <div class="flex flex-row bg-grey-light md:bg-gray-700 h-13 mr-3 ml-3 rounded-t-xl items-center shadow-xl flex-grow">
+    <div class="flex flex-row bg-app-secondary md:bg-app-primary h-13 mr-3 ml-3 rounded-t-xl items-center shadow-xl flex-grow">
       <img
         class="rounded-xl h-20 w-20 shadow-xl bg-white -mt-8 ml-2 mb-2"
         src={playbackState?.song.icon ?? "https://www.veryicon.com/download/png/media/music-series/sound-wave-1-2?s=256"}
       ></img>
       <div class="flex flex-col justify-center ml-4">
         <div>{playbackState?.song.songName}</div>
-        <div class="text-gray-400 text-xs">
+        <div class="text-app-text-secondary text-xs">
           {playbackState?.song.artistName} • {playbackState?.song.albumName} •
           playback from {playbackState?.song.sourceName}
         </div>
       </div>
       <div></div>
       {!isMobile ? (
-        <div class="mr-3 text-xl text-gray-400 ml-auto flex flex-row">
+        <div class="mr-3 text-xl text-app-text-secondary ml-auto flex flex-row">
           <div class="relative flex justify-center">
             {eqOpen && playbackState?.eq ? (
               <div class="absolute bottom-[50px] shadow-xl text-center rounded-xl w-[170px] p-4 z-index-2 bg-gray-700 mb-1">
@@ -66,6 +67,9 @@ const PlaybackBar = () => {
             max="15"
           />
           <Icon
+            onClick={() => {
+                setPaused(playbackState?.status == PlaybackStatus.Playing)
+            }}
             name={
               playbackState?.status == PlaybackStatus.Playing ? "pause" : "play"
             }

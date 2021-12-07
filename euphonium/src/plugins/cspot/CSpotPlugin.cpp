@@ -4,28 +4,42 @@
 
 std::shared_ptr<ConfigJSON> configMan;
 
-CSpotPlugin::CSpotPlugin() : bell::Task("cspot", 4 * 1024, 1)
-{
+CSpotPlugin::CSpotPlugin() : bell::Task("cspot", 4 * 1024, 1) {
     auto file = std::make_shared<CliFile>();
     configMan = std::make_shared<ConfigJSON>("test.json", file);
     name = "cspot";
 }
 
-void CSpotPlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader)
-{
+void CSpotPlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader) {
     scriptLoader->loadScript("cspot_plugin", berry);
 }
 
-void CSpotPlugin::setupBindings()
-{
-    berry->export_this("cspotConfigUpdated", this, &CSpotPlugin::configurationUpdated);
+void CSpotPlugin::setupBindings() {
+    berry->export_this("cspot_config_updated", this,
+                       &CSpotPlugin::configurationUpdated);
+    berry->export_this("cspot_set_pause", this, &CSpotPlugin::setPause);
+    berry->export_this("cspot_set_volume_remote", this,
+                       &CSpotPlugin::setVolumeRemote);
 }
 
-void CSpotPlugin::configurationUpdated()
-{
+void CSpotPlugin::setPause(bool pause) {
+    if (spircController != nullptr) {
+        spircController->setPause(pause);
+    }
+}
+
+void CSpotPlugin::setVolumeRemote(int volume) {
+    if (spircController != nullptr) {
+        double volStep = MAX_VOLUME / 100.0;
+        spircController->setRemoteVolume((int)volStep * volume);
+    }
+}
+
+void CSpotPlugin::configurationUpdated() {
     std::cout << "CSpotPlugin::configurationUpdated()" << std::endl;
+    mapConfig();
     shutdown();
-    //startAudioThread();
+    // startAudioThread();
 }
 
 void CSpotPlugin::shutdown() {
@@ -41,8 +55,7 @@ void CSpotPlugin::shutdown() {
     status = ModuleStatus::SHUTDOWN;
 }
 
-void CSpotPlugin::runTask()
-{
+void CSpotPlugin::runTask() {
     status = ModuleStatus::RUNNING;
     std::scoped_lock lock(runningMutex);
     this->isRunning = true;
@@ -57,40 +70,54 @@ void CSpotPlugin::runTask()
     auto token = session->authenticate(authBlob);
 
     EUPH_LOG(info, "cspot", "Auth");
-    if (token.size() > 0)
-    {
+    if (token.size() > 0) {
         // @TODO Actually store this token somewhere
         mercuryManager = std::make_shared<MercuryManager>(std::move(session));
         mercuryManager->startTask();
-        auto audioSink = std::make_shared<FakeAudioSink>(this->audioBuffer, this->luaEventBus);
-        spircController = std::make_shared<SpircController>(mercuryManager, authBlob->username, audioSink);
-        spircController->setTrackChangedCallback([this](TrackInfo &track)
-                                                 {
-                                                     auto sourceName = std::string("cspot");
-                                                     auto event = std::make_unique<SongChangedEvent>(track.name, track.album, track.artist, sourceName, track.imageUrl);
-                                                     EUPH_LOG(info, "cspot", "Song name changed");
-                                                     this->luaEventBus->postEvent(std::move(event));
-                                                 });
+        mercuryManager->updateQueue();
+        auto audioSink = std::make_shared<FakeAudioSink>(this->audioBuffer,
+                                                         this->luaEventBus);
+        spircController = std::make_shared<SpircController>(
+            mercuryManager, authBlob->username, audioSink);
+        spircController->setEventHandler([this](CSpotEvent &event) {
+            switch (event.eventType) {
+            case CSpotEventType::TRACK_INFO: {
+                TrackInfo track = std::get<TrackInfo>(event.data);
+                auto sourceName = std::string("cspot");
+                auto event = std::make_unique<SongChangedEvent>(
+                    track.name, track.album, track.artist, sourceName,
+                    track.imageUrl);
+                EUPH_LOG(info, "cspot", "Song name changed");
+                this->luaEventBus->postEvent(std::move(event));
+                break;
+            }
+            case CSpotEventType::PLAY_PAUSE: {
+                bool isPaused = std::get<bool>(event.data);
+                auto event = std::make_unique<PauseChangedEvent>(isPaused);
+                this->luaEventBus->postEvent(std::move(event));
+                break;
+            }
+            default:
+                break;
+            }
+        });
 
-        mercuryManager->reconnectedCallback = [this]()
-        {
+        mercuryManager->reconnectedCallback = [this]() {
             return this->spircController->subscribe();
         };
 
-        while (this->isRunning)
-        {
+        while (this->isRunning) {
             mercuryManager->updateQueue();
         }
     }
 }
 
-void CSpotPlugin::mapConfig()
-{
+void CSpotPlugin::mapConfig() {
     configMan->volume = 255;
     configMan->deviceName = std::any_cast<std::string>(config["receiverName"]);
-    std::string bitrateString = std::any_cast<std::string>(config["audioBitrate"]);
-    switch (std::stoi(bitrateString))
-    {
+    std::string bitrateString =
+        std::any_cast<std::string>(config["audioBitrate"]);
+    switch (std::stoi(bitrateString)) {
     case 160:
         configMan->format = AudioFormat::OGG_VORBIS_160;
         break;
@@ -103,15 +130,11 @@ void CSpotPlugin::mapConfig()
     }
 }
 
-void CSpotPlugin::startAudioThread()
-{
+void CSpotPlugin::startAudioThread() {
     mapConfig();
-    if (this->authenticator == nullptr)
-    {
-        createPlayerCallback = [this](std::shared_ptr<LoginBlob> blob)
-        {
-            if (this->isRunning)
-            {
+    if (this->authenticator == nullptr) {
+        createPlayerCallback = [this](std::shared_ptr<LoginBlob> blob) {
+            if (this->isRunning) {
                 configurationUpdated();
             }
 
@@ -121,7 +144,9 @@ void CSpotPlugin::startAudioThread()
             EUPH_LOG(info, "cspot", "Detached");
         };
 
-        authenticator = std::make_shared<ZeroconfAuthenticator>(createPlayerCallback, mainServer);
+        BELL_LOG(info, "cspot", "Setting up zeroconf");
+        authenticator = std::make_shared<ZeroconfAuthenticator>(
+            createPlayerCallback, mainServer);
         authenticator->registerHandlers();
     }
 }

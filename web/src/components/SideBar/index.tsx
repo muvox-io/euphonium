@@ -2,9 +2,10 @@ import { Link } from "preact-router/match";
 import { useState, useEffect } from "preact/hooks";
 import { getPlugins } from "../../api/euphonium/api";
 import { PluginEntry, PluginEntryType } from "../../api/euphonium/models";
+import Icon from "../Icon";
 import SelectItem from "../SelectItem";
 
-const SideBarItem = ({ displayName = "", name = "", type = "" }) => {
+const SideBarItem = ({ displayName = "", name = "", type = ""}) => {
   return (
     <SelectItem>
       <Link
@@ -26,7 +27,7 @@ type CategoryProps = {
 const SideBarCategory = ({ plugins, filterType, header }: CategoryProps) => {
   return (
     <div className="flex flex-col space-y-4">
-      <div className="text-gray-400 text-lg md:text-sm">{header}</div>
+      <div className="text-app-text-secondary text-lg md:text-sm">{header}</div>
 
       {plugins
         .filter((e) => e.type == filterType)
@@ -37,7 +38,7 @@ const SideBarCategory = ({ plugins, filterType, header }: CategoryProps) => {
   );
 };
 
-export default () => {
+export default ({ version = "", theme = "", onThemeChange = () => {} }) => {
   const [plugins, setPlugins] = useState<PluginEntry[]>([]);
 
   useEffect(() => {
@@ -47,7 +48,7 @@ export default () => {
   }, []);
 
   return (
-    <div className="flex md:w-[220px] md:min-w-[220px] flex-col bg-gray-700 p-8 md:p-4 h-screen text-m space-y-2 overflow-y-auto">
+    <div className="flex align-start relative md:w-[220px] md:min-w-[220px] flex-col bg-app-primary p-8 md:p-4 h-screen text-m space-y-2 overflow-y-auto">
       <div className="text-3xl md:text-2xl">Euphonium 🎺</div>
       <SideBarCategory
         plugins={plugins}
@@ -64,6 +65,12 @@ export default () => {
         filterType={PluginEntryType.Plugin}
         header="plugin configuration"
       />
+
+
+    <div class="absolute bottom-4 left-4 text-xs">v{version}</div>
+      <div onClick={(v) => onThemeChange() } class="absolute bg-app-secondary rounded-full w-8 h-8 right-4 bottom-4 flex text-xl items-center justify-center flex">
+        <Icon name="moon"/>
+      </div>
     </div>
   );
 };

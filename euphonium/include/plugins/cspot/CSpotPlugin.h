@@ -12,6 +12,7 @@
 #include "CoreEvents.h"
 #include "SpircController.h"
 #include "FakeAudioSink.h"
+#include <variant>
 #include "CliFile.h"
 #include "plugins/http/HTTPModule.h"
 #include "Module.h"
@@ -37,6 +38,8 @@ public:
     void loadScript(std::shared_ptr<ScriptLoader> scriptLoader);
     void setupBindings();
     void configurationUpdated();
+    void setPause(bool);
+    void setVolumeRemote(int);
     void shutdown();
     void startAudioThread();
     void runTask();

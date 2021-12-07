@@ -1,3 +1,8 @@
+EVENT_CONFIG_UPDATED = 'conf_updated'
+EVENT_VOLUME_UPDATED = 'volume_updated'
+EVENT_SYSTEM_INIT = 'system_init'
+EVENT_SET_PAUSE = 'set_pause'
+
 class Plugin
     var name
     var type
@@ -20,23 +25,24 @@ class Plugin
     def initAudio()
     end
 
-    def configurationUpdated()
-    end
-
-    def onSystemInit()
-
+    def onEvent(event, data)
     end
 
     def configValue(key)
         return self.configSchema[key]['value']
     end
 
-    def persistConfig()
+    def getBareValues()
         var bareValues = {}
         for key : self.configSchema.keys()
             bareValues[key] = self.configSchema[key]['value']
         end
 
+        return bareValues
+    end
+
+    def persistConfig()
+        var bareValues = self.getBareValues()
         conf_persist(self.name, json.dump(bareValues))
     end
 
@@ -67,6 +73,19 @@ class App
             end,
             'songChangedEvent': def (song)
                 self.updateSong(song)
+            end,
+            'statusChangedEvent': def (req)
+                if req['isPaused']
+                    self.playbackState['status'] = 'paused'
+                else
+                    self.playbackState['status'] = 'playing'
+                end
+                self.updatePlaybackInfo()
+            end,
+            'volumeChangedEvent': def (req)
+                self.playbackState['volume'] = int(req['volume'])
+                setVolume(self.playbackState['volume'])
+                self.updatePlaybackInfo()
             end,
             'handleConfigLoaded': def (config)
                 self.loadConfForPlugin(config)
@@ -133,9 +152,11 @@ class App
             plugin.initAudio()
         end
 
+        startAudioThreadForPlugin('cspot', self.getPluginByName('cspot').getBareValues())
+        startAudioThreadForPlugin('webradio', self.getPluginByName('webradio').getBareValues())
+        startAudioThreadForPlugin('youtube', self.getPluginByName('youtube').getBareValues())
+
         self.initHTTP()
-        startAudioThreadForPlugin('webradio', {})
-        startAudioThreadForPlugin('youtube', {})
     end
 
     def initHTTP()
@@ -164,12 +185,22 @@ class App
         return nil
     end
 
+    def broadcastEvent(eventType, eventData)
+        for plugin : self.plugins
+            plugin.onEvent(eventType, eventData)
+        end
+    end
+
+    def sendPluginEvent(plugin, eventType, eventData)
+        plugin = self.getPluginByName(plugin)
+        plugin.onEvent(eventType, eventData)
+    end
+
     def loadConfForPlugin(conf)
-        self plugin = self.getPluginByName(conf['key'])
+        plugin = self.getPluginByName(conf['key'])
         plugin.loadConfig(conf['value'])
         plugin.configurationLoaded = true
         self.loadPluginsWhenReady()
-        plugin.configurationUpdated()
     end
 
     def loadPluginsWhenReady()
@@ -184,7 +215,7 @@ class App
 
             for plugin : self.plugins
                 if plugin.type == 'init_handler'
-                    plugin.onSystemInit()
+                    plugin.onEvent(EVENT_SYSTEM_INIT, {})
                     return
                 end
             end
@@ -258,6 +289,7 @@ http.handle('POST', '/plugins/:name', def (request)
     var bodyObj = json.load(request['body'])
 
     var plugin = app.getPluginByName(request['urlParams']['name'])
+
     var confSchema = plugin.configSchema
 
     for key : bodyObj.keys()
@@ -266,6 +298,8 @@ http.handle('POST', '/plugins/:name', def (request)
 
     plugin.persistConfig()
     http.sendJSON({ 'configSchema': confSchema, 'displayName': plugin.displayName }, request['connection'], 200)
+
+    plugin.onEvent(EVENT_CONFIG_UPDATED, {})
 end)
 
 http.handle('GET', '/playback', def (request)
@@ -283,6 +317,8 @@ http.handle('POST', '/volume', def (request)
     var body = json.load(request['body'])
     setVolume(body['volume'])
     app.playbackState['volume'] = body['volume']
+
+    app.broadcastEvent(EVENT_VOLUME_UPDATED, body['volume'])
     app.updatePlaybackInfo()
     http.sendJSON(body, request['connection'], 200)
 end)
@@ -293,6 +329,19 @@ http.handle('POST', '/eq', def (request)
     app.playbackState['eq'] = body
     app.updatePlaybackInfo()
     http.sendJSON(body, request['connection'], 200)
+end)
+
+http.handle('POST', '/play', def (request)
+    app.playbackState['status'] = json.load(request['body'])['status']
+    cspot = app.getPluginByName('cspot')
+
+    if app.playbackState['status'] == 'playing'
+        cspot.onEvent(EVENT_SET_PAUSE, false)
+    else
+        cspot.onEvent(EVENT_SET_PAUSE, true)
+    end
+
+    http.sendJSON({'status': 'ok'}, request['connection'], 200)
 end)
 
 startAudioThreadForPlugin('persistor', {})

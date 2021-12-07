@@ -34,6 +34,23 @@ class SongChangedEvent: public Event {
     }
 };
 
+class PauseChangedEvent: public Event {
+    private:
+    bool isPaused;
+    public:
+    PauseChangedEvent(bool isPaused) {
+        this->isPaused = isPaused;
+        this->subType = "statusChangedEvent";
+        this->eventType = EventType::LUA_MAIN_EVENT;
+    };
+
+    berry::map toBerry() {
+        berry::map result;
+        result["isPaused"] = this->isPaused;
+        return result;
+    }
+};
+
 class VolumeChangedEvent: public Event {
     private:
     int volume;

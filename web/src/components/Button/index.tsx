@@ -8,11 +8,11 @@ type ButtonProps = {
 export default ({ onClick, disabled = false, type = 'transparent', children }: ButtonProps) => {
     if (type == 'transparent') {
         return (
-            <button className={` ${(disabled && 'text-gray-400') || 'text-red-500'}`} disabled={disabled} onClick={(e) => onClick()}>{ children }</button>
+            <button className={` ${(disabled && 'text-app-text-secondary') || 'text-red-500'}`} disabled={disabled} onClick={(e) => onClick()}>{ children }</button>
         )
     }
 
     return (
-        <button disabled={disabled} className={`${(disabled && 'bg-gray-400') || 'bg-green-600'} font-bold p-3 rounded-xl w-full`} onClick={(e) => onClick()}>{ children }</button>
+        <button disabled={disabled} className={`${(disabled && 'bg-app-text-secondary') || 'bg-green-600'} font-bold p-3 rounded-xl w-full`} onClick={(e) => onClick()}>{ children }</button>
     )
 }

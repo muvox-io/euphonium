@@ -119,6 +119,18 @@ const updateVolume = async (
   }).then((e) => e.json());
 };
 
+const setPaused = async (isPaused: boolean) => {
+    return await fetch(apiUrl + '/play', {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ status: isPaused ? 'paused' : 'playing' }),
+
+    });
+}
+
 const scanWifi = async () => {
   return await fetch(apiUrl + "/wifi/wifi_scan", { method: "GET" });
 }
@@ -151,6 +163,7 @@ export {
   getPlaybackState,
   updateEq,
   updateVolume,
+  setPaused,
   getWifiStatus,
   getInfo,
   scanWifi,
