@@ -134,6 +134,10 @@ void YouTubePlugin::runTask()
             isRunning = true;
             status = ModuleStatus::RUNNING;
             audioBuffer->shutdownExcept(name);
+            auto event = std::make_unique<AudioTakeoverEvent>(name);
+            this->luaEventBus->postEvent(std::move(event));
+
+
             auto ytHandler = std::make_shared<bell::HTTPStream>();
             ytHandler->connectToUrl(url);
 

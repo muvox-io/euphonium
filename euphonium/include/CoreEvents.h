@@ -8,17 +8,17 @@ struct PlaybackInfo {
     std::string songName, albumName, artistName, sourceName, icon;
 };
 
-class SongChangedEvent: public Event {
-    public:
+class SongChangedEvent : public Event {
+  public:
     PlaybackInfo playbackInfo;
-    SongChangedEvent(const std::string& songName, const std::string& albumName, const std::string& artistName, const std::string& sourceName, const std::string& icon) {
-        this->playbackInfo = {
-            .songName = songName,
-            .albumName = albumName,
-            .artistName = artistName,
-            .sourceName = sourceName,
-            .icon = icon
-        };
+    SongChangedEvent(const std::string &songName, const std::string &albumName,
+                     const std::string &artistName,
+                     const std::string &sourceName, const std::string &icon) {
+        this->playbackInfo = {.songName = songName,
+                              .albumName = albumName,
+                              .artistName = artistName,
+                              .sourceName = sourceName,
+                              .icon = icon};
         this->subType = "songChangedEvent";
         this->eventType = EventType::LUA_MAIN_EVENT;
     };
@@ -34,10 +34,11 @@ class SongChangedEvent: public Event {
     }
 };
 
-class PauseChangedEvent: public Event {
-    private:
+class PauseChangedEvent : public Event {
+  private:
     bool isPaused;
-    public:
+
+  public:
     PauseChangedEvent(bool isPaused) {
         this->isPaused = isPaused;
         this->subType = "statusChangedEvent";
@@ -51,10 +52,29 @@ class PauseChangedEvent: public Event {
     }
 };
 
-class VolumeChangedEvent: public Event {
-    private:
+class AudioTakeoverEvent : public Event {
+  private:
+    std::string source;
+
+  public:
+    AudioTakeoverEvent(std::string source) {
+        this->source = source;
+        this->subType = "audioTakeoverEvent";
+        this->eventType = EventType::LUA_MAIN_EVENT;
+    };
+
+    berry::map toBerry() {
+        berry::map result;
+        result["source"] = this->source;
+        return result;
+    }
+};
+
+class VolumeChangedEvent : public Event {
+  private:
     int volume;
-    public:
+
+  public:
     VolumeChangedEvent(int volume) {
         this->volume = volume;
         this->subType = "volumeChangedEvent";

@@ -17,6 +17,7 @@ class WebRadioPlugin : public bell::Task, public Module
 private:
     std::shared_ptr<HTTPAudioStream> audioStream;
     std::atomic<bool> isRunning;
+    std::atomic<bool> isPaused;
     std::mutex runningMutex;
     bell::Queue<std::pair<bool, std::string>> radioUrlQueue;
 
@@ -26,6 +27,7 @@ public:
     void setupBindings();
     void shutdown();
     void configurationUpdated();
+    void setPaused(bool);
     void startAudioThread();
     void runTask();
     void playRadioUrl(std::string, bool);

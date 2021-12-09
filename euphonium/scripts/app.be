@@ -64,6 +64,7 @@ class App
     var playbackState
     var pluginsInitialized
     var networkState
+    var currentPlayer
 
     def init()
         self.pluginsInitialized = false
@@ -73,6 +74,9 @@ class App
             end,
             'songChangedEvent': def (song)
                 self.updateSong(song)
+            end,
+            'audioTakeoverEvent': def (req)
+                self.currentPlayer = req['source']
             end,
             'statusChangedEvent': def (req)
                 if req['isPaused']
@@ -333,7 +337,7 @@ end)
 
 http.handle('POST', '/play', def (request)
     app.playbackState['status'] = json.load(request['body'])['status']
-    cspot = app.getPluginByName('cspot')
+    cspot = app.getPluginByName(app.currentPlayer)
 
     if app.playbackState['status'] == 'playing'
         cspot.onEvent(EVENT_SET_PAUSE, false)
@@ -341,6 +345,7 @@ http.handle('POST', '/play', def (request)
         cspot.onEvent(EVENT_SET_PAUSE, true)
     end
 
+    core_empty_buffers()
     http.sendJSON({'status': 'ok'}, request['connection'], 200)
 end)
 
@@ -349,4 +354,3 @@ startAudioThreadForPlugin('persistor', {})
 def loadPlugins()
     app.loadConfiguration()
 end
-

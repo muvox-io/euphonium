@@ -42,6 +42,7 @@ public:
     void handleLuaThread();
     void handleServerThread();
     void runTask();
+    void emptyBuffers();
     void handleEvent(std::unique_ptr<Event> event);
     void setupBindings();
     void startAudioThreadForPlugin(std::string pluginName, berry::map config);

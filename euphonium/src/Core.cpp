@@ -81,6 +81,10 @@ void Core::selectAudioOutput(std::shared_ptr<AudioOutput> output)
     this->outputConnected = true;
 }
 
+void Core::emptyBuffers() {
+    audioBuffer->audioBuffer->emptyBuffer();
+}
+
 void Core::handleEvent(std::unique_ptr<Event> event) {
     EUPH_LOG(debug, "core", "Got event");
     // Load function
@@ -128,6 +132,7 @@ void sleepMS(int ms) {
 void Core::setupBindings() {
     berry->export_this("startAudioThreadForPlugin", this, &Core::startAudioThreadForPlugin);
     berry->export_function("sleep_ms", &sleepMS);
+    berry->export_this("core_empty_buffers", this, &Core::emptyBuffers);
 }
 
 void Core::runTask() {

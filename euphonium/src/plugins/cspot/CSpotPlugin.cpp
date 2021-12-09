@@ -61,7 +61,10 @@ void CSpotPlugin::runTask() {
     this->isRunning = true;
 
     EUPH_LOG(info, "cspot", "Starting CSpot");
-    this->audioBuffer->shutdownExcept(name);
+    this->audioBuffer->shutdownExcept(name);                
+
+    auto event = std::make_unique<AudioTakeoverEvent>(name);
+    this->luaEventBus->postEvent(std::move(event));
 
     auto session = std::make_unique<Session>();
     session->connectWithRandomAp();

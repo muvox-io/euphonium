@@ -15,11 +15,19 @@ void WebRadioPlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader)
 
 void WebRadioPlugin::setupBindings()
 {
-    berry->export_this("webradioQueueUrl", this, &WebRadioPlugin::playRadioUrl);
+    berry->export_this("webradio_set_pause", this, &WebRadioPlugin::setPaused);
+    berry->export_this("webradio_queue_url", this, &WebRadioPlugin::playRadioUrl);
 }
 
 void WebRadioPlugin::configurationUpdated()
 {
+}
+
+void WebRadioPlugin::setPaused(bool isPaused)
+{
+    this->isPaused = isPaused;
+    auto event = std::make_unique<PauseChangedEvent>(isPaused);
+    this->luaEventBus->postEvent(std::move(event));
 }
 
 void WebRadioPlugin::playRadioUrl(std::string url, bool isAAC)
@@ -46,21 +54,30 @@ void WebRadioPlugin::runTask()
         if (this->radioUrlQueue.wpop(url)) {
             std::lock_guard lock(runningMutex);
             isRunning = true;
+            isPaused = false;
             status = ModuleStatus::RUNNING;
 
             EUPH_LOG(info, "webradio", "Starting WebRadio");
             // Shutdown all other modules
-            audioBuffer->shutdownExcept(name);
+            audioBuffer->shutdownExcept(name); 
+            auto event = std::make_unique<AudioTakeoverEvent>(name);
+            this->luaEventBus->postEvent(std::move(event));
 
             if (url.first) {
                 audioStream->querySongFromUrl(url.second, AudioCodec::AAC);
             } else {
                 audioStream->querySongFromUrl(url.second, AudioCodec::MP3);
             }
+
             while (isRunning) {
-                audioStream->decodeFrame(audioBuffer);
-                BELL_SLEEP_MS(10);
+                if (!isPaused) {
+                    audioStream->decodeFrame(audioBuffer);
+                    BELL_SLEEP_MS(10);
+                } else {
+                    BELL_SLEEP_MS(100);
+                }
             }
+
         }
     }
 }

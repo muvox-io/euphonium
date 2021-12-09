@@ -15,6 +15,7 @@ public:
     size_t capacity() const { return dataCapacity; }
     size_t write(const uint8_t *data, size_t bytes);
     size_t read(uint8_t *data, size_t bytes);
+    void emptyBuffer();
 
 private:
     std::mutex bufferMutex;
