@@ -77,6 +77,7 @@ class App
             end,
             'audioTakeoverEvent': def (req)
                 self.currentPlayer = req['source']
+                self.sendNotification("success", self.currentPlayer, "Took over playback")
             end,
             'statusChangedEvent': def (req)
                 if req['isPaused']
@@ -137,6 +138,14 @@ class App
 
     def updatePlaybackInfo()
         http.publishEvent("playback", self.playbackState)
+    end
+
+    def sendNotification(type, from, text, submessage)
+        var secondMessage = ""
+        if submessage != nil 
+            secondMessage = submessage
+        end
+        http.publishEvent("notification", { 'type': type, 'message': text, 'source': from, 'submessage': submessage })
     end
 
     def getAudioOutput()
@@ -302,7 +311,7 @@ http.handle('POST', '/plugins/:name', def (request)
 
     plugin.persistConfig()
     http.sendJSON({ 'configSchema': confSchema, 'displayName': plugin.displayName }, request['connection'], 200)
-
+    app.sendNotification("info", plugin.name, "Configuration updated")
     plugin.onEvent(EVENT_CONFIG_UPDATED, {})
 end)
 

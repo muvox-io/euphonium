@@ -26,6 +26,7 @@ class HTTPAudioStream {
     std::shared_ptr<bell::HTTPStream> httpStream;
     std::vector<uint8_t> inputBuffer;
     std::vector<short> outputBuffer;
+    int mutedSamples = 0;
     AudioCodec codec = AudioCodec::AAC;
     int bytesLeft = 0;
     int offset = 0;

@@ -15,9 +15,9 @@ const Radio = ({
   url_resolved = "",
 }) => {
   return (
-    <div class="bg-app-secondary shadow-m p-5 flex flex-col relative rounded-xl">
+    <div class="bg-app-secondary shadow-m p-5 border border-app-border flex flex-col relative rounded-xl">
       <img
-        class="w-10 h-10 rounded-full bg-white absolute -right-2 -top-2 shadow-xl"
+        class="w-10 h-10 rounded-full bg-white border-app-border border absolute -right-2 -top-2 shadow-xl"
         src={
           favicon ||
           "https://www.veryicon.com/download/png/media/music-series/sound-wave-1-2?s=256"
@@ -54,11 +54,19 @@ export default () => {
           placeholder="Search radio-browser.info"
           icon="search"
         />
-        <div class="grid md:grid-cols-2 grid-cols-1 xl:grid-cols-5 gap-8 mt-10">
-          {radios.map((radio) => (
-            <Radio {...radio}></Radio>
-          ))}
-        </div>
+        {radios.length > 0 && (
+          <div class="grid md:grid-cols-2 grid-cols-1 xl:grid-cols-5 gap-8 mt-10">
+            {radios.map((radio) => (
+              <Radio {...radio}></Radio>
+            ))}
+          </div>
+        )}
+        {radios.length == 0 && (
+          <div class="text-app-text-secondary text-xl mt-2 flex-col flex w-full items-center p-5">
+              <Icon name="close" />
+              Results empty.
+          </div>
+        )}
       </Card>
     </div>
   );
