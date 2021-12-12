@@ -14,6 +14,11 @@ class WebRadioPlugin : Plugin
         self.type = "plugin"
         self.exposeWebApp = true
     end
+    def onEvent(event, data)
+        if event == EVENT_SET_PAUSE
+            webradio_set_pause(data)
+        end
+    end
 end
 
 app.registerPlugin(WebRadioPlugin())
@@ -29,7 +34,7 @@ http.handle('POST', '/webradio', def(request)
         'icon': body['favicon'],
         'albumName': body['codec']
     })
-    webradioQueueUrl(body['stationUrl'], (body["codec"] == "AAC" || body["codec"] == "AAC+"))
+    webradio_queue_url(body['stationUrl'], (body["codec"] == "AAC" || body["codec"] == "AAC+"))
     app.setStatus('playing')
     http.sendJSON({ 'status': 'playing'}, request['connection'], 200)
 end)

@@ -30,8 +30,11 @@ YouTubePlugin::YouTubePlugin() : bell::Task("youtube", 16 * 1024, 1)
 {
     name = "youtube";
     outputBuffer = std::vector<short>(AAC_MAX_NCHANS * AAC_MAX_NSAMPS * 2 * 4);
+    auto deviceId = bell::generateRandomUUID();
+    dialServer = std::make_shared<DIALServer>(deviceId);
 
     bell::decodersInstance->ensureAAC();
+    ssdpListener = std::make_shared<SSDPListener>(deviceId);
 }
 
 void YouTubePlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader)
@@ -42,6 +45,8 @@ void YouTubePlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader)
 void YouTubePlugin::setupBindings()
 {
     berry->export_this("youtubeQueueUrl", this, &YouTubePlugin::playYTUrl);
+
+    dialServer->registerHandlers(mainServer);
 }
 
 void YouTubePlugin::configurationUpdated()

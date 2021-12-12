@@ -19,6 +19,20 @@ class CSpotPlugin : Plugin
         self.displayName = "Spotify (cspot)"
         self.type = "plugin"
     end
+
+    def onEvent(event, data)
+        if event == EVENT_SET_PAUSE
+            cspot_set_pause(data)
+        end
+
+        if event == EVENT_CONFIG_UPDATED
+            cspot_config_updated()
+        end
+
+        if event == EVENT_VOLUME_UPDATED
+            cspot_set_volume_remote(data)
+        end
+    end
 end
 
 app.registerPlugin(CSpotPlugin())

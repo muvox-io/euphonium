@@ -9,7 +9,10 @@
 #include <atomic>
 #include <mutex>
 #include "Queue.h"
+#include "../http/HTTPModule.h"
 #include "MpegDashDemuxer.h"
+#include "DIALServer.h"
+#include "SSDPListener.h"
 #include "Task.h"
 #include "HTTPStream.h"
 #include "aacdec.h"
@@ -29,6 +32,9 @@ private:
     std::atomic<bool> isRunning;
     std::mutex runningMutex;
     bell::Queue<std::string> ytUrlQueue;
+    std::shared_ptr<DIALServer> dialServer;
+
+    std::shared_ptr<SSDPListener> ssdpListener;
     AACFrameInfo aacFrameInfo;
     std::vector<short> outputBuffer;
 public:
