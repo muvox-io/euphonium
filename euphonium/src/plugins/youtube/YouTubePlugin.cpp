@@ -2,8 +2,7 @@
 #include <HTTPStream.h>
 #include <thread>
 
-std::vector<uint8_t> getAdtsHeader(int length)
-{
+std::vector<uint8_t> getAdtsHeader(int length) {
     int profile = 2;
     int chanCfg = 2;
 
@@ -26,53 +25,49 @@ std::vector<uint8_t> getAdtsHeader(int length)
     return res;
 }
 
-YouTubePlugin::YouTubePlugin() : bell::Task("youtube", 16 * 1024, 1)
-{
+YouTubePlugin::YouTubePlugin() : bell::Task("youtube", 16 * 1024, 1) {
     name = "youtube";
     outputBuffer = std::vector<short>(AAC_MAX_NCHANS * AAC_MAX_NSAMPS * 2 * 4);
-    auto deviceId = bell::generateRandomUUID();
-    dialServer = std::make_shared<DIALServer>(deviceId);
 
     bell::decodersInstance->ensureAAC();
-    ssdpListener = std::make_shared<SSDPListener>(deviceId);
 }
 
-void YouTubePlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader)
-{
+void YouTubePlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader) {
     scriptLoader->loadScript("youtube_plugin", berry);
 }
 
-void YouTubePlugin::setupBindings()
-{
+void YouTubePlugin::setupBindings() {
     berry->export_this("youtubeQueueUrl", this, &YouTubePlugin::playYTUrl);
 
+    auto deviceId = bell::generateRandomUUID();
+    leanHandler = std::make_shared<YouTubeLeanHandler>(deviceId, luaEventBus);
+    dialServer = std::make_shared<DIALServer>(deviceId, leanHandler);
+    ssdpListener = std::make_shared<SSDPListener>(deviceId);
     dialServer->registerHandlers(mainServer);
+    leanHandler->registerBindings(berry);
 }
 
-void YouTubePlugin::configurationUpdated()
-{
-}
+void YouTubePlugin::configurationUpdated() {}
 
-void YouTubePlugin::playYTUrl(std::string url)
-{
+void YouTubePlugin::playYTUrl(std::string url) {
     isRunning = false;
-    ytUrlQueue.push(url);
+    ytUrlQueue.push(getStreamForVideo(url));
 }
 
-void YouTubePlugin::shutdown()
-{
+void YouTubePlugin::shutdown() {
     EUPH_LOG(info, "youtube", "Shutting down...");
     isRunning = false;
     std::lock_guard lock(runningMutex);
     status = ModuleStatus::SHUTDOWN;
 }
 
-std::string YouTubePlugin::getStreamForVideo(std::string videoUrl)
-{
+std::string YouTubePlugin::getStreamForVideo(std::string videoUrl) {
     auto socket = std::make_unique<bell::TLSSocket>();
-    socket->open("https://youtubei.googleapis.com/youtubei/v1/player?key=" + std::string(YT_PLAYER_KEY));
+    socket->open("https://youtubei.googleapis.com/youtubei/v1/player?key=" +
+                 std::string(YT_PLAYER_KEY));
 
-    auto body = std::string(POST_BODY_PART1) + videoUrl + std::string(POST_BODY_PART2) + videoUrl + std::string(POST_BODY_PART3);
+    auto body = std::string(POST_BODY_PART1) + videoUrl +
+                std::string(POST_BODY_PART2); 
     std::stringstream ss;
     ss << "POST /youtubei/v1/player?key=" << YT_PLAYER_KEY << " HTTP/1.1\r\n"
        << "Host: youtubei.googleapis.com:443\r\n"
@@ -92,19 +87,17 @@ std::string YouTubePlugin::getStreamForVideo(std::string videoUrl)
     bool gotItag = false;
     bool isFinished = false;
 
-    while (nbytes >= 0 && !isFinished)
-    {
+    while (nbytes >= 0 && !isFinished) {
         // Read line by line from socket
         nbytes = socket->read(&buffer[0], buffer.size());
 
         currentLine += std::string(buffer.data(), buffer.data() + nbytes);
-        while (currentLine.find("\n") != std::string::npos)
-        {
+        while (currentLine.find("\n") != std::string::npos) {
             auto line = currentLine.substr(0, currentLine.find("\n"));
-            currentLine = currentLine.substr(currentLine.find("\n") + 1, currentLine.size());
+            currentLine = currentLine.substr(currentLine.find("\n") + 1,
+                                             currentLine.size());
 
-            if (gotItag && line.find("\"url\"") != std::string::npos)
-            {
+            if (gotItag && line.find("\"url\"") != std::string::npos) {
 
                 EUPH_LOG(info, "youtube", "Got url: %s", line.c_str());
                 // get substring after ""url": ""
@@ -116,8 +109,7 @@ std::string YouTubePlugin::getStreamForVideo(std::string videoUrl)
                 return url;
             }
 
-            if (line.find("\"itag\": 140") != std::string::npos)
-            {
+            if (line.find("\"itag\": 140") != std::string::npos) {
                 gotItag = true;
                 BELL_LOG(info, "youtube", "Got itag: 140");
             }
@@ -127,14 +119,11 @@ std::string YouTubePlugin::getStreamForVideo(std::string videoUrl)
     return "";
 }
 
-void YouTubePlugin::runTask()
-{
+void YouTubePlugin::runTask() {
     std::string url;
 
-    while (true)
-    {
-        if (this->ytUrlQueue.wpop(url))
-        {
+    while (true) {
+        if (this->ytUrlQueue.wpop(url)) {
             std::lock_guard lock(runningMutex);
             isRunning = true;
             status = ModuleStatus::RUNNING;
@@ -142,39 +131,47 @@ void YouTubePlugin::runTask()
             auto event = std::make_unique<AudioTakeoverEvent>(name);
             this->luaEventBus->postEvent(std::move(event));
 
-
             auto ytHandler = std::make_shared<bell::HTTPStream>();
             ytHandler->connectToUrl(url);
 
-            auto demuxer = std::make_shared<bell::mpeg::MpegDashDemuxer>(ytHandler);
+            auto demuxer =
+                std::make_shared<bell::mpeg::MpegDashDemuxer>(ytHandler);
             demuxer->parse();
 
             auto currentChunk = demuxer->getNextChunk(false);
 
-            while (currentChunk && isRunning)
-            {
-                EUPH_LOG(info, "yt", "Received chunk with size %d", currentChunk->size);
+            while (currentChunk && isRunning) {
+                EUPH_LOG(info, "yt", "Received chunk with size %d",
+                         currentChunk->size);
                 auto sample = demuxer->getNextSample(currentChunk);
 
-                while (sample && isRunning)
-                {
+                while (sample && isRunning) {
                     auto adtsHeader = getAdtsHeader(sample->data.size() + 7);
-                    sample->data.insert(sample->data.begin(), adtsHeader.begin(), adtsHeader.end());
+                    sample->data.insert(sample->data.begin(),
+                                        adtsHeader.begin(), adtsHeader.end());
 
                     int size = sample->data.size();
-                    unsigned char *data = reinterpret_cast<unsigned char *>(sample->data.data());
+                    unsigned char *data =
+                        reinterpret_cast<unsigned char *>(sample->data.data());
 
-                    int decodeStatus = AACDecode(bell::decodersInstance->aacDecoder, &data, &size, outputBuffer.data());
-                    AACGetLastFrameInfo(bell::decodersInstance->aacDecoder, &aacFrameInfo);
-                    if (decodeStatus == ERR_AAC_NONE)
-                    {
-                        const uint8_t *audioData = reinterpret_cast<const uint8_t *>(outputBuffer.data());
-                        auto sizeData = (aacFrameInfo.outputSamps / aacFrameInfo.nChans) * sizeof(uint32_t);
+                    int decodeStatus =
+                        AACDecode(bell::decodersInstance->aacDecoder, &data,
+                                  &size, outputBuffer.data());
+                    AACGetLastFrameInfo(bell::decodersInstance->aacDecoder,
+                                        &aacFrameInfo);
+                    if (decodeStatus == ERR_AAC_NONE) {
+                        const uint8_t *audioData =
+                            reinterpret_cast<const uint8_t *>(
+                                outputBuffer.data());
+                        auto sizeData =
+                            (aacFrameInfo.outputSamps / aacFrameInfo.nChans) *
+                            sizeof(uint32_t);
 
                         size_t bytesWritten = 0;
-                        while (bytesWritten < sizeData)
-                        {
-                            bytesWritten += audioBuffer->write(audioData + bytesWritten, sizeData - bytesWritten);
+                        while (bytesWritten < sizeData) {
+                            bytesWritten +=
+                                audioBuffer->write(audioData + bytesWritten,
+                                                   sizeData - bytesWritten);
                         }
                     }
                     sample = demuxer->getNextSample(currentChunk);
@@ -187,7 +184,4 @@ void YouTubePlugin::runTask()
     }
 }
 
-void YouTubePlugin::startAudioThread()
-{
-    startTask();
-}
+void YouTubePlugin::startAudioThread() { startTask(); }

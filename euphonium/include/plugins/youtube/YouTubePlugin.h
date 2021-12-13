@@ -13,6 +13,7 @@
 #include "MpegDashDemuxer.h"
 #include "DIALServer.h"
 #include "SSDPListener.h"
+#include "YouTubeLeanHandler.h"
 #include "Task.h"
 #include "HTTPStream.h"
 #include "aacdec.h"
@@ -20,9 +21,8 @@
 #include "platform/TLSSocket.h"
 
 // Could've done it with a JSON parser, but wanted to save overhead
-#define POST_BODY_PART1 "{\"context\":{\"client\":{\"hl\":\"en\",\"clientName\":\"WEB\",\"clientVersion\":\"2.20210721.00.00\",\"mainAppWebInfo\":{\"graftUrl\": \"/watch?v="
-#define POST_BODY_PART2 "\"}}},\"videoId\":\""
-#define POST_BODY_PART3 "\"}"
+#define POST_BODY_PART1 "{\"context\":{\"client\":{\"hl\":\"en\",\"clientName\":\"Android\",\"clientVersion\":\"15.47.38\",\"deviceMake\":\"Google\",\"deviceModel\":\"Android SDK built for x86\",\"osType\":\"Android\",\"osVersion\":\"7.1.1\"}},\"videoId\":\""
+#define POST_BODY_PART2 "\"}"
 
 #define YT_PLAYER_KEY "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"
 
@@ -35,6 +35,7 @@ private:
     std::shared_ptr<DIALServer> dialServer;
 
     std::shared_ptr<SSDPListener> ssdpListener;
+    std::shared_ptr<YouTubeLeanHandler> leanHandler;
     AACFrameInfo aacFrameInfo;
     std::vector<short> outputBuffer;
 public:

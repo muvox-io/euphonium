@@ -87,6 +87,9 @@ class App
                 end
                 self.updatePlaybackInfo()
             end,
+            'youtubeEvent': def (ev)
+                self.getPluginByName('youtube').onEvent('youtube', ev)
+            end,
             'volumeChangedEvent': def (req)
                 self.playbackState['volume'] = int(req['volume'])
                 setVolume(self.playbackState['volume'])

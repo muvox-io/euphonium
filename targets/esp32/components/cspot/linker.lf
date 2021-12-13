@@ -1,0 +1,4 @@
+[mapping:cpp]
+archive: libstdc++.a
+entries:
+    * (extram_bss)

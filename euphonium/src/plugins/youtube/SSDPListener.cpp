@@ -1,17 +1,17 @@
 #include "SSDPListener.h"
+#include "HTTPClient.h"
+#include "cJSON.h"
 
-SSDPListener::SSDPListener(std::string& uuid) : bell::Task("ssdp", 1024, 1) { 
+SSDPListener::SSDPListener(std::string &uuid) : bell::Task("ssdp", 1024, 1) {
     this->uuid = uuid;
-    startTask(); 
+    startTask();
 }
 
 const std::string currentDateTime() {
-    time_t     now = time(0);
-    struct tm  tstruct;
-    char       buf[80];
+    time_t now = time(0);
+    struct tm tstruct;
+    char buf[80];
     tstruct = *localtime(&now);
-    // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
-    // for more information about date/time format
     strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S %Z", &tstruct);
 
     return buf;
@@ -80,30 +80,28 @@ void SSDPListener::listenForMulticast() {
             auto line = currentLine.substr(0, currentLine.find("\r\n"));
             currentLine = currentLine.substr(currentLine.find("\r\n") + 2,
                                              currentLine.size());
-
-
-                BELL_LOG(info, "youtube", "%s", line.c_str());
-            if (line.find("ST: ") !=
-                std::string::npos) {
-                BELL_LOG(info, "youtube", "SSDP Writing response");
+            if (line.find("ST: ") != std::string::npos) {
                 BELL_SLEEP_MS(700);
 
                 std::stringstream stream;
                 stream << "HTTP/1.1 200 OK\r\n";
+                stream << "LOCATION: http://192.168.1.208:80/ssdp/device-desc.xml\r\n";
                 stream << "CACHE-CONTROL: max-age=1800\r\n";
-                stream << "DATE: " << currentDateTime() << "\r\n";
                 stream << "EXT: \r\n";
-                stream << "LOCATION: http://192.168.100.176:80/dial/upnp/device_desc.xml\r\n";
-                stream << "SERVER: Linux/2.6.16+ UPnP/1.1 Euphonium/1.0.0\r\n";
+                stream << "SERVER: UPnP/1.0\r\n";
+                stream << "BOOTID.UPNP.ORG: 1\r\n";
+                stream << "USN: uuid:" << uuid << "\r\n";
                 stream << "ST: urn:dial-multiscreen-org:service:dial:1\r\n";
-                stream << "USN: uuid:" << uuid << "::urn:dial-multiscreen-org:service:dial:1\r\n";
-                stream << "CONFIGID.UPNP.ORG: 1\r\n\r\n";
 
                 auto data = stream.str();
-                int res = sendto(fd, data.data(), data.size(), 0, (struct sockaddr*)&addr, addrlen);
+                int res = sendto(fd, data.data(), data.size(), 0,
+                                 (struct sockaddr *)&addr, addrlen);
             }
         }
     }
 }
 
-void SSDPListener::runTask() { listenForMulticast(); }
+void SSDPListener::runTask() {
+
+    listenForMulticast();
+}
