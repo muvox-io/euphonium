@@ -43,6 +43,7 @@ class Plugin
 
     def persistConfig()
         var bareValues = self.getBareValues()
+        print(bareValues)
         conf_persist(self.name, json.dump(bareValues))
     end
 
@@ -86,6 +87,9 @@ class App
                     self.playbackState['status'] = 'playing'
                 end
                 self.updatePlaybackInfo()
+            end,
+            'youtubeEvent': def (ev)
+                self.getPluginByName('youtube').onEvent('youtube', ev)
             end,
             'volumeChangedEvent': def (req)
                 self.playbackState['volume'] = int(req['volume'])
@@ -162,12 +166,15 @@ class App
         self.networkState = 'online'
         var plugin = self.getAudioOutput()
         if (plugin != nil)
+            plugin.onEvent(EVENT_CONFIG_UPDATED, {})
             plugin.initAudio()
         end
 
         startAudioThreadForPlugin('cspot', self.getPluginByName('cspot').getBareValues())
         startAudioThreadForPlugin('webradio', self.getPluginByName('webradio').getBareValues())
-        startAudioThreadForPlugin('youtube', self.getPluginByName('youtube').getBareValues())
+
+        startAudioThreadForPlugin('bluetooth', {})
+        #startAudioThreadForPlugin('youtube', self.getPluginByName('youtube').getBareValues())
 
         self.initHTTP()
     end
@@ -233,7 +240,9 @@ class App
                 end
             end
 
-            self.initRequiredPlugins()
+            if get_platform() == 'desktop'
+                self.initRequiredPlugins()
+            end
         end
     end
 end
@@ -358,8 +367,9 @@ http.handle('POST', '/play', def (request)
     http.sendJSON({'status': 'ok'}, request['connection'], 200)
 end)
 
-startAudioThreadForPlugin('persistor', {})
 
 def loadPlugins()
     app.loadConfiguration()
 end
+
+startAudioThreadForPlugin('persistor', {})

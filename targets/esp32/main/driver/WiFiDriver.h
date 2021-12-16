@@ -5,6 +5,7 @@
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "EventBus.h"
+#include <Core.h>
 #include <vector>
 #include <mutex>
 
@@ -42,12 +43,10 @@ class WiFiStateChangedEvent: public Event {
 };
 
 extern WiFiState globalWiFiState;
-extern std::shared_ptr<EventBus> mainEventBus;
 
 void startFastScan();
 void initializeWiFiStack();
 void tryToConnect(std::string ssid, std::string password, bool fromAp);
 void setupAP(std::string ssid, std::string password);
-void applyWiFiEventBus(std::shared_ptr<EventBus> eventBus);
 void exportWiFiDriver(std::shared_ptr<berry::VmState> berry);
 #endif

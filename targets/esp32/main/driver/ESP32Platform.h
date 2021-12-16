@@ -19,6 +19,7 @@ public:
     void loadScript(std::shared_ptr<ScriptLoader> scriptLoader);
     void setupBindings();
     void shutdown() {};
+    void reportRAM(std::string);
     void configurationUpdated() {};
     void startAudioThread() {};
     void runTask() {};

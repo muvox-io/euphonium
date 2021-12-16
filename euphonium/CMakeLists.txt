@@ -14,11 +14,13 @@ else()
     set(EXTRA_REQ_LIBS Threads::Threads)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
+    add_definitions(-Wno-sequence-point)
 endif()
 
 if(UNIX AND NOT APPLE)
     set(EXTRA_REQ_LIBS ${EXTRA_REQ_LIBS})
 endif()
+
 
 include_directories("include")
 include_directories("include/plugins/cspot")

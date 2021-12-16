@@ -1,6 +1,6 @@
 #include "ConfigPersistor.h"
 
-ConfigPersistor::ConfigPersistor() : bell::Task("persistor",  2 * 1024, 0, false)
+ConfigPersistor::ConfigPersistor() : bell::Task("persistor",  4 * 1024, 0, false)
 {
     name = "persistor";
 }
@@ -50,7 +50,6 @@ void ConfigPersistor::runTask()
             {
                 BELL_LOG(info, "persistor", "Saving key: %s", request.key.c_str());
                 scriptLoader->saveFile(request.key + ".config.json", request.value);
-
             }
             else
             {

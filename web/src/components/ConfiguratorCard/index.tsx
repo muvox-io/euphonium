@@ -2,6 +2,7 @@ import { useState, useEffect } from "preact/hooks";
 
 import Input from "../Input";
 import Select from "../Select";
+import Modal from "../Modal";
 import {
   ConfigurationField,
   ConfigurationFieldType,
@@ -12,6 +13,7 @@ import {
 } from "../../api/euphonium/api";
 import Card from "../Card";
 import Button from "../Button";
+import DACConfig from "../../apps/DACConfig";
 
 const renderConfigurationField = (
   field: ConfigurationField,
@@ -44,14 +46,17 @@ export default ({ plugin = "" }) => {
     ConfigurationField[]
   >([]);
 
-
   const [dirty, setDirty] = useState<boolean>(false);
 
-  useEffect(() => {
+  const loadConfig = () => {
     getPluginConfiguration(plugin).then((e) => {
       setConfigurationFields(e.fields);
       setDisplayName(e.displayName);
     });
+  };
+
+  useEffect(() => {
+    loadConfig();
   }, [plugin]);
 
   const updateConfiguration = () => {
@@ -74,14 +79,21 @@ export default ({ plugin = "" }) => {
   };
 
   return (
-    
     <Card title={displayName} subtitle={"plugin configuration"}>
-      <div class="flex flex-col items-start space-y-2">
+      <div class="flex flex-col items-start space-y-2 md:max-w-[400px]">
+        { plugin == 'dac' ? <DACConfig
+          configurationUpdated={() => {
+            loadConfig();
+          }}
+        ></DACConfig> : null }
+
         {configurationFields.map((field) =>
           renderConfigurationField(field, updateField)
         )}
         <div class="pt-3">
-          <Button disabled={!dirty} onClick={updateConfiguration}>Apply changes</Button>
+          <Button disabled={!dirty} onClick={updateConfiguration}>
+            Apply changes
+          </Button>
         </div>
       </div>
     </Card>

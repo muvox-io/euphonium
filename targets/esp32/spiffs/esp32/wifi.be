@@ -27,6 +27,8 @@ class WiFiPlugin : Plugin
                 print("Connected to wifi")
                 self.wifiState['state'] = 'connected'
                 self.wifiState['ipAddress'] = state['ipAddress']
+                print(self.configSchema)
+                self.persistConfig()
                 http.publishEvent('wifi_state', self.wifiState)
                 app.initRequiredPlugins()
             end
@@ -35,6 +37,8 @@ class WiFiPlugin : Plugin
             end
 
             if state['state'] == 'no_ap'
+                self.wifiState['state'] = 'error'
+                http.publishEvent('wifi_state', self.wifiState)
                 print("No wifi access point found")
                 #wifi_start_ap("Euphonium", "euphonium")
             end
@@ -45,10 +49,7 @@ class WiFiPlugin : Plugin
             end
 
             if state['state'] == 'scan_done'
-                self.wifiState = {
-                    'status': 'scanning',
-                    'ssids': []
-                }
+                self.wifiState['ssids'] = [] 
 
                 for ssid : state['networks'].keys()
                     self.wifiState['ssids'].push({
@@ -62,15 +63,16 @@ class WiFiPlugin : Plugin
             end
         end)
     end
-
-    def onSystemInit()
-        print('on system init called')
-        wifi_init()
-        if self.configValue('ssid') != ""
-            wifi_connect(self.configValue('ssid'), self.configValue('password'), false)
-        else
-            # start access point for config
-            wifi_start_ap("Euphonium", "euphonium")
+    def onEvent(event, data)
+        if event == EVENT_SYSTEM_INIT
+            wifi_init()
+            print(self.configSchema)
+            if self.configValue('ssid') != ""
+                wifi_connect(self.configValue('ssid'), self.configValue('password'), false)
+            else
+                # start access point for config
+                wifi_start_ap("Euphonium", "euphonium")
+            end
         end
     end
 end
@@ -103,6 +105,8 @@ http.handle('POST', '/wifi/connect', def (request)
     wifi.configSchema['ssid']['value'] = body['ssid']
     wifi.configSchema['password']['value'] = body['password']
 
+    wifi.wifiState['state'] = 'connecting'
+    http.publishEvent('wifi_state', wifi.wifiState)
     wifi_connect(body['ssid'], body['password'], true)
 end)
 

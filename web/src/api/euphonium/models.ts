@@ -45,6 +45,17 @@ interface ConfigurationField {
     key: string;
 }
 
+interface DACPreset {
+    board: string;
+    dac: string;
+    mclk: string;
+    bck: string;
+    ws: string;
+    data: string;
+    scl: string;
+    sda: string;
+}
+
 interface EqSettings {
     low: number;
     mid: number;
@@ -72,5 +83,5 @@ interface SongPlaybackState {
 }
 
 
-export type { PluginEntry, PluginConfiguration, EqSettings, EuphoniumInfo, ConfigurationField, PlaybackState, WiFiNetwork, WiFiState }
+export type { PluginEntry, PluginConfiguration, EqSettings, DACPreset, EuphoniumInfo, ConfigurationField, PlaybackState, WiFiNetwork, WiFiState }
 export { ConfigurationFieldType, PluginEntryType, PlaybackStatus }

@@ -1,11 +1,17 @@
 #include "Core.h"
+#include "EventBus.h"
 #include <string.h>
 #include <cassert>
 #include <EuphoniumLog.h>
 
-Core::Core() : bell::Task("Core", 4 * 1024, 0) {
+std::shared_ptr<MainAudioBuffer> mainAudioBuffer;
+std::shared_ptr<EventBus> mainEventBus;
+
+Core::Core() : bell::Task("Core", 4 * 1024, 1) {
     audioBuffer = std::make_shared<MainAudioBuffer>();
     luaEventBus = std::make_shared<EventBus>();
+    mainAudioBuffer = audioBuffer;
+    mainEventBus = luaEventBus;
     audioProcessor = std::make_shared<AudioProcessors>();
     audioProcessor->addProcessor(std::make_unique<SoftwareVolumeProcessor>());
     audioProcessor->addProcessor(std::make_unique<EqualizerProcessor>());
@@ -20,7 +26,7 @@ Core::Core() : bell::Task("Core", 4 * 1024, 0) {
     registeredPlugins = {
         std::make_shared<CSpotPlugin>(),
         std::make_shared<WebRadioPlugin>(),
-        std::make_shared<YouTubePlugin>()
+       // std::make_shared<YouTubePlugin>()
     };
     requiredModules = {std::make_shared<HTTPModule>(), std::make_shared<ConfigPersistor>()};
 
@@ -129,10 +135,19 @@ void sleepMS(int ms) {
     BELL_SLEEP_MS(ms);
 }
 
+std::string Core::getPlatform() {
+    #ifdef ESP_PLATFORM
+        return "esp32";
+    #else
+        return "desktop";
+    #endif
+}
+
 void Core::setupBindings() {
     berry->export_this("startAudioThreadForPlugin", this, &Core::startAudioThreadForPlugin);
     berry->export_function("sleep_ms", &sleepMS);
     berry->export_this("core_empty_buffers", this, &Core::emptyBuffers);
+    berry->export_this("get_platform", this, &Core::getPlatform);
 }
 
 void Core::runTask() {

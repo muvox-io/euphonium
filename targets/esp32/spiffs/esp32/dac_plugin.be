@@ -36,7 +36,7 @@ class DACPlugin : Plugin
 
     def init()
         self.configSchema = {
-            'driver': {
+            'dac': {
                 'tooltip': 'Select driver',
                 'type': 'stringList',
                 'listValues': ["I2S", "AC101", "TAS5711"],
@@ -93,7 +93,7 @@ class DACPlugin : Plugin
             drivers.push(driver.name)
         end
 
-        self.configSchema['driver']['listValues'] = drivers
+        self.configSchema['dac']['listValues'] = drivers
     end
 
     def selectDriver(driverName)
@@ -115,8 +115,10 @@ class DACPlugin : Plugin
     def initAudio()
     end
 
-    def configurationUpdated()
-        self.selectDriver(self.configSchema['driver']['value'])
+    def onEvent(event, data)
+        if event == EVENT_CONFIG_UPDATED
+            self.selectDriver(self.configSchema['dac']['value'])
+        end
     end
 
     def volumeChanged(volume)

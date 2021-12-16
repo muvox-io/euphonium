@@ -1,4 +1,5 @@
 #include "FakeAudioSink.h"
+#include "BellUtils.h"
 
 FakeAudioSink::FakeAudioSink(std::shared_ptr<MainAudioBuffer> buffer, std::shared_ptr<EventBus> eventBus)
 {
@@ -20,7 +21,11 @@ void FakeAudioSink::feedPCMFrames(std::vector<uint8_t> &data)
     size_t bytesWritten = 0;
     while (bytesWritten < data.size())
     {
-        bytesWritten += buffer->write(data.data() + bytesWritten, data.size() - bytesWritten);
+        auto write = buffer->write(data.data() + bytesWritten, data.size() - bytesWritten);
+        bytesWritten += write;
+        if (write == 0) {
+            BELL_SLEEP_MS(10);
+        }
     }
 
     //buffer->audioBufferSemaphore->give();

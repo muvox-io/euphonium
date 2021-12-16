@@ -1,6 +1,5 @@
 #include "WiFiDriver.h"
 
-std::shared_ptr<EventBus> mainEventBus;
 WiFiState globalWiFiState;
 wifi_ap_record_t ap_info[DEFAULT_SCAN_LIST_SIZE];
 
@@ -175,11 +174,6 @@ void setupAP(std::string ssid, std::string password)
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config_sta));
 
     ESP_ERROR_CHECK(esp_wifi_start());
-}
-
-void applyWiFiEventBus(std::shared_ptr<EventBus> eventBus)
-{
-    mainEventBus = eventBus;
 }
 
 void exportWiFiDriver(std::shared_ptr<berry::VmState> berry)

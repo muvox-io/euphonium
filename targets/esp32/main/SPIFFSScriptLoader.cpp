@@ -6,13 +6,13 @@ SPIFFSScriptLoader::SPIFFSScriptLoader()
 
 void SPIFFSScriptLoader::loadScript(std::string scriptName, std::shared_ptr<berry::VmState> berry)
 {
-    auto scriptContent = loadFile("/spiffs/" + scriptName + ".be");
+    auto scriptContent = loadFile(scriptName + ".be");
     berry->execute_string(scriptContent);
 }
 
 std::string SPIFFSScriptLoader::loadFile(std::string fileName)
 {
-    std::ifstream indexFile(fileName);
+    std::ifstream indexFile("/spiffs/" + fileName);
     std::string indexContent((std::istreambuf_iterator<char>(indexFile)),
                              std::istreambuf_iterator<char>());
 
@@ -21,7 +21,7 @@ std::string SPIFFSScriptLoader::loadFile(std::string fileName)
 
 void SPIFFSScriptLoader::saveFile(const std::string& fileName, const std::string& content) {
     // Save the file
-    std::ofstream indexFile(fileName);
+    std::ofstream indexFile("/spiffs/" + fileName);
     indexFile << content;
     indexFile.close();
 }

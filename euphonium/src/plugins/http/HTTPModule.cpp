@@ -3,7 +3,7 @@
 
 std::shared_ptr<bell::HTTPServer> mainServer;
 
-HTTPModule::HTTPModule() : bell::Task("http", 1024 * 4, 0, false)
+HTTPModule::HTTPModule() : bell::Task("http", 1024 * 4, 1, false)
 {
     name = "http";
     mainServer = std::make_shared<bell::HTTPServer>(80);
@@ -79,12 +79,14 @@ void HTTPModule::runTask()
         }
         
 
-        std::string prefix = "../../../web/dist";
+        std::string prefix = "../../../web/dist/";
+        std::string checkPrefix = prefix;
 #ifdef ESP_PLATFORM
-        prefix = "/spiffs";
+        prefix = "/spiffs/";
+        checkPrefix = "/spiffs/";
 #endif
 
-        std::ifstream checkFile(prefix + "/assets/" + fileName + ".gz");
+        std::ifstream checkFile(checkPrefix + "assets/" + fileName + ".gz");
         if (checkFile.good()) {
             fileName += ".gz";
             useGzip = true;
@@ -96,15 +98,15 @@ void HTTPModule::runTask()
             .useGzip = useGzip,
             .contentType = contentType,
         };
-        response.responseReader = std::make_unique<bell::FileResponseReader>(prefix + "/assets/" + fileName);
+        response.responseReader = std::make_unique<bell::FileResponseReader>(prefix + "assets/" + fileName);
         mainServer->respond(response);
     };
 
     auto indexHandler = [this](bell::HTTPRequest &request)
     {
-        std::string prefix = "../../../web/dist";
+        std::string prefix = "../../../web/dist/";
 #ifdef ESP_PLATFORM
-        prefix = "/spiffs";
+        prefix = "/spiffs/";
 #endif
 
         bell::HTTPResponse response = {
@@ -112,11 +114,19 @@ void HTTPModule::runTask()
             .status = 200,
             .contentType = "text/html",
         };
-        response.responseReader = std::make_unique<bell::FileResponseReader>(prefix + "/index.html");
+        response.responseReader = std::make_unique<bell::FileResponseReader>(prefix + "index.html");
         mainServer->respond(response);
     };
+
+    // redirect all requests to /web
+    auto rootHandler = [this](bell::HTTPRequest &request)
+    {
+        mainServer->redirectTo("/web", request.connection);
+    };
+
     mainServer->registerHandler(bell::RequestType::GET, "/assets/:asset", assetHandler);
     mainServer->registerHandler(bell::RequestType::GET, "/web/*", indexHandler);
+    mainServer->registerHandler(bell::RequestType::GET, "/", rootHandler);
     mainServer->listen();
 }
 

@@ -13,6 +13,6 @@ export default ({ onClick, disabled = false, type = 'transparent', children }: B
     }
 
     return (
-        <button disabled={disabled} className={`${(disabled && 'bg-app-text-secondary') || 'bg-green-600'} font-bold p-3 rounded-xl w-full`} onClick={(e) => onClick()}>{ children }</button>
+        <button disabled={disabled} className={`${(disabled && 'bg-app-text-secondary') || 'bg-green-600'} font-bold text-white p-3 rounded-xl w-full`} onClick={(e) => onClick()}>{ children }</button>
     )
 }

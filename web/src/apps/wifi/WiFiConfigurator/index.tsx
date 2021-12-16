@@ -51,7 +51,7 @@ export default () => {
     return (
         <div class="md:w-[600px] md:absolute md:left-1/2 md:transform md:-translate-x-1/2 w-full">
             <Card enableButton={false} title="WiFi configuration" subtitle="initial configuration">
-                {wifiState.state == 'connected' ? <ConnectedState/> : (
+                {wifiState.state == 'connected' ? <ConnectedState ipAddr={wifiState.ipAddress}/> : (
                     <div class="flex flex-col space-y-3">
                         <p><div class='text-gray-400 text-s mb-1 flex-row flex'>available networks (<div class='ml-1 mr-1 text-green-400 text-s animate-pulse'>scanning</div>)</div>
                         </p>

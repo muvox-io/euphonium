@@ -1,4 +1,4 @@
 [mapping:cpp]
-archive: libstdc++.a
+archive: libbell.a
 entries:
     * (extram_bss)

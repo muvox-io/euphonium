@@ -24,6 +24,9 @@
 
 #define PCMBUF_SIZE (1024*4)
 
+extern std::shared_ptr<MainAudioBuffer> mainAudioBuffer;
+extern std::shared_ptr<EventBus> mainEventBus;
+
 class Core: public bell::Task, public EventSubscriber {
 private:
     std::shared_ptr<AudioOutput> currentOutput;
@@ -45,6 +48,7 @@ public:
     void emptyBuffers();
     void handleEvent(std::unique_ptr<Event> event);
     void setupBindings();
+    std::string getPlatform();
     void startAudioThreadForPlugin(std::string pluginName, berry::map config);
 
     std::shared_ptr<EventBus> luaEventBus;

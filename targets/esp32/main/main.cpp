@@ -22,9 +22,27 @@
 #include "SPIFFSScriptLoader.h"
 #include "Core.h"
 #include "DACAudioOutput.h"
+#include "BluetoothPlugin.h"
 #include "ESP32Platform.h"
+#include <memory>
+#include <esp_heap_caps.h>
+
+void* operator new(std::size_t count) { 
+    return heap_caps_malloc(count, MALLOC_CAP_SPIRAM); 
+}
+
+void operator delete(void* ptr) noexcept { 
+    if (ptr) free(ptr); 
+}
 
 static const char *TAG = "euphonium";
+
+void reportRAM(int i) {
+    auto memUsage = heap_caps_get_free_size(MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+    auto memUsage2 = heap_caps_get_free_size(MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
+
+    BELL_LOG(info, "bluetooth", "[%d] Free RAM %d | %d", i, memUsage, memUsage2);
+}
 
 extern "C"
 {
@@ -32,16 +50,25 @@ extern "C"
 }
 static void euphoniumTask(void *pvParameters)
 {
+    reportRAM(0);
     bell::setDefaultLogger();
     bell::enableSubmoduleLogging();
     bell::createDecoders();
+
+    reportRAM(1);
     auto core = std::make_shared<Core>();
     core->registeredPlugins.push_back(std::make_shared<ESP32PlatformPlugin>());
+
+    core->registeredPlugins.push_back(std::make_shared<BluetoothPlugin>());
     auto loader = std::make_shared<SPIFFSScriptLoader>();
     auto output = std::make_shared<DACAudioOutput>();
     core->selectAudioOutput(output);
+    reportRAM(2);
     core->setupBindings();
+
+    reportRAM(3);
     core->loadPlugins(loader);
+    reportRAM(4);
 }
 
 void init_spiffs()
