@@ -338,6 +338,7 @@ end)
 http.handle('POST', '/volume', def (request)
     var body = json.load(request['body'])
     setVolume(body['volume'])
+    print(app.playbackState)
     app.playbackState['volume'] = body['volume']
 
     app.broadcastEvent(EVENT_VOLUME_UPDATED, body['volume'])

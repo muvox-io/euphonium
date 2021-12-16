@@ -17,7 +17,6 @@
 #include "fstream"
 #include "Logger.h"
 #include "nvs_flash.h"
-#include "protocol_examples_common.h"
 #include <string>
 #include "SPIFFSScriptLoader.h"
 #include "Core.h"
