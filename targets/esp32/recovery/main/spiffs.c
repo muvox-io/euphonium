@@ -104,7 +104,43 @@ euph_wifi_config_t* load_wifi_config() {
     strcpy(config->password, password->valuestring);
 
     cJSON_Delete(json);
-        printf("%s", config->ssid);
+
+    return config;
+}
+
+euph_ota_manifest_t* load_ota_manifest() {
+    if (!spiffs_file_exists(OTA_MANIFEST_FILE))
+    {
+        return NULL;
+    }
+
+    char *string = read_file_str(OTA_MANIFEST_FILE);
+
+    cJSON *json = cJSON_Parse(string);
+    if (json == NULL)
+    {
+        ESP_LOGE(LOG_TAG, "Failed to parse JSON");
+        return false;
+    }
+
+    cJSON *url = cJSON_GetObjectItemCaseSensitive(json, "url");
+    cJSON *sha256 = cJSON_GetObjectItemCaseSensitive(json, "sha256");
+
+    if (url == NULL || sha256 == NULL)
+    {
+        ESP_LOGE(LOG_TAG, "Failed to parse JSON");
+        cJSON_Delete(json);
+        return false;
+    }
+
+    // copy configuration to the struct
+    euph_ota_manifest_t *config = malloc(sizeof(euph_ota_manifest_t));
+    config->url = (char *)malloc(strlen(url->valuestring)+1);
+    config->sha256 = (char *)malloc(strlen(sha256->valuestring)+1);
+    strcpy(config->url, url->valuestring);
+    strcpy(config->sha256, sha256->valuestring);
+
+    cJSON_Delete(json);
 
     return config;
 }

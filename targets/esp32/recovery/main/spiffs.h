@@ -14,10 +14,18 @@ struct euph_wifi_config {
     char* password;
 };
 
+struct euph_ota_manifest {
+    char* url;
+    char* sha256;
+    bool requested;
+};
+
 typedef struct euph_wifi_config euph_wifi_config_t;
+typedef struct euph_ota_manifest euph_ota_manifest_t;
 
 void spiffs_init();
 euph_wifi_config_t* load_wifi_config();
+euph_ota_manifest_t* load_ota_manifest();
 bool ota_requested();
 
 

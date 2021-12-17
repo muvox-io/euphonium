@@ -49,12 +49,10 @@ extern "C"
 }
 static void euphoniumTask(void *pvParameters)
 {
-    reportRAM(0);
     bell::setDefaultLogger();
     bell::enableSubmoduleLogging();
     bell::createDecoders();
 
-    reportRAM(1);
     auto core = std::make_shared<Core>();
     core->registeredPlugins.push_back(std::make_shared<ESP32PlatformPlugin>());
 
@@ -62,12 +60,9 @@ static void euphoniumTask(void *pvParameters)
     auto loader = std::make_shared<SPIFFSScriptLoader>();
     auto output = std::make_shared<DACAudioOutput>();
     core->selectAudioOutput(output);
-    reportRAM(2);
     core->setupBindings();
 
-    reportRAM(3);
     core->loadPlugins(loader);
-    reportRAM(4);
 }
 
 void init_spiffs()
