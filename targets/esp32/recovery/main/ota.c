@@ -1,4 +1,9 @@
 #include "ota.h"
+#include "http.h"
+
+int otaTaskHandle = -1;
+
+#define FIRMWARE_RECV_OTA_SIZE (1024 * 2)
 
 static void ota_task(void *pvParameters) {
     euph_ota_manifest_t *ota = load_ota_manifest();
@@ -6,13 +11,23 @@ static void ota_task(void *pvParameters) {
 }
 
 void start_ota_task() {
-    int taskHandle =
-        xTaskCreatePinnedToCore(&ota_task, "ota", 8192, NULL, 5, NULL, 0);
+    if (otaTaskHandle == -1) {
+        otaTaskHandle = xTaskCreatePinnedToCore(&ota_task, "ota", 8192, NULL, 5, NULL, 0);
+    }
+}
+
+void send_file_progress(int file_size, int downloaded_size) {
+    char res[400];
+    sprintf(res, "{\"progress\": %d, \"total\": %d}", downloaded_size, file_size);
+
+    send_sse_message(res, "ota_progress");
 }
 
 void download_ota(euph_ota_manifest_t *manifest) {
     ESP_LOGI("euph_boot", "Getting new firmware...");
-    char *buffer = malloc(512 + 1);
+    send_ota_state(EUPH_OTA_DOWNLOADING);
+
+    char *buffer = malloc(FIRMWARE_RECV_OTA_SIZE + 1);
     esp_http_client_config_t config = {.disable_auto_redirect = false,
                                        .max_redirection_count = 4,
                                        .buffer_size = 2048,
@@ -40,7 +55,7 @@ _handle_conn:
     int status = esp_http_client_get_status_code(client);
     if (status == 302) {
         int read_len = 1;
-        while (read_len > 0) { read_len = esp_http_client_read(client, buffer, 512); }
+        while (read_len > 0) { read_len = esp_http_client_read(client, buffer, FIRMWARE_RECV_OTA_SIZE); }
 
         esp_http_client_set_redirection(client);
         goto _handle_conn;
@@ -64,15 +79,15 @@ _handle_conn:
 
         int total_read_len = 0, read_len = 0;
         while (total_read_len < content_length) {
-            read_len = esp_http_client_read(client, buffer, 512);
+            read_len = esp_http_client_read(client, buffer, FIRMWARE_RECV_OTA_SIZE);
             if (read_len <= 0) {
                 ESP_LOGE("euph_boot", "Error read data");
             }
             memcpy(firmware_buffer + total_read_len, buffer, read_len);
             mbedtls_md_update(&ctx, (unsigned char *)buffer, read_len);
             total_read_len += read_len;
+            send_file_progress(content_length, total_read_len);
         }
-
         mbedtls_md_finish(&ctx, received_sha256);
         ESP_LOGI("euph_boot", "Received firmware, reading sha256 %d...", total_read_len);
 
@@ -91,16 +106,19 @@ _handle_conn:
         output[64] = '\0';
 
         if (strcmp(manifest->sha256, output)) {
-            ESP_LOGE("euph_boot",
-                     "\nSHA256 of firmware does not match \n got: "
+            ESP_LOGE("euph_boot", 
+                    "\nSHA256 of firmware does not match \n got: "
                      "(%s)\nexpected: (%s)!",
                      manifest->sha256, output);
-            //free(firmware_buffer);
-            //return;
+            send_ota_state(EUPH_OTA_SHA256_INVALID);
+            free(firmware_buffer);
+            return;
         }
 
         ESP_LOGI("euph_boot", "SHA256 matches!\n");
         esp_ota_handle_t ota_handle = 0;
+            
+        send_ota_state(EUPH_OTA_FLASHING);
         const esp_partition_t *ota_partition = get_ota_partition_index();
         esp_ota_begin(ota_partition, content_length, &ota_handle);
 
@@ -108,11 +126,17 @@ _handle_conn:
 
         if (esp_ota_end(ota_handle) == ESP_OK) {
             ESP_LOGI("euph_boot", "Update complete successfully");
+            send_ota_state(EUPH_OTA_FINISHED);
+        } else {
+            send_ota_state(EUPH_OTA_ERROR);
         }
+
         esp_http_client_close(client);
         esp_http_client_cleanup(client);
         free(firmware_buffer);
         free(buffer);
+
+        ota_boot_to_app();
     }
 }
 
@@ -125,18 +149,16 @@ const esp_partition_t *get_ota_partition_index() {
         ESP_LOGE("esp_boot", "Failed to find factory partition");
     }
 
-    const esp_partition_t *factory =
-        esp_partition_get(pi);          // Get partition struct
-    esp_partition_iterator_release(pi); // Release the iterator
+    const esp_partition_t *factory = esp_partition_get(pi);
+    esp_partition_iterator_release(pi);
     return factory;
 }
 
-void boot_to_app() {
-
+void ota_boot_to_app() {
     esp_err_t err;
     const esp_partition_t *factory = get_ota_partition_index();
-    err = esp_ota_set_boot_partition(factory); // Set partition for boot
-    if (err != ESP_OK)                         // Check error
+    err = esp_ota_set_boot_partition(factory);
+    if (err != ESP_OK)
     {
         ESP_LOGE("esp_boot", "Failed to set boot partition");
     } else {

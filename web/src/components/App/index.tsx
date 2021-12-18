@@ -14,6 +14,7 @@ import { EuphoniumInfo } from "../../api/euphonium/models";
 import { getInfo } from "../../api/euphonium/api";
 import Notifications from "../Notifications";
 import PlaybackMobile from "../PlaybackMobile";
+import OTACard from "../../apps/ota/OTACard";
 
 export function App() {
   const [info, setInfo] = useState<EuphoniumInfo>();
@@ -42,6 +43,7 @@ export function App() {
       <div className={css.mainWrapper}>
         <div class="md:bg-app-secondary bg-app-primary h-screen w-screen">
           <Notifications />
+          { info?.networkState == "recovery" ? <OTACard/> : null }
           {info?.networkState == "online" ? (
             <div class="flex-row flex">
               {!isMobile ? (

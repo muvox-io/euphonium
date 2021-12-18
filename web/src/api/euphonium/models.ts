@@ -26,9 +26,15 @@ interface WiFiState {
     ipAddress: string;
 }
 
+interface OTAManifest {
+    url: string;
+    sha256: string;
+    name: string;
+}
+
 interface EuphoniumInfo {
     version: string;
-    networkState: 'online' | 'offline';
+    networkState: 'online' | 'offline' | 'recovery';
 }
 
 enum ConfigurationFieldType {
@@ -83,5 +89,5 @@ interface SongPlaybackState {
 }
 
 
-export type { PluginEntry, PluginConfiguration, EqSettings, DACPreset, EuphoniumInfo, ConfigurationField, PlaybackState, WiFiNetwork, WiFiState }
+export type { PluginEntry, OTAManifest, PluginConfiguration, EqSettings, DACPreset, EuphoniumInfo, ConfigurationField, PlaybackState, WiFiNetwork, WiFiState }
 export { ConfigurationFieldType, PluginEntryType, PlaybackStatus }

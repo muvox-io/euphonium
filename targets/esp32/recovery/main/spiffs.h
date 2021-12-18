@@ -26,6 +26,7 @@ typedef struct euph_ota_manifest euph_ota_manifest_t;
 void spiffs_init();
 euph_wifi_config_t* load_wifi_config();
 euph_ota_manifest_t* load_ota_manifest();
+bool spiffs_file_exists(const char* filename);
 bool ota_requested();
 
 

@@ -1,11 +1,3 @@
-/* WiFi station Example
-
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
 #include "esp_event.h"
 #include "esp_log.h"
 #include "esp_netif_types.h"
@@ -31,7 +23,6 @@ static int s_retry_num = 0;
 
 static void event_handler(void *arg, esp_event_base_t event_base,
                           int32_t event_id, void *event_data) {
-    ESP_LOGI("euph_boot", "Gor any event %d ", event_id);
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
         ESP_LOGI("euph_boot", "Connect WiFi!");
         esp_wifi_connect();
@@ -50,7 +41,8 @@ static void event_handler(void *arg, esp_event_base_t event_base,
         ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
 
-        start_ota_task();
+        // start_ota_task();
+        register_handlers();
     }
 }
 
@@ -69,8 +61,6 @@ void wifi_init_sta(void) {
         .sta = {},
     };
 
-    printf("%s ", global_wifi_config->ssid);
-    printf("%s ssid", global_wifi_config->password);
     strcpy((char *)wifi_config.sta.ssid, global_wifi_config->ssid);
     strcpy((char *)wifi_config.sta.password, global_wifi_config->password);
 
@@ -99,14 +89,20 @@ void app_main(void) {
     ESP_LOGI("euph_boot", "Loaded recovery");
     spiffs_init();
 
-    global_wifi_config = load_wifi_config();
+    if (spiffs_file_exists("/spiffs/ota_manifest.json")) {
+        global_wifi_config = load_wifi_config();
 
-    if (global_wifi_config == NULL) {
-        ESP_LOGI("euph_boot", "No wifi config found, booting to app");
-        // bootToApp();
+        if (global_wifi_config == NULL) {
+            ESP_LOGI("euph_boot", "No wifi config found, booting to app");
+            // bootToApp();
+            ota_boot_to_app();
+        }
+
+        ESP_LOGI("euph_boot", "Connecting to wifi");
+        wifi_init_sta();
+    } else {
+        ESP_LOGI("euph_boot", "No ota manifest, booting to app");
+        ota_boot_to_app();
     }
-
-    ESP_LOGI("euph_boot", "Connecting to wifi");
-    wifi_init_sta();
     // bootToApp();
 }

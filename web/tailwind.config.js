@@ -22,6 +22,7 @@ module.exports = {
       white: colors.white,
       gray: colors.trueGray,
       green: colors.green,
+        blue: colors.blue,
       notif: {
           error: "#f44321",
           success: "#00a852",

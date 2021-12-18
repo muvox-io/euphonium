@@ -12,7 +12,7 @@ import {
 let apiUrl = "";
 
 if (import.meta.env.MODE !== "production") {
-  apiUrl = "http://192.168.254.123:80";
+  apiUrl = "http://192.168.1.108:80";
 }
 
 let eventsUrl = apiUrl + "/events";
@@ -156,6 +156,16 @@ const connectToWifi = async (ssid: string, password: string) => {
     }),
   });
 };
+
+const triggerOTA = async () => {
+  return await fetch(apiUrl + "/start_ota");
+};
+
+const getOTAManifest = async () => {
+  return await fetch(apiUrl + "/web/ota_manifest.json", {
+    method: "GET",
+  }).then((e) => e.json());
+};
 const getWifiStatus = async (): Promise<WiFiState> => {
   return await fetch(apiUrl + "/wifi/status", { method: "GET" }).then((e) =>
     e.json()
@@ -184,4 +194,6 @@ export {
   getDACPresets,
   scanWifi,
   connectToWifi,
+  getOTAManifest,
+  triggerOTA
 };

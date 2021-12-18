@@ -2,6 +2,7 @@
 euphonium/protos
 targets/cli/build
 build/
+targets/esp32/app/spiffs/*
 py/
 .cache
 .cache/
