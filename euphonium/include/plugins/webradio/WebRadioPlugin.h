@@ -6,6 +6,7 @@
 #include "Logger.h"
 #include "CoreEvents.h"
 #include "Module.h"
+#include "Core.h"
 #include <atomic>
 #include <mutex>
 #include "Queue.h"

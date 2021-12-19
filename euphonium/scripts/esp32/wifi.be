@@ -22,7 +22,6 @@ class WiFiPlugin : Plugin
         self.type = "init_handler"
 
         app.registerHandler('wifiStateChanged', def (state)
-            print(state)
             if state['state'] == 'connected'
                 print("Connected to wifi")
                 self.wifiState['state'] = 'connected'
@@ -108,6 +107,7 @@ http.handle('POST', '/wifi/connect', def (request)
     wifi.wifiState['state'] = 'connecting'
     http.publishEvent('wifi_state', wifi.wifiState)
     wifi_connect(body['ssid'], body['password'], true)
+    http.sendJSON(result, request['connection'], 200)
 end)
 
 app.registerPlugin(wifi)

@@ -2,7 +2,7 @@
 #include "cJSON.h"
 
 const char* LOG_TAG = "euph_boot";
-const char* OTA_MANIFEST_FILE = "/spiffs/ota_manifest.json";
+const char* OTA_MANIFEST_FILE = "/spiffs/ota.config.json";
 const char* WIFI_CONFIG_FILE = "/spiffs/wifi.config.json";
 
 // Initializes VFS

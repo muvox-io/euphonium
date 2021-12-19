@@ -4,7 +4,7 @@
 
 std::shared_ptr<ConfigJSON> configMan;
 
-CSpotPlugin::CSpotPlugin() : bell::Task("cspot", 4 * 1024, 1) {
+CSpotPlugin::CSpotPlugin() : bell::Task("cspot", 4 * 1024, EUPH_PRIO_DEFAULT, 1) {
     auto file = std::make_shared<CliFile>();
     configMan = std::make_shared<ConfigJSON>("test.json", file);
     name = "cspot";

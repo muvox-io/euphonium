@@ -5,7 +5,7 @@
 
 YouTubeLeanHandler::YouTubeLeanHandler(std::string &uuid,
                                        std::shared_ptr<EventBus> eventBus)
-    : bell::Task("lean", 1024, 1) {
+    : bell::Task("lean", 1024, 0, 1) {
     this->eventBus = eventBus;
     this->uuid = uuid;
     startTask();

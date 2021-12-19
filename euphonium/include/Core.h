@@ -27,6 +27,8 @@
 extern std::shared_ptr<MainAudioBuffer> mainAudioBuffer;
 extern std::shared_ptr<EventBus> mainEventBus;
 
+#define EUPH_PRIO_DEFAULT 5
+
 class Core: public bell::Task, public EventSubscriber {
 private:
     std::shared_ptr<AudioOutput> currentOutput;

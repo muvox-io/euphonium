@@ -17,6 +17,7 @@
 #include "fstream"
 #include "Logger.h"
 #include "nvs_flash.h"
+#include "OTAPlugin.h"
 #include <string>
 #include "SPIFFSScriptLoader.h"
 #include "Core.h"
@@ -27,7 +28,7 @@
 #include <esp_heap_caps.h>
 
 void* operator new(std::size_t count) { 
-    return heap_caps_malloc(count, MALLOC_CAP_SPIRAM); 
+    return heap_caps_malloc(count, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT); 
 }
 
 void operator delete(void* ptr) noexcept { 
@@ -35,13 +36,6 @@ void operator delete(void* ptr) noexcept {
 }
 
 static const char *TAG = "euphonium";
-
-void reportRAM(int i) {
-    auto memUsage = heap_caps_get_free_size(MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-    auto memUsage2 = heap_caps_get_free_size(MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
-
-    BELL_LOG(info, "bluetooth", "[%d] Free RAM %d | %d", i, memUsage, memUsage2);
-}
 
 extern "C"
 {
@@ -55,7 +49,7 @@ static void euphoniumTask(void *pvParameters)
 
     auto core = std::make_shared<Core>();
     core->registeredPlugins.push_back(std::make_shared<ESP32PlatformPlugin>());
-
+    core->registeredPlugins.push_back(std::make_shared<OTAPlugin>());
     core->registeredPlugins.push_back(std::make_shared<BluetoothPlugin>());
     auto loader = std::make_shared<SPIFFSScriptLoader>();
     auto output = std::make_shared<DACAudioOutput>();
@@ -121,5 +115,5 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     init_spiffs();
 
-    auto taskHandle = xTaskCreatePinnedToCore(&euphoniumTask, "euphonium", 8192 * 8, NULL, 5, NULL, 0);
+    auto taskHandle = xTaskCreatePinnedToCore(&euphoniumTask, "euphonium", 8192 * 8, NULL, 5, NULL, 1);
 }

@@ -25,7 +25,7 @@ std::vector<uint8_t> getAdtsHeader(int length) {
     return res;
 }
 
-YouTubePlugin::YouTubePlugin() : bell::Task("youtube", 16 * 1024, 1) {
+YouTubePlugin::YouTubePlugin() : bell::Task("youtube", 16 * 1024, 1, 1) {
     name = "youtube";
     outputBuffer = std::vector<short>(AAC_MAX_NCHANS * AAC_MAX_NSAMPS * 2 * 4);
 

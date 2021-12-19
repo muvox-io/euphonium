@@ -89,7 +89,7 @@ void app_main(void) {
     ESP_LOGI("euph_boot", "Loaded recovery");
     spiffs_init();
 
-    if (spiffs_file_exists("/spiffs/ota_manifest.json")) {
+    if (spiffs_file_exists("/spiffs/ota.config.json")) {
         global_wifi_config = load_wifi_config();
 
         if (global_wifi_config == NULL) {

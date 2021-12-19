@@ -2,7 +2,7 @@
 #include "HTTPClient.h"
 #include "cJSON.h"
 
-SSDPListener::SSDPListener(std::string &uuid) : bell::Task("ssdp", 1024, 1) {
+SSDPListener::SSDPListener(std::string &uuid) : bell::Task("ssdp", 1024, 0, 1) {
     this->uuid = uuid;
     startTask();
 }

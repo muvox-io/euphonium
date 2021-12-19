@@ -3,7 +3,7 @@
 
 std::shared_ptr<bell::HTTPServer> mainServer;
 
-HTTPModule::HTTPModule() : bell::Task("http", 1024 * 4, 1, false)
+HTTPModule::HTTPModule() : bell::Task("http", 1024 * 4, 0, 1, false)
 {
     name = "http";
     mainServer = std::make_shared<bell::HTTPServer>(80);

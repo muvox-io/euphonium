@@ -24,7 +24,7 @@ export default ({
       <div class='text-app-text-secondary text-s mb-1'>{tooltip}</div>
       <input
         placeholder={placeholder}
-        className={`${icon ? "pl-10" : ""} bg-app-secondary border border-app-border p-3 rounded-xl min-w-full`}
+        className={`${icon ? "pl-10" : ""} bg-app-secondary h-[45px] border border-app-border p-3 rounded-xl min-w-full`}
         value={value}
         type={type}
         onChange={(e: any) => onSubmit && onSubmit(e.target.value)}

@@ -5,11 +5,12 @@ set(COMPONENT_SRCS
     "driver/I2CDriver.cpp"
     "driver/I2SDriver.cpp"
     "driver/WiFiDriver.cpp"
+    "ota/OTAPlugin.cpp"
     "bluetooth/BluetoothPlugin.cpp"
     "bluetooth/bt_app_core.c"
     "bluetooth/bt_app_sink.c"
     "main.cpp"
 )
-set(COMPONENT_ADD_INCLUDEDIRS "." "driver/." "bluetooth/.")
+set(COMPONENT_ADD_INCLUDEDIRS "." "driver/." "bluetooth/." "ota/.")
 register_component(REQUIRES "euphonium")
 component_compile_options(-std=gnu++17)

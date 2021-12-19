@@ -40,6 +40,7 @@ interface EuphoniumInfo {
 enum ConfigurationFieldType {
     String = "string",
     Number = "number",
+    Hidden = "hidden",
     StringList = "stringList"
 }
 interface ConfigurationField {

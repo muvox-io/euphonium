@@ -17,6 +17,7 @@
 #include "plugins/http/HTTPModule.h"
 #include "Module.h"
 #include "BellUtils.h"
+#include "Core.h"
 #include <atomic>
 #include <mutex>
 

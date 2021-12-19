@@ -162,10 +162,18 @@ const triggerOTA = async () => {
 };
 
 const getOTAManifest = async () => {
-  return await fetch(apiUrl + "/web/ota_manifest.json", {
+  return await fetch(apiUrl + "/web/ota.config.json", {
     method: "GET",
   }).then((e) => e.json());
 };
+
+const setOTAManifest = async (manifest: any) => {
+  return await fetch(apiUrl + "/set_ota", {
+    method: "POST",
+    body: JSON.stringify(manifest)
+  }).then((e) => e.json());
+};
+
 const getWifiStatus = async (): Promise<WiFiState> => {
   return await fetch(apiUrl + "/wifi/status", { method: "GET" }).then((e) =>
     e.json()
@@ -193,6 +201,7 @@ export {
   getInfo,
   getDACPresets,
   scanWifi,
+  setOTAManifest,
   connectToWifi,
   getOTAManifest,
   triggerOTA

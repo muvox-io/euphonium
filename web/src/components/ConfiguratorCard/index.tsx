@@ -14,6 +14,7 @@ import {
 import Card from "../Card";
 import Button from "../Button";
 import DACConfig from "../../apps/DACConfig";
+import OTATrigger from "../../apps/ota/OTATrigger";
 
 const renderConfigurationField = (
   field: ConfigurationField,
@@ -35,6 +36,8 @@ const renderConfigurationField = (
           onChange={onChange}
         />
       );
+    case ConfigurationFieldType.Hidden:
+        return (<></>)
     default:
       return <p>Unsupported field type</p>;
   }
@@ -86,6 +89,7 @@ export default ({ plugin = "" }) => {
             loadConfig();
           }}
         ></DACConfig> : null }
+        { plugin == 'ota' ? <OTATrigger/> : null }
 
         {configurationFields.map((field) =>
           renderConfigurationField(field, updateField)

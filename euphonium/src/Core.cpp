@@ -7,7 +7,7 @@
 std::shared_ptr<MainAudioBuffer> mainAudioBuffer;
 std::shared_ptr<EventBus> mainEventBus;
 
-Core::Core() : bell::Task("Core", 4 * 1024, 1) {
+Core::Core() : bell::Task("Core", 4 * 1024, 1, 0) {
     audioBuffer = std::make_shared<MainAudioBuffer>();
     luaEventBus = std::make_shared<EventBus>();
     mainAudioBuffer = audioBuffer;

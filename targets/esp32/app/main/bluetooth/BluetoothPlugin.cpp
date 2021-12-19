@@ -49,7 +49,7 @@ static bool bt_sink_cmd_handler(bt_sink_cmd_t cmd, va_list args) {
         char *title = va_arg(args, char *);
         auto event = std::make_unique<SongChangedEvent>(
             std::string(title), std::string(album), std::string(artist),
-            "bluetooth", "https://i.imgur.com/F1b2xkj.png");
+            "bluetooth", "https://i.imgur.com/Fuu73lv.png");
         EUPH_LOG(info, "bluetooth", "Song name changed");
         mainEventBus->postEvent(std::move(event));
 
@@ -70,7 +70,7 @@ static bool bt_sink_cmd_handler(bt_sink_cmd_t cmd, va_list args) {
     return true;
 }
 
-BluetoothPlugin::BluetoothPlugin() : bell::Task("bt_euph", 4 * 1024, 0, false) {
+BluetoothPlugin::BluetoothPlugin() : bell::Task("bt_euph", 4 * 1024, 3, 0, false) {
     name = "bluetooth";
     // bt_sink_init(bt_sink_cmd_handler, sink_data_handler);
 }
@@ -80,11 +80,6 @@ void BluetoothPlugin::shutdown() {
 }
 
 void BluetoothPlugin::runTask() {
-    auto memUsage =
-        heap_caps_get_free_size(MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-    auto memUsage2 = heap_caps_get_free_size(MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
-
-    BELL_LOG(info, "bluetooth", "Free RAM %d | %d", memUsage, memUsage2);
     bt_sink_init(bt_sink_cmd_handler, sink_data_handler);
 }
 
@@ -98,7 +93,7 @@ void BluetoothPlugin::startAudioThread() {
 }
 
 void BluetoothPlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader) {
-    // scriptLoader->loadScript("esp32/bluetooth", berry);
+    scriptLoader->loadScript("esp32/bluetooth", berry);
 }
 
 void BluetoothPlugin::setupBindings() {}

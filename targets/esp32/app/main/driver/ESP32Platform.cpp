@@ -1,6 +1,6 @@
 #include "ESP32Platform.h"
 
-ESP32PlatformPlugin::ESP32PlatformPlugin() : bell::Task("platform", 512, 0)
+ESP32PlatformPlugin::ESP32PlatformPlugin() : bell::Task("platform", 512, 3, 0)
 {
 }
 
