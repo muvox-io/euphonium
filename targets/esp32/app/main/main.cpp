@@ -6,6 +6,7 @@
 #include "esp_system.h"
 #include "esp_spiffs.h"
 #include <string.h>
+#include <memory.h>
 #include <arpa/inet.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -23,6 +24,7 @@
 #include "Core.h"
 #include "DACAudioOutput.h"
 #include "BluetoothPlugin.h"
+#include "ScriptsUpdater.h"
 #include "ESP32Platform.h"
 #include <memory>
 #include <esp_heap_caps.h>
@@ -47,16 +49,23 @@ static void euphoniumTask(void *pvParameters)
     bell::enableSubmoduleLogging();
     bell::createDecoders();
 
-    auto core = std::make_shared<Core>();
-    core->registeredPlugins.push_back(std::make_shared<ESP32PlatformPlugin>());
-    core->registeredPlugins.push_back(std::make_shared<OTAPlugin>());
-    core->registeredPlugins.push_back(std::make_shared<BluetoothPlugin>());
-    auto loader = std::make_shared<SPIFFSScriptLoader>();
-    auto output = std::make_shared<DACAudioOutput>();
-    core->selectAudioOutput(output);
-    core->setupBindings();
+    auto updater = std::make_shared<ScriptsUpdater>();
 
-    core->loadPlugins(loader);
+    if (updater->versionMatches()) {
+        auto core = std::make_shared<Core>();
+        core->registeredPlugins.push_back(std::make_shared<ESP32PlatformPlugin>());
+        core->registeredPlugins.push_back(std::make_shared<OTAPlugin>());
+        core->registeredPlugins.push_back(std::make_shared<BluetoothPlugin>());
+        auto loader = std::make_shared<SPIFFSScriptLoader>();
+        auto output = std::make_shared<DACAudioOutput>();
+        core->selectAudioOutput(output);
+        core->setupBindings();
+
+        core->loadPlugins(loader);
+    } else {
+        BELL_LOG(info, "init", "Script version does not match app, updating...");
+        updater->update();
+    }
 }
 
 void init_spiffs()

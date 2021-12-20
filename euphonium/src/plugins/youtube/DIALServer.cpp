@@ -27,8 +27,7 @@ void DIALServer::registerHandlers(std::shared_ptr<bell::HTTPServer> server) {
     BELL_LOG(info, "youtube", "Registering DIAL handlers");
     server->registerHandler(
         bell::RequestType::GET, "/ssdp/device-desc.xml",
-        [this](bell::HTTPRequest &request) {
-            BELL_LOG(info, "youtube", "REQUESTED REEEEEE");
+        [this](bell::HTTPRequest &request) {;
             auto size = std::snprintf(nullptr, 0, DEVICE_TEMPLATE_STR,
                                       this->deviceId.c_str());
             std::string output(size + 1, '\0');

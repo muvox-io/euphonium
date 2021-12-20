@@ -46,6 +46,11 @@ void i2sInstall(int channelFormatInt, int commFormat, int sampleRate, bool autoC
     i2s_set_pin((i2s_port_t)0, &pin_config);
 }
 
+void i2sEnableMCLK() {
+    PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
+    REG_SET_FIELD(PIN_CTRL, CLK_OUT1, 0);
+}
+
 void i2sDelete() {
     i2s_driver_uninstall((i2s_port_t) 0);
 }
@@ -53,4 +58,5 @@ void i2sDelete() {
 void exportI2SDriver(std::shared_ptr<berry::VmState> berry) {
     berry->export_function("i2s_install", &i2sInstall);
     berry->export_function("i2s_delete", &i2sDelete);
+    berry->export_function("i2s_enable_mclk", &i2sEnableMCLK);
 }
