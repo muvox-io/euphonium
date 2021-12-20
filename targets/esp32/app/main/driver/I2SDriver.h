@@ -5,7 +5,7 @@
 #include <memory>
 #include "BerryBind.h"
 
-void i2sInstall(int channelFormatInt, int commFormat, int sampleRate, bool autoClear, int bck, int ws, int dataOut);
+void i2sInstall(int channelFormatInt, int commFormat, int sampleRate, bool autoClear, int bck, int ws, int dataOut, int mclk);
 
 void i2sDelete();
 
