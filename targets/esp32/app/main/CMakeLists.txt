@@ -12,6 +12,11 @@ set(COMPONENT_SRCS
     "bluetooth/bt_app_sink.c"
     "main.cpp"
 )
+
 set(COMPONENT_ADD_INCLUDEDIRS "." "driver/." "bluetooth/." "ota/.")
 register_component(REQUIRES "euphonium")
 component_compile_options(-std=gnu++17)
+
+if (DEFINED ENV{EUPH_VER})
+    add_definitions(-DEUPH_VERSION=ENV{EUPH_VER})
+endif()

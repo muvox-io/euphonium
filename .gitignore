@@ -2,6 +2,7 @@
 euphonium/protos
 targets/cli/build
 build/
+scripts-version
 wifi.config.json
 euphonium/scripts/*.json
 targets/esp32/app/spiffs/*
