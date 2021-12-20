@@ -14,7 +14,7 @@
 #include <sys/stat.h>
 #include <fstream>
 
-#define EUPH_VERSION "v0.0.2-otatest"
+#define EUPH_VERSION "v0.0.3-otatest"
 
 class ScriptsUpdater: public EventSubscriber {
 private:

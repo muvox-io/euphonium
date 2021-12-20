@@ -60,8 +60,9 @@ void ScriptsUpdater::downloadUpdate() {
     auto size = std::snprintf(nullptr, 0, SCRIPTS_TAR_TEMPLATE, EUPH_VERSION);
     std::string output(size + 1, '\0');
     std::sprintf(&output[0], SCRIPTS_TAR_TEMPLATE, EUPH_VERSION);
+    BELL_LOG(info, "scripts_updater", "Requested url: %s %d", output.c_str());
 
-    httpStream->connectToUrl(output);
+    httpStream->connectToUrl(output.substr(0, output.size()-1));
     BELL_LOG(info, "tar_reader", "Size seems to be %d",
              httpStream->contentLength);
     tarData = std::vector<uint8_t>(httpStream->contentLength);
