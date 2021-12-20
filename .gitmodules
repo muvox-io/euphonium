@@ -10,6 +10,3 @@
 [submodule "euphonium/bell"]
 	path = euphonium/bell
 	url = https://github.com/feelfreelinux/bell
-[submodule "berry"]
-	path = berry
-	url = https://github.com/berry-lang/berry
