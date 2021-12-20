@@ -29,5 +29,5 @@ jobs:
           export GOPATH=\$HOME && \
           apt-get install --no-install-recommends --assume-yes protobuf-compiler && \
           python3 -m pip install --upgrade pip setuptools wheel && \
-          pip3 install protobuf grpcio-tools && cd targets/esp32 && sh build_recovery.sh"
+          pip3 install protobuf grpcio-tools && cd targets/esp32 && sh generate_full_build.sh"
         ls -la targets/esp32/build
