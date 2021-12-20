@@ -21,7 +21,8 @@ jobs:
         key: ${{ runner.os }}-esp32-build2
     - name: Build the firmware
       run: |
-        docker run --rm -v $PWD:/project -w /project espressif/idf:release-v4.3 /bin/bash -c "apt-get update && \
+        echo ${{github.ref_name}} > euphonium/scripts/scripts-version
+        docker run --rm -v $PWD:/project --env EUPH_VER=${{github.ref_name}} -w /project espressif/idf:release-v4.3 /bin/bash -c "apt-get update && \
           wget https://dl.google.com/go/go1.15.2.linux-amd64.tar.gz && tar -xvf go1.15.2.linux-amd64.tar.gz && \
           mv go /usr/local && \
           export GOROOT=/usr/local/go && \
@@ -31,3 +32,4 @@ jobs:
           python3 -m pip install --upgrade pip setuptools wheel && \
           pip3 install protobuf grpcio-tools && cd targets/esp32 && sh generate_full_build.sh"
         ls -la targets/esp32/build
+        cat euphonium/scripts/scripts-version
