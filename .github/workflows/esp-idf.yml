@@ -21,6 +21,8 @@ jobs:
         key: ${{ runner.os }}-esp32-build2
     - name: Build the firmware
       run: |
+        mkdir -p targets/esp32/app/spiffs
+        echo ${{github.ref_name}} > targets/esp32/app/spiffs/scripts-version
         echo ${{github.ref_name}} > euphonium/scripts/scripts-version
         docker run --rm -v $PWD:/project --env EUPH_VER=${{github.ref_name}} -w /project espressif/idf:release-v4.3 /bin/bash -c "apt-get update && \
           wget https://dl.google.com/go/go1.15.2.linux-amd64.tar.gz && tar -xvf go1.15.2.linux-amd64.tar.gz && \
