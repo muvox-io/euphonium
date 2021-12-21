@@ -33,3 +33,13 @@ jobs:
           pip3 install protobuf grpcio-tools && cd targets/esp32 && sh generate_full_build.sh"
         ls -la targets/esp32/build
         cat euphonium/scripts/scripts-version
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: Firmware
+        path: |
+          targets/esp32/*.tar.gz
+          targets/esp32/ota_checksum.txt
+          targets/esp32/scripts.tar
+          targets/esp32/scripts_checksum.txt
+          targete/esp32/ota.bin
