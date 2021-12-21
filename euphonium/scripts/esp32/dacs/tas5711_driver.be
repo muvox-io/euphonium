@@ -1,4 +1,5 @@
 class TAS5711Driver : DACDriver
+    var volumeTable
     def init()
         self.name = "TAS5711"
         self.hardwareVolumeControl = true
@@ -6,6 +7,7 @@ class TAS5711Driver : DACDriver
 
     def initI2S()
         var ADDRESS = 0x1a
+        self.volumeTable = [255,160,120,100,90,85,80, 75, 70, 65, 61, 57, 53, 50, 47, 44, 41, 38, 35, 32, 29, 26, 23, 20, 17, 14, 12, 10, 8, 6, 4, 2, 0]
 
         # 0x01: I2S STAND MODE
         i2s_install(0, 0x01, 44100, true, int(self.getGPIO('bck')), int(self.getGPIO('ws')), int(self.getGPIO('data')), 256)
@@ -37,8 +39,8 @@ class TAS5711Driver : DACDriver
 
     def setDacVolume(volume)
         var volumeStep = volume / 100.0
-        var actualVolume = int(volumeStep * 0xFF)
-        i2c_write8(0x1a, 0x07, 255 - actualVolume)
+        var actualVolume = int(volumeStep * 32)
+        i2c_write8(0x1a, 0x07, self.volumeTable[actualVolume])
     end
 end
 
