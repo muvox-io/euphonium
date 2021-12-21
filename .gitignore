@@ -7,6 +7,7 @@ wifi.config.json
 euphonium/scripts/*.json
 targets/esp32/app/spiffs/*
 py/
+*.d
 .cache
 .cache/
 authBlob.json
