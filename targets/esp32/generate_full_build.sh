@@ -1,10 +1,10 @@
 #!/bin/bash
 sh build_recovery.sh
-sh build_app.sh
 cp -r ../../euphonium/scripts/. app/spiffs/
 cd app/spiffs
 tar -cvf scripts.tar *
 cd ../../
+sh build_app.sh
 
 # package scripts
 cp app/spiffs/scripts.tar scripts.tar
