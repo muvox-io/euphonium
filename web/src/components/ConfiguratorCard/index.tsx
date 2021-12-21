@@ -37,13 +37,14 @@ const renderConfigurationField = (
         />
       );
     case ConfigurationFieldType.Hidden:
-        return (<></>)
+      return <></>;
     default:
       return <p>Unsupported field type</p>;
   }
 };
 
 export default ({ plugin = "" }) => {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [displayName, setDisplayName] = useState<string>("");
   const [configurationFields, setConfigurationFields] = useState<
     ConfigurationField[]
@@ -84,12 +85,14 @@ export default ({ plugin = "" }) => {
   return (
     <Card title={displayName} subtitle={"plugin configuration"}>
       <div class="flex flex-col items-start space-y-2 md:max-w-[400px]">
-        { plugin == 'dac' ? <DACConfig
-          configurationUpdated={() => {
-            loadConfig();
-          }}
-        ></DACConfig> : null }
-        { plugin == 'ota' ? <OTATrigger/> : null }
+        {plugin == "dac" ? (
+          <DACConfig
+            configurationUpdated={() => {
+              loadConfig();
+            }}
+          ></DACConfig>
+        ) : null}
+        {plugin == "ota" ? <OTATrigger /> : null}
 
         {configurationFields.map((field) =>
           renderConfigurationField(field, updateField)

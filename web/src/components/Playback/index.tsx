@@ -10,6 +10,20 @@ import useIsMobile from "../../utils/isMobile.hook";
 import Equalizer from "../Equalizer";
 import { PlaybackState, PlaybackStatus } from "../../api/euphonium/models";
 
+export function debounce<T extends unknown[], U>(
+  callback: (...args: T) => PromiseLike<U> | U,
+  wait: number
+) {
+  let timer: number;
+
+  return (...args: T): Promise<U> => {
+    clearTimeout(timer);
+    return new Promise((resolve) => {
+      timer = setTimeout(() => resolve(callback(...args)), wait);
+    });
+  };
+}
+
 const PlaybackBar = () => {
   const [playbackState, setPlaybackState] = useState<PlaybackState>();
 
@@ -25,9 +39,11 @@ const PlaybackBar = () => {
 
   const [eqOpen, setEqOpen] = useState<boolean>(false);
 
-  const volUpdated = (volume: number) => {
+  const volUpdatedInstant = (volume: number) => {
     updateVolume(Math.round((volume / 15) * 100));
   };
+
+  const volUpdated = debounce((volume: number) => volUpdatedInstant(volume), 100);
 
   const isMobile = useIsMobile();
 

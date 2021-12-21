@@ -170,17 +170,17 @@ class App
             plugin.initAudio()
         end
 
-        startAudioThreadForPlugin('cspot', self.getPluginByName('cspot').getBareValues())
-        startAudioThreadForPlugin('webradio', self.getPluginByName('webradio').getBareValues())
+        start_plugin_thread('cspot', self.getPluginByName('cspot').getBareValues())
+        start_plugin_thread('webradio', self.getPluginByName('webradio').getBareValues())
 
-        startAudioThreadForPlugin('bluetooth', {})
-        #startAudioThreadForPlugin('youtube', self.getPluginByName('youtube').getBareValues())
+        start_plugin_thread('bluetooth', {})
+        #start_plugin_thread('youtube', self.getPluginByName('youtube').getBareValues())
 
         self.initHTTP()
     end
 
     def initHTTP()
-        startAudioThreadForPlugin('http', {})
+        start_plugin_thread('http', {})
     end
 
     def registerPlugin(plugin)
@@ -330,7 +330,7 @@ end)
 
 http.handle('GET', '/info', def (request)
     http.sendJSON({
-        'version': '0.0.1',
+        'version': get_version(),
         'networkState': app.networkState
     }, request['connection'], 200)
 end)
@@ -372,4 +372,4 @@ def loadPlugins()
     app.loadConfiguration()
 end
 
-startAudioThreadForPlugin('persistor', {})
+start_plugin_thread('persistor', {})

@@ -51,6 +51,7 @@ public:
     void handleEvent(std::unique_ptr<Event> event);
     void setupBindings();
     std::string getPlatform();
+    std::string getVersion();
     void startAudioThreadForPlugin(std::string pluginName, berry::map config);
 
     std::shared_ptr<EventBus> luaEventBus;
