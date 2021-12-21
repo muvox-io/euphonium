@@ -18,5 +18,6 @@ register_component(REQUIRES "euphonium")
 component_compile_options(-std=gnu++17)
 
 if (DEFINED ENV{EUPH_VER})
-    add_definitions(-DEUPH_VERSION=ENV{EUPH_VER})
+    set(EUPH_VERSION, ENV{EUPH_VER})
+    add_definitions(-DEUPH_VERSION="${EUPH_VERSION}")
 endif()

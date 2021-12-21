@@ -19,6 +19,7 @@ bool ScriptsUpdater::versionMatches() {
     BELL_LOG(info, "scripts_updater", "Scripts version: %s",
              indexContent.c_str());
     std::string currentVer(EUPH_VERSION);
+    BELL_LOG(info, "scripts_updater", "App version: %s", currentVer.c_str());
     return indexContent.substr(0, currentVer.size()) ==
            std::string(EUPH_VERSION);
 }
@@ -62,7 +63,7 @@ void ScriptsUpdater::downloadUpdate() {
     std::sprintf(&output[0], SCRIPTS_TAR_TEMPLATE, EUPH_VERSION);
     BELL_LOG(info, "scripts_updater", "Requested url: %s %d", output.c_str());
 
-    httpStream->connectToUrl(output.substr(0, output.size()-1));
+    httpStream->connectToUrl(output.substr(0, output.size() - 1));
     BELL_LOG(info, "tar_reader", "Size seems to be %d",
              httpStream->contentLength);
     tarData = std::vector<uint8_t>(httpStream->contentLength);

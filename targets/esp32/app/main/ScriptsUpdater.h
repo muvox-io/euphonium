@@ -14,8 +14,6 @@
 #include <sys/stat.h>
 #include <fstream>
 
-#define EUPH_VERSION "v0.0.3-otatest"
-
 class ScriptsUpdater: public EventSubscriber {
 private:
     std::vector<uint8_t> tarData;
