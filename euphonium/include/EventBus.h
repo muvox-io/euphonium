@@ -33,7 +33,7 @@ private:
     std::unordered_map<EventType, std::vector<std::reference_wrapper<EventSubscriber>>> registeredListeners;
 public:
     EventBus();
-    void update();
+    bool update();
     void postEvent(std::unique_ptr<Event> event);
     void addListener(EventType eventType, EventSubscriber& eventSubscriber);
 };

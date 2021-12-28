@@ -8,6 +8,8 @@
 #include "Module.h"
 #include "Task.h"
 #include "EuphoniumLog.h"
+#include "dirent.h"
+#include "plugins/persistor/ConfigPersistor.h"
 #include "HTTPServer.h"
 
 extern std::shared_ptr<bell::HTTPServer> mainServer;

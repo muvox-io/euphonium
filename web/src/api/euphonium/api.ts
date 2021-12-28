@@ -12,7 +12,7 @@ import {
 let apiUrl = "";
 
 if (import.meta.env.MODE !== "production") {
-  apiUrl = "http://192.168.1.108:80";
+  apiUrl = "http://localhost";
 }
 
 let eventsUrl = apiUrl + "/events";

@@ -20,6 +20,7 @@ bool ScriptsUpdater::versionMatches() {
              indexContent.c_str());
     std::string currentVer(EUPH_VERSION);
     BELL_LOG(info, "scripts_updater", "App version: %s", currentVer.c_str());
+    if (currentVer == "debug") return true;
     return indexContent.substr(0, currentVer.size()) ==
            std::string(EUPH_VERSION);
 }

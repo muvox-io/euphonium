@@ -15,14 +15,15 @@ import { getInfo } from "../../api/euphonium/api";
 import Notifications from "../Notifications";
 import PlaybackMobile from "../PlaybackMobile";
 import OTACard from "../../apps/ota/OTACard";
+import SplashScreen from "../SplashScreen";
 
 export function App() {
   const [info, setInfo] = useState<EuphoniumInfo>();
 
   const updateTheme = () => {
     const isLight = localStorage.getItem("theme") == "light";
-    document.documentElement.className = isLight ? 'themeLight' : 'themeDark';
-  }
+    document.documentElement.className = isLight ? "themeLight" : "themeDark";
+  };
 
   useEffect(() => {
     updateTheme();
@@ -43,7 +44,7 @@ export function App() {
       <div className={css.mainWrapper}>
         <div class="md:bg-app-secondary bg-app-primary h-screen w-screen">
           <Notifications />
-          { info?.networkState == "recovery" ? <OTACard/> : null }
+          {info?.networkState == "recovery" ? <OTACard /> : null}
           {info?.networkState == "online" ? (
             <div class="flex-row flex">
               {!isMobile ? (
@@ -59,6 +60,11 @@ export function App() {
                     path="/web/plugin/:plugin"
                     component={ConfiguratorCard}
                   />
+                  <Route
+                    path="/web"
+                    component={SplashScreen}
+                  />
+
                   <Route path="/web/apps/webradio" component={RadioBrowser} />
                   <Route path="/web/playback" component={PlaybackMobile} />
                 </Router>

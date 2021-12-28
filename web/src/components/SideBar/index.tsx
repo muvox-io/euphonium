@@ -26,8 +26,8 @@ type CategoryProps = {
 
 const SideBarCategory = ({ plugins, filterType, header }: CategoryProps) => {
   return (
-    <div className="flex flex-col space-y-4">
-      <div className="text-app-text-secondary text-lg md:text-sm">{header}</div>
+    <div className="flex flex-col space-y-3">
+      <div className="-mt-1 text-lg text-app-text-secondary md:text-sm">{header}</div>
 
       {plugins
         .filter((e) => e.type == filterType)

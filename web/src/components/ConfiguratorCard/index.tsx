@@ -53,7 +53,9 @@ export default ({ plugin = "" }) => {
   const [dirty, setDirty] = useState<boolean>(false);
 
   const loadConfig = () => {
+    setIsLoading(true);
     getPluginConfiguration(plugin).then((e) => {
+      setIsLoading(false);
       setConfigurationFields(e.fields);
       setDisplayName(e.displayName);
     });
@@ -81,6 +83,8 @@ export default ({ plugin = "" }) => {
     });
     setConfigurationFields(newFields);
   };
+
+  if (isLoading) return null;
 
   return (
     <Card title={displayName} subtitle={"plugin configuration"}>

@@ -89,7 +89,7 @@ class VmState {
 
     bvm *raw_ptr() { return vm; }
 
-    void execute_string(const std::string &string);
+    bool execute_string(const std::string &string);
 
     void lambda(std::function<int(VmState &)> *function,
                 const std::string &name);

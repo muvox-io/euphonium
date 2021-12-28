@@ -3,7 +3,7 @@
 #include "esp_ota_ops.h"
 #include "esp_system.h"
 
-OTAPlugin::OTAPlugin() : bell::Task("ota", 512, 3, 0)
+OTAPlugin::OTAPlugin() : bell::Task("ota", 512, 0, 0)
 {
 }
 

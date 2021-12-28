@@ -7,6 +7,7 @@
 #include "EventBus.h"
 #include <Core.h>
 #include <vector>
+#include "mdns.h"
 #include <mutex>
 
 #define MAX_RECONNECT_COUNT 3

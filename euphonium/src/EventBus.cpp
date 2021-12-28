@@ -5,10 +5,12 @@ EventBus::EventBus()
     // this->registeredListeners = std::map<EventType, std::set<eventListener*>>();
 }
 
-void EventBus::update()
+bool EventBus::update()
 {
+    bool gotUpdate = false;
     while (!eventQueue.empty())
     {
+        gotUpdate = true;
         std::unique_ptr localPtr(std::move(eventQueue.front()));
         eventQueue.pop();
         auto type = localPtr->eventType;
@@ -21,6 +23,8 @@ void EventBus::update()
             }
         }
     }
+
+    return gotUpdate;
 }
 
 void EventBus::postEvent(std::unique_ptr<Event> event)

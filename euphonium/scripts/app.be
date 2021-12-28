@@ -1,3 +1,5 @@
+import string
+
 EVENT_CONFIG_UPDATED = 'conf_updated'
 EVENT_VOLUME_UPDATED = 'volume_updated'
 EVENT_SYSTEM_INIT = 'system_init'
@@ -44,7 +46,7 @@ class Plugin
     def persistConfig()
         var bareValues = self.getBareValues()
         print(bareValues)
-        conf_persist(self.name, json.dump(bareValues))
+        conf_persist(self.name + ".config.json", json.dump(bareValues))
     end
 
     def loadConfig(schema)
@@ -92,9 +94,7 @@ class App
                 self.getPluginByName('youtube').onEvent('youtube', ev)
             end,
             'volumeChangedEvent': def (req)
-                self.playbackState['volume'] = int(req['volume'])
-                setVolume(self.playbackState['volume'])
-                self.updatePlaybackInfo()
+                self.applyVolume(int(req['volume']))
             end,
             'handleConfigLoaded': def (config)
                 self.loadConfForPlugin(config)
@@ -191,7 +191,7 @@ class App
 
     def loadConfiguration()
         for plugin : self.plugins
-            conf_load(plugin.name)
+            conf_load(plugin.name + ".config.json")
         end
     end
 
@@ -217,10 +217,14 @@ class App
     end
 
     def loadConfForPlugin(conf)
-        plugin = self.getPluginByName(conf['key'])
-        plugin.loadConfig(conf['value'])
-        plugin.configurationLoaded = true
-        self.loadPluginsWhenReady()
+        var strIndex = string.find(conf['key'], ".config.json")
+        if (strIndex > 0)
+            var pluginName = string.split(conf['key'], strIndex)[0]
+            plugin = self.getPluginByName(pluginName)
+            plugin.loadConfig(conf['value'])
+            plugin.configurationLoaded = true
+            self.loadPluginsWhenReady()
+        end
     end
 
     def loadPluginsWhenReady()
@@ -244,6 +248,22 @@ class App
                 self.initRequiredPlugins()
             end
         end
+    end
+
+    def applyVolume(volume)
+        if get_platform() == 'desktop'
+            setVolume(volume)
+        else
+            var dacPlugin = self.getPluginByName('dac')
+            if !dacPlugin.hasHardwareVolume()
+                setVolume(volume)
+            end
+        end
+
+        self.playbackState['volume'] = volume
+        self.updatePlaybackInfo()
+        print("Broadcasting volume data")
+        self.broadcastEvent(EVENT_VOLUME_UPDATED, volume)
     end
 end
 
@@ -337,11 +357,8 @@ end)
 
 http.handle('POST', '/volume', def (request)
     var body = json.load(request['body'])
-    setVolume(body['volume'])
-    app.playbackState['volume'] = body['volume']
+    app.applyVolume(int(body['volume']))
 
-    app.broadcastEvent(EVENT_VOLUME_UPDATED, body['volume'])
-    app.updatePlaybackInfo()
     http.sendJSON(body, request['connection'], 200)
 end)
 

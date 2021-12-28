@@ -17,16 +17,20 @@ int VmState::call(bvm *vm) {
     return (*function)(l);
 }
 
-void VmState::execute_string(const std::string &data) {
+bool VmState::execute_string(const std::string &data) {
     // create an array
     if (be_loadstring(vm, data.c_str()) == 0) {
         if (be_pcall(vm, 0) != 0) {
             be_dumpexcept(vm);
+            return false;
         }
     } else {
         be_dumpexcept(vm);
+        return false;
     }
     be_pop(vm, 1);
+
+    return true;
 }
 
 void VmState::lambda(std::function<int(VmState &)> *function,

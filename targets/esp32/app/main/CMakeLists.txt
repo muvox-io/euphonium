@@ -5,6 +5,7 @@ set(COMPONENT_SRCS
     "driver/ESP32Platform.cpp"
     "driver/I2CDriver.cpp"
     "driver/I2SDriver.cpp"
+    "driver/GPIODriver.cpp"
     "driver/WiFiDriver.cpp"
     "ota/OTAPlugin.cpp"
     "bluetooth/BluetoothPlugin.cpp"
@@ -20,4 +21,6 @@ component_compile_options(-std=gnu++17)
 if (DEFINED ENV{EUPH_VER})
     set(EUPH_VERSION, ENV{EUPH_VER})
     add_definitions(-DEUPH_VERSION="${EUPH_VERSION}")
+else()
+    add_definitions(-DEUPH_VERSION="debug")
 endif()

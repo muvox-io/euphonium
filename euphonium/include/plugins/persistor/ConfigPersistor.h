@@ -36,6 +36,7 @@ struct PersistenceRequest {
     std::string value;
 };
 
+
 class ConfigPersistor : public bell::Task, public Module
 {
 private:
@@ -52,5 +53,7 @@ public:
     void startAudioThread();
     void shutdown() {};
 };
+
+extern std::shared_ptr<ConfigPersistor> mainPersistor;
 
 #endif

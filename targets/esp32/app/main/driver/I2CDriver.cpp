@@ -36,6 +36,9 @@ bool i2cWriteRegValueByte(int address, int reg, int value)
     esp_err_t res = i2c_master_cmd_begin(i2c_port, cmd, 500 / portTICK_RATE_MS);
     i2c_cmd_link_delete(cmd);
 
+    if (res != ESP_OK) {
+        BELL_LOG(error, "i2c", "Error writing i2c!");
+    }
     return res == ESP_OK;
 }
 
@@ -117,6 +120,7 @@ int i2cReadReg(int address, int reg)
     if(res == ESP_OK) {
         return data;
     } else {
+        BELL_LOG(error, "i2c", "Error reading i2c!");
         return -1;
     }
 }

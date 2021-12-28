@@ -101,9 +101,10 @@ export default () => {
   return (
   <div>
 
-    <div class="flex flex-grow bottom-0 fixed right-0 left-0 md:left-[220px]">
+    <div class="flex flex-col flex-grow bottom-0 fixed right-0 left-0 md:left-[220px]">
 
       <PlaybackBar />
+      <div class="mr-3 ml-3 h-1 w-auto bg-[#1DB954] text-xs"></div>
     </div>
 </div>
   );

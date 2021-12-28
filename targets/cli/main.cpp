@@ -6,10 +6,7 @@
 #include <optional>
 
 int main(int argc, char *argv[]) {
-
-    bell::setDefaultLogger();
-    bell::enableSubmoduleLogging();
-
+    initializeEuphoniumLogger();
     bell::createDecoders();
     auto core = std::make_shared<Core>();
     auto loader = std::make_shared<FileScriptLoader>();

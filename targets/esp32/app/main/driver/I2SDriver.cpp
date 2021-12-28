@@ -51,8 +51,8 @@ void i2sInstall(int channelFormatInt, int commFormat, int sampleRate, bool autoC
 }
 
 void i2sEnableMCLK() {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
-    REG_SET_FIELD(PIN_CTRL, CLK_OUT1, 0);
+            PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
+            WRITE_PERI_REG(PIN_CTRL, 0xFFF0);
 }
 
 void i2sDelete() {

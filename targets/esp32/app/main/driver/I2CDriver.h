@@ -5,7 +5,6 @@
 #include "driver/i2c.h"
 #include <memory>
 #include "BerryBind.h"
-
 #define i2c_port 0
 
 void i2cInstall(bool isMaster, int sda, int scl, int clkSpeed);

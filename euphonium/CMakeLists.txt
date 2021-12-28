@@ -4,7 +4,7 @@ set(CMAKE_BUILD_TYPE Debug)
 cmake_minimum_required(VERSION 2.8.9)
 set (CMAKE_CXX_STANDARD 17)
 
-set(USE_INTERNAL_BELL OFF
+set(CSPOT_EXTERNAL_BELL "bell"
         CACHE INTERNAL ""
 )
 

@@ -1,7 +1,10 @@
 #include "ConfigPersistor.h"
 
+std::shared_ptr<ConfigPersistor> mainPersistor;
+
 ConfigPersistor::ConfigPersistor() : bell::Task("persistor", 4 * 1024, 0, 0, false)
 {
+    //mainPersistor = this->shared_from_this();
     name = "persistor";
 }
 
@@ -49,11 +52,11 @@ void ConfigPersistor::runTask()
             if (request.isSave)
             {
                 BELL_LOG(info, "persistor", "Saving key: %s", request.key.c_str());
-                scriptLoader->saveFile(request.key + ".config.json", request.value);
+                scriptLoader->saveFile(request.key, request.value);
             }
             else
             {
-                std::string value = scriptLoader->loadFile(request.key + ".config.json");
+                std::string value = scriptLoader->loadFile(request.key);
                 BELL_LOG(info, "persistor", "Loaded key: %s", request.key.c_str());
                 auto event = std::make_unique<ConfigLoadedEvent>(request.key, value);
                 EUPH_LOG(info, "persistor", "Posting the event");

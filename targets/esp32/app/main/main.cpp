@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "mdns.h"
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "esp_wifi.h"
@@ -43,10 +44,10 @@ extern "C"
 {
     void app_main(void);
 }
+
 static void euphoniumTask(void *pvParameters)
 {
-    bell::setDefaultLogger();
-    bell::enableSubmoduleLogging();
+    initializeEuphoniumLogger();
     bell::createDecoders();
 
     auto updater = std::make_shared<ScriptsUpdater>();
@@ -117,7 +118,6 @@ void app_main(void)
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
-
 
     esp_wifi_set_ps(WIFI_PS_NONE);
     ESP_ERROR_CHECK(esp_netif_init());

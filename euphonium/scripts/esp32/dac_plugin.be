@@ -115,14 +115,19 @@ class DACPlugin : Plugin
     def initAudio()
     end
 
+    def hasHardwareVolume()
+        return self.selectedDriver.hardwareVolumeControl
+    end
+
     def onEvent(event, data)
         if event == EVENT_CONFIG_UPDATED
             self.selectDriver(self.configSchema['dac']['value'])
         end
-    end
 
-    def volumeChanged(volume)
-        self.selectedDriver.setVolume(volume)
+        if event == EVENT_VOLUME_UPDATED
+            print("received volume data")
+            self.selectedDriver.setVolume(data)
+        end
     end
 end
 

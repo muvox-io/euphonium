@@ -1,10 +1,13 @@
 #include "CSpotPlugin.h"
+#ifdef ESP_PLATFORM
+#include "mdns.h"
+#endif
 
 #include <thread>
 
 std::shared_ptr<ConfigJSON> configMan;
 
-CSpotPlugin::CSpotPlugin() : bell::Task("cspot", 4 * 1024, EUPH_PRIO_DEFAULT, 1) {
+CSpotPlugin::CSpotPlugin() : bell::Task("cspot", 4 * 1024, 0, 1) {
     auto file = std::make_shared<CliFile>();
     configMan = std::make_shared<ConfigJSON>("test.json", file);
     name = "cspot";
@@ -56,6 +59,11 @@ void CSpotPlugin::shutdown() {
 }
 
 void CSpotPlugin::runTask() {
+#ifdef ESP_PLATFORM
+            // setup mdns
+        mdns_init();
+        mdns_hostname_set("cspot");
+#endif
     status = ModuleStatus::RUNNING;
     std::scoped_lock lock(runningMutex);
     this->isRunning = true;

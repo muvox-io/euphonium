@@ -8,6 +8,7 @@
 #include "Module.h"
 #include "I2CDriver.h"
 #include "I2SDriver.h"
+#include "GPIODriver.h"
 #include "Task.h"
 #include "WiFiDriver.h"
 

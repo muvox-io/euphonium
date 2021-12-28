@@ -7,9 +7,11 @@
 std::shared_ptr<MainAudioBuffer> mainAudioBuffer;
 std::shared_ptr<EventBus> mainEventBus;
 
-Core::Core() : bell::Task("Core", 4 * 1024, 1, 0) {
+Core::Core() : bell::Task("Core", 4 * 1024, 0, 0) {
     audioBuffer = std::make_shared<MainAudioBuffer>();
     luaEventBus = std::make_shared<EventBus>();
+    mainPersistor = std::make_shared<ConfigPersistor>();
+
     mainAudioBuffer = audioBuffer;
     mainEventBus = luaEventBus;
     audioProcessor = std::make_shared<AudioProcessors>();
@@ -28,7 +30,7 @@ Core::Core() : bell::Task("Core", 4 * 1024, 1, 0) {
         // std::make_shared<YouTubePlugin>()
     };
     requiredModules = {std::make_shared<HTTPModule>(),
-                       std::make_shared<ConfigPersistor>()};
+                       mainPersistor};
 
     audioBuffer->shutdownListener = [this](std::string exceptPlugin) {
         for (auto &plugin : registeredPlugins) {
@@ -74,8 +76,9 @@ void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader) {
 
     EUPH_LOG(info, "core", "Lua thread listening");
     while (true) {
-        BELL_SLEEP_MS(100);
-        luaEventBus->update();
+        if (!luaEventBus->update()) {
+            BELL_SLEEP_MS(100);
+        };
     }
 }
 
@@ -167,7 +170,7 @@ void Core::runTask() {
             audioProcessor->process(pcmBuf.data(), readNumber);
             currentOutput->feedPCMFrames(pcmBuf.data(), readNumber);
         } else {
-            EUPH_LOG(info, "core", "No data");
+            //EUPH_LOG(info, "core", "No data");
             BELL_SLEEP_MS(1000);
         }
     }
