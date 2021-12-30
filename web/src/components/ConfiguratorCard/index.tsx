@@ -1,4 +1,4 @@
-import { useState, useEffect } from "preact/hooks";
+import { useState, useEffect, useContext } from "preact/hooks";
 
 import Input from "../Input";
 import Select from "../Select";
@@ -15,6 +15,7 @@ import Card from "../Card";
 import Button from "../Button";
 import DACConfig from "../../apps/DACConfig";
 import OTATrigger from "../../apps/ota/OTATrigger";
+import {PlaybackDataContext} from "../../utils/PlaybackContext";
 
 const renderConfigurationField = (
   field: ConfigurationField,
@@ -51,6 +52,7 @@ export default ({ plugin = "" }) => {
   >([]);
 
   const [dirty, setDirty] = useState<boolean>(false);
+  const {setPlaybackState} = useContext(PlaybackDataContext);
 
   const loadConfig = () => {
     setIsLoading(true);
@@ -69,6 +71,7 @@ export default ({ plugin = "" }) => {
     updatePluginConfiguration(plugin, configurationFields).then((e) => {
       setConfigurationFields(e.fields);
       setDisplayName(e.displayName);
+      setPlaybackState(e);
       setDirty(false);
     });
   };

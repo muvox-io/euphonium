@@ -2,7 +2,7 @@
 #include <HTTPStream.h>
 #include <thread>
 
-WebRadioPlugin::WebRadioPlugin(): bell::Task("radio", 6 * 1024, 1, 0)
+WebRadioPlugin::WebRadioPlugin(): bell::Task("radio", 6 * 1024, 0, 1)
 {
     name = "webradio";
     audioStream = std::make_shared<HTTPAudioStream>();

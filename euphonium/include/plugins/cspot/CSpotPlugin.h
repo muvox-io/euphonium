@@ -14,7 +14,7 @@
 #include "FakeAudioSink.h"
 #include <variant>
 #include "CliFile.h"
-#include "plugins/http/HTTPModule.h"
+#include "plugins/http/HTTPInstance.h"
 #include "Module.h"
 #include "BellUtils.h"
 #include "Core.h"

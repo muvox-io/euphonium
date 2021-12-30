@@ -16,6 +16,7 @@ class CSpotPlugin : Plugin
 
         self.applyDefaultValues()
         self.name = "cspot"
+        self.themeColor = "#1DB954"
         self.displayName = "Spotify (cspot)"
         self.type = "plugin"
     end

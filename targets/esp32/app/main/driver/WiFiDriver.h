@@ -8,6 +8,9 @@
 #include <Core.h>
 #include <vector>
 #include "mdns.h"
+extern "C" {
+#include "dns_server.h"
+}
 #include <mutex>
 
 #define MAX_RECONNECT_COUNT 3

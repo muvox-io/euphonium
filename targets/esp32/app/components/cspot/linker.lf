@@ -8,6 +8,22 @@ archive: libeuphonium.a
 entries:
     * (extram_bss)
 
+[mapping:btdm]
+archive: libbtdm_app.a
+entries:
+    * (extram_bss)
+
+[mapping:mdns]
+archive: libmdns.a
+entries:
+    * (extram_bss)
+
+
+[mapping:proto]
+archive: libproto.a
+entries:
+    * (extram_bss)
+
 [mapping:cspot]
 archive: libcspot.a
 entries:

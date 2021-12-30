@@ -13,11 +13,13 @@ class Plugin
     var audioOutput
     var exposeWebApp
     var configurationLoaded
+    var themeColor
 
     def applyDefaultValues()
         self.exposeWebApp = false
         self.configurationLoaded = false
         self.audioOutput = false
+        self.themeColor = "#fff"
 
         for key : self.configSchema.keys()
             self.configSchema[key]['value'] = self.configSchema[key]['defaultValue']
@@ -132,6 +134,12 @@ class App
 
     def updateSong(playbackInfo)
         self.playbackState['song'] = playbackInfo
+
+        print(playbackInfo)
+        if playbackInfo['sourceName'] != ''
+            print("Being updated")
+            self.playbackState['song']['sourceThemeColor'] = self.getPluginByName(playbackInfo['sourceName']).themeColor
+        end
         self.updatePlaybackInfo()
     end
 
@@ -316,6 +324,7 @@ http.handle('GET', '/plugins/:name', def (request)
 
             result = {
                 'displayName': plugin.displayName,
+                'themeColor': plugin.themeColor,
                 'configSchema': plugin.configSchema
             }
         end
@@ -339,7 +348,7 @@ http.handle('POST', '/plugins/:name', def (request)
     end
 
     plugin.persistConfig()
-    http.sendJSON({ 'configSchema': confSchema, 'displayName': plugin.displayName }, request['connection'], 200)
+    http.sendJSON({ 'configSchema': confSchema, 'displayName': plugin.displayName, 'themeColor': plugin.themeColor }, request['connection'], 200)
     app.sendNotification("info", plugin.name, "Configuration updated")
     plugin.onEvent(EVENT_CONFIG_UPDATED, {})
 end)

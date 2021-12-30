@@ -10,6 +10,7 @@ class WebRadioPlugin : Plugin
 
         self.applyDefaultValues()
         self.name = "webradio"
+        self.themeColor = "#d2c464"
         self.displayName = "Web Radio"
         self.type = "plugin"
         self.exposeWebApp = true

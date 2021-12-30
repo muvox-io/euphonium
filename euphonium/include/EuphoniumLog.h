@@ -15,7 +15,7 @@ typedef std::function<void(std::string &)> onLogReceived;
 
 class EuphoniumLogger : public bell::AbstractLogger {
   private:
-    char buffer[4096];
+      std::vector<char> buffer = std::vector<char>(4096);
 
   public:
     std::deque<std::string> logCache;
@@ -37,9 +37,9 @@ class EuphoniumLogger : public bell::AbstractLogger {
         va_list args;
         va_start(args, format);
         vprintf(format, args);
-        vsprintf(buffer, format, args);
+        vsprintf(buffer.data(), format, args);
         va_end(args);
-        log << std::string(buffer);
+        log << std::string(buffer.data());
         log << "\n";
         printf("\n");
         handleLog(log);
@@ -60,9 +60,9 @@ class EuphoniumLogger : public bell::AbstractLogger {
         va_list args;
         va_start(args, format);
         vprintf(format, args);
-        vsprintf(buffer, format, args);
+        vsprintf(buffer.data(), format, args);
         va_end(args);
-        log << std::string(buffer);
+        log << std::string(buffer.data());
         log << "\n";
         printf("\n");
         handleLog(log);
@@ -83,9 +83,9 @@ class EuphoniumLogger : public bell::AbstractLogger {
         va_list args;
         va_start(args, format);
         vprintf(format, args);
-        vsprintf(buffer, format, args);
+        vsprintf(buffer.data(), format, args);
         va_end(args);
-        log << std::string(buffer);
+        log << std::string(buffer.data());
         log << "\n";
         printf("\n");
         handleLog(log);
@@ -112,7 +112,7 @@ class EuphoniumLogger : public bell::AbstractLogger {
         if (logCache.size() > 100) {
             logCache.pop_front();
         }
-        //logCache.push_back(logStr);
+        logCache.push_back(logStr);
         if (logReceived != nullptr) {
             //logReceived(logStr);
         }

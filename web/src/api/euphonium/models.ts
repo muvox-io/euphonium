@@ -71,6 +71,7 @@ interface EqSettings {
 
 interface PluginConfiguration {
     fields: ConfigurationField[];
+    themeColor: string;
     displayName: string;
 }
 
@@ -83,6 +84,7 @@ interface PlaybackState {
 
 interface SongPlaybackState {
     artistName: string;
+    sourceThemeColor: string;
     songName: string;
     sourceName: string;
     albumName: string;

@@ -1,13 +1,13 @@
 import { useState, useEffect } from "preact/hooks";
 import FileItem from "../FileItem";
 
-export default function ({fileSelected = (a:any) => {}}) {
+export default function ({ipAddr = "", fileSelected = (a:any) => {}}) {
   const [files, setFiles] = useState<string[]>([]);
   const [selectedFile, setFile] = useState<string>("");
 
   useEffect(() => {
     const fetchFiles = async () => {
-      const response = await fetch("http://192.168.1.234/directories");
+      const response = await fetch("http://" + ipAddr + "/directories");
       const json = await response.json();
       setFiles(json);
     };

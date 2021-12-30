@@ -10,6 +10,7 @@ class BluetoothPlugin : Plugin
         }
 
         self.applyDefaultValues()
+        self.themeColor = "#287AA9"
         self.name = "bluetooth"
         self.displayName = "Bluetooth"
         self.type = "plugin"

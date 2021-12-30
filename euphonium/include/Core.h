@@ -46,6 +46,7 @@ public:
     void loadPlugins(std::shared_ptr<ScriptLoader> loader);
     void handleLuaThread();
     void handleServerThread();
+    void handleScriptingThread();
     void runTask();
     void emptyBuffers();
     void handleEvent(std::unique_ptr<Event> event);

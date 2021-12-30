@@ -29,8 +29,7 @@ Core::Core() : bell::Task("Core", 4 * 1024, 0, 0) {
         std::make_shared<CSpotPlugin>(), std::make_shared<WebRadioPlugin>(),
         // std::make_shared<YouTubePlugin>()
     };
-    requiredModules = {std::make_shared<HTTPModule>(),
-                       mainPersistor};
+    requiredModules = {std::make_shared<HTTPModule>(), mainPersistor};
 
     audioBuffer->shutdownListener = [this](std::string exceptPlugin) {
         for (auto &plugin : registeredPlugins) {
@@ -72,12 +71,15 @@ void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader) {
 
     berry->execute_string("loadPlugins()");
 
+}
+
+void Core::handleScriptingThread() {
     startTask();
 
-    EUPH_LOG(info, "core", "Lua thread listening");
+    EUPH_LOG(info, "core", "Scripting thread listening");
     while (true) {
         if (!luaEventBus->update()) {
-            BELL_SLEEP_MS(100);
+            BELL_SLEEP_MS(30);
         };
     }
 }
@@ -170,7 +172,7 @@ void Core::runTask() {
             audioProcessor->process(pcmBuf.data(), readNumber);
             currentOutput->feedPCMFrames(pcmBuf.data(), readNumber);
         } else {
-            //EUPH_LOG(info, "core", "No data");
+            // EUPH_LOG(info, "core", "No data");
             BELL_SLEEP_MS(1000);
         }
     }

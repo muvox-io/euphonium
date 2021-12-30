@@ -1,6 +1,7 @@
 #ifndef EUPHONIUM_CONFIG_PERSISTOR_MODULE_H
 #define EUPHONIUM_CONFIG_PERSISTOR_MODULE_H
 
+#include "BaseHTTPServer.h"
 #include "ScriptLoader.h"
 #include <iostream>
 #include <fstream>
@@ -10,7 +11,9 @@
 #include "Module.h"
 #include "Task.h"
 #include "EventBus.h"
+#include "HTTPServer.h"
 #include "EuphoniumLog.h"
+#include "plugins/http/HTTPInstance.h"
 
 class ConfigLoadedEvent: public Event {
     public:
@@ -30,17 +33,24 @@ class ConfigLoadedEvent: public Event {
     }
 };
 
-struct PersistenceRequest {
-    bool isSave = false;
+enum class StorageOperationType {
+    PERSIST_CONF,
+    READ_CONF,
+    WRITE_HTTP
+};
+
+struct StorageOperation {
+    StorageOperationType type;
     std::string key;
     std::string value;
+    int connFd;
 };
 
 
 class ConfigPersistor : public bell::Task, public Module
 {
 private:
-    bell::Queue<PersistenceRequest> requestQueue;
+    bell::Queue<StorageOperation> requestQueue;
 
 public:
     ConfigPersistor();
@@ -50,6 +60,7 @@ public:
     void persist(std::string key, std::string value);
     void load(std::string key);
     void runTask();
+    void serveFile(int fd, std::string& fileName);
     void startAudioThread();
     void shutdown() {};
 };

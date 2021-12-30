@@ -56,6 +56,7 @@ static bool bt_sink_cmd_handler(bt_sink_cmd_t cmd, va_list args) {
         break;
     }
     case BT_SINK_VOLUME: {
+        EUPH_LOG(info, "bluetooth", "Volume changed");
         u32_t volume = va_arg(args, u32_t);
         volume = 100 * powf(volume / 128.0f, 3);
         auto event = std::make_unique<VolumeChangedEvent>(volume);
@@ -70,7 +71,7 @@ static bool bt_sink_cmd_handler(bt_sink_cmd_t cmd, va_list args) {
     return true;
 }
 
-BluetoothPlugin::BluetoothPlugin() : bell::Task("bt_euph", 4 * 1024, 0, 0, false) {
+BluetoothPlugin::BluetoothPlugin() : bell::Task("bt_euph", 4 * 1024, 0, 0) {
     name = "bluetooth";
     // bt_sink_init(bt_sink_cmd_handler, sink_data_handler);
 }
@@ -84,12 +85,7 @@ void BluetoothPlugin::runTask() {
 }
 
 void BluetoothPlugin::startAudioThread() {
-    auto memUsage =
-        heap_caps_get_free_size(MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-    auto memUsage2 = heap_caps_get_free_size(MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
-
-    BELL_LOG(info, "bluetooth", "Free RAM %d | %d", memUsage, memUsage2);
-    startTask();
+    //startTask();
 }
 
 void BluetoothPlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader) {

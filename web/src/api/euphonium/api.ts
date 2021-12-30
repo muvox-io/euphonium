@@ -12,7 +12,7 @@ import {
 let apiUrl = "";
 
 if (import.meta.env.MODE !== "production") {
-  apiUrl = "http://localhost";
+  apiUrl = "http://192.168.1.108";
 }
 
 let eventsUrl = apiUrl + "/events";
@@ -36,6 +36,7 @@ const getPluginConfiguration = async (
     .then((e) => e.json())
     .then((e) => {
       return {
+        themeColor: e.themeColor,
         displayName: e.displayName,
         fields: Object.keys(e["configSchema"])
           .map((key) => {
@@ -70,6 +71,7 @@ const updatePluginConfValues = async (
     .then((e) => e.json())
     .then((e) => {
       return {
+        themeColor: e.themeColor,
         displayName: e.displayName,
         fields: Object.keys(e["configSchema"]).map((key) => {
           return {

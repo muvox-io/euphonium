@@ -14,5 +14,6 @@ int main(int argc, char *argv[]) {
     core->selectAudioOutput(output);
     core->setupBindings();
     core->loadPlugins(loader);
+    core->handleScriptingThread();
     return 0;
 }

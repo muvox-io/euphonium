@@ -3,8 +3,6 @@
 #include "EuphoniumLog.h"
 #include "HTTPEvents.h"
 
-std::shared_ptr<bell::HTTPServer> mainServer;
-
 void listFiles(const std::string &path,
                std::function<void(const std::string &)> cb) {
     if (auto dir = opendir(path.c_str())) {
@@ -21,7 +19,7 @@ void listFiles(const std::string &path,
     }
 }
 
-HTTPModule::HTTPModule() : bell::Task("http", 1024 * 4, 0, 0, false) {
+HTTPModule::HTTPModule() : bell::Task("http", 1024 * 6, 0, 0) {
     name = "http";
     mainServer = std::make_shared<bell::HTTPServer>(80);
 }
@@ -77,39 +75,13 @@ void HTTPModule::runTask() {
     if (taskRunning)
         return;
     taskRunning = true;
-    EuphoniumLogger* logger = static_cast<EuphoniumLogger *>(bell::bellGlobalLogger.get());
+    EuphoniumLogger *logger =
+        static_cast<EuphoniumLogger *>(bell::bellGlobalLogger.get());
 
     auto assetHandler = [this](bell::HTTPRequest &request) {
         auto fileName = request.urlParams.at("asset");
-        auto extension = fileName.substr(fileName.size() - 3, fileName.size());
-        auto useGzip = false;
-        auto contentType = "text/css";
-        if (extension == ".js") {
-            contentType = "application/javascript";
-        }
-
-        std::string prefix = "../../../web/dist/";
-        std::string checkPrefix = prefix;
-#ifdef ESP_PLATFORM
-        prefix = "/spiffs/";
-        checkPrefix = "/spiffs/";
-#endif
-
-        std::ifstream checkFile(checkPrefix + "assets/" + fileName + ".gz");
-        if (checkFile.good()) {
-            fileName += ".gz";
-            useGzip = true;
-        }
-
-        bell::HTTPResponse response = {
-            .connectionFd = request.connection,
-            .status = 200,
-            .useGzip = useGzip,
-            .contentType = contentType,
-        };
-        response.responseReader = std::make_unique<bell::FileResponseReader>(
-            prefix + "assets/" + fileName);
-        mainServer->respond(response);
+        std::string fullFilePath = "assets/" + fileName;
+        mainPersistor->serveFile(request.connection, fullFilePath);
     };
     auto directoriesHandler = [this](bell::HTTPRequest &request) {
         std::string result = "[";
@@ -180,42 +152,12 @@ void HTTPModule::runTask() {
     };
 
     auto indexHandler = [this](bell::HTTPRequest &request) {
-        std::string prefix = "../../../web/dist/";
         std::string fileName = "index.html";
-        std::string contentType = "text/html";
         if (request.url.find("/file/") != std::string::npos) {
-            prefix = "../../../euphonium/scripts/";
             fileName = request.url.substr(request.url.find("/file/") + 6,
                                           request.url.size());
-            contentType = "text/plain";
         }
-
-#ifdef ESP_PLATFORM
-        prefix = "/spiffs/";
-#endif
-
-        BELL_LOG(info, "http", "Got url %s", request.url.c_str());
-
-        BELL_LOG(info, "http", "Loading file %s", fileName.c_str());
-        std::ifstream checkFile(prefix + fileName);
-        if (checkFile.good()) {
-            bell::HTTPResponse response = {
-                .connectionFd = request.connection,
-                .status = 200,
-                .contentType = contentType,
-            };
-            response.responseReader =
-                std::make_unique<bell::FileResponseReader>(prefix + fileName);
-            mainServer->respond(response);
-        } else {
-            bell::HTTPResponse response = {
-                .connectionFd = request.connection,
-                .status = 404,
-                .body = "File not found",
-                .contentType = "text/html",
-            };
-            mainServer->respond(response);
-        }
+        mainPersistor->serveFile(request.connection, fileName);
     };
 
     // redirect all requests to /web

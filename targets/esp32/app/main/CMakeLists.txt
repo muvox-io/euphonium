@@ -7,6 +7,7 @@ set(COMPONENT_SRCS
     "driver/I2SDriver.cpp"
     "driver/GPIODriver.cpp"
     "driver/WiFiDriver.cpp"
+    "driver/dns_server.c"
     "ota/OTAPlugin.cpp"
     "bluetooth/BluetoothPlugin.cpp"
     "bluetooth/bt_app_core.c"

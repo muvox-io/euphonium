@@ -16,6 +16,7 @@ class YouTubePlugin : Plugin
         self.displayName = "YouTube"
         self.playerStatus = YT_STATUS_STOPPED
         self.type = "plugin"
+        self.themeColor = "#FF0000"
     end
 
     def postBind(name, data)

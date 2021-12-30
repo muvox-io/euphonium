@@ -37,7 +37,7 @@ class TAS5711Driver : DACDriver
         i2c_delete()
     end
 
-    def setDacVolume(volume)
+    def setVolume(volume)
         var volumeStep = volume / 100.0
         var actualVolume = int(volumeStep * 32)
         i2c_write8(0x1a, 0x07, self.volumeTable[actualVolume])

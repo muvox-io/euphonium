@@ -11,8 +11,8 @@
 #include "dirent.h"
 #include "plugins/persistor/ConfigPersistor.h"
 #include "HTTPServer.h"
+#include "HTTPInstance.h"
 
-extern std::shared_ptr<bell::HTTPServer> mainServer;
 class HTTPModule : public bell::Task, public Module
 {
 private:

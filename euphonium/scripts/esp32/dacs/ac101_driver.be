@@ -49,7 +49,7 @@ class AC101Driver : DACDriver
         i2c_write16(ADDRESS, 0x56, 0xf801) # headphones
 
         # set headphones volume
-        self.setDacVolume(100)
+        self.setVolume(100)
 
         value = i2c_read16(ADDRESS, 0x02)
 		value |= 0x8000
@@ -61,7 +61,7 @@ class AC101Driver : DACDriver
         i2c_delete()
     end
 
-    def setDacVolume(volume)
+    def setVolume(volume)
         var ADDRESS = 0x1a
         var convVolume = (real(volume) / 100) * 255
         var value = int(((convVolume)*0x3f)/255) << 4;
