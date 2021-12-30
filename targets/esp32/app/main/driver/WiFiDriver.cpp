@@ -22,7 +22,7 @@ static void event_handler(void *arg, esp_event_base_t event_base,
         std::scoped_lock lock(globalWiFiState.stateMutex);
         if (!globalWiFiState.isConnecting) {
             publishWiFiEvent("ap_ready");
-            start_dns_server();
+            //start_dns_server();
         }
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_SCAN_DONE) {
         uint16_t number = DEFAULT_SCAN_LIST_SIZE;

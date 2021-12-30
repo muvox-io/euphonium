@@ -22,6 +22,7 @@ class WiFiPlugin : Plugin
         self.type = "init_handler"
 
         app.registerHandler('wifiStateChanged', def (state)
+            print(state)
             if state['state'] == 'connected'
                 print("Connected to wifi")
                 self.wifiState['state'] = 'connected'
