@@ -62,59 +62,59 @@ void YouTubePlugin::shutdown() {
 }
 
 std::string YouTubePlugin::getStreamForVideo(std::string videoUrl) {
-    auto socket = std::make_unique<bell::TLSSocket>();
-    socket->open("https://youtubei.googleapis.com/youtubei/v1/player?key=" +
-                 std::string(YT_PLAYER_KEY));
+    // auto socket = std::make_unique<bell::TLSSocket>();
+    // socket->open("https://youtubei.googleapis.com/youtubei/v1/player?key=" +
+    //              std::string(YT_PLAYER_KEY));
 
-    auto body = std::string(POST_BODY_PART1) + videoUrl +
-                std::string(POST_BODY_PART2); 
-    std::stringstream ss;
-    ss << "POST /youtubei/v1/player?key=" << YT_PLAYER_KEY << " HTTP/1.1\r\n"
-       << "Host: youtubei.googleapis.com:443\r\n"
-       << "Accept: */*\r\n"
-       << "Content-Type: application/json\r\n"
-       << "Content-Length: " << body.length() << "\r\n"
-       << "\r\n"
-       << body;
-    auto req = ss.str();
+    // auto body = std::string(POST_BODY_PART1) + videoUrl +
+    //             std::string(POST_BODY_PART2); 
+    // std::stringstream ss;
+    // ss << "POST /youtubei/v1/player?key=" << YT_PLAYER_KEY << " HTTP/1.1\r\n"
+    //    << "Host: youtubei.googleapis.com:443\r\n"
+    //    << "Accept: */*\r\n"
+    //    << "Content-Type: application/json\r\n"
+    //    << "Content-Length: " << body.length() << "\r\n"
+    //    << "\r\n"
+    //    << body;
+    // auto req = ss.str();
 
-    socket->write((uint8_t *)req.c_str(), req.length());
+    // socket->write((uint8_t *)req.c_str(), req.length());
 
-    std::vector<uint8_t> buffer(128);
+    // std::vector<uint8_t> buffer(128);
 
-    size_t nbytes = 0;
-    std::string currentLine = "";
-    bool gotItag = false;
-    bool isFinished = false;
+    // size_t nbytes = 0;
+    // std::string currentLine = "";
+    // bool gotItag = false;
+    // bool isFinished = false;
 
-    while (nbytes >= 0 && !isFinished) {
-        // Read line by line from socket
-        nbytes = socket->read(&buffer[0], buffer.size());
+    // while (nbytes >= 0 && !isFinished) {
+    //     // Read line by line from socket
+    //     nbytes = socket->read(&buffer[0], buffer.size());
 
-        currentLine += std::string(buffer.data(), buffer.data() + nbytes);
-        while (currentLine.find("\n") != std::string::npos) {
-            auto line = currentLine.substr(0, currentLine.find("\n"));
-            currentLine = currentLine.substr(currentLine.find("\n") + 1,
-                                             currentLine.size());
+    //     currentLine += std::string(buffer.data(), buffer.data() + nbytes);
+    //     while (currentLine.find("\n") != std::string::npos) {
+    //         auto line = currentLine.substr(0, currentLine.find("\n"));
+    //         currentLine = currentLine.substr(currentLine.find("\n") + 1,
+    //                                          currentLine.size());
 
-            if (gotItag && line.find("\"url\"") != std::string::npos) {
+    //         if (gotItag && line.find("\"url\"") != std::string::npos) {
 
-                EUPH_LOG(info, "youtube", "Got url: %s", line.c_str());
-                // get substring after ""url": ""
-                auto url = line.substr(line.find("\"url\": \"") + 8);
-                url = url.substr(0, url.find("\""));
-                EUPH_LOG(info, "youtube", "Got url: %s", url.c_str());
-                isFinished = true;
+    //             EUPH_LOG(info, "youtube", "Got url: %s", line.c_str());
+    //             // get substring after ""url": ""
+    //             auto url = line.substr(line.find("\"url\": \"") + 8);
+    //             url = url.substr(0, url.find("\""));
+    //             EUPH_LOG(info, "youtube", "Got url: %s", url.c_str());
+    //             isFinished = true;
 
-                return url;
-            }
+    //             return url;
+    //         }
 
-            if (line.find("\"itag\": 140") != std::string::npos) {
-                gotItag = true;
-                BELL_LOG(info, "youtube", "Got itag: 140");
-            }
-        }
-    }
+    //         if (line.find("\"itag\": 140") != std::string::npos) {
+    //             gotItag = true;
+    //             BELL_LOG(info, "youtube", "Got itag: 140");
+    //         }
+    //     }
+    // }
 
     return "";
 }
