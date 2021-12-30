@@ -108,11 +108,11 @@ void app_main(void) {
     ESP_ERROR_CHECK(ret);
 
     esp_wifi_set_ps(WIFI_PS_NONE);
-    init_spiffs();
 
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
+    init_spiffs();
 
     auto taskHandle = xTaskCreatePinnedToCore(&euphoniumTask, "euphonium", 1024 * 6,
-                                              NULL, 5, NULL, 0);
+                                              NULL, 5, NULL, 1);
 }

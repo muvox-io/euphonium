@@ -108,11 +108,10 @@ class EuphoniumLogger : public bell::AbstractLogger {
     }
 
     void handleLog(std::stringstream &log) {
-        auto logStr = log.str();
         if (logCache.size() > 100) {
             logCache.pop_front();
         }
-        logCache.push_back(logStr);
+        logCache.push_back(log.str());
         if (logReceived != nullptr) {
             //logReceived(logStr);
         }
