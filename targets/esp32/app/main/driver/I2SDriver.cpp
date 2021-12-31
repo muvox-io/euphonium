@@ -25,7 +25,7 @@ void i2sInstall(int channelFormatInt, int commFormat, int sampleRate, bool autoC
     i2s_config_t i2s_config = {
 
         .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX), // Only TX
-        .sample_rate = sampleRate,
+        .sample_rate = (uint32_t) sampleRate,
         .bits_per_sample = (i2s_bits_per_sample_t)16,
         .channel_format = channelFormat, // 2-channels
         .communication_format = (i2s_comm_format_t)commFormat,
