@@ -85,7 +85,7 @@ void BluetoothPlugin::runTask() {
 }
 
 void BluetoothPlugin::startAudioThread() {
-    //startTask();
+    startTask();
 }
 
 void BluetoothPlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader) {
