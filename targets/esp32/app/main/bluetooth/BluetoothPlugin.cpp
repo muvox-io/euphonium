@@ -71,7 +71,7 @@ static bool bt_sink_cmd_handler(bt_sink_cmd_t cmd, va_list args) {
     return true;
 }
 
-BluetoothPlugin::BluetoothPlugin() : bell::Task("bt_euph", 4 * 1024, 0, 0) {
+BluetoothPlugin::BluetoothPlugin() : bell::Task("bt_euph", 4 * 1024, 0, 0, false) {
     name = "bluetooth";
     // bt_sink_init(bt_sink_cmd_handler, sink_data_handler);
 }
