@@ -32,7 +32,7 @@ http.handle('POST', '/set_ota', def (request)
     }
     print(body['url'])
     print(body['sha256'])
-    conf_persist('ota', json.dump(body))
+    conf_persist('ota.config.json', json.dump(body))
 
     http.sendJSON(result, request['connection'], 200)
     sleep_ms(500)
