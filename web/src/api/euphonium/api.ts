@@ -53,7 +53,7 @@ const getPluginConfiguration = async (
 
 const getDACPresets = async (): Promise<DACPreset[]> => {
   return await fetch(
-    `https://gist.githubusercontent.com/feelfreelinux/e9b0866342350536fb46f9155ff6ec19/raw/dacs.json`
+    `https://raw.githubusercontent.com/HeikoGr/euphonium/master/dacs.json`
   ).then((e) => e.json());
 };
 
