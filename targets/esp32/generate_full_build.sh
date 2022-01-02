@@ -1,6 +1,7 @@
 #!/bin/bash
 sh build_recovery.sh
 cp -r ../../euphonium/scripts/. app/spiffs/
+cp -r ../../web/dist/. app/spiffs/
 cd app/spiffs
 tar -cvf scripts.tar *
 cd ../../
