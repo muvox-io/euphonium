@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -e
 cd ../../../web
+npm install
 npm run build
 rm -rf ../targets/esp32/app/spiffs
 mkdir ../targets/esp32/app/spiffs

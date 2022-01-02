@@ -6,6 +6,9 @@ NC='\033[0m' # No Color
 echo -e "${YELLOW}### building recovery.bin ${NC}"
 sh build_recovery.sh
 
+echo -e "${YELLOW}### (re)build web assets ${NC}"
+sh rebuild_web.sh
+
 echo -e "${YELLOW}### copy scripts to storage ${NC}"
 cp -r ../../euphonium/scripts/. app/spiffs/
 
