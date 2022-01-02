@@ -1,28 +1,28 @@
 #!/bin/bash
 
-RED='\033[0;31m'
+YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo -e "${RED}### building recovery.bin ${NC}"
+echo -e "${YELLOW}### building recovery.bin ${NC}"
 sh build_recovery.sh
 
-echo -e "${RED}### copy scripts to storage ${NC}"
+echo -e "${YELLOW}### copy scripts to storage ${NC}"
 cp -r ../../euphonium/scripts/. app/spiffs/
 
-echo -e "${RED}### building the app ${NC}"
+echo -e "${YELLOW}### building the app ${NC}"
 sh build_app.sh
 
-echo -e "${RED}### make scripts.tar file ${NC}"
+echo -e "${YELLOW}### make scripts.tar file ${NC}"
 cd app/spiffs
 tar -cvf scripts.tar *
 cd ../../
 cp app/spiffs/scripts.tar scripts.tar
 
-echo -e "${RED}### building release file ${NC}"
+echo -e "${YELLOW}### building release file ${NC}"
 tar -czvf euphonium-$EUPH_VER.tar.gz build/*.bin build/partition_table/partition-table.bin build/bootloader/bootloader.bin 
 #flash_all.sh
 
-echo -e "${RED}### building OTA file ${NC}"
+echo -e "${YELLOW}### building OTA file ${NC}"
 cp build/euphonium-esp32.bin ota.bin
 sha256sum ota.bin | cut -d " " -f 1 > ota_checksum.txt
 sha256sum scripts.tar | cut -d " " -f 1 > scripts_checksum.txt
