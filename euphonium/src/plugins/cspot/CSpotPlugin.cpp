@@ -130,13 +130,13 @@ void CSpotPlugin::mapConfig() {
         std::any_cast<std::string>(config["audioBitrate"]);
     switch (std::stoi(bitrateString)) {
     case 160:
-        configMan->format = AudioFormat::OGG_VORBIS_160;
+        configMan->format = AudioFormat_OGG_VORBIS_160;
         break;
     case 96:
-        configMan->format = AudioFormat::OGG_VORBIS_96;
+        configMan->format = AudioFormat_OGG_VORBIS_96;
         break;
     default:
-        configMan->format = AudioFormat::OGG_VORBIS_320;
+        configMan->format = AudioFormat_OGG_VORBIS_320;
         break;
     }
 }

@@ -8,8 +8,8 @@ set(CSPOT_EXTERNAL_BELL "bell"
         CACHE INTERNAL ""
 )
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cspot/cspot ${CMAKE_CURRENT_BINARY_DIR}/cspot)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/bell ${CMAKE_CURRENT_BINARY_DIR}/bell)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cspot/cspot ${CMAKE_CURRENT_BINARY_DIR}/cspot)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../berry ${CMAKE_CURRENT_BINARY_DIR}/berry)
 
 file(GLOB SOURCES "src/*.cpp" "src/*.c" "src/plugins/webradio/*.cpp" "src/plugins/cspot/*.cpp" "src/plugins/persistor/*.cpp" "src/plugins/youtube/*.cpp"  "src/plugins/http/*.cpp")
