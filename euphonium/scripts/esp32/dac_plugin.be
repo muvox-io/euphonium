@@ -39,7 +39,7 @@ class DACPlugin : Plugin
             'dac': {
                 'tooltip': 'Select driver',
                 'type': 'stringList',
-                'listValues': ["I2S", "AC101", "TAS5711"],
+                'listValues': ["I2S", "AC101", "ES8388", "TAS5711"],
                 'defaultValue': "I2S"
             },
             'mclk': {
@@ -68,7 +68,7 @@ class DACPlugin : Plugin
                 'defaultValue': "0"
             },
             'sda': {
-                'tooltip': 'I2S - SDA',
+                'tooltip': 'I2C - SDA',
                 'type': 'number',
                 'defaultValue': "0"
             },
