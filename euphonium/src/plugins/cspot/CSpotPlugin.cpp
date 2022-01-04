@@ -109,6 +109,7 @@ void CSpotPlugin::runTask() {
                 bool isPaused = std::get<bool>(event.data);
                 auto event = std::make_unique<PauseChangedEvent>(isPaused);
                 this->luaEventBus->postEvent(std::move(event));
+                this->audioBuffer->clearBuffer();
                 break;
             }
             default:
