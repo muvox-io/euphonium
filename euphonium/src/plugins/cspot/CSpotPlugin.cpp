@@ -9,7 +9,7 @@ std::shared_ptr<ConfigJSON> configMan;
 
 CSpotPlugin::CSpotPlugin() : bell::Task("cspot", 4 * 1024, 0, 1) {
     auto file = std::make_shared<CliFile>();
-    configMan = std::make_shared<ConfigJSON>("test.json", file);
+    configMan = std::make_shared<ConfigJSON>("", file);
     name = "cspot";
 }
 
@@ -39,10 +39,8 @@ void CSpotPlugin::setVolumeRemote(int volume) {
 }
 
 void CSpotPlugin::configurationUpdated() {
-    std::cout << "CSpotPlugin::configurationUpdated()" << std::endl;
     mapConfig();
     shutdown();
-    // startAudioThread();
 }
 
 void CSpotPlugin::shutdown() {
@@ -56,6 +54,7 @@ void CSpotPlugin::shutdown() {
     mercuryManager.reset();
     BELL_SLEEP_MS(50);
     status = ModuleStatus::SHUTDOWN;
+    audioBuffer->unlockAccess();
 }
 
 void CSpotPlugin::runTask() {
@@ -69,10 +68,9 @@ void CSpotPlugin::runTask() {
     this->isRunning = true;
 
     EUPH_LOG(info, "cspot", "Starting CSpot");
-    this->audioBuffer->shutdownExcept(name);                
-
-    auto event = std::make_unique<AudioTakeoverEvent>(name);
-    this->luaEventBus->postEvent(std::move(event));
+    this->audioBuffer->shutdownExcept(name);
+    this->audioBuffer->lockAccess();
+    this->audioBuffer->configureOutput(AudioOutput::SampleFormat::INT16, 44100);
 
     auto session = std::make_unique<Session>();
     session->connectWithRandomAp();
@@ -90,9 +88,12 @@ void CSpotPlugin::runTask() {
                                                          this->luaEventBus);
         spircController = std::make_shared<SpircController>(
             mercuryManager, authBlob->username, audioSink);
+
+        // Add event handler
         spircController->setEventHandler([this](CSpotEvent &event) {
             switch (event.eventType) {
             case CSpotEventType::TRACK_INFO: {
+                // Handle track info
                 TrackInfo track = std::get<TrackInfo>(event.data);
                 auto sourceName = std::string("cspot");
                 auto event = std::make_unique<SongChangedEvent>(
@@ -100,9 +101,11 @@ void CSpotPlugin::runTask() {
                     track.imageUrl);
                 EUPH_LOG(info, "cspot", "Song name changed");
                 this->luaEventBus->postEvent(std::move(event));
+                this->audioBuffer->clearBuffer();
                 break;
             }
             case CSpotEventType::PLAY_PAUSE: {
+                // Handle stop pause
                 bool isPaused = std::get<bool>(event.data);
                 auto event = std::make_unique<PauseChangedEvent>(isPaused);
                 this->luaEventBus->postEvent(std::move(event));

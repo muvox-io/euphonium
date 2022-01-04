@@ -70,6 +70,27 @@ class AudioTakeoverEvent : public Event {
     }
 };
 
+class PlaybackError : public Event {
+  private:
+    std::string errorMessage;
+    std::string source;
+
+  public:
+    PlaybackError(const std::string& source, const std::string& errorMessage) {
+        this->source = source;
+        this->errorMessage = errorMessage;
+        this->subType = "playbackError";
+        this->eventType = EventType::LUA_MAIN_EVENT;
+    };
+
+    berry::map toBerry() {
+        berry::map result;
+        result["source"] = this->source;
+        result["errorMessage"] = this->errorMessage;
+        return result;
+    }
+};
+
 class VolumeChangedEvent : public Event {
   private:
     int volume;

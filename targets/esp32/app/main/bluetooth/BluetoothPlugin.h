@@ -21,6 +21,7 @@ extern "C" {
 class BluetoothPlugin : public bell::Task, public Module
 {
 
+
 public:
     BluetoothPlugin();
     void loadScript(std::shared_ptr<ScriptLoader> scriptLoader);

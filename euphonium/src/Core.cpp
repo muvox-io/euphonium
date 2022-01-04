@@ -11,13 +11,19 @@ Core::Core() : bell::Task("Core", 4 * 1024, 1, 0) {
     audioBuffer = std::make_shared<MainAudioBuffer>();
     luaEventBus = std::make_shared<EventBus>();
     mainPersistor = std::make_shared<ConfigPersistor>();
-
     mainAudioBuffer = audioBuffer;
     mainEventBus = luaEventBus;
+
     audioProcessor = std::make_shared<AudioProcessors>();
+
+    // Add preincluded audio processors
     audioProcessor->addProcessor(std::make_unique<SoftwareVolumeProcessor>());
     audioProcessor->addProcessor(std::make_unique<EqualizerProcessor>());
+
+    // include berry
     berry = std::make_shared<berry::VmState>();
+
+    // Import necessary berry modules
     berry->execute_string("import json");
     berry->execute_string("import global");
 
@@ -32,6 +38,12 @@ Core::Core() : bell::Task("Core", 4 * 1024, 1, 0) {
     requiredModules = {std::make_shared<HTTPModule>(), mainPersistor};
 
     audioBuffer->shutdownListener = [this](std::string exceptPlugin) {
+        EUPH_LOG(info, "core", "Shutting down except %s", exceptPlugin.c_str());
+
+        // Notify scripting part about audio source change
+        auto event = std::make_unique<AudioTakeoverEvent>(exceptPlugin);
+        this->luaEventBus->postEvent(std::move(event));
+
         for (auto &plugin : registeredPlugins) {
             if (plugin->name != exceptPlugin &&
                 plugin->status == ModuleStatus::RUNNING) {
@@ -85,6 +97,7 @@ void Core::handleScriptingThread() {
 }
 
 void Core::selectAudioOutput(std::shared_ptr<AudioOutput> output) {
+    mainAudioBuffer->audioOutput = output;
     currentOutput = output;
     this->outputConnected = true;
 }

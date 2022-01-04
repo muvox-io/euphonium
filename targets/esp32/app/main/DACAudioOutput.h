@@ -28,6 +28,7 @@ public:
     void feedPCMFrames(uint8_t* data, size_t nBytes);
     void setupBindings(std::shared_ptr<berry::VmState>);
     void setReadable(bool);
+    void configureOutput(SampleFormat format, int sampleRate);
 };
 
 #endif

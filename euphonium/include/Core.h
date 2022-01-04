@@ -25,9 +25,6 @@
 #define PCMBUF_SIZE (1024*4)
 
 extern std::shared_ptr<MainAudioBuffer> mainAudioBuffer;
-extern std::shared_ptr<EventBus> mainEventBus;
-
-#define EUPH_PRIO_DEFAULT 5
 
 class Core: public bell::Task, public EventSubscriber {
 private:
@@ -44,8 +41,6 @@ public:
 
     void selectAudioOutput(std::shared_ptr<AudioOutput> output);
     void loadPlugins(std::shared_ptr<ScriptLoader> loader);
-    void handleLuaThread();
-    void handleServerThread();
     void handleScriptingThread();
     void runTask();
     void emptyBuffers();

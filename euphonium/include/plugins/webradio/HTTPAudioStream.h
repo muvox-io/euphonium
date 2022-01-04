@@ -26,7 +26,6 @@ class HTTPAudioStream {
     std::shared_ptr<bell::HTTPStream> httpStream;
     std::vector<uint8_t> inputBuffer;
     std::vector<short> outputBuffer;
-    int mutedSamples = 0;
     AudioCodec codec = AudioCodec::AAC;
     int bytesLeft = 0;
     int offset = 0;
@@ -36,6 +35,8 @@ class HTTPAudioStream {
     public:
     HTTPAudioStream();
     ~HTTPAudioStream();
+    uint32_t currentSampleRate = 0;
+
     void querySongFromUrl(std::string url, AudioCodec audioCodec);
     void decodeFrame(std::shared_ptr<MainAudioBuffer> circularBuffer);
 };

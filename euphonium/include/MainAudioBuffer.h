@@ -1,39 +1,81 @@
 #ifndef EUPHONIUM_MAUDIOBUFFER_H
 #define EUPHONIUM_MAUDIOBUFFER_H
 
+// Definition of internal audio buffer size.
 #define AUDIO_BUFFER_SIZE 4096 * 64
 
-
-#include <memory>
 #include "CircularBuffer.h"
-#include <cmath>
 #include "EuphoniumLog.h"
 #include "platform/WrappedSemaphore.h"
+#include <cmath>
+#include <memory>
+#include <AudioOutput.h>
 
 typedef std::function<void(std::string)> shutdownEventHandler;
 
-class MainAudioBuffer
-{
-public:
+/**
+ * MainAudioBuffer is a wrapper exposed to plugins which handles audio transport.
+ * Lacks logic, only passes the calls further down
+ */
+class MainAudioBuffer {
+  private:
+  public:
+
+    std::shared_ptr<AudioOutput> audioOutput;
     std::shared_ptr<CircularBuffer> audioBuffer;
-    std::unique_ptr<WrappedSemaphore> audioBufferSemaphore;
+    std::mutex accessMutex;
     shutdownEventHandler shutdownListener;
+    uint32_t sampleRate = 0;
 
-    int sampleRate = 44100;
-    uint32_t logVolume = 1;
-
-    MainAudioBuffer()
-    {
+    MainAudioBuffer() {
         audioBuffer = std::make_shared<CircularBuffer>(AUDIO_BUFFER_SIZE);
-        audioBufferSemaphore = std::make_unique<WrappedSemaphore>(200);
     }
 
+    /**
+     * Sends an event which reconfigures current audio output
+     * @param format incoming sample format
+     * @param sampleRate data's sample rate
+     */
+    void configureOutput(AudioOutput::SampleFormat format, uint32_t sampleRate) {
+        this->sampleRate = sampleRate;
+        audioOutput->configureOutput(format, sampleRate);
+    }
+
+    /**
+     * Clears input buffer, to be called for track change and such
+     */
+    void clearBuffer() { audioBuffer->emptyBuffer(); }
+
+    /**
+     * Locks access to audio buffer. Call after starting playback
+     */
+    void lockAccess() {
+        this->accessMutex.lock();
+    }
+
+    /**
+     * Frees access to the audio buffer. Call during shutdown
+     */
+     void unlockAccess() {
+         this->accessMutex.unlock();
+     }
+
+    /**
+     * Prompts every plugin except for one provided to shut down and release mutex
+     * @param other name of plugin calling the function
+     */
     void shutdownExcept(std::string other) {
+        clearBuffer();
         this->shutdownListener(other);
     }
 
-    size_t write(const uint8_t *data, size_t bytes)
-    {
+    /**
+     * Write audio data to the main buffer
+     * @param data pointer to raw PCM data
+     * @param bytes number of bytes to be read from provided pointer
+     * @return number of bytes read
+     */
+    size_t write(const uint8_t *data, size_t bytes) {
         return audioBuffer->write(data, bytes);
     }
 };

@@ -17,7 +17,7 @@ void HTTPAudioStream::querySongFromUrl(std::string url, AudioCodec audioCodec)
 {
     codec = audioCodec;
     httpStream = std::make_shared<bell::HTTPStream>();
-    httpStream->connectToUrl(url, true);
+    httpStream->connectToUrl(url);
     decodePtr = inputBuffer.data();
     bytesLeft = 0;
     offset = 0;
@@ -44,6 +44,7 @@ void HTTPAudioStream::decodeFrameMP3(std::shared_ptr<MainAudioBuffer> audioBuffe
             if (decodeStatus == ERR_MP3_NONE)
             {
                 const uint8_t *audioData = reinterpret_cast<const uint8_t *>(outputBuffer.data());
+                currentSampleRate = mp3FrameInfo.samprate;
                 auto sizeData = (mp3FrameInfo.bitsPerSample / 8) * mp3FrameInfo.outputSamps;
 
                 size_t bytesWritten = 0;
@@ -91,6 +92,7 @@ void HTTPAudioStream::decodeFrameAAC(std::shared_ptr<MainAudioBuffer> audioBuffe
             if (decodeStatus == ERR_AAC_NONE)
             {
                 const uint8_t *audioData = reinterpret_cast<const uint8_t *>(outputBuffer.data());
+                currentSampleRate = aacFrameInfo.sampRateOut;
                 auto sizeData = (aacFrameInfo.bitsPerSample / 8) * aacFrameInfo.outputSamps;
 
                 size_t bytesWritten = 0;

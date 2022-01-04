@@ -84,6 +84,10 @@ class App
                 self.currentPlayer = req['source']
                 self.sendNotification("success", self.currentPlayer, "Took over playback")
             end,
+            'playbackError': def (req)
+                self.currentPlayer = req['source']
+                self.sendNotification("error", self.currentPlayer, req["errorMessage"])
+            end,
             'statusChangedEvent': def (req)
                 if req['isPaused']
                     self.playbackState['status'] = 'paused'

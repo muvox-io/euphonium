@@ -12,9 +12,10 @@ public:
     ~PortAudioAudioOutput();
     void setupBindings(std::shared_ptr<berry::VmState>) {};
     void feedPCMFrames(uint8_t* data, size_t nBytes);
+    void configureOutput(SampleFormat format, int sampleRate);
 
 private:
-    PaStream *stream;
+    PaStream *stream = NULL;
 };
 
 #endif
