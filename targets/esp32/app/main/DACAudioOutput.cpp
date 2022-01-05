@@ -33,6 +33,6 @@ void DACAudioOutput::feedPCMFrames(uint8_t* data, size_t nBytes) {
 
 void DACAudioOutput::configureOutput(SampleFormat format, int sampleRate) {
     setReadable(false);
-    i2s_set_sample_rates(sampleRate);
+    i2s_set_sample_rates((i2s_port_t) 0, sampleRate);
     setReadable(true);
 }

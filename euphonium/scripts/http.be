@@ -31,6 +31,14 @@ class HTTP
             jsonBody, 
             "application/json")
     end
+
+    def sendText(body, conn, status)
+        httpRespond(
+                conn,
+                status ? status : 200,
+                body,
+                "text/plain")
+    end
 end
 
 http = HTTP()

@@ -12,7 +12,7 @@ static bool bt_sink_cmd_handler(bt_sink_cmd_t cmd, va_list args) {
     switch (cmd) {
     case BT_SINK_AUDIO_STARTED: {
         mainAudioBuffer->shutdownExcept("bluetooth");
-        mainAudioBuffer->lockAccess();
+        //mainAudioBuffer->lockAccess();
         BELL_LOG(info, "bluetooth", "Audio sink started");
         break;
     }
@@ -77,7 +77,7 @@ BluetoothPlugin::BluetoothPlugin() : bell::Task("bt_euph", 4 * 1024, 0, 0, false
 
 void BluetoothPlugin::shutdown() {
     EUPH_LOG(info, "bluetooth", "Shutting down...");
-    mainAudioBuffer->unlockAccess();
+    //mainAudioBuffer->unlockAccess();
     status = ModuleStatus::SHUTDOWN;
     bt_disconnect();
 }

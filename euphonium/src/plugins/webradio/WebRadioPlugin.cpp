@@ -2,7 +2,7 @@
 #include <HTTPStream.h>
 #include <thread>
 
-WebRadioPlugin::WebRadioPlugin() : bell::Task("radio", 6 * 1024, 0, 1) {
+WebRadioPlugin::WebRadioPlugin() : bell::Task("radio", 6 * 1024, 1, 1) {
     name = "webradio";
     audioStream = std::make_shared<HTTPAudioStream>();
 }
@@ -35,7 +35,6 @@ void WebRadioPlugin::shutdown() {
     isRunning = false;
     std::lock_guard lock(runningMutex);
     status = ModuleStatus::SHUTDOWN;
-    mainAudioBuffer->unlockAccess();
 }
 
 void WebRadioPlugin::runTask() {
@@ -74,6 +73,8 @@ void WebRadioPlugin::runTask() {
                                 AudioOutput::SampleFormat::INT16,
                                 audioStream->currentSampleRate);
                         }
+
+                        BELL_YIELD();
                     } else {
                         BELL_SLEEP_MS(100);
                     }

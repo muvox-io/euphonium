@@ -5,6 +5,7 @@ ESP32PlatformPlugin::ESP32PlatformPlugin() : bell::Task("platform", 512, 0, 0)
 }
 
 void ESP32PlatformPlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader) {
+    scriptLoader->loadScript("esp32/platform", berry);
     scriptLoader->loadScript("esp32/wifi", berry);
     scriptLoader->loadScript("esp32/dac_plugin", berry);
     scriptLoader->loadScript("esp32/dacs/i2s_driver", berry);
@@ -22,7 +23,7 @@ void ESP32PlatformPlugin::reportRAM(std::string from) {
 
 void ESP32PlatformPlugin::setupBindings() {
     // Export necessary drivers to berry
-    berry->export_this("report_ram", this, &ESP32PlatformPlugin::reportRAM);
+    berry->export_this("esp32_report_ram", this, &ESP32PlatformPlugin::reportRAM);
     exportWiFiDriver(berry);
     exportI2CDriver(berry);
     exportI2SDriver(berry);

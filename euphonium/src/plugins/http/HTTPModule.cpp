@@ -19,7 +19,7 @@ void listFiles(const std::string &path,
     }
 }
 
-HTTPModule::HTTPModule() : bell::Task("http", 1024 * 6, 1, 1, false) {
+HTTPModule::HTTPModule() : bell::Task("http", 1024 * 6, 1, 0, false) {
     name = "http";
     mainServer = std::make_shared<bell::HTTPServer>(80);
 }
@@ -137,20 +137,6 @@ void HTTPModule::runTask() {
         mainServer->respond(response);
     };
 
-    auto rebootHandler = [&logger](bell::HTTPRequest &request) {
-        bell::HTTPResponse response = {
-            .connectionFd = request.connection,
-            .status = 200,
-            .body = "{\"status\": \"ok\"}",
-            .contentType = "application/json",
-        };
-        mainServer->respond(response);
-
-#ifdef ESP_PLATFORM
-        esp_restart();
-#endif
-    };
-
     auto indexHandler = [this](bell::HTTPRequest &request) {
         std::string fileName = "index.html";
         if (request.url.find("/file/") != std::string::npos) {
@@ -176,8 +162,6 @@ void HTTPModule::runTask() {
                                 directoriesHandler);
     mainServer->registerHandler(bell::RequestType::GET, "/request_logs",
                                 requestLogsHandler);
-    mainServer->registerHandler(bell::RequestType::GET, "/reboot",
-                                rebootHandler);
     mainServer->registerHandler(bell::RequestType::GET, "/", rootHandler);
     mainServer->registerHandler(bell::RequestType::POST, "/file/*)",
                                 uploadFileHandler);

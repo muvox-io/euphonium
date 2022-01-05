@@ -25,6 +25,7 @@
 #define PCMBUF_SIZE (1024*4)
 
 extern std::shared_ptr<MainAudioBuffer> mainAudioBuffer;
+extern std::shared_ptr<EventBus> mainEventBus;
 
 class Core: public bell::Task, public EventSubscriber {
 private:

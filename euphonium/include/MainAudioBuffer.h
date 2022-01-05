@@ -37,8 +37,10 @@ class MainAudioBuffer {
      * @param sampleRate data's sample rate
      */
     void configureOutput(AudioOutput::SampleFormat format, uint32_t sampleRate) {
-        this->sampleRate = sampleRate;
-        audioOutput->configureOutput(format, sampleRate);
+        if (this->sampleRate != sampleRate) {
+            this->sampleRate = sampleRate;
+            audioOutput->configureOutput(format, sampleRate);
+        }
     }
 
     /**

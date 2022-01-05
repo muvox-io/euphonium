@@ -49,12 +49,11 @@ void CSpotPlugin::shutdown() {
     spircController->stopPlayer();
 
     mercuryManager->stop();
-    BELL_SLEEP_MS(50);
+    BELL_SLEEP_MS(100);
     spircController.reset();
     mercuryManager.reset();
-    BELL_SLEEP_MS(50);
+    BELL_SLEEP_MS(100);
     status = ModuleStatus::SHUTDOWN;
-    audioBuffer->unlockAccess();
 }
 
 void CSpotPlugin::runTask() {
@@ -69,7 +68,7 @@ void CSpotPlugin::runTask() {
 
     EUPH_LOG(info, "cspot", "Starting CSpot");
     this->audioBuffer->shutdownExcept(name);
-    this->audioBuffer->lockAccess();
+    //this->audioBuffer->lockAccess();
     this->audioBuffer->configureOutput(AudioOutput::SampleFormat::INT16, 44100);
 
     auto session = std::make_unique<Session>();
@@ -124,6 +123,8 @@ void CSpotPlugin::runTask() {
         while (this->isRunning) {
             mercuryManager->updateQueue();
         }
+        BELL_LOG(info, "cspot", "Unlocking audio mutex");
+        //audioBuffer->unlockAccess();
     }
 }
 

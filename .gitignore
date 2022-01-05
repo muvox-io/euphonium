@@ -1,6 +1,8 @@
 .DS_Store
 euphonium/protos
 targets/cli/build
+.idea
+cmake-build-debug
 build/
 scripts-version
 wifi.config.json

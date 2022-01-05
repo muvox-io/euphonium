@@ -25,7 +25,7 @@ void i2sInstall(int channelFormatInt, int commFormat, int sampleRate, bool autoC
     i2s_config_t i2s_config = {
 
         .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX), // Only TX
-        .sample_rate = (int) sampleRate,
+        .sample_rate = (uint32_t) sampleRate,
         .bits_per_sample = (i2s_bits_per_sample_t)16,
         .channel_format = channelFormat, // 2-channels
         .communication_format = (i2s_comm_format_t)commFormat,
@@ -51,8 +51,8 @@ void i2sInstall(int channelFormatInt, int commFormat, int sampleRate, bool autoC
 }
 
 void i2sEnableMCLK() {
-            PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
-            WRITE_PERI_REG(PIN_CTRL, 0xFFF0);
+    PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
+    WRITE_PERI_REG(PIN_CTRL, 0xFFF0);
 }
 
 void i2sDelete() {

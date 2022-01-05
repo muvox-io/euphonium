@@ -12,6 +12,9 @@
 #include "plugins/persistor/ConfigPersistor.h"
 #include "HTTPServer.h"
 #include "HTTPInstance.h"
+#ifdef ESP_PLATFORM
+#include "freertos/task.h"
+#endif
 
 class HTTPModule : public bell::Task, public Module
 {
@@ -27,7 +30,6 @@ public:
     void runTask();
     void publishEvent(std::string eventName, std::string eventData);
     void startAudioThread();
-    void listen();
     void shutdown(){};
 };
 
