@@ -291,6 +291,8 @@ template <> int VmState::ret<std::string>(const std::string r);
 
 template <> std::string VmState::arg<std::string>(const int i);
 
+template <> const std::string& VmState::arg<const std::string&>(const int i);
+
 template <> bint VmState::arg<bint>(const int i);
 
 template <> float VmState::arg<float>(const int i);

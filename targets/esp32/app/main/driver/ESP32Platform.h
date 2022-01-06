@@ -22,7 +22,7 @@ public:
     void setupBindings();
     void shutdown() {};
     std::string dumpTaskInfo();
-    void reportRAM(std::string);
+    void reportRAM();
     void configurationUpdated() {};
     void startAudioThread() {};
     void runTask() {};

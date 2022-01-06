@@ -7,7 +7,7 @@
 std::shared_ptr<MainAudioBuffer> mainAudioBuffer;
 std::shared_ptr<EventBus> mainEventBus;
 
-Core::Core() : bell::Task("Core", 4 * 1024, 2, 0) {
+Core::Core() : bell::Task("Core", 4 * 1024, 10, 0) {
     audioBuffer = std::make_shared<MainAudioBuffer>();
     luaEventBus = std::make_shared<EventBus>();
     mainPersistor = std::make_shared<ConfigPersistor>();
@@ -124,7 +124,7 @@ void Core::handleEvent(std::unique_ptr<Event> event) {
     }
 }
 
-void Core::startAudioThreadForPlugin(std::string pluginName,
+void Core::startAudioThreadForPlugin(const std::string& pluginName,
                                      berry::map config) {
     for (auto const &plugin : this->registeredPlugins) {
         if (plugin->name == pluginName) {
