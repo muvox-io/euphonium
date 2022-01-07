@@ -114,5 +114,5 @@ void app_main(void) {
     init_spiffs();
 
     auto taskHandle = xTaskCreatePinnedToCore(&euphoniumTask, "euphonium", 1024 * 8,
-                                              NULL, 7, NULL, 0);
+                                              NULL, 8, NULL, 0);
 }

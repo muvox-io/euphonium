@@ -299,6 +299,10 @@ template <> std::string VmState::arg<std::string>(const int i) {
     return string(i);
 }
 
+template <> const std::string& VmState::arg<const std::string&>(const int i) {
+    return string(i);
+}
+
 template <> float VmState::arg<float>(const int i) { return toreal(i); }
 
 template <> bool VmState::arg<bool>(const int i) { return boolean(i); }

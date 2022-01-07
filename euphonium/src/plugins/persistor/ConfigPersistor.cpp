@@ -3,7 +3,7 @@
 std::shared_ptr<ConfigPersistor> mainPersistor;
 
 ConfigPersistor::ConfigPersistor()
-    : bell::Task("persistor", 4 * 1024, 0, 1, false) {
+    : bell::Task("persistor", 4 * 1024, 5, 0, false) {
     // mainPersistor = this->shared_from_this();
     name = "persistor";
 }

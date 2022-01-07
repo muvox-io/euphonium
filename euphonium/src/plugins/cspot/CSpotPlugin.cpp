@@ -7,7 +7,7 @@
 
 std::shared_ptr<ConfigJSON> configMan;
 
-CSpotPlugin::CSpotPlugin() : bell::Task("cspot", 4 * 1024, 0, 1) {
+CSpotPlugin::CSpotPlugin() : bell::Task("cspot", 4 * 1024, 1, 0) {
     auto file = std::make_shared<CliFile>();
     configMan = std::make_shared<ConfigJSON>("", file);
     name = "cspot";
@@ -68,7 +68,7 @@ void CSpotPlugin::runTask() {
 
     EUPH_LOG(info, "cspot", "Starting CSpot");
     this->audioBuffer->shutdownExcept(name);
-    //this->audioBuffer->lockAccess();
+    this->audioBuffer->lockAccess();
     this->audioBuffer->configureOutput(AudioOutput::SampleFormat::INT16, 44100);
 
     auto session = std::make_unique<Session>();
@@ -124,12 +124,12 @@ void CSpotPlugin::runTask() {
             mercuryManager->updateQueue();
         }
         BELL_LOG(info, "cspot", "Unlocking audio mutex");
-        //audioBuffer->unlockAccess();
+        audioBuffer->unlockAccess();
     }
 }
 
 void CSpotPlugin::mapConfig() {
-    configMan->volume = 255;
+    configMan->volume = 65536;
     configMan->deviceName = std::any_cast<std::string>(config["receiverName"]);
     std::string bitrateString =
         std::any_cast<std::string>(config["audioBitrate"]);

@@ -29,11 +29,11 @@ void i2sInstall(int channelFormatInt, int commFormat, int sampleRate, bool autoC
         .bits_per_sample = (i2s_bits_per_sample_t)16,
         .channel_format = channelFormat, // 2-channels
         .communication_format = (i2s_comm_format_t)commFormat,
-        .intr_alloc_flags = 0, // Default interrupt priority
-        .dma_buf_count = 12,
+        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, // Default interrupt priority
+        .dma_buf_count = 12 * 2,
         .dma_buf_len = 512,
         .use_apll = true,
-        .tx_desc_auto_clear = autoClear, // Auto clear tx descriptor on underflow
+        .tx_desc_auto_clear = true, // Auto clear tx descriptor on underflow
     };
 
     if (mclk > 0) {
