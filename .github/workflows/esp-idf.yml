@@ -62,7 +62,7 @@ jobs:
           targets/esp32/scripts.tar, 
           targets/esp32/scripts_checksum.txt, 
           targets/esp32/ota.bin
-        allow_failure: false
+        allow_failure: true
         
     - name: File exists
       if: steps.check_files.outputs.files_exists == 'true'
