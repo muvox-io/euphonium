@@ -129,7 +129,7 @@ void CSpotPlugin::runTask() {
 }
 
 void CSpotPlugin::mapConfig() {
-    configMan->volume = 65536;
+    configMan->volume = 65535;
     configMan->deviceName = std::any_cast<std::string>(config["receiverName"]);
     std::string bitrateString =
         std::any_cast<std::string>(config["audioBitrate"]);

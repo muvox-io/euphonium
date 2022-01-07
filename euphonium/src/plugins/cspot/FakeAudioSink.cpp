@@ -16,12 +16,12 @@ void FakeAudioSink::volumeChanged(uint16_t volume)
     this->eventBus->postEvent(std::move(event));
 }
 
-void FakeAudioSink::feedPCMFrames(std::vector<uint8_t> &data)
+void FakeAudioSink::feedPCMFrames(const uint8_t *buf, size_t bytes)
 {
     size_t bytesWritten = 0;
-    while (bytesWritten < data.size())
+    while (bytesWritten < bytes)
     {
-        auto write = buffer->write(data.data() + bytesWritten, data.size() - bytesWritten);
+        auto write = buffer->write(buf + bytesWritten, bytes - bytesWritten);
         bytesWritten += write;
         if (write == 0) {
             BELL_SLEEP_MS(10);

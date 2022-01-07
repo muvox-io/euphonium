@@ -14,7 +14,7 @@ class FakeAudioSink: public AudioSink {
     std::shared_ptr<MainAudioBuffer> buffer;
     std::shared_ptr<EventBus> eventBus;
     FakeAudioSink(std::shared_ptr<MainAudioBuffer> buffer, std::shared_ptr<EventBus> eventBus);
-    void feedPCMFrames(std::vector<uint8_t> &data);
+    void feedPCMFrames(const uint8_t *buffer, size_t bytes);
     void volumeChanged(uint16_t volume);
 };
 
