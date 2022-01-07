@@ -4,4 +4,3 @@
 [submodule "euphonium/bell"]
 	path = euphonium/bell
 	url = https://github.com/heikogr/bell
-	branch = master
