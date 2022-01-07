@@ -55,8 +55,15 @@ jobs:
       id: check_files
       uses: andstor/file-existence-action@v1
       with:
-        files: "build/euphonium-esp32.bin, targets/esp32/euphonium-${{github.ref_name}}.tar.gz, targets/esp32/ota_checksum.txt, targets/esp32/scripts.tar, targets/esp32/scripts_checksum.txt, targets/esp32/ota.bin"
-
+        files: |
+          build/euphonium-esp32.bin,
+          targets/esp32/euphonium-${{github.ref_name}}.tar.gz, 
+          targets/esp32/ota_checksum.txt, 
+          targets/esp32/scripts.tar, 
+          targets/esp32/scripts_checksum.txt, 
+          targets/esp32/ota.bin
+        allow_failure: false
+        
     - name: File exists
       if: steps.check_files.outputs.files_exists == 'true'
       # Only runs if all of the files exists
