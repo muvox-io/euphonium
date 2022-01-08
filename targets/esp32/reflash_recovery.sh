@@ -1,5 +1,5 @@
-
 #!/bin/bash
+set -e
 cd recovery
 idf.py build
 cd ..
