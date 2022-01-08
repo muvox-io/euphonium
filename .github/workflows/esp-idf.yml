@@ -30,14 +30,9 @@ jobs:
         echo ${{github.ref_name}} > targets/esp32/app/spiffs/scripts-version
         echo ${{github.ref_name}} > euphonium/scripts/scripts-version
         docker run --rm -v $PWD:/project --env EUPH_VER=${{github.ref_name}} -w /project espressif/idf:release-v4.4 /bin/bash -c "apt-get update && \
-          wget https://dl.google.com/go/go1.15.2.linux-amd64.tar.gz && tar -xvf go1.15.2.linux-amd64.tar.gz && \
-          mv go /usr/local && \
-          export GOROOT=/usr/local/go && \
-          export PATH=\$PATH:\$GOPATH/bin:\$GOROOT/bin && \
-          export GOPATH=\$HOME && \
-          apt-get install --no-install-recommends --assume-yes protobuf-compiler && \
+          apt-get install --no-install-recommends --assume-yes && \
           python3 -m pip install --upgrade pip setuptools wheel && \
-          pip3 install protobuf grpcio-tools && cd targets/esp32 && sh generate_full_build.sh"
+          pip3 install grpcio-tools && cd targets/esp32 && sh generate_full_build.sh"
         ls -la targets/esp32/build
         cat euphonium/scripts/scripts-version
     - name: Archive production artifacts
@@ -56,7 +51,7 @@ jobs:
       uses: andstor/file-existence-action@v1
       with:
         files: |
-          build/euphonium-esp32.bin,
+          targets/esp32/build/euphonium-esp32.bin,
           targets/esp32/euphonium-${{github.ref_name}}.tar.gz, 
           targets/esp32/ota_checksum.txt, 
           targets/esp32/scripts.tar, 
