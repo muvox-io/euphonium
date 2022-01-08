@@ -132,7 +132,7 @@ static void bt_next(bool pressed) {
 /* disconnection */
 void bt_disconnect(void) {
 	//displayer_control(DISPLAYER_SHUTDOWN);
-	if (s_audio == AUDIO_PLAYING) esp_avrc_ct_send_passthrough_cmd(tl++ & 0x0f, ESP_AVRC_PT_CMD_STOP, ESP_AVRC_PT_CMD_STATE_PRESSED);
+	esp_avrc_ct_send_passthrough_cmd(tl++ & 0x0f, ESP_AVRC_PT_CMD_STOP, ESP_AVRC_PT_CMD_STATE_PRESSED);
 	//actrls_unset();
 	ESP_LOGD(BT_AV_TAG, "forced disconnection %d", s_audio);
 }

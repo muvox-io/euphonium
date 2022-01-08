@@ -2,7 +2,7 @@
 #include <HTTPStream.h>
 #include <thread>
 
-WebRadioPlugin::WebRadioPlugin() : bell::Task("radio", 6 * 1024, 1, 1) {
+WebRadioPlugin::WebRadioPlugin() : bell::Task("radio", 6 * 1024, 3, 1) {
     name = "webradio";
     audioStream = std::make_shared<HTTPAudioStream>();
 }
@@ -45,15 +45,15 @@ void WebRadioPlugin::runTask() {
             std::lock_guard lock(runningMutex);
             isRunning = true;
             isPaused = false;
-            status = ModuleStatus::RUNNING;
 
             EUPH_LOG(info, "webradio", "Starting WebRadio");
             // Shutdown all other modules
             audioBuffer->shutdownExcept(name);
             audioBuffer->lockAccess();
+            EUPH_LOG(info, "webradio", "Got access to audio buffer");
             audioBuffer->configureOutput(AudioOutput::SampleFormat::INT16,
                                          44100);
-
+            status = ModuleStatus::RUNNING;
             try {
                 if (url.first) {
                     audioStream->querySongFromUrl(url.second, AudioCodec::AAC);

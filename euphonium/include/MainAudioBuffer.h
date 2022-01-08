@@ -10,6 +10,7 @@
 #include <cmath>
 #include <memory>
 #include <AudioOutput.h>
+#include <BellUtils.h>
 
 typedef std::function<void(std::string)> shutdownEventHandler;
 
@@ -78,7 +79,15 @@ class MainAudioBuffer {
      * @return number of bytes read
      */
     size_t write(const uint8_t *data, size_t bytes) {
-        return audioBuffer->write(data, bytes);
+        size_t bytesWritten = 0;
+        while (bytesWritten < bytes)
+        {
+            auto write = buffer->write(buf + bytesWritten, bytes - bytesWritten);
+            bytesWritten += write;
+            if (write == 0) {
+                BELL_SLEEP_MS(10);
+            }
+        }
     }
 };
 

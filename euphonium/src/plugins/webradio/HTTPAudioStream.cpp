@@ -26,6 +26,7 @@ void HTTPAudioStream::querySongFromUrl(std::string url, AudioCodec audioCodec)
 void HTTPAudioStream::decodeFrameMP3(std::shared_ptr<MainAudioBuffer> audioBuffer)
 {
     auto bufSize = MP3_READBUF_SIZE;
+    bufSize = bufSize * 2;
 
     int readBytes = httpStream->read(inputBuffer.data() + bytesLeft, bufSize - bytesLeft);
     if (readBytes > 0)

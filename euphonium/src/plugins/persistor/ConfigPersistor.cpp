@@ -3,13 +3,11 @@
 std::shared_ptr<ConfigPersistor> mainPersistor;
 
 ConfigPersistor::ConfigPersistor()
-    : bell::Task("persistor", 4 * 1024, 5, 0, false) {
-    // mainPersistor = this->shared_from_this();
+    : bell::Task("persistor", 4 * 1024, 2, 0, false) {
     name = "persistor";
 }
 
 void ConfigPersistor::loadScript(std::shared_ptr<ScriptLoader> loader) {
-    //    loader->loadScript("http", berry);
     this->scriptLoader = loader;
 }
 
