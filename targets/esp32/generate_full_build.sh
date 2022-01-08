@@ -6,11 +6,11 @@ NC='\033[0m' # No Color
 echo -e "${YELLOW}### building recovery.bin ${NC}"
 sh build_recovery.sh
 
-echo -e "${YELLOW}### building the app + web assets ${NC}"
-sh build_app.sh
-
 echo -e "${YELLOW}### copy scripts to storage ${NC}"
 cp -r ../../euphonium/scripts/. app/spiffs/
+
+echo -e "${YELLOW}### building the app + web assets ${NC}"
+sh build_app.sh
 
 echo -e "${YELLOW}### make scripts.tar file ${NC}"
 cd app/spiffs
@@ -19,7 +19,7 @@ cd ../../
 cp app/spiffs/scripts.tar scripts.tar
 
 echo -e "${YELLOW}### building release file ${NC}"
-tar -czvf euphonium-$EUPH_VER.tar.gz build/*.bin build/partition_table/partition-table.bin build/bootloader/bootloader.bin 
+tar -czvf euphonium-$EUPH_VER.tar.gz build/*.bin build/partition_table/partition-table.bin build/bootloader/bootloader.bin flash_all.sh
 #flash_all.sh
 
 echo -e "${YELLOW}### building OTA file ${NC}"
