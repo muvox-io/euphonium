@@ -82,12 +82,14 @@ class MainAudioBuffer {
         size_t bytesWritten = 0;
         while (bytesWritten < bytes)
         {
-            auto write = buffer->write(buf + bytesWritten, bytes - bytesWritten);
+            auto write = audioBuffer->write(data + bytesWritten, bytes - bytesWritten);
             bytesWritten += write;
             if (write == 0) {
                 BELL_SLEEP_MS(10);
             }
         }
+
+        return bytesWritten;
     }
 };
 

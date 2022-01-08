@@ -7,4 +7,4 @@ execute_process(COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/cmake/build_web.sh" WORKING
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(euphonium-esp32)
 
-spiffs_create_partition_image(storage spiffs FLASH_IN_PROJECT)
+littlefs_create_partition_image(storage spiffs)

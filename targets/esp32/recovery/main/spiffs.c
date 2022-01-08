@@ -7,13 +7,13 @@ const char* WIFI_CONFIG_FILE = "/spiffs/wifi.config.json";
 
 // Initializes VFS
 void spiffs_init() {
-    esp_vfs_spiffs_conf_t conf = {
+    esp_vfs_littlefs_conf_t conf = {
         .base_path = "/spiffs",
-        .partition_label = NULL,
-        .max_files = 15,
-        .format_if_mount_failed = true};
+        .partition_label = "storage",
+        .format_if_mount_failed = true,
+        .dont_mount = false};
 
-    esp_err_t ret = esp_vfs_spiffs_register(&conf);
+    esp_err_t ret = esp_vfs_littlefs_register(&conf);
 
     if (ret != ESP_OK)
     {
@@ -33,7 +33,7 @@ void spiffs_init() {
     }
 
     size_t total = 0, used = 0;
-    ret = esp_spiffs_info(conf.partition_label, &total, &used);
+    ret = esp_littlefs_info(conf.partition_label, &total, &used);
     if (ret != ESP_OK)
     {
         ESP_LOGE(LOG_TAG, "Failed to get SPIFFS partition information (%s)", esp_err_to_name(ret));
