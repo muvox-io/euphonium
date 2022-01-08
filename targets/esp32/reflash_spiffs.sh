@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 sh rebuild_web.sh
 cd app
 idf.py build

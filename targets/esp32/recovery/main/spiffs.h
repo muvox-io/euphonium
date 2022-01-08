@@ -2,7 +2,7 @@
 #define EUPH_RECOVERY_SPIFFS_H
 
 #include "esp_system.h"
-#include "esp_spiffs.h"
+#include "esp_littlefs.h"
 #include "esp_log.h"
 #include "recovery.h"
 #include "cJSON.h"

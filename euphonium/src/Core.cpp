@@ -124,7 +124,7 @@ void Core::handleEvent(std::unique_ptr<Event> event) {
     }
 }
 
-void Core::startAudioThreadForPlugin(const std::string& pluginName,
+void Core::startAudioThreadForPlugin(std::string pluginName,
                                      berry::map config) {
     for (auto const &plugin : this->registeredPlugins) {
         if (plugin->name == pluginName) {

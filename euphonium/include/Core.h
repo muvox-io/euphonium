@@ -49,7 +49,7 @@ public:
     void setupBindings();
     std::string getPlatform();
     std::string getVersion();
-    void startAudioThreadForPlugin(const std::string& pluginName, berry::map config);
+    void startAudioThreadForPlugin(std::string pluginName, berry::map config);
 
     std::shared_ptr<EventBus> luaEventBus;
     std::shared_ptr<MainAudioBuffer> audioBuffer;

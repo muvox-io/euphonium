@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <string>
+#include "esp_littlefs.h"
 
 void *operator new(std::size_t count) {
     return heap_caps_malloc(count, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
@@ -49,10 +50,12 @@ static void euphoniumTask(void *pvParameters) {
 
     if (updater->versionMatches()) {
         auto core = std::make_shared<Core>();
+        auto bluetoothPlugin = std::make_shared<BluetoothPlugin>();
+        mainBluetoothPlugin = bluetoothPlugin;
         core->registeredPlugins.push_back(
             std::make_shared<ESP32PlatformPlugin>());
         core->registeredPlugins.push_back(std::make_shared<OTAPlugin>());
-        core->registeredPlugins.push_back(std::make_shared<BluetoothPlugin>());
+        core->registeredPlugins.push_back(bluetoothPlugin);
         auto loader = std::make_shared<SPIFFSScriptLoader>();
         auto output = std::make_shared<DACAudioOutput>();
         core->selectAudioOutput(output);
@@ -67,13 +70,13 @@ static void euphoniumTask(void *pvParameters) {
     }
 }
 
-void init_spiffs() {
-    esp_vfs_spiffs_conf_t conf = {.base_path = "/spiffs",
-                                  .partition_label = NULL,
-                                  .max_files = 30,
-                                  .format_if_mount_failed = true};
+void init_littlefs() {
+    esp_vfs_littlefs_conf_t conf = {.base_path = "/spiffs",
+                                  .partition_label = "storage",
+                                  .format_if_mount_failed = true,
+                                  .dont_mount = false};
 
-    esp_err_t ret = esp_vfs_spiffs_register(&conf);
+    esp_err_t ret = esp_vfs_littlefs_register(&conf);
     bell::setDefaultLogger();
 
     if (ret != ESP_OK) {
@@ -89,7 +92,7 @@ void init_spiffs() {
     }
 
     size_t total = 0, used = 0;
-    ret = esp_spiffs_info(conf.partition_label, &total, &used);
+    ret = esp_littlefs_info(conf.partition_label, &total, &used);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to get SPIFFS partition information (%s)",
                  esp_err_to_name(ret));
@@ -111,7 +114,7 @@ void app_main(void) {
 
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
-    init_spiffs();
+    init_littlefs();
 
     auto taskHandle = xTaskCreatePinnedToCore(&euphoniumTask, "euphonium", 1024 * 8,
                                               NULL, 8, NULL, 0);
