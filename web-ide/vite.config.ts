@@ -6,6 +6,7 @@ import alias from '@rollup/plugin-alias';
 
 export default defineConfig({
   plugins: [preact()],
+  base: '',
   // build: {
   //   rollupOptions: {
   //     plugins: [
