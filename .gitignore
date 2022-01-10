@@ -1,6 +1,8 @@
 .DS_Store
 euphonium/protos
 targets/cli/build
+targets/esp32/app/dependencies.lock
+web/yarn.lock
 .idea
 cmake-build-debug
 build/

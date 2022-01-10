@@ -21,6 +21,10 @@ class DACDriver
     def setVolume(volume)
     end
 
+    # sets the signedness of the DAC
+    def setSignedness(value)
+    end
+
     def BIN(num)
         var res = 0
         for x : 1..size(num)
@@ -107,6 +111,7 @@ class DACPlugin : Plugin
                 self.selectedDriver = driver
                 self.selectedDriver.currentConfig = self.configSchema
                 self.selectedDriver.initI2S()
+                setSignedness(self.selectedDriver.signedness);
                 dac_set_readable(true)
             end
         end

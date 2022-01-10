@@ -9,12 +9,18 @@ class SoftwareVolumeProcessor : public AudioProcessor
 {
 private:
     uint32_t logVolume;
+    bool signedness;
 
 public:
     SoftwareVolumeProcessor() {
         setVolume(VOL_MAX / 2);
+        setSignedness(false);
     };
     ~SoftwareVolumeProcessor() {};
+
+    void setSignedness(bool value){
+        signedness = value;
+    }
 
     void setVolume(int volume)
     {
@@ -38,11 +44,11 @@ public:
         {
             int32_t temp;
             // Offset data for unsigned sinks
-
-            temp = ((int32_t)psample[i] + 0x8000) * logVolume;
-
-            temp = ((int32_t)psample[i]) * logVolume;
-
+            if(signedness) {
+                temp = ((int32_t)psample[i] + 0x8000) * logVolume;
+            } else {
+                temp = ((int32_t)psample[i]) * logVolume;
+            }
             psample[i] = (temp >> 16) & 0xFFFF;
         }
     }
@@ -50,6 +56,7 @@ public:
     void setBindings(std::shared_ptr<berry::VmState> berry)
     {
         berry->export_this("setVolume", this, &SoftwareVolumeProcessor::setVolume);
+        berry->export_this("setSignedness", this, &SoftwareVolumeProcessor::setSignedness);
     }
 };
 
