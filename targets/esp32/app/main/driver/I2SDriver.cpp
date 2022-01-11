@@ -76,12 +76,13 @@ void InternalDACInstall(int channelFormatInt, int sampleRate)
         .sample_rate = (uint32_t) sampleRate,
         .bits_per_sample = (i2s_bits_per_sample_t)16,
         .channel_format = channelFormat, // 2-channels
-        .communication_format = I2S_COMM_FORMAT_STAND_I2S,,
+        .communication_format = I2S_COMM_FORMAT_STAND_MSB,
         .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, // Default interrupt priority
         .dma_buf_count = 12 * 2,
         .dma_buf_len = 512,
         .use_apll = true,
         .tx_desc_auto_clear = true, // Auto clear tx descriptor on underflow
+        .fixed_mclk=-1
     };
 
     i2s_driver_install((i2s_port_t)0, &i2s_config, 0, NULL);
