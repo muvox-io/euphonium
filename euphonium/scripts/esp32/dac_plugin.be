@@ -4,6 +4,7 @@ class DACDriver
     var hardwareVolumeControl
     var currentConfig
     var name
+    var signedness
 
     def getGPIO(pin)
         return int(self.currentConfig[pin]['value'])
@@ -19,10 +20,6 @@ class DACDriver
 
     # sets the volume of the DAC
     def setVolume(volume)
-    end
-
-    # sets the signedness of the DAC
-    def setSignedness(value)
     end
 
     def BIN(num)
@@ -43,8 +40,8 @@ class DACPlugin : Plugin
             'dac': {
                 'tooltip': 'Select driver',
                 'type': 'stringList',
-                'listValues': ["I2S", "AC101", "ES8388", "TAS5711"],
-                'defaultValue': "I2S"
+                'listValues': ["I2S", "AC101", "ES8388", "TAS5711", "Internal"],
+                'defaultValue': "Internal"
             },
             'mclk': {
                 'tooltip': 'I2S - MCLK',
@@ -111,13 +108,16 @@ class DACPlugin : Plugin
                 self.selectedDriver = driver
                 self.selectedDriver.currentConfig = self.configSchema
                 self.selectedDriver.initI2S()
-                setSignedness(self.selectedDriver.signedness);
                 dac_set_readable(true)
             end
         end
     end
 
     def initAudio()
+    end
+
+    def getSignedness()
+        return self.selectedDriver.signedness
     end
 
     def hasHardwareVolume()

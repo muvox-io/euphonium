@@ -19,6 +19,7 @@ public:
     ~SoftwareVolumeProcessor() {};
 
     void setSignedness(bool value){
+        EUPH_LOG(info, "buf", "Setting signedness %s", value ? "true" : "false");
         signedness = value;
     }
 
