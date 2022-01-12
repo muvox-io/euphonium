@@ -12,6 +12,7 @@ void ESP32PlatformPlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader)
     scriptLoader->loadScript("esp32/dacs/es8388_driver", berry);
     scriptLoader->loadScript("esp32/dacs/ac101_driver", berry);
     scriptLoader->loadScript("esp32/dacs/tas5711_driver", berry);
+    scriptLoader->loadScript("esp32/dacs/internal_driver", berry);
 }
 
 void ESP32PlatformPlugin::reportRAM() {

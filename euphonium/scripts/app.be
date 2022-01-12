@@ -180,6 +180,7 @@ class App
         if (plugin != nil)
             plugin.onEvent(EVENT_CONFIG_UPDATED, {})
             plugin.initAudio()
+            setSignedness(plugin.getSignedness())
         end
 
         start_plugin_thread('cspot', self.getPluginByName('cspot').getBareValues())

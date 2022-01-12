@@ -36,14 +36,8 @@ public:
         psample = (int16_t *)(data);
         for (int32_t i = 0; i < (nBytes / 2); i++)
         {
-            int32_t temp;
-            // Offset data for unsigned sinks
-
-            temp = ((int32_t)psample[i] + 0x8000) * logVolume;
-
-            temp = ((int32_t)psample[i]) * logVolume;
-
-            psample[i] = (temp >> 16) & 0xFFFF;
+            int32_t temp = ((int32_t)psample[i]) * logVolume;
+            psample[i] = ((temp >> 16) & 0xFFFF);
         }
     }
 
