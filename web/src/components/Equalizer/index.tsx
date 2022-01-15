@@ -51,8 +51,6 @@ export default ({ eq }: IEqualizerParams) => {
     updateEq(newSettings);
   };
   return (
-    <div>
-      equalizer
       <div class="flex flex-row mt-2 ml-4">
         <EqBand
           type="bass"
@@ -72,6 +70,5 @@ export default ({ eq }: IEqualizerParams) => {
           onValueChanged={(val) => updateSettings(val, "high")}
         />
       </div>
-    </div>
   );
 };

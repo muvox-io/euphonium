@@ -13,7 +13,7 @@ let apiUrl = "";
 let currentVersion = "";
 
 if (import.meta.env.MODE !== "production") {
-  apiUrl = "http://192.168.1.234";
+  apiUrl = "http://localhost";
 }
 
 let eventsUrl = apiUrl + "/events";

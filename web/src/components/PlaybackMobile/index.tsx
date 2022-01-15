@@ -43,7 +43,6 @@ export default function () {
         </div>
 
               <div class="text-center rounded-xl w-[170px] p-4 z-index-2 bg-app-secondary mb-1">
-        <Equalizer eq={{low: 0, high: 0, mid: 0}}/>
         </div>
       </div>
     </Card>
