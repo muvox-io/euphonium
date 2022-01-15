@@ -36,8 +36,8 @@ class EuphoniumLogger : public bell::AbstractLogger {
         printf(colorReset);
         va_list args;
         va_start(args, format);
-        vprintf(format, args);
         vsprintf(buffer.data(), format, args);
+        printf("%s", buffer.data());
         va_end(args);
         log << std::string(buffer.data());
         log << "\n";
@@ -59,8 +59,8 @@ class EuphoniumLogger : public bell::AbstractLogger {
         printf(colorReset);
         va_list args;
         va_start(args, format);
-        vprintf(format, args);
         vsprintf(buffer.data(), format, args);
+        printf("%s", buffer.data());
         va_end(args);
         log << std::string(buffer.data());
         log << "\n";
@@ -82,8 +82,8 @@ class EuphoniumLogger : public bell::AbstractLogger {
         printf(colorReset);
         va_list args;
         va_start(args, format);
-        vprintf(format, args);
         vsprintf(buffer.data(), format, args);
+        printf("%s", buffer.data());
         va_end(args);
         log << std::string(buffer.data());
         log << "\n";
