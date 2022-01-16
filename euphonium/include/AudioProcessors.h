@@ -15,7 +15,7 @@ public:
 class AudioProcessors {
 private:
     std::vector<std::unique_ptr<AudioProcessor>> processors;
-    bool signedness;
+    bool signedness = false;
 
 public:
     AudioProcessors() {};
