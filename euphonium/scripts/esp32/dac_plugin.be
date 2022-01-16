@@ -116,10 +116,6 @@ class DACPlugin : Plugin
     def initAudio()
     end
 
-    def getSignedness()
-        return self.selectedDriver.signedness
-    end
-
     def hasHardwareVolume()
         return self.selectedDriver.hardwareVolumeControl
     end

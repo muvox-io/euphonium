@@ -2,7 +2,7 @@ class InternalDriver : DACDriver
     def init()
         self.name = "Internal"
         self.hardwareVolumeControl = false
-        self.signedness = true
+        setSignedness(true)
     end
 
     def initI2S()
