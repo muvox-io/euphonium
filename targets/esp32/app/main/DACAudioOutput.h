@@ -22,11 +22,17 @@ class DACAudioOutput : public AudioOutput
 private:
     std::mutex readingMutex;
     std::atomic<bool> isReading;
+    bool doWriteExpand = false;
+    int srcBits = 16;
+    int dstBits = 16;
+
 public:
     DACAudioOutput();
     ~DACAudioOutput();
     void feedPCMFrames(uint8_t* data, size_t nBytes);
     void setupBindings(std::shared_ptr<berry::VmState>);
+    void setWriteExpand(int srcBits, int dstBits);
+    void disableWriteExpand();
     void setReadable(bool);
     void configureOutput(SampleFormat format, int sampleRate);
 };
