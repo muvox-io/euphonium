@@ -1,6 +1,6 @@
 #include "I2SDriver.h"
 
-void i2sInstall(int channelFormatInt, int commFormat, int sampleRate, bool autoClear, int bck, int ws, int dataOut, int mclk)
+void i2sInstall(int channelFormatInt, int commFormat, int bitsPerSample, int sampleRate, bool autoClear, int bck, int ws, int dataOut, int mclk)
 {
     i2s_channel_fmt_t channelFormat;
     switch (channelFormatInt)
@@ -25,7 +25,7 @@ void i2sInstall(int channelFormatInt, int commFormat, int sampleRate, bool autoC
     i2s_config_t i2s_config = {
         .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX), // Only TX
         .sample_rate = (uint32_t) sampleRate,
-        .bits_per_sample = (i2s_bits_per_sample_t)16,
+        .bits_per_sample = (i2s_bits_per_sample_t)bitsPerSample,
         .channel_format = channelFormat, // 2-channels
         .communication_format = (i2s_comm_format_t)commFormat,
         .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, // Default interrupt priority
@@ -36,7 +36,7 @@ void i2sInstall(int channelFormatInt, int commFormat, int sampleRate, bool autoC
     };
 
     if (mclk > 0) {
-        i2s_config.fixed_mclk = mclk * 44100;
+        i2s_config.fixed_mclk = mclk * sampleRate;
     }
 
     i2s_pin_config_t pin_config = {

@@ -46,7 +46,7 @@ class ES8388Driver : DACDriver
         i2c_write8(ADDRESS, 0x02, 0x00)
 
         i2s_enable_mclk()
-        i2s_install(0, 0x01, 44100, true, int(self.getGPIO('bck')), int(self.getGPIO('ws')), int(self.getGPIO('data')), 0)
+        i2s_install(0, 0x01, 16, 44100, true, int(self.getGPIO('bck')), int(self.getGPIO('ws')), int(self.getGPIO('data')), 0)
         
   
 

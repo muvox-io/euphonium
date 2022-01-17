@@ -8,7 +8,7 @@ class AC101Driver : DACDriver
         var ADDRESS = 0x1a
 
         # 0x01: I2S STAND MODE
-        i2s_install(0, 0x01, 44100, true, int(self.getGPIO('bck')), int(self.getGPIO('ws')), int(self.getGPIO('data')), 0)
+        i2s_install(0, 0x01, 16, 44100, true, int(self.getGPIO('bck')), int(self.getGPIO('ws')), int(self.getGPIO('data')), 0)
 
         # setup i2c
         i2c_install(true, int(self.getGPIO('sda')), int(self.getGPIO('scl')), 250000)

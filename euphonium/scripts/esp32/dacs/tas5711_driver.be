@@ -10,7 +10,7 @@ class TAS5711Driver : DACDriver
         self.volumeTable = [255,160,120,100,90,85,80, 75, 70, 65, 61, 57, 53, 50, 47, 44, 41, 38, 35, 32, 29, 26, 23, 20, 17, 14, 12, 10, 8, 6, 4, 2, 0]
 
         # 0x01: I2S STAND MODE
-        i2s_install(0, 0x01, 44100, true, int(self.getGPIO('bck')), int(self.getGPIO('ws')), int(self.getGPIO('data')), 256)
+        i2s_install(0, 0x01, 16, 44100, true, int(self.getGPIO('bck')), int(self.getGPIO('ws')), int(self.getGPIO('data')), 256)
 
         i2c_install(true, int(self.getGPIO('sda')), int(self.getGPIO('scl')), 250000)
         # enable mclk on GPIO 0
