@@ -40,7 +40,7 @@ class DACPlugin : Plugin
             'dac': {
                 'tooltip': 'Select driver',
                 'type': 'stringList',
-                'listValues': ["I2S", "AC101", "ES8388", "TAS5711", "Internal"],
+                'listValues': ["I2S", "AC101", "ES8388", "TAS5711", "MA12070P", "Internal"],
                 'defaultValue': "I2S"
             },
             'mclk': {
