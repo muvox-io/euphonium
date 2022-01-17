@@ -10,3 +10,6 @@ Current state: Feature freeze until end of January.
 
 ### Web IDE
 You can access the web-ide [here](https://feelfreelinux.github.io/euphonium/).
+
+### Wiki
+Basic setup instructions are available [on the wiki](https://github.com/feelfreelinux/euphonium/wiki)
