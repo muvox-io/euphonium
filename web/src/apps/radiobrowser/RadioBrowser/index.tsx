@@ -17,7 +17,7 @@ const Radio = ({
   return (
     <div class="bg-app-secondary shadow-m p-5 border border-app-border flex flex-col relative rounded-xl">
       <img
-        class="w-10 h-10 rounded-full bg-white border-app-border border absolute -right-2 -top-2 shadow-xl"
+        class="w-10 h-10 rounded-full bg-white border-app-border border absolute -right-2 -top-2 shadow-xl object-contain"
         src={
           favicon ||
           "https://www.veryicon.com/download/png/media/music-series/sound-wave-1-2?s=256"
@@ -27,7 +27,7 @@ const Radio = ({
       <div class="font-thin text-sm truncate text-gray-400">
         {codec} Codec • {bitrate} kbps • {countrycode}
       </div>
-      <div class="bg-green-600 text-white w-10 h-10 rounded-full absolute flex -bottom-2 -right-2">
+      <div class="bg-green-600 active:bg-green-800 text-white w-10 h-10 rounded-full absolute flex -bottom-2 -right-2 cursor-pointer">
         <div class="mt-[9px] ml-[5px]">
           <Icon
             onClick={() => playRadio(name, favicon, url_resolved, codec)}

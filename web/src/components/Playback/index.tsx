@@ -68,14 +68,14 @@ const PlaybackBar = ({themeColor = "#fff"}) => {
                         "https://www.veryicon.com/download/png/media/music-series/sound-wave-1-2?s=256"
                     }
                 ></img>
-                <div class="flex flex-col justify-center ml-4">
+                <div class="flex flex-col justify-center ml-4 w-full">
                     <div>{playbackState?.song.songName}</div>
                     <div class="text-app-text-secondary text-xs">
                         {playbackState?.song.artistName} • {playbackState?.song.albumName} •
                         playback from {playbackState?.song.sourceName}
                     </div>
                 </div>
-                <div></div>
+                <div class="md:hidden mx-3 rounded-full cursor-pointer flex items-center justify-center"><Icon name="eq"/></div>
                 {!isMobile ? (
                     <div class="mr-3 text-xl text-app-text-secondary ml-auto flex flex-row">
                         <div class="relative flex justify-center">
