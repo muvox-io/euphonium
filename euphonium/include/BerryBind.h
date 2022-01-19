@@ -31,6 +31,7 @@ class VmState {
     bvm *vm;
     std::vector<std::function<int(VmState &)> *> lambdas;
     static int call(bvm *vm);
+    static int get_module_member(bvm *vm);
 
     template <class T> T arg(const int i) { return *(T *)comptr(i); }
 
@@ -92,7 +93,7 @@ class VmState {
     bool execute_string(const std::string &string);
 
     void lambda(std::function<int(VmState &)> *function,
-                const std::string &name);
+                const std::string &name, const std::string &module = "");
 
     void push_data(int n = -2) {
         be_data_push(vm, n);
@@ -134,24 +135,6 @@ class VmState {
 
     int doreturn() { be_return(vm); }
 
-    template <typename R, class T, typename... Args>
-    void export_method(const std::string &name, R (T::*method)(Args...)) {
-        auto function = new std::function<int(
-            berry::VmState &)>([method](berry::VmState &vm) -> int {
-            auto tuple = vm.args<Args...>(2);
-            if constexpr (std::is_same_v<R, void>) {
-                apply_method<std::tuple_size<decltype(tuple)>::value>::apply(
-                    vm.argp<T>(1), method, tuple);
-                return vm.doreturn();
-            } else {
-                return vm.ret(
-                    apply_method<std::tuple_size<decltype(tuple)>::value>::
-                        apply(vm.argp<T>(1), method, tuple));
-            }
-        });
-        lambda(function, name);
-    }
-
     void map_push(const std::string &key, const std::string &value) {
         string(key);
         string(value);
@@ -185,7 +168,7 @@ class VmState {
 
     template <typename R, typename... Args>
     void export_function(const std::string &name,
-                         std::function<R(Args...)> callback) {
+                         std::function<R(Args...)> callback, const std::string& module = "") {
         auto function =
             new std::function<int(VmState &)>([callback](VmState &vm) -> int {
                 auto tuple = vm.args<Args...>();
@@ -200,11 +183,11 @@ class VmState {
                             decltype(tuple)>::value>::apply(callback, tuple));
                 }
             });
-        lambda(function, name);
+        lambda(function, name, module);
     }
 
     template <typename R, typename... Args>
-    void export_function(const std::string &name, R (*callback)(Args...)) {
+    void export_function(const std::string &name, R (*callback)(Args...), const std::string& module = "") {
         auto function = new std::function<int(VmState &)>([callback](
                                                               VmState &vm)
                                                               -> int {
@@ -220,11 +203,11 @@ class VmState {
                         apply(callback, tuple));
             }
         });
-        lambda(function, name);
+        lambda(function, name, module);
     }
 
     template <typename R>
-    void export_function(const std::string &name, R (*callback)()) {
+    void export_function(const std::string &name, R (*callback)(), const std::string& module = "") {
         auto function =
             new std::function<int(VmState &)>([callback](VmState &vm) -> int {
                 if constexpr (std::is_same_v<R, void>) {
@@ -234,26 +217,12 @@ class VmState {
                     return vm.ret((*callback)());
                 }
             });
-        lambda(function, name);
-    }
-
-    template <typename R, class T>
-    void export_method(const std::string &name, R (T::*method)()) {
-        auto function =
-            new std::function<int(VmState &)>([method](VmState &vm) -> int {
-                if constexpr (std::is_same_v<R, void>) {
-                    vm.argp<T>(1)->*method();
-                    return vm.doreturn();
-                } else {
-                    return vm.ret((vm.argp<T>(1)->*method)());
-                }
-            });
-        lambda(function, name);
+        lambda(function, name, module);
     }
 
     template <typename R>
     void export_function(const std::string &name,
-                         std::function<R(void)> callback) {
+                         std::function<R(void)> callback, const std::string& module = "") {
         auto function =
             new std::function<int(VmState &)>([callback](VmState &vm) -> int {
                 if constexpr (std::is_same_v<R, void>) {
@@ -263,17 +232,21 @@ class VmState {
                     return vm.ret(callback());
                 }
             });
-        lambda(function, name);
+        lambda(function, name, module);
     }
 
     template <class C, typename Ret, typename... Ts>
-    void export_this(const std::string &name, C *c, Ret (C::*m)(Ts...)) {
+    void export_this(const std::string &name, C *c, Ret (C::*m)(Ts...), const std::string& module = "") {
         std::function<Ret(Ts...)> res = [=](auto &&...args) {
             return (c->*m)(std::forward<decltype(args)>(args)...);
         };
-        export_function(name, res);
+        export_function(name, res, module);
     }
 };
+
+typedef std::map<std::string, std::function<int(berry::VmState &)> *> moduleMap;
+
+extern berry::moduleMap moduleLambdas;
 
 template <> int VmState::ret<bool>(const bool r);
 

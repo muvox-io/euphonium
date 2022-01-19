@@ -3,7 +3,7 @@
 
 #include <string>
 #include <memory>
-#include "HTTPStream.h"
+#include "HTTPClient.h"
 #include "aacdec.h"
 #include "mp3dec.h"
 #include "MainAudioBuffer.h"
@@ -23,7 +23,8 @@ class HTTPAudioStream {
     MP3FrameInfo mp3FrameInfo;
     uint8_t *decodePtr;
 
-    std::shared_ptr<bell::HTTPStream> httpStream;
+    std::shared_ptr<bell::HTTPClient> httpClient;
+    std::unique_ptr<bell::HTTPClient::HTTPResponse> stream;
     std::vector<uint8_t> inputBuffer;
     std::vector<short> outputBuffer;
     AudioCodec codec = AudioCodec::AAC;

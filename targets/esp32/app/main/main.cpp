@@ -27,14 +27,14 @@
 #include <string>
 #include "esp_littlefs.h"
 
-void *operator new(std::size_t count) {
-    return heap_caps_malloc(count, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-}
-
-void operator delete(void *ptr) noexcept {
-    if (ptr)
-        free(ptr);
-}
+//void *operator new(std::size_t count) {
+//    return heap_caps_malloc(count, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+//}
+//
+//void operator delete(void *ptr) noexcept {
+//    if (ptr)
+//        free(ptr);
+//}
 
 static const char *TAG = "euphonium";
 
@@ -50,12 +50,12 @@ static void euphoniumTask(void *pvParameters) {
 
     if (updater->versionMatches()) {
         auto core = std::make_shared<Core>();
-        auto bluetoothPlugin = std::make_shared<BluetoothPlugin>();
-        mainBluetoothPlugin = bluetoothPlugin;
+//        auto bluetoothPlugin = std::make_shared<BluetoothPlugin>();
+//        mainBluetoothPlugin = bluetoothPlugin;
         core->registeredPlugins.push_back(
             std::make_shared<ESP32PlatformPlugin>());
         core->registeredPlugins.push_back(std::make_shared<OTAPlugin>());
-        core->registeredPlugins.push_back(bluetoothPlugin);
+        //core->registeredPlugins.push_back(bluetoothPlugin);
         auto loader = std::make_shared<SPIFFSScriptLoader>();
         auto output = std::make_shared<DACAudioOutput>();
         core->selectAudioOutput(output);
@@ -117,5 +117,5 @@ void app_main(void) {
     init_littlefs();
 
     auto taskHandle = xTaskCreatePinnedToCore(&euphoniumTask, "euphonium", 1024 * 8,
-                                              NULL, 8, NULL, 0);
+                                              NULL, 5, NULL, 0);
 }

@@ -19,7 +19,7 @@ void listFiles(const std::string &path,
     }
 }
 
-HTTPModule::HTTPModule() : bell::Task("http", 1024 * 6, 4, 0, false) {
+HTTPModule::HTTPModule() : bell::Task("http", 1024 * 6, 0, 0, false) {
     name = "http";
     mainServer = std::make_shared<bell::HTTPServer>(80);
 }

@@ -182,17 +182,17 @@ class App
             plugin.initAudio()
         end
 
-        start_plugin_thread('cspot', self.getPluginByName('cspot').getBareValues())
-        start_plugin_thread('webradio', self.getPluginByName('webradio').getBareValues())
+        core_start_plugin_thread('cspot', self.getPluginByName('cspot').getBareValues())
+        core_start_plugin_thread('webradio', self.getPluginByName('webradio').getBareValues())
 
-        start_plugin_thread('bluetooth', {})
+        core_start_plugin_thread('bluetooth', {})
         #start_plugin_thread('youtube', self.getPluginByName('youtube').getBareValues())
 
         self.initHTTP()
     end
 
     def initHTTP()
-        start_plugin_thread('http', {})
+        core_start_plugin_thread('http', {})
     end
 
     def registerPlugin(plugin)
@@ -256,14 +256,14 @@ class App
                 end
             end
 
-            if get_platform() == 'desktop'
+            if core_get_platform() == 'desktop'
                 self.initRequiredPlugins()
             end
         end
     end
 
     def applyVolume(volume)
-        if get_platform() == 'desktop'
+        if core_get_platform() == 'desktop'
             setVolume(volume)
         else
             var dacPlugin = self.getPluginByName('dac')
@@ -363,7 +363,7 @@ end)
 
 http.handle('GET', '/info', def (request)
     http.sendJSON({
-        'version': get_version(),
+        'version': core_get_version(),
         'networkState': app.networkState
     }, request['connection'], 200)
 end)
@@ -402,4 +402,4 @@ def loadPlugins()
     app.loadConfiguration()
 end
 
-start_plugin_thread('persistor', {})
+core_start_plugin_thread('persistor', {})

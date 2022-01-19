@@ -3,11 +3,14 @@
 #include <EuphoniumLog.h>
 #include <cassert>
 #include <string.h>
+#ifdef ESP_PLATFORM
+#include "esp_heap_caps.h"
+#endif
 
 std::shared_ptr<MainAudioBuffer> mainAudioBuffer;
 std::shared_ptr<EventBus> mainEventBus;
 
-Core::Core() : bell::Task("Core", 4 * 1024, 10, 0) {
+Core::Core() : bell::Task("Core", 4 * 1024, 1, 0) {
     audioBuffer = std::make_shared<MainAudioBuffer>();
     luaEventBus = std::make_shared<EventBus>();
     mainPersistor = std::make_shared<ConfigPersistor>();
@@ -166,12 +169,12 @@ std::string Core::getVersion() {
 }
 
 void Core::setupBindings() {
-    berry->export_this("start_plugin_thread", this,
-                       &Core::startAudioThreadForPlugin);
+    berry->export_this("start_plugin", this,
+                       &Core::startAudioThreadForPlugin, "core");
     berry->export_function("sleep_ms", &sleepMS);
-    berry->export_this("core_empty_buffers", this, &Core::emptyBuffers);
-    berry->export_this("get_version", this, &Core::getVersion);
-    berry->export_this("get_platform", this, &Core::getPlatform);
+    berry->export_this("empty_buffers", this, &Core::emptyBuffers, "core");
+    berry->export_this("version", this, &Core::getVersion, "core");
+    berry->export_this("platform", this, &Core::getPlatform, "core");
 }
 
 void Core::runTask() {
@@ -185,8 +188,14 @@ void Core::runTask() {
             audioProcessor->process(pcmBuf.data(), readNumber);
             currentOutput->feedPCMFrames(pcmBuf.data(), readNumber);
         } else {
-            // EUPH_LOG(info, "core", "No data");
+            EUPH_LOG(info, "core", "No data");
+#ifdef ESP_PLATFORM
+            auto memUsage = heap_caps_get_free_size(MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+            auto memUsage2 = heap_caps_get_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+            EUPH_LOG(debug, "core", "Free memory: (psram) %d, (internal) %d", memUsage, memUsage2);
+#endif
             BELL_SLEEP_MS(1000);
+
         }
     }
 }

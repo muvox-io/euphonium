@@ -16,8 +16,12 @@ HTTPAudioStream::~HTTPAudioStream()
 void HTTPAudioStream::querySongFromUrl(std::string url, AudioCodec audioCodec)
 {
     codec = audioCodec;
-    httpStream = std::make_shared<bell::HTTPStream>();
-    httpStream->connectToUrl(url);
+    BELL_LOG(info, "webradio", "Doing request");
+    stream = bell::HTTPClient::execute(bell::HTTPClient::HTTPRequest{
+        .url = url
+    });
+    BELL_LOG(info, "webradio", "Got headers");
+    BELL_LOG(info, "webradio", "moved");
     decodePtr = inputBuffer.data();
     bytesLeft = 0;
     offset = 0;
@@ -28,7 +32,7 @@ void HTTPAudioStream::decodeFrameMP3(std::shared_ptr<MainAudioBuffer> audioBuffe
     auto bufSize = MP3_READBUF_SIZE;
     bufSize = bufSize * 2;
 
-    int readBytes = httpStream->read(inputBuffer.data() + bytesLeft, bufSize - bytesLeft);
+    int readBytes = stream->read(inputBuffer.data() + bytesLeft, bufSize - bytesLeft);
     if (readBytes > 0)
     {
         bytesLeft = readBytes + bytesLeft;
@@ -76,7 +80,7 @@ void HTTPAudioStream::decodeFrameAAC(std::shared_ptr<MainAudioBuffer> audioBuffe
 {
     auto bufSize = AAC_READBUF_SIZE;
 
-    int readBytes = httpStream->read(inputBuffer.data() + bytesLeft, bufSize - bytesLeft);
+    int readBytes = stream->read(inputBuffer.data() + bytesLeft, bufSize - bytesLeft);
     if (readBytes > 0)
     {
         bytesLeft = readBytes + bytesLeft;

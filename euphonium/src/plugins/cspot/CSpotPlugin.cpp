@@ -7,7 +7,7 @@
 
 std::shared_ptr<ConfigJSON> configMan;
 
-CSpotPlugin::CSpotPlugin() : bell::Task("cspot", 4 * 1024, 1, 0) {
+CSpotPlugin::CSpotPlugin() : bell::Task("cspot", 4 * 1024, 1, 1) {
     auto file = std::make_shared<CliFile>();
     configMan = std::make_shared<ConfigJSON>("", file);
     name = "cspot";
@@ -70,6 +70,7 @@ void CSpotPlugin::runTask() {
     this->audioBuffer->shutdownExcept(name);
     this->audioBuffer->lockAccess();
     this->audioBuffer->configureOutput(AudioOutput::SampleFormat::INT16, 44100);
+    BELL_SLEEP_MS(1000);
 
     auto session = std::make_unique<Session>();
     session->connectWithRandomAp();
@@ -82,7 +83,6 @@ void CSpotPlugin::runTask() {
         // @TODO Actually store this token somewhere
         mercuryManager = std::make_shared<MercuryManager>(std::move(session));
         mercuryManager->startTask();
-        mercuryManager->updateQueue();
         auto audioSink = std::make_shared<FakeAudioSink>(this->audioBuffer,
                                                          this->luaEventBus);
         spircController = std::make_shared<SpircController>(
@@ -105,10 +105,11 @@ void CSpotPlugin::runTask() {
             }
             case CSpotEventType::PLAY_PAUSE: {
                 // Handle stop pause
-                bool isPaused = std::get<bool>(event.data);
-                auto event = std::make_unique<PauseChangedEvent>(isPaused);
-                this->luaEventBus->postEvent(std::move(event));
-                this->audioBuffer->clearBuffer();
+                EUPH_LOG(info, "cspot", "Gor PLAY_PAUSE");
+//                bool isPaused = std::get<bool>(event.data);
+//                auto event = std::make_unique<PauseChangedEvent>(isPaused);
+//                this->luaEventBus->postEvent(std::move(event));
+//                this->audioBuffer->clearBuffer();
                 break;
             }
             default:

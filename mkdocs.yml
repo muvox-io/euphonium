@@ -1,0 +1,90 @@
+site_name: Euphonium
+site_description: Documentation (Wiki) for Euphonium
+site_url: https://euphonium.github.io/docs/
+repo_name: 'feelfreelinux/euphonium'
+repo_url: 'https://github.com/feelfreelinux/euphonium'
+edit_uri: 'https://github.com/feelfreelinux/docs/blob/master/docs/'
+docs_dir: docs
+extra_css:
+  - stylesheets/extra.css
+plugins:
+  - search:
+      lang:
+        - en
+theme:
+  name: material
+  language: 'en'
+#  # custom_dir: 'overrides'
+  logo: 'images/euph.svg'
+#  favicon: _media/favicon.ico
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: euphonium
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: euphonium
+      accent: deep purple
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.instant
+    - navigation.top
+    - navigation.tracking
+  font:
+    text: Barlow
+    code: Roboto Mono
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: "~"
+      toc_depth: 3
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.superfences
+  - pymdownx.snippets
+  - pymdownx.tilde
+  - meta
+  - def_list
+  - attr_list
+
+nav:
+  - Home:
+      - Status: status.md
+      - Getting Started: getting-started.md
+      - Plugins:
+        - Spotify: spotify.md
+        - WebRadio: webradio.md
+        - Bluetooth: bluetooth.md
+        - JellyFin: jellyfin.md
+        - YouTube: youtube.md
+      - Technical documentation:
+        - Architecture: architecture.md
+        - Writing your own plugin: writing-your-own-plugin.md
+        - Adding support to new DAC: adding-support-to-new-dac.md
+        - API Documentation:
+          - Scripting Language: plugins/scripting-language.md
+          - HTTP API: plugins/http.md
+          - C++ Documentation: plugins/cpp.md
+      - Hardware:
+        - DevBoards: hardware.md

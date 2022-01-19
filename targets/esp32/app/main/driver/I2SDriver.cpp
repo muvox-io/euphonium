@@ -23,13 +23,13 @@ void i2sInstall(int channelFormatInt, int commFormat, int bitsPerSample, int sam
     }
 
     i2s_config_t i2s_config = {
-        .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX), // Only TX
+        .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX),
         .sample_rate = (uint32_t) sampleRate,
         .bits_per_sample = (i2s_bits_per_sample_t)bitsPerSample,
-        .channel_format = channelFormat, // 2-channels
+        .channel_format = channelFormat,
         .communication_format = (i2s_comm_format_t)commFormat,
         .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, // Default interrupt priority
-        .dma_buf_count = 12 * 2,
+        .dma_buf_count = 8,
         .dma_buf_len = 512,
         .use_apll = true,
         .tx_desc_auto_clear = true, // Auto clear tx descriptor on underflow
@@ -78,7 +78,7 @@ void InternalDACInstall(int channelFormatInt, int sampleRate)
         .channel_format = channelFormat, // 2-channels
         .communication_format = I2S_COMM_FORMAT_STAND_MSB,
         .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, // Default interrupt priority
-        .dma_buf_count = 12 * 2,
+        .dma_buf_count = 8,
         .dma_buf_len = 512,
         .use_apll = true,
         .tx_desc_auto_clear = true, // Auto clear tx descriptor on underflow
