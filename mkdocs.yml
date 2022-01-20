@@ -70,21 +70,16 @@ markdown_extensions:
 
 nav:
   - Home:
+      - 'index.md'
       - Status: status.md
       - Getting Started: getting-started.md
-      - Plugins:
-        - Spotify: spotify.md
-        - WebRadio: webradio.md
-        - Bluetooth: bluetooth.md
-        - JellyFin: jellyfin.md
-        - YouTube: youtube.md
+      - Plugins: plugins/plugins.md
       - Technical documentation:
         - Architecture: architecture.md
         - Writing your own plugin: writing-your-own-plugin.md
         - Adding support to new DAC: adding-support-to-new-dac.md
-        - API Documentation:
-          - Scripting Language: plugins/scripting-language.md
-          - HTTP API: plugins/http.md
-          - C++ Documentation: plugins/cpp.md
-      - Hardware:
-        - DevBoards: hardware.md
+      - API Documentation:
+        - Scripting Language: plugins/scripting-language.md
+        - HTTP API: plugins/http.md
+        - C++ Documentation: plugins/cpp.md
+      - Hardware: hardware.md

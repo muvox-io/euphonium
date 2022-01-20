@@ -1,11 +1,12 @@
 # Scripting language API
 
-Euphonium contains a berry-lang scripting language that can be used to tweak the system for your needs. The following page documents the internal API.
+Euphonium contains a berry-lang scripting language that can be used to tweak the system for your needs. The following page documents the internal API used in all scripts. Feel free to check `euphonium/scripts` to see how this is used internally.
 
 ## `globals`
 
 Global utilities
 
+### Commands
 
 | Command    | Signature                                                                                 | Supported platforms |
 |:-----------|-------------------------------------------------------------------------------------------|---------------------|
@@ -19,6 +20,7 @@ Manages euphonium's core functionality, mostly shared utils.
 
 **Implemented by `Core.cpp`**
 
+### Commands
 
 | Command              | Signature                                                                                                              | Supported platforms |
 |:---------------------|------------------------------------------------------------------------------------------------------------------------|---------------------|
@@ -27,6 +29,51 @@ Manages euphonium's core functionality, mostly shared utils.
 | `core.version`       | `() -> string`.<br/>Returns current version of the system. Example result: `0.0.14`                                    | All                 |
 | `core.empty_buffers` | `() -> void`.<br/>Empties internal audio buffers of the system. Call this during playback changes / stop pause.        | All                 |
 
+## `http`
+Allows for registering endpoints on the internal HTTP server.
+
+**Implemented by `http.be` and `HTTPModule.cpp`**
+
+### Commands
+
+| Command           | Signature                                                                                                                                                                                                                                | Supported platforms |
+|:------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| `http.handle`     | `(method: string, path: string, response_handler: [(request) -> void]) -> void`<br/>Register a new HTTP endpoint under given `path`. Response handler is a method that takes `HTTPRequest` as a parameter. See examples below for usage. | All                 |
+| `http.write_text` | `(body: string, fd: int, status: int) -> void`.<br/>Writes given response with type `text/plain`. `fd` is connection fd taken from the `HTTPRequest` object.                                                                             | All                 |
+| `http.write_json` | `(body: map, fd: int, status: int) -> void`.<br/>As above, but serializes the `body` into a json string. Content-type is `application/json`.                                                                                             | All                 |
+| `http.emit_event` | `(type: string, body: map) -> void`.<br/>Broadcasts a server-side event to all connected devices. `body` will be serialized into json string.                                                                                            | All                 |
+
+### Object `HTTPRequest`
+
+### Object `HTTPResponse`
+
+### Example
+
+!!! example "HTTP server usage"
+
+    Handle simple GET and return "Hello, world!"
+
+    ```python
+    http.handle('GET', '/hello_world', def (request)
+        http.write_text("Hello world!", request['connection'], 200)
+    end)
+    ```
+    Handle POST with json body, return a json response
+
+    ```python
+    http.handle('POST', '/create_cat', def (request)
+        if request['body'] == nil
+            http.write_text("No body", request['connection'], 400)
+        else
+           # Parse json body
+           var parsedBody = json.parse(request['body'])
+
+           # Create response
+           var response = { 'name': parsedBody['name'], 'age': 3 }
+           http.write_json(response, request['connection'], 200)
+        end
+    end)
+    ```
 ## `i2s`
 
 Controls I2S bus. Mainly used for DAC support.
@@ -74,13 +121,16 @@ Controls I2C bus on supported platforms. Mainly used in different drivers.
 
 ### Commands
 
-| Command       | Signature                                                                                                                                                                  | Supported platforms |
-|:--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
-| `i2c.install` | `(sda: int, scl: int) -> void`<br/>Installs I2C driver under given pins.                                                                                                   | esp32               |
-| `i2s.read`    | `(addr:int, reg:int, size:int) -> int or nil`.<br/>Read a value of 1..4 bytes from address addr and register reg. Returns nil if no response.                              | esp32               |
-| `i2s.write`   | `(addr:int, reg:int, val:int, size:int) -> bool`.<br/>Writes a value of 1..4 bytes to address addr, register reg with value val. Returns true if successful, false if not. | esp32               |
-| `i2s.write`   | `(addr:int, reg:int, val:int, size:int) -> bool`.<br/>Writes a value of 1..4 bytes to address addr, register reg with value val. Returns true if successful, false if not. | esp32               |
+| Command           | Signature                                                                                                                                                                  | Supported platforms |
+|:------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| `i2c.install`     | `(sda: int, scl: int) -> void`<br/>Installs I2C driver under given pins.                                                                                                   | esp32               |
+| `i2c.detect`      | `(addr:int) -> bool`.<br/>Tries to detect device under given addr. Returns true if device found.                                                                           | esp32               |
+| `i2c.read`        | `(addr:int, reg:int, size:int) -> int or nil`.<br/>Read a value of 1..4 bytes from address addr and register reg. Returns nil if no response.                              | esp32               |
+| `i2c.write`       | `(addr:int, reg:int, val:int, size:int) -> bool`.<br/>Writes a value of 1..4 bytes to address addr, register reg with value val. Returns true if successful, false if not. | esp32               |
+| `i2c.read_bytes`  | `(addr:int, reg:int, size:int) -> int or nil`.<br/>Read a value of 1..4 bytes from address addr and register reg. Returns nil if no response.                              | esp32               |
+| `i2c.write_bytes` | `(addr:int, reg:int, val:bytes) -> nil`<br/>Writes the val bytes sequence as bytes() to address addr register reg.                                                         | esp32               |
 
+### Example
 
 ## GPIO
 
