@@ -27,7 +27,6 @@ Manages euphonium's core functionality, mostly shared utils.
  | `core.start_plugin`  | `(pluginName: string, pluginConfig: map) -> void`<br/>Starts given plugin's audio thread with following configuration. | All                 |
 | `core.platform`      | `() -> string`.<br/>Returns platform on which euphonium is currently running. Result being either `esp32` or `desktop` | All                 |
 | `core.version`       | `() -> string`.<br/>Returns current version of the system. Example result: `0.0.14`                                    | All                 |
-| `core.empty_buffers` | `() -> void`.<br/>Empties internal audio buffers of the system. Call this during playback changes / stop pause.        | All                 |
 
 ## `http`
 Allows for registering endpoints on the internal HTTP server.
@@ -74,6 +73,20 @@ Allows for registering endpoints on the internal HTTP server.
         end
     end)
     ```
+
+## `playback`
+
+Manages playback state of the system.
+
+### Commands
+
+| Command                  | Signature                                                                                                                                                                        | Supported platforms |
+|:-------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| `playback.set_eq`        | `(low: int, mid: int, high: int) -> void`.<br/>If `EqualizerProcessor` is enabled, this changes the eq's settings. 1 point on the scale means 3 db. Defaults to 0, 0, 0 (no eq). | All                 |
+| `playback.set_pause`     | `(paused: boolean) -> void`.<br/>Pauses the playback state. This also triggers a pause event.                                                                                    | All                 |
+| `playback.empty_buffers` | `() -> void`.<br/>Empties internal audio buffers of the system. Call this during playback changes / stop pause.                                                                  | All                 |
+| `playback.soft_volume`   | `(volume: int) -> void`<br/>Changes the system's software volume. Volume is between `0` and `100`.                                                                               | All                 |
+
 ## `i2s`
 
 Controls I2S bus. Mainly used for DAC support.

@@ -284,7 +284,7 @@ This endpoint does not have parameters
     }
     ```
 
-### `GET` `/system/reboot`
+### `POST` `/system/reboot`
 Returns information about current system state.
 
 #### Parameters

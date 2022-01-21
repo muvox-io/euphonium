@@ -19,21 +19,8 @@ theme:
 #  favicon: _media/favicon.ico
   palette:
     # Light mode
-    - media: "(prefers-color-scheme: light)"
-      scheme: euphonium
+    - scheme: euphonium
       accent: indigo
-      toggle:
-        icon: material/toggle-switch-off-outline
-        name: Switch to dark mode
-
-    # Dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: euphonium
-      accent: deep purple
-      toggle:
-        icon: material/toggle-switch
-        name: Switch to light mode
 
   features:
     - navigation.tabs
@@ -80,6 +67,10 @@ nav:
         - Adding support to new DAC: adding-support-to-new-dac.md
       - API Documentation:
         - Scripting Language: plugins/scripting-language.md
-        - HTTP API: plugins/http.md
+        - HTTP API:
+            - Euphonium REST API: http/index.md
+            - Core: http/main.md
+            - Plugin - WebRadio: http/webradio.md
+            - Plugin - OTA: http/ota.md
         - C++ Documentation: plugins/cpp.md
       - Hardware: hardware.md
