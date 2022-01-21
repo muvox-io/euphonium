@@ -42,6 +42,8 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.tasklist:
+      custom_checkbox: true
   - pymdownx.betterem
   - pymdownx.caret
   - pymdownx.details
@@ -60,16 +62,18 @@ nav:
       - 'index.md'
       - Status: status.md
       - Getting Started: getting-started.md
-      - Plugins: plugins/plugins.md
+      - Plugins: plugins.md
       - Technical documentation:
-        - Architecture: architecture.md
-        - Writing your own plugin: writing-your-own-plugin.md
-        - Adding support to new DAC: adding-support-to-new-dac.md
+        - Architecture: technical/architecture.md
+        - Setting up development environment: technical/dev-environment.md
+        - Adding support to new DAC: technical/adding-new-dac.md
+        - Writing your own plugin: technical/adding-new-plugin.md
       - API Documentation:
         - Scripting Language: plugins/scripting-language.md
         - HTTP API:
             - Euphonium REST API: http/index.md
             - Core: http/main.md
+            - Plugin - DevTools: http/devtools.md
             - Plugin - WebRadio: http/webradio.md
             - Plugin - OTA: http/ota.md
         - C++ Documentation: plugins/cpp.md
