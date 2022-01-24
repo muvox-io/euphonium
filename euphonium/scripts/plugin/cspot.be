@@ -1,6 +1,6 @@
 class CSpotPlugin : Plugin
     def init()
-        self.configSchema = {
+        self.config_schema = {
             'receiverName': {
                 'tooltip': "Speaker's name",
                 'type': 'string',
@@ -14,10 +14,10 @@ class CSpotPlugin : Plugin
             },
         }
 
-        self.applyDefaultValues()
+        self.apply_default_values()
         self.name = "cspot"
-        self.themeColor = "#1DB954"
-        self.displayName = "Spotify (cspot)"
+        self.theme_color = "#1DB954"
+        self.display_name = "Spotify (cspot)"
         self.type = "plugin"
     end
 
@@ -36,4 +36,4 @@ class CSpotPlugin : Plugin
     end
 end
 
-app.registerPlugin(CSpotPlugin())
+euphonium.register_plugin(CSpotPlugin())

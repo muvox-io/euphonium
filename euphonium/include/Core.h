@@ -33,6 +33,7 @@ private:
     std::shared_ptr<AudioProcessors> audioProcessor;
     bool outputConnected = false;
     std::shared_ptr<berry::VmState> berry;
+    std::shared_ptr<ScriptLoader> loader;
 
 public:
     Core();
@@ -45,6 +46,7 @@ public:
     void handleScriptingThread();
     void runTask();
     void emptyBuffers();
+    void loadScript(std::string file);
     void handleEvent(std::unique_ptr<Event> event);
     void setupBindings();
     std::string getPlatform();

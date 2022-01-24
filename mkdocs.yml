@@ -18,7 +18,6 @@ theme:
   logo: 'images/euph.svg'
 #  favicon: _media/favicon.ico
   palette:
-    # Light mode
     - scheme: euphonium
       accent: indigo
 

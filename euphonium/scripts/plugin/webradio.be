@@ -1,6 +1,6 @@
 class WebRadioPlugin : Plugin
     def init()
-        self.configSchema = {
+        self.config_schema = {
             'radioBrowserApi': {
                 'tooltip': 'Radio Browser instance url',
                 'type': 'string',
@@ -8,27 +8,28 @@ class WebRadioPlugin : Plugin
             },
         }
 
-        self.applyDefaultValues()
+        self.apply_default_values()
         self.name = "webradio"
-        self.themeColor = "#d2c464"
-        self.displayName = "Web Radio"
+        self.theme_color = "#d2c464"
+        self.display_name = "Web Radio"
         self.type = "plugin"
-        self.exposeWebApp = true
+        self.has_web_app = true
     end
-    def onEvent(event, data)
+
+    def on_event(event, data)
         if event == EVENT_SET_PAUSE
             webradio_set_pause(data)
         end
     end
 end
 
-app.registerPlugin(WebRadioPlugin())
+euphonium.register_plugin(WebRadioPlugin())
 
 # HTTP Handlers
 http.handle('POST', '/webradio', def(request)
-    var body = json.load(request['body'])
+    var body = request.json_body()
 
-    app.updateSong({
+    euphonium.update_song({
         'songName': body["stationName"],
         'artistName': 'Internet Radio',
         'sourceName': 'webradio',
@@ -36,6 +37,6 @@ http.handle('POST', '/webradio', def(request)
         'albumName': body['codec']
     })
     webradio_queue_url(body['stationUrl'], (body["codec"] == "AAC" || body["codec"] == "AAC+"))
-    app.setStatus('playing')
-    http.sendJSON({ 'status': 'playing'}, request['connection'], 200)
+    euphonium.set_status('playing')
+    request.write_json({ 'status': 'playing'}, 200)
 end)

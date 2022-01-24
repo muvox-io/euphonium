@@ -59,7 +59,9 @@ Core::Core() : bell::Task("Core", 4 * 1024, 1, 0) {
 }
 
 void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader) {
+    this->loader = loader;
     std::vector<std::string> berryModules({"app"});
+    mainPersistor->scriptLoader = loader;
 
     audioProcessor->setBindings(berry);
 
@@ -67,13 +69,7 @@ void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader) {
         module->luaEventBus = this->luaEventBus;
         module->berry = berry;
         module->setupBindings();
-        module->loadScript(loader);
     }
-
-    for (auto const &value : berryModules) {
-        loader->loadScript(value, berry);
-    }
-
     currentOutput->setupBindings(berry);
 
     for (auto const &plugin : this->registeredPlugins) {
@@ -81,11 +77,10 @@ void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader) {
         plugin->berry = this->berry;
         plugin->luaEventBus = this->luaEventBus;
         plugin->setupBindings();
-        plugin->loadScript(loader);
     }
-
-    berry->execute_string("loadPlugins()");
-
+    loader->loadScript("internal/bindings.be", berry);
+    loader->loadScript("init.be", berry);
+    berry->execute_string("load_plugins()");
 }
 
 void Core::handleScriptingThread() {
@@ -107,10 +102,14 @@ void Core::selectAudioOutput(std::shared_ptr<AudioOutput> output) {
 
 void Core::emptyBuffers() { audioBuffer->audioBuffer->emptyBuffer(); }
 
+void Core::loadScript(std::string file) {
+    loader->loadScript(file, berry);
+}
+
 void Core::handleEvent(std::unique_ptr<Event> event) {
     EUPH_LOG(debug, "core", "Got event");
     // Load function
-    berry->get_global("handleEvent");
+    berry->get_global("handle_event");
 
     // Arg 1
     berry->string(event->subType);
@@ -175,6 +174,7 @@ void Core::setupBindings() {
     berry->export_this("empty_buffers", this, &Core::emptyBuffers, "core");
     berry->export_this("version", this, &Core::getVersion, "core");
     berry->export_this("platform", this, &Core::getPlatform, "core");
+    berry->export_this("load", this, &Core::loadScript, "core");
 }
 
 void Core::runTask() {

@@ -355,12 +355,12 @@ int be_isexist(const char *path)
 
 char* be_getcwd(char *buf, size_t size)
 {
-    return NULL;
+    return getcwd(buf, size);
 }
 
 int be_chdir(const char *path)
 {
-    return 0;
+    return chdir(path);
 }
 
 int be_mkdir(const char *path)

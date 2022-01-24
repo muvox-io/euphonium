@@ -6,7 +6,12 @@ berry::moduleMap berry::moduleLambdas;
 
 VmState::VmState(bvm *vm) : vm(vm) {}
 
-VmState::VmState() { vm = be_vm_new(); }
+VmState::VmState() {
+    vm = be_vm_new();
+    be_pushntvfunction(vm, VmState::get_module_member);
+    be_setglobal(vm, "get_native");
+    be_pop(vm, 1);
+}
 
 VmState::~VmState() {}
 
@@ -14,9 +19,10 @@ VmState::~VmState() {}
 int VmState::get_module_member(bvm *vm) {
     int top = be_top(vm);
     if (top == 2 && be_isstring(vm, 2)) {
-        auto module = std::string(be_classname(vm, 1));
-        auto functionName = be_tostring(vm, 2);
-        if (moduleLambdas.find(module + "." + functionName) != moduleLambdas.end()) {
+        auto module = std::string(be_tostring(vm, 1));
+        auto functionName = std::string(be_tostring(vm, 2));
+        if (moduleLambdas.find(module + "." + functionName) !=
+            moduleLambdas.end()) {
             be_pop(vm, 2);
             auto func = moduleLambdas.at(module + "." + functionName);
             be_pushntvclosure(vm, VmState::call, 1);
@@ -68,18 +74,6 @@ void VmState::lambda(std::function<int(VmState &)> *function,
         be_pop(vm, 1);
     } else {
         moduleLambdas.insert({module + "." + name, function});
-
-        if (!be_getglobal(vm, module.c_str())) {
-            static const bnfuncinfo members[] = {
-                {"member", VmState::get_module_member},
-                {NULL, NULL}
-            };
-
-            be_pushclass(vm, module.c_str(), members);
-            be_call(vm, 0);
-            set_global(module);
-            be_pop(vm, 2);
-        }
     }
 }
 

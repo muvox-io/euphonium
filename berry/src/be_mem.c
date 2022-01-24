@@ -11,9 +11,6 @@
 #include "be_gc.h"
 #include <stdlib.h>
 #include <string.h>
-#ifdef ESP_PLATFORM
-#include <esp_heap_caps.h>
-#endif
 
 #define GC_ALLOC    (1 << 2) /* GC in alloc */
 
@@ -31,11 +28,7 @@
 
 BERRY_API void* be_os_malloc(size_t size)
 {
-#ifdef ESP_PLATFORM
-    return heap_caps_malloc(size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
     return malloc(size);
-#endif
 }
 
 BERRY_API void be_os_free(void *ptr)
@@ -45,11 +38,7 @@ BERRY_API void be_os_free(void *ptr)
 
 BERRY_API void* be_os_realloc(void *ptr, size_t size)
 {
-#ifdef ESP_PLATFORM
-    return heap_caps_realloc(ptr, size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
     return realloc(ptr, size);
-#endif
 }
 
 static void* _realloc(void *ptr, size_t old_size, size_t new_size)
@@ -58,11 +47,11 @@ static void* _realloc(void *ptr, size_t old_size, size_t new_size)
         return ptr;
     }
     if (ptr && new_size) { /* realloc block */
-        return be_os_realloc(ptr, new_size);
+        return realloc(ptr, new_size);
     }
     if (new_size) { /* alloc a new block */
         be_assert(ptr == NULL && old_size == 0);
-        return be_os_malloc(new_size);
+        return malloc(new_size);
     }
     be_assert(new_size == 0);
 

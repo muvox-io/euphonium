@@ -35,8 +35,8 @@ void ConfigPersistor::load(std::string key) {
 
 void ConfigPersistor::setupBindings() {
     BELL_LOG(info, "persistor", "Registering handlers");
-    berry->export_this("conf_persist", this, &ConfigPersistor::persist);
-    berry->export_this("conf_load", this, &ConfigPersistor::load);
+    berry->export_this("persist", this, &ConfigPersistor::persist, "persistor");
+    berry->export_this("load", this, &ConfigPersistor::load, "persistor");
 }
 
 void ConfigPersistor::runTask() {

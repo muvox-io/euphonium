@@ -171,6 +171,11 @@ class VmState {
                          std::function<R(Args...)> callback, const std::string& module = "") {
         auto function =
             new std::function<int(VmState &)>([callback](VmState &vm) -> int {
+                // Remove first argument in case of called from class
+                if (be_isinstance(vm.raw_ptr(), 1)) {
+                    be_remove(vm.raw_ptr(), 1);
+                }
+
                 auto tuple = vm.args<Args...>();
 
                 if constexpr (std::is_same_v<R, void>) {
@@ -191,6 +196,11 @@ class VmState {
         auto function = new std::function<int(VmState &)>([callback](
                                                               VmState &vm)
                                                               -> int {
+            // Remove first argument in case of called from class
+            if (be_isinstance(vm.raw_ptr(), 1)) {
+                be_remove(vm.raw_ptr(), 1);
+            }
+
             auto tuple = vm.args<Args...>();
 
             if constexpr (std::is_same_v<R, void>) {

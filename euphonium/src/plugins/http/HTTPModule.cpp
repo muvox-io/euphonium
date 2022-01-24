@@ -31,10 +31,10 @@ void HTTPModule::loadScript(std::shared_ptr<ScriptLoader> loader) {
 
 void HTTPModule::setupBindings() {
     BELL_LOG(info, "http", "Registering handlers");
-    berry->export_this("httpRegisterHandler", this,
+    berry->export_this("_http_register_handler", this,
                        &HTTPModule::registerHandler);
-    berry->export_this("httpRespond", this, &HTTPModule::respond);
-    berry->export_this("httpPublishEvent", this, &HTTPModule::publishEvent);
+    berry->export_this("_http_respond", this, &HTTPModule::respond);
+    berry->export_this("_http_publish_event", this, &HTTPModule::publishEvent);
 }
 
 void HTTPModule::publishEvent(std::string event, std::string data) {

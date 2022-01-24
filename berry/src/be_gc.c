@@ -138,6 +138,7 @@ static void mark_gray(bvm *vm, bgcobject *obj)
 {
     if (obj && gc_iswhite(obj) && !gc_isconst(obj)) {
         gc_setgray(obj);
+        be_assert(!var_isstatic(obj));
         switch (var_type(obj)) {
         case BE_STRING: gc_setdark(obj); break; /* just set dark */
         case BE_CLASS: link_gray(vm, cast_class(obj)); break;
@@ -171,7 +172,7 @@ static void mark_map(bvm *vm, bgcobject *obj)
         while ((node = be_map_next(map, &iter)) != NULL) {
             bmapkey *key = &node->key;
             bvalue *val = &node->value;
-            if (be_isgctype((signed char)key->type)) {
+            if (be_isgcobj(key)) {
                 mark_gray(vm, var_togc(key));
             }
             mark_gray_var(vm, val);
@@ -432,6 +433,7 @@ static void mark_unscanned(bvm *vm)
         bgcobject *obj = vm->gc.gray;
         if (obj && !gc_isdark(obj) && !gc_isconst(obj)) {
             gc_setdark(obj);
+            be_assert(!var_isstatic(obj));
             switch (var_type(obj)) {
             case BE_CLASS: mark_class(vm, obj); break;
             case BE_PROTO: mark_proto(vm, obj); break;
