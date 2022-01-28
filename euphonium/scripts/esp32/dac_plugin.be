@@ -1,28 +1,38 @@
 import math 
 
 class DACDriver
-    var hardwareVolumeControl
-    var currentConfig
+    var hardware_volume_control
+    var current_config
     var name
     var signedness
 
-    def getGPIO(pin)
-        return int(self.currentConfig[pin]['value'])
+    def get_gpio(pin)
+        return int(self.current_config[pin]['value'])
+    end
+
+    def get_i2s_pins()
+        var pins_config = I2SPinsConfig()
+        pins_config.mck_io = 0
+        pins_config.bck_io = self.get_gpio('bck')
+        pins_config.ws_io = self.get_gpio('ws')
+        pins_config.data_out_io = self.get_gpio('data')
+
+        return pins_config
     end
 
     # initializes the DAC driver
-    def initI2S()
+    def init_i2s()
     end
 
     # disables I2S
-    def unloadI2S()
+    def unload_i2s()
     end
 
     # sets the volume of the DAC
-    def setVolume(volume)
+    def set_volume(volume)
     end
 
-    def BIN(num)
+    def bin(num)
         var res = 0
         for x : 1..size(num)
             res += math.pow(2, x-1) * int(num[size(num) - x])
@@ -32,11 +42,11 @@ class DACDriver
 end
 
 class DACPlugin : Plugin
-    var registeredDrivers
-    var selectedDriver
+    var registered_drivers
+    var selected_driver
 
     def init()
-        self.configSchema = {
+        self.config_schema = {
             'dac': {
                 'tooltip': 'Select driver',
                 'type': 'stringList',
@@ -75,63 +85,62 @@ class DACPlugin : Plugin
             },
         }
 
-        self.applyDefaultValues()
+        self.apply_default_values()
 
         self.name = "dac"
-        self.displayName = "DAC Settings"
+        self.display_name = "DAC Settings"
         self.type = "system"
-        self.selectedDriver = nil
-        self.audioOutput = true
-        self.registeredDrivers = []
+        self.selected_driver = nil
+        self.is_audio_output = true
+        self.registered_drivers = []
     end
 
     # register driver implementation
-    def registerDriver(driver)
-        self.registeredDrivers.push(driver)
+    def register_driver(driver)
+        self.registered_drivers.push(driver)
         var drivers = []
 
-        for driver : self.registeredDrivers
+        for driver : self.registered_drivers
             drivers.push(driver.name)
         end
 
-        self.configSchema['dac']['listValues'] = drivers
+        self.config_schema['dac']['listValues'] = drivers
     end
 
-    def selectDriver(driverName)
-        if (self.selectedDriver != nil)
+    def select_driver(driver_name)
+        if (self.selected_driver != nil)
             dac_set_readable(false)
-            self.selectedDriver.unloadI2S()
+            self.selected_driver.unload_i2s()
         end
 
-        for driver : self.registeredDrivers
-            if driver.name == driverName
-                self.selectedDriver = driver
-                self.selectedDriver.currentConfig = self.configSchema
-                self.selectedDriver.initI2S()
+        for driver : self.registered_drivers
+            if driver.name == driver_name
+                self.selected_driver = driver
+                self.selected_driver.current_config = self.config_schema
+                self.selected_driver.init_i2s()
                 dac_set_readable(true)
             end
         end
     end
 
-    def initAudio()
+    def init_audio()
     end
 
-    def hasHardwareVolume()
-        return self.selectedDriver.hardwareVolumeControl
+    def has_hardware_volume()
+        return self.selected_driver.hardware_volume_control
     end
 
-    def onEvent(event, data)
+    def on_event(event, data)
         if event == EVENT_CONFIG_UPDATED
-            self.selectDriver(self.configSchema['dac']['value'])
+            self.select_driver(self.config_schema['dac']['value'])
         end
 
         if event == EVENT_VOLUME_UPDATED
-            print("received volume data")
-            self.selectedDriver.setVolume(data)
+            self.selected_driver.set_volume(data)
         end
     end
 end
 
 var dac = DACPlugin()
 
-app.registerPlugin(dac)
+euphonium.register_plugin(dac)

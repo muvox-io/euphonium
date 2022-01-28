@@ -1,7 +1,7 @@
 class WiFiPlugin : Plugin
-    var wifiState
+    var wifi_state
     def init()
-        self.configSchema = {
+        self.config_schema = {
             'ssid': {
                 'tooltip': 'WiFi SSID',
                 'type': 'string',
@@ -14,87 +14,88 @@ class WiFiPlugin : Plugin
                 'defaultValue': ""
             },
         }
-        self.wifiState = {}
+        self.wifi_state = {}
 
-        self.applyDefaultValues()
+        self.apply_default_values()
         self.name = "wifi"
-        self.displayName = "WiFi"
+        self.display_name = "WiFi"
         self.type = "init_handler"
 
-        app.registerHandler('wifiStateChanged', def (state)
+        euphonium.register_handler('wifiStateChanged', def (state)
             print(state)
             if state['state'] == 'connected'
                 print("Connected to wifi")
-                self.wifiState['state'] = 'connected'
-                self.wifiState['ipAddress'] = state['ipAddress']
-                print(self.configSchema)
-                self.persistConfig()
-                http.publishEvent('wifi_state', self.wifiState)
-                app.initRequiredPlugins()
+                self.wifi_state['state'] = 'connected'
+                self.wifi_state['ipAddress'] = state['ipAddress']
+                print(self.config_schema)
+                self.persist_config()
+                http.emit_event('wifi_state', self.wifi_state)
+                euphonium.init_required_plugins()
             end
             if state['state'] == 'ap_ready'
-                app.initHTTP()
+                euphonium.init_http()
             end
 
             if state['state'] == 'no_ap'
-                self.wifiState['state'] = 'error'
-                http.publishEvent('wifi_state', self.wifiState)
+                self.wifi_state['state'] = 'error'
+                http.emit_event('wifi_state', self.wifi_state)
                 print("No wifi access point found")
                 #wifi_start_ap("Euphonium", "euphonium")
             end
 
             if state['state'] == 'connecting'
-                self.wifiState['state'] = 'connecting'
-                http.publishEvent('wifi_state', self.wifiState)
+                self.wifi_state['state'] = 'connecting'
+                http.emit_event('wifi_state', self.wifi_state)
             end
 
             if state['state'] == 'scan_done'
-                self.wifiState['ssids'] = [] 
+                self.wifi_state['ssids'] = [] 
 
                 for ssid : state['networks'].keys()
-                    self.wifiState['ssids'].push({
+                    self.wifi_state['ssids'].push({
                         'ssid': ssid,
                         'open': state['networks'][ssid]['open']
                     })
                 end
 
-                http.publishEvent('wifi_state', self.wifiState)
-                wifi_start_scan()
+                http.emit_event('wifi_state', self.wifi_state)
+                wifi.start_scan()
             end
         end)
     end
-    def onEvent(event, data)
+    def on_event(event, data)
         if event == EVENT_SYSTEM_INIT
-            wifi_init()
-            print(self.configSchema)
-            if self.configValue('ssid') != ""
-                wifi_connect(self.configValue('ssid'), self.configValue('password'), false)
+            print("Calling WiFi init")
+            wifi.init_stack()
+            print(self.config_schema)
+            if self.config_value('ssid') != ""
+                wifi.connect(self.config_value('ssid'), self.config_value('password'), false)
             else
                 # start access point for config
-                wifi_start_ap("Euphonium", "euphonium")
+                wifi.start_ap("Euphonium", "euphonium")
             end
         end
     end
 end
 
-var wifi = WiFiPlugin()
+var wifi_plugin = WiFiPlugin()
 
 http.handle('GET', '/wifi/wifi_scan', def (request)
     var result = {
         'status': 'scanning'
     }
 
-    http.sendJSON(result, request['connection'], 200)
-    wifi_start_scan()
+    request.write_json(result, 200)
+    wifi.start_scan()
 end)
 
 
 http.handle('GET', '/wifi/status', def (request)
-    http.sendJSON(wifi.wifiState, request['connection'], 200)
+    request.write_json(wifi_plugin.wifi_state, 200)
 end)
 
 http.handle('POST', '/wifi/connect', def (request)
-    var body = json.load(request['body'])
+    var body = request.json_body()
 
     var result = {
         'status': 'connecting'
@@ -102,13 +103,13 @@ http.handle('POST', '/wifi/connect', def (request)
     print(body['ssid'])
     print(body['password'])
 
-    wifi.configSchema['ssid']['value'] = body['ssid']
-    wifi.configSchema['password']['value'] = body['password']
+    wifi_plugin.config_schema['ssid']['value'] = body['ssid']
+    wifi_plugin.config_schema['password']['value'] = body['password']
 
-    wifi.wifiState['state'] = 'connecting'
-    http.publishEvent('wifi_state', wifi.wifiState)
-    wifi_connect(body['ssid'], body['password'], true)
-    http.sendJSON(result, request['connection'], 200)
+    wifi_plugin.wifi_state['state'] = 'connecting'
+    http.emit_event('wifi_state', wifi_plugin.wifi_state)
+    wifi.connect(body['ssid'], body['password'], true)
+    http.emit_event(result, 200)
 end)
 
-app.registerPlugin(wifi)
+euphonium.register_plugin(wifi_plugin)

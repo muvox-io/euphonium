@@ -5,7 +5,8 @@
 #include <memory>
 #include "BerryBind.h"
 
-void i2sInstall(int channelFormatInt, int commFormat, int bitsPerSample, int sampleRate, bool autoClear, int bck, int ws, int dataOut, int mclk);
+void i2sInstall(int sampleRate, int bitsPerSample, int channelFormatInt, int commFormat, int mclk);
+void i2sSetPins(int mck, int bck, int ws, int dataOut);
 void InternalDACInstall(int channelFormatInt, int sampleRate);
 
 void i2sDelete();

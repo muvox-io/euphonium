@@ -78,7 +78,7 @@ static void event_handler(void *arg, esp_event_base_t event_base,
 }
 
 void initializeWiFiStack() {
-
+    BELL_LOG(info, "wifi", "Initializing WiFi");
     esp_netif_t *sta_netif = esp_netif_create_default_wifi_sta();
     assert(sta_netif);
 
@@ -161,8 +161,8 @@ void setupAP(std::string ssid, std::string password) {
 }
 
 void exportWiFiDriver(std::shared_ptr<berry::VmState> berry) {
-    berry->export_function("wifi_init", &initializeWiFiStack);
-    berry->export_function("wifi_connect", &tryToConnect);
-    berry->export_function("wifi_start_ap", &setupAP);
-    berry->export_function("wifi_start_scan", &startFastScan);
+    berry->export_function("init_stack", &initializeWiFiStack, "wifi");
+    berry->export_function("connect", &tryToConnect, "wifi");
+    berry->export_function("start_ap", &setupAP, "wifi");
+    berry->export_function("start_scan", &startFastScan, "wifi");
 }

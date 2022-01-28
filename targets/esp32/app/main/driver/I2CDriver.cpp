@@ -18,16 +18,19 @@ void i2cInstall(bool isMaster, int sda, int scl, int clkSpeed) {
     i2c_driver_install(i2c_port, I2C_MODE_MASTER, false, false, false);
 }
 
-void i2cDelete() { i2c_driver_delete(i2c_port); }
+void i2cDelete() {
+    i2c_driver_delete(i2c_port);
+}
 
-bool i2cWriteRegValueByte(int address, int reg, int value) {
+bool i2cWriteRegValueByte(int address, int reg, int value)
+{
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
 
     i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, (((uint8_t)address) << 1) | I2C_MASTER_WRITE,
-                          ACK_CHECK_ENU);
-    i2c_master_write_byte(cmd, (uint8_t)reg, ACK_CHECK_ENU);
-    i2c_master_write_byte(cmd, (uint8_t)value, ACK_CHECK_ENU);
+    i2c_master_write_byte(cmd, (((uint8_t) address) << 1) | I2C_MASTER_WRITE, ACK_CHECK_ENU);
+    i2c_master_write_byte(cmd, (uint8_t) reg, ACK_CHECK_ENU);
+    i2c_master_write_byte(cmd, (uint8_t) value, ACK_CHECK_ENU);
+
 
     i2c_master_stop(cmd);
     esp_err_t res = i2c_master_cmd_begin(i2c_port, cmd, 500 / portTICK_RATE_MS);
@@ -39,13 +42,14 @@ bool i2cWriteRegValueByte(int address, int reg, int value) {
     return res == ESP_OK;
 }
 
-bool i2cWriteRegValueInt16(int address, int reg, int value) {
-    auto value16 = (uint16_t)value;
+bool i2cWriteRegValueInt16(int address, int reg, int value)
+{
+    auto value16 = (uint16_t) value;
 
     esp_err_t res = 0;
     uint8_t send_buff[4];
-    send_buff[0] = (((uint8_t)address) << 1);
-    send_buff[1] = (uint8_t)reg;
+    send_buff[0] = (((uint8_t) address) << 1);
+    send_buff[1] = (uint8_t) reg;
     send_buff[2] = (value16 >> 8) & 0xff;
     send_buff[3] = value16 & 0xff;
 
@@ -60,9 +64,10 @@ bool i2cWriteRegValueInt16(int address, int reg, int value) {
     return res == ESP_OK;
 }
 
-int i2cReadRegValueInt16(int address, int reg) {
-    uint8_t addr = (uint8_t)address;
-    uint8_t reg_addr = (uint8_t)reg;
+int i2cReadRegValueInt16(int address, int reg)
+{
+    uint8_t addr = (uint8_t) address;
+    uint8_t reg_addr = (uint8_t) reg;
 
     uint8_t data[2] = {0};
 
@@ -71,8 +76,7 @@ int i2cReadRegValueInt16(int address, int reg) {
     i2c_master_write_byte(cmd, (addr << 1) | I2C_MASTER_WRITE, ACK_CHECK_ENU);
     i2c_master_write_byte(cmd, reg_addr, ACK_CHECK_ENU);
     i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, (addr << 1) | I2C_MASTER_READ,
-                          ACK_CHECK_ENU); // check or not
+    i2c_master_write_byte(cmd, (addr << 1) | I2C_MASTER_READ, ACK_CHECK_ENU); //check or not
     i2c_master_read(cmd, data, 2, ACK_VALU);
     i2c_master_stop(cmd);
     i2c_master_cmd_begin(i2c_port, cmd, 1000 / portTICK_RATE_MS);
@@ -83,37 +87,37 @@ int i2cReadRegValueInt16(int address, int reg) {
     return value;
 }
 
-bool i2cWriteReg(int address, int reg) {
+bool i2cWriteReg(int address, int reg)
+{
     i2c_cmd_handle_t i2c_cmd = i2c_cmd_link_create();
 
     i2c_master_start(i2c_cmd);
-    i2c_master_write_byte(i2c_cmd, (((uint8_t)address) << 1) | I2C_MASTER_WRITE,
-                          ACK_CHECK_ENU);
-    i2c_master_write_byte(i2c_cmd, (uint8_t)reg, ACK_CHECK_ENU);
+    i2c_master_write_byte(i2c_cmd, (((uint8_t) address) << 1) | I2C_MASTER_WRITE, ACK_CHECK_ENU);
+    i2c_master_write_byte(i2c_cmd, (uint8_t) reg, ACK_CHECK_ENU);
+
 
     i2c_master_stop(i2c_cmd);
-    esp_err_t res =
-        i2c_master_cmd_begin(i2c_port, i2c_cmd, 500 / portTICK_RATE_MS);
+    esp_err_t res = i2c_master_cmd_begin(i2c_port, i2c_cmd, 500 / portTICK_RATE_MS);
     i2c_cmd_link_delete(i2c_cmd);
 
     return res == ESP_OK;
 }
 
-int i2cReadReg(int address, int reg) {
+int i2cReadReg(int address, int reg)
+{
     i2c_cmd_handle_t i2c_cmd = i2c_cmd_link_create();
     uint8_t data;
 
     i2c_master_start(i2c_cmd);
-    i2c_master_write_byte(i2c_cmd, (((uint8_t)address) << 1) | I2C_MASTER_WRITE,
-                          ACK_CHECK_ENU);
+    i2c_master_write_byte(i2c_cmd, (((uint8_t) address) << 1) | I2C_MASTER_WRITE, ACK_CHECK_ENU);
     i2c_master_read_byte(i2c_cmd, &data, ACK_CHECK_ENU);
 
+
     i2c_master_stop(i2c_cmd);
-    esp_err_t res =
-        i2c_master_cmd_begin(i2c_port, i2c_cmd, 500 / portTICK_RATE_MS);
+    esp_err_t res = i2c_master_cmd_begin(i2c_port, i2c_cmd, 500 / portTICK_RATE_MS);
     i2c_cmd_link_delete(i2c_cmd);
 
-    if (res == ESP_OK) {
+    if(res == ESP_OK) {
         return data;
     } else {
         BELL_LOG(error, "i2c", "Error reading i2c!");
@@ -122,14 +126,13 @@ int i2cReadReg(int address, int reg) {
 }
 
 void exportI2CDriver(std::shared_ptr<berry::VmState> berry) {
-    berry->export_function("install", &i2cInstall, "i2c");
-    berry->export_function("delete", &i2cDelete, "i2c");
+    berry->export_function("i2c_install", &i2cInstall);
+    berry->export_function("i2c_delete", &i2cDelete);
 
-    berry->export_function("write8", &i2cWriteRegValueByte, "i2c");
-    berry->export_function("read8", &i2cReadReg, "i2c");
+    berry->export_function("i2c_write8", &i2cWriteRegValueByte);
+    berry->export_function("i2c_write8_val", &i2cWriteReg);
+    berry->export_function("i2c_read8", &i2cReadReg);
 
-    berry->export_function("write_reg", &i2cWriteReg, "i2c");
-
-    berry->export_function("write16", &i2cWriteRegValueInt16, "i2c");
-    berry->export_function("read16", &i2cReadRegValueInt16, "i2c");
+    berry->export_function("i2c_write16", &i2cWriteRegValueInt16);
+    berry->export_function("i2c_read16", &i2cReadRegValueInt16);
 }

@@ -38,13 +38,19 @@ Allows for registering endpoints on the internal HTTP server.
 | Command           | Signature                                                                                                                                                                                                                                | Supported platforms |
 |:------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
 | `http.handle`     | `(method: string, path: string, response_handler: [(request) -> void]) -> void`<br/>Register a new HTTP endpoint under given `path`. Response handler is a method that takes `HTTPRequest` as a parameter. See examples below for usage. | All                 |
-| `http.write_text` | `(body: string, fd: int, status: int) -> void`.<br/>Writes given response with type `text/plain`. `fd` is connection fd taken from the `HTTPRequest` object.                                                                             | All                 |
-| `http.write_json` | `(body: map, fd: int, status: int) -> void`.<br/>As above, but serializes the `body` into a json string. Content-type is `application/json`.                                                                                             | All                 |
 | `http.emit_event` | `(type: string, body: map) -> void`.<br/>Broadcasts a server-side event to all connected devices. `body` will be serialized into json string.                                                                                            | All                 |
 
 ### Object `HTTPRequest`
 
-### Object `HTTPResponse`
+
+| Command        | Signature                                                                                                                                                                                       | Supported platforms |
+|:---------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| `write_json`   | `(body: map, status: int) -> void`.<br/>Writes a response json to given connection. Body is passed as a map of data to be serialized into json. Status is the HTTP status code of the response. | All                 |
+| `write_text`   | `(body: string, status: int) -> void`.<br/>Writes the response as `text/plain`.                                                                                                                 | All                 |
+| `json_body`    | `() -> map`<br/>Parses given request's body string into json and returns it as map                                                                                                              | All                 |
+| `query_params` | `() -> map`<br/>Returns map of parsed query parameters of the given request.                                                                                                                    | All                 |
+| `url_params`   | `() -> map`<br/>Returns map of parsed url parameters of the given request.                                                                                                                      | All                 |
+
 
 ### Example
 
@@ -54,22 +60,22 @@ Allows for registering endpoints on the internal HTTP server.
 
     ```python
     http.handle('GET', '/hello_world', def (request)
-        http.write_text("Hello world!", request['connection'], 200)
+        request.write_text("Hello world!", 200)
     end)
     ```
     Handle POST with json body, return a json response
 
     ```python
     http.handle('POST', '/create_cat', def (request)
-        if request['body'] == nil
+        if request.json_body() == nil
             http.write_text("No body", request['connection'], 400)
         else
            # Parse json body
-           var parsedBody = json.parse(request['body'])
+           var parsed_body = request.json_body()
 
            # Create response
-           var response = { 'name': parsedBody['name'], 'age': 3 }
-           http.write_json(response, request['connection'], 200)
+           var response = { 'name': parsed_body['name'], 'age': 3 }
+           request.write_json(response, 200)
         end
     end)
     ```
@@ -145,6 +151,35 @@ Controls I2C bus on supported platforms. Mainly used in different drivers.
 
 ### Example
 
-## GPIO
+## `gpio`
+Controls GPIO pins on supported platforms. Mainly used in different drivers.
 
-## WiFi
+**Implemented by `GPIODriver.cpp`**
+
+### Commands
+
+| Command              | Signature                                                                                                                                                                                                                                                                                                          | Supported platforms |
+|:---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| `gpio.digital_write` | `(gpio: int, state: int) -> void`<br/>Sets GPIO to LOW/HIGH. Needs physical pin number                                                                                                                                                                                                                             | esp32               |
+| `gpio.digital_read`  | `(gpio: int) -> int`<br/>Returns digital state of given physical GPIO. Either 0 or 1.                                                                                                                                                                                                                              | esp32               |
+| `gpio.pin_mode`      | `(gpio: int, mode: int) -> int`<br/>Changes the GPIO mode. Only use if if you know what you're doing, by default Euphonium handles GPIO mode itself. Mode can have the following values: gpio.INPUT, gpio.OUTPUT, gpio.PULLUP, gpio.INPUT_PULLUP, gpio.PULLDOWN, gpio.OPEN_DRAIN, gpio.OUTPUT_OPEN_DRAIN, gpio.DAC | esp32               |
+| `gpio.adc_voltage`   | `(gpio: int) -> real`.<br/>Returns the voltage on a given pin in mV. **Only used with DAC pins.**                                                                                                                                                                                                                  | esp32               |
+
+### Example
+
+## `wifi`
+
+Controls internal state of the platform's WiFi. Used internally by `wifi.be`.
+
+**Implemented by `WiFiDriver.cpp`**
+
+### Commands
+
+| Command                | Signature                                                                                                                                         | Supported platforms |
+|:-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| `wifi.init_stack`      | `() -> void`<br/>Initializes the WiFi stack                                                                                                       | esp32               |
+| `wifi.connect`         | `(ssid: string, password: string, fromAP: bool) -> void`<br/>Attempts WiFi connection. `fromAP` should be set according to the current WiFi mode. | esp32               |
+| `wifi.start_ap`        | `(ssid: string, password: string) -> void`<br/>Starts an access point with given credentials.                                                     | esp32               |
+| `wifi.start_scan`      | `() -> boid`.<br/>Starts scanning of WiFi networks.                                                                                               | esp32               |
+
+### Example

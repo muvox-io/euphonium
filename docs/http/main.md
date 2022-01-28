@@ -260,6 +260,50 @@ Updates playback current equalizer settings.
     }
     ```
 
+### `POST` `/playback/status`
+Updates playback current playback status.
+
+#### Parameters
+
+| Parameter    | type | Description                             |
+|:-------------|------|-----------------------------------------|
+| `body`       | body | `Playback`<br/>Content described below. |
+
+#### Requests
+
+??? example "Change playback settings"
+
+    Request type `application/json`. Status is either 'playing' or 'paused'
+    ```json
+    {
+        "status": "playing"
+    }
+    ```
+
+#### Responses
+
+??? example "Returns current playback state"
+
+    Response type `application/json`. Example of spotify.
+    ```json
+    {
+        "song": {
+            "icon": "https://i.scdn.co/image/kocz.jpg",
+            "songName": "Never Gonna Give You Up",
+            "albumName": "Never Gonna Give You Up",
+            "sourceName": "cspot",
+            "artistName": "Rick Astley",
+        },
+        "status": "playing",
+        "volume": 100,
+        "eq": {
+            "low": 1.25,
+            "mid": 0,
+            "high": 0
+        }
+    }
+    ```
+
 ## System
 
 Manages the state of the system.
@@ -299,5 +343,81 @@ Calling this endpoint will reboot the system.
     {
         "version": "0.0.14",
         "networkState": "rebooting",
+    }
+    ```
+
+## WiFi
+
+Manages state of the WiFi connection
+
+---------------------------------------
+
+### `GET` `/wifi`
+Returns current WiFi state.
+
+#### Parameters
+This endpoint does not have parameters
+
+#### Responses
+
+??? example "Returns current WiFi state"
+
+    Response type `application/json`. Example of connected to AP.
+    ```json
+    {
+        "state": "connected",
+        "ipAddress": "192.168.254.103"
+    }
+    ```
+
+### `POST` `/wifi/connect`
+Connects to WiFi network.
+
+#### Parameters
+
+| Parameter    | type | Description                                 |
+|:-------------|------|---------------------------------------------|
+| `body`       | body | `WiFiSettings`<br/>Content described below. |
+
+#### Requests
+
+??? example "WiFi network parameters"
+
+    Request type `application/json`.
+    ```json
+    {
+        "ssid": "RandomNetwork",
+        "password": "Test123"
+    }
+    ```
+
+
+#### Responses
+
+??? example "Returns current WiFi state"
+
+    Response type `application/json`. Example of connected to AP.
+    ```json
+    {
+        "state": "connecting",
+    }
+    ```
+
+
+### `POST` `/wifi/scan_start`
+Starts WiFi network scan.
+
+#### Parameters
+
+This endpoint does not have parameters
+
+#### Responses
+
+??? example "Returns current WiFi state"
+
+    Response type `application/json`. Example of connected to AP.
+    ```json
+    {
+        "state": "scanning",
     }
     ```

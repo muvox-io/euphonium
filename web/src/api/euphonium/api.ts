@@ -114,7 +114,7 @@ const playRadio = async (
 };
 
 const updateEq = async (settings: EqSettings): Promise<any> => {
-  return await fetch(apiUrl + "/eq", {
+  return await fetch(apiUrl + "/playback/eq", {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -125,7 +125,7 @@ const updateEq = async (settings: EqSettings): Promise<any> => {
 };
 
 const updateVolume = async (volume: number): Promise<any> => {
-  return await fetch(apiUrl + "/volume", {
+  return await fetch(apiUrl + "/playback/volume", {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -136,7 +136,7 @@ const updateVolume = async (volume: number): Promise<any> => {
 };
 
 const setPaused = async (isPaused: boolean) => {
-  return await fetch(apiUrl + "/play", {
+  return await fetch(apiUrl + "/playback/status", {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -171,7 +171,7 @@ const getOTAManifest = async () => {
 };
 
 const setOTAManifest = async (manifest: any) => {
-  return await fetch(apiUrl + "/set_ota", {
+  return await fetch(apiUrl + "/ota", {
     method: "POST",
     body: JSON.stringify(manifest)
   }).then((e) => e.json());
@@ -184,7 +184,7 @@ const getWifiStatus = async (): Promise<WiFiState> => {
 };
 
 const getInfo = async (): Promise<EuphoniumInfo> => {
-  return await fetch(apiUrl + "/info", { method: "GET" }).then((e) => e.json());
+  return await fetch(apiUrl + "/system", { method: "GET" }).then((e) => e.json());
 };
 
 let eventSource = new EventSource(eventsUrl);

@@ -1,7 +1,7 @@
 
 class BluetoothPlugin : Plugin
     def init()
-        self.configSchema = {
+        self.config_schema = {
             'name': {
                 'tooltip': 'Device\'s name',
                 'type': 'string',
@@ -9,12 +9,12 @@ class BluetoothPlugin : Plugin
             },
         }
 
-        self.applyDefaultValues()
-        self.themeColor = "#287AA9"
+        self.apply_default_values()
+        self.theme_color = "#287AA9"
         self.name = "bluetooth"
-        self.displayName = "Bluetooth"
+        self.display_name = "Bluetooth"
         self.type = "plugin"
     end
 end
 
-app.registerPlugin(BluetoothPlugin())
+euphonium.register_plugin(BluetoothPlugin())

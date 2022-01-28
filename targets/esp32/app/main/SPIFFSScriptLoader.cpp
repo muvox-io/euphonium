@@ -6,7 +6,8 @@ SPIFFSScriptLoader::SPIFFSScriptLoader()
 
 void SPIFFSScriptLoader::loadScript(std::string scriptName, std::shared_ptr<berry::VmState> berry)
 {
-    auto scriptContent = loadFile(scriptName + ".be");
+    BELL_LOG(info, "spiffs_loader", "Loading script: %s", scriptName.c_str());
+    auto scriptContent = loadFile(scriptName);
     if (!berry->execute_string(scriptContent)) {
         EUPH_LOG(error, "script_loader", "Failed to load script %s", scriptName.c_str());
     }

@@ -1,10 +1,10 @@
 class ES8388Driver : DACDriver
     def init()
         self.name = "ES8388"
-        self.hardwareVolumeControl = true
+        self.has_hardware_volume = true
     end
 
-    def initI2S()
+    def init_i2s()
         var ADDRESS = 0x10
 
         # 0x01: I2S STAND MODE
@@ -57,16 +57,16 @@ class ES8388Driver : DACDriver
         i2c_write8(ADDRESS, 0x2a, 144)
     end
 
-    def unloadI2S()
+    def unload_i2s()
         i2s_delete()
         i2c_delete()
     end
 
-    def setVolume(volume)
+    def set_volume(volume)
         var realVolume = int((volume / 100.0) * 33)
         i2c_write8(0x10, 0x2e, realVolume)
         i2c_write8(0x10, 0x2f, realVolume)
     end
 end
 
-dac.registerDriver(ES8388Driver())
+euphonium.register_driver(ES8388Driver())
