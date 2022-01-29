@@ -93,6 +93,38 @@ Manages playback state of the system.
 | `playback.empty_buffers` | `() -> void`.<br/>Empties internal audio buffers of the system. Call this during playback changes / stop pause.                                                                  | All                 |
 | `playback.soft_volume`   | `(volume: int) -> void`<br/>Changes the system's software volume. Volume is between `0` and `100`.                                                                               | All                 |
 
+## `hooks`
+
+Hooks allow to run different instructions during certain boot stages. Used for example to pull up an IO during boot.
+
+### Commands
+
+| Command             | Signature                                                                                                                | Supported platforms |
+|:--------------------|--------------------------------------------------------------------------------------------------------------------------|---------------------|
+| `hooks.add_handler` | `(bootstage: int, handler: [() -> void]) -> void`<br/>Register a new hook. Different `bootstage` values described below. | All                 |                                                                                            | esp32               |
+
+### enum `hooks.BOOTSTAGE`
+
+| Command             | Description                                                               | Supported platforms |
+|:--------------------|---------------------------------------------------------------------------|---------------------|
+| `hooks.ON_INIT`     | Called earliest during boot, after scripting VM init.                     | All                 |
+| `hooks.POST_SYSTEM` | Called after all core logic has been initialized, before plugins startup. | All                 |
+| `hooks.POST_PLUGIN` | Called after all plugins have been initialized                            | All                 |
+| `hooks.AP_INIT`     | Called after AP network has been initialized.                             | esp32               |
+| `hooks.WIFI_INIT`   | Called after WiFi has been initialized.                                   | esp32               |
+
+
+### Example
+
+!!! example "Sample hook that runs after boot"
+
+    Define I2S configuration, output 256 x MCLK clock on GPIO0.
+    ```python
+    hooks.add_handler(hooks.ON_INIT, def ()
+        print("On boot called!")
+    end)
+    ```
+
 ## `i2s`
 
 Controls I2S bus. Mainly used for DAC support.
@@ -144,8 +176,6 @@ Controls I2C bus on supported platforms. Mainly used in different drivers.
 |:------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
 | `i2c.install`     | `(sda: int, scl: int) -> void`<br/>Installs I2C driver under given pins.                                                                                                   | esp32               |
 | `i2c.detect`      | `(addr:int) -> bool`.<br/>Tries to detect device under given addr. Returns true if device found.                                                                           | esp32               |
-| `i2c.read`        | `(addr:int, reg:int, size:int) -> int or nil`.<br/>Read a value of 1..4 bytes from address addr and register reg. Returns nil if no response.                              | esp32               |
-| `i2c.write`       | `(addr:int, reg:int, val:int, size:int) -> bool`.<br/>Writes a value of 1..4 bytes to address addr, register reg with value val. Returns true if successful, false if not. | esp32               |
 | `i2c.read_bytes`  | `(addr:int, reg:int, size:int) -> int or nil`.<br/>Read a value of 1..4 bytes from address addr and register reg. Returns nil if no response.                              | esp32               |
 | `i2c.write_bytes` | `(addr:int, reg:int, val:bytes) -> nil`<br/>Writes the val bytes sequence as bytes() to address addr register reg.                                                         | esp32               |
 

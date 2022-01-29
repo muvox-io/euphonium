@@ -33,11 +33,11 @@ class VmState {
     static int call(bvm *vm);
     static int get_module_member(bvm *vm);
 
-    template <class T> T arg(const int i) { return *(T *)comptr(i); }
+    template <class T> T arg(const int i) { return *(T *)tocomptr(i); }
 
     template <typename T> int ret(const T r) { be_return(vm); }
 
-    template <class T> T *argp(const int i) { return (T *)comptr(i); }
+    template <class T> T *argp(const int i) { return (T *)tocomptr(i); }
 
     template <typename T, typename T1, typename... Args>
     std::tuple<T, T1, Args...> args(const int i = 1) {
@@ -108,7 +108,7 @@ class VmState {
     }
 
     void comptr(const void *d);
-    void *comptr(const int i = 1);
+    void* tocomptr(const int i = 1);
 
     void closure(int (*)(bvm *), const int i = -1);
     void set_global(const std::string &name);
@@ -266,6 +266,8 @@ template <> int VmState::ret<int>(const int r);
 
 template <> int VmState::ret<breal>(const breal r);
 
+template <> int VmState::ret<uint8_t>(const uint8_t r);
+
 template <> int VmState::ret<berry::map>(const berry::map r);
 
 template <> int VmState::ret<berry::list>(const berry::list r);
@@ -285,6 +287,8 @@ template <> int VmState::arg<int>(const int i);
 template <> bool VmState::arg<bool>(const int i);
 
 template <> berry::map VmState::arg<berry::map>(const int i);
+
+template <> uint8_t VmState::arg<uint8_t>(const int i);
 
 template <> berry::list VmState::arg<berry::list>(const int i);
 

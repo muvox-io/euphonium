@@ -125,6 +125,87 @@ int i2cReadReg(int address, int reg)
     }
 }
 
+//void* i2cCmdLinkCreate() {
+//    return (void*) i2c_cmd_link_create();
+//}
+//
+//void* i2cMasterStart(void* cmdHandle) {
+//    return (void*) i2c_master_start(cmdHandle);
+//}
+//
+//void i2cMasterWriteByte(void* cmd, int address, bool enableAck) {
+//    i2c_master_write_byte(cmd, address, enableAck);
+//}
+//
+//int i2cMasterReadByte(void* cmd, bool enableAck) {
+//    uint8_t data;
+//    i2c_master_read_byte(cmd, &data, enableAck);
+//    return data;
+//}
+//
+//void i2cMasterStop(void* cmd) {
+//    i2c_master_stop(cmd);
+//}
+//
+//void i2cMasterCmdBegin(void* cmd) {
+//    i2c_master_cmd_begin(0, cmd, 1000 / portTICK_RATE_MS);
+//}
+//
+//void i2cCmdLinkDelete(void* cmd) {
+//    i2c_cmd_link_delete(cmd);
+//}
+
+void i2cMasterWriteToDevice(int portNum, uint8_t deviceAddr, berry::list writeBuf) {
+    auto writeBufMapped = std::vector<uint8_t>(writeBuf.size());
+    for(auto const& value: writeBuf) {
+        writeBufMapped.push_back(std::any_cast<int>(value));
+    }
+
+    auto res = i2c_master_write_to_device(portNum, deviceAddr, writeBufMapped.data(), writeBuf.size(), 1000 / portTICK_RATE_MS);
+
+    if (res != ESP_OK) {
+        BELL_LOG(info, "i2c", "Write failed!");
+    }
+}
+
+berry::list i2cMasterReadFromDevice(int portNum, uint8_t deviceAddr, int readSize) {
+    auto result = std::vector<uint8_t>(readSize);
+    auto res = i2c_master_read_from_device(portNum, deviceAddr, result.data(), readSize, 1000 / portTICK_RATE_MS);
+    if (res != ESP_OK) {
+        BELL_LOG(info, "i2c", "Read failed!");
+    }
+
+    auto mappedRes = berry::list(result.size());
+    for(auto const& value: result) {
+        mappedRes.push_back(int(value));
+    }
+
+    return mappedRes;
+}
+
+berry::list i2cMasterWriteReadDevice(int portNum, uint8_t deviceAddr, berry::list writeBuf, int readSize) {
+    auto writeBufMapped = std::vector<uint8_t>(writeBuf.size());
+    for(auto const& value: writeBuf) {
+        writeBufMapped.push_back(std::any_cast<int>(value));
+    }
+
+    auto result = std::vector<uint8_t>(readSize);
+    auto res = i2c_master_write_read_device(portNum, deviceAddr, writeBufMapped.data(), writeBuf.size(), result.data(), readSize, 1000 / portTICK_RATE_MS);
+    if (res != ESP_OK) {
+        BELL_LOG(info, "i2c", "Read / Write failed!");
+    }
+
+    auto mappedRes = berry::list(result.size());
+    for(auto const& value: result) {
+        mappedRes.push_back(int(value));
+    }
+
+    return mappedRes;
+}
+void i2cMasterInit() {
+    //i2c_master_init();
+}
+
 void exportI2CDriver(std::shared_ptr<berry::VmState> berry) {
     berry->export_function("i2c_install", &i2cInstall);
     berry->export_function("i2c_delete", &i2cDelete);
@@ -135,4 +216,11 @@ void exportI2CDriver(std::shared_ptr<berry::VmState> berry) {
 
     berry->export_function("i2c_write16", &i2cWriteRegValueInt16);
     berry->export_function("i2c_read16", &i2cReadRegValueInt16);
+
+    // new apis
+
+    berry->export_function("master_write_to_device", &i2cMasterWriteToDevice, "i2c");
+    berry->export_function("master_init", &i2cMasterInit, "i2c");
+    berry->export_function("master_read_from_device", &i2cMasterReadFromDevice, "i2c");
+    berry->export_function("master_write_read_device", &i2cMasterWriteReadDevice, "i2c");
 }

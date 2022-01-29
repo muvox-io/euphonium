@@ -287,7 +287,7 @@ void VmState::comptr(const void *d) {
     be_pushcomptr(vm, const_cast<void *>(d));
 }
 
-void *VmState::comptr(const int i) {
+void *VmState::tocomptr(const int i) {
     if (!be_iscomptr(vm, i))
         be_raise(vm, "internal_error", "is not comptr");
     return be_tocomptr(vm, i);
@@ -328,6 +328,10 @@ template <> int VmState::ret<int>(const int r) {
     be_return(vm);
 }
 
+template <> int VmState::ret<uint8_t>(const uint8_t r) {
+    number(r);
+    be_return(vm);
+}
 template <> std::string VmState::arg<std::string>(const int i) {
     return string(i);
 }
@@ -341,6 +345,8 @@ template <> float VmState::arg<float>(const int i) { return toreal(i); }
 template <> bool VmState::arg<bool>(const int i) { return boolean(i); }
 
 template <> bint VmState::arg<bint>(const int i) { return tonumber(i); }
+
+template <> uint8_t VmState::arg<uint8_t>(const int i) { return tonumber(i); }
 
 template <> berry::map VmState::arg<berry::map>(const int i) { return map(i); }
 

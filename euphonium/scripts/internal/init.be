@@ -13,6 +13,7 @@ if core.platform() == "esp32"
     core.load("esp32/wifi.be")
     core.load("esp32/bluetooth.be")
     core.load("esp32/i2s.be")
+    core.load("esp32/i2c.be")
     core.load("esp32/dac_plugin.be")
     core.load("esp32/dacs/es8388.be")
     core.load("esp32/dacs/ac101_driver.be")
