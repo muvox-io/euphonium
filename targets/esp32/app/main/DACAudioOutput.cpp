@@ -9,9 +9,9 @@ DACAudioOutput::~DACAudioOutput()
 }
 
 void DACAudioOutput::setupBindings(std::shared_ptr<berry::VmState> berry) {
-    berry->export_this("dac_set_readable", this, &DACAudioOutput::setReadable);
-    berry->export_this("dac_set_expand", this, &DACAudioOutput::setWriteExpand);
-    berry->export_this("dac_disable_expand", this, &DACAudioOutput::disableWriteExpand);
+    berry->export_this("set_readable", this, &DACAudioOutput::setReadable, "i2s");
+    berry->export_this("expand", this, &DACAudioOutput::setWriteExpand, "i2s");
+    berry->export_this("disable_expand", this, &DACAudioOutput::disableWriteExpand, "i2s");
 }
 
 void DACAudioOutput::setReadable(bool readable) {

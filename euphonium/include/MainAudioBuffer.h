@@ -53,6 +53,7 @@ class MainAudioBuffer {
      * Locks access to audio buffer. Call after starting playback
      */
     void lockAccess() {
+        clearBuffer();
         this->accessMutex.lock();
     }
 
@@ -60,6 +61,7 @@ class MainAudioBuffer {
      * Frees access to the audio buffer. Call during shutdown
      */
      void unlockAccess() {
+         clearBuffer();
          this->accessMutex.unlock();
      }
 

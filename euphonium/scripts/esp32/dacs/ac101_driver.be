@@ -57,17 +57,14 @@ class AC101Driver : DACDriver
         # set headphones volume
         self.set_volume(100)
 
-        value = i2c_read16(ADDRESS, 0x02)
-        print(value)
         value = i2c.read_bytes(ADDRESS, 0x02, 2)
-        print(value)
 		value |= 0x8000
 		i2c.write_bytes(ADDRESS, 0x02, bytes().add(value, -2));
     end
 
     def unload_i2s()
         i2s.uninstall()
-        i2c_delete()
+        i2c.delete()
     end
 
     def set_volume(volume)

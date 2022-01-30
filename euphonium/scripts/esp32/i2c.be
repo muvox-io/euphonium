@@ -8,19 +8,35 @@ _i2c = I2SBind()
 
 class I2C
     def install(sda, scl)
-        i2c_install(true, sda, scl, 250000)
-        _i2c.master_init()
+        _i2c.master_install(sda, scl, 250000)
     end
 
-    def read()
+    def read(addr, reg)
+        return self.read_bytes(adddr, reg, 1)
     end
 
-    def write()
+    def write(addr, reg, val)
+        return self.write_bytes(addr, reg, bytes().add(val))
+    end
+
+    def delete()
+        _i2c.delete()
+    end
+
+    def detect(addr)
+        return _i2c.detect(addr)
     end
 
     def write_bytes(addr, reg, val)
+        return self.write_raw(addr, bytes().add(reg)..val)
+    end
+
+    def read_bytes(addr, reg, size)
+        return self.read_raw(addr, bytes().add(reg), size)
+    end
+
+    def write_raw(addr, val)
         var intResult = list()
-        intResult.push(reg)
         for i : 0..(val.size()-1)
             intResult.push(val[i])
         end
@@ -28,9 +44,11 @@ class I2C
         _i2c.master_write_to_device(0, addr, intResult)
     end
 
-    def read_bytes(addr, reg, size)
+    def read_raw(addr, val, size)
         var intResult = list()
-        intResult.push(reg)
+        for i : 0..(val.size()-1)
+            intResult.push(val[i])
+        end
 
         var res = _i2c.master_write_read_device(0, addr, intResult, size)
 

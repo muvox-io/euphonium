@@ -109,7 +109,7 @@ class DACPlugin : Plugin
 
     def select_driver(driver_name)
         if (self.selected_driver != nil)
-            dac_set_readable(false)
+            i2s.set_readable(false)
             self.selected_driver.unload_i2s()
         end
 
@@ -118,7 +118,7 @@ class DACPlugin : Plugin
                 self.selected_driver = driver
                 self.selected_driver.current_config = self.config_schema
                 self.selected_driver.init_i2s()
-                dac_set_readable(true)
+                i2s.set_readable(true)
             end
         end
     end

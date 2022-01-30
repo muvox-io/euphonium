@@ -172,12 +172,16 @@ Controls I2C bus on supported platforms. Mainly used in different drivers.
 
 ### Commands
 
-| Command           | Signature                                                                                                                                                                  | Supported platforms |
-|:------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
-| `i2c.install`     | `(sda: int, scl: int) -> void`<br/>Installs I2C driver under given pins.                                                                                                   | esp32               |
-| `i2c.detect`      | `(addr:int) -> bool`.<br/>Tries to detect device under given addr. Returns true if device found.                                                                           | esp32               |
-| `i2c.read_bytes`  | `(addr:int, reg:int, size:int) -> int or nil`.<br/>Read a value of 1..4 bytes from address addr and register reg. Returns nil if no response.                              | esp32               |
-| `i2c.write_bytes` | `(addr:int, reg:int, val:bytes) -> nil`<br/>Writes the val bytes sequence as bytes() to address addr register reg.                                                         | esp32               |
+| Command           | Signature                                                                                                                                     | Supported platforms |
+|:------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| `i2c.install`     | `(sda: int, scl: int) -> void`<br/>Installs I2C driver under given pins.                                                                      | esp32               |
+| `i2c.detect`      | `(addr:int) -> bool`.<br/>Tries to detect device under given addr. Returns true if device found.                                              | esp32               |
+| `i2c.read_bytes`  | `(addr:int, reg:int, size:int) -> int or nil`.<br/>Read a value of 1..4 bytes from address addr and register reg. Returns nil if no response. | esp32               |
+| `i2c.write_bytes` | `(addr:int, reg:int, val:bytes) -> nil`<br/>Writes the val bytes sequence as bytes() to address addr register reg.                            | esp32               |
+| `i2c.read`        | `(addr:int, reg:int, size:int) -> int or nil`.<br/>Reads a singular bytes from a given register.                                              | esp32               |
+| `i2c.write`       | `(addr:int, reg:int, val:int) -> nil`<br/>Writes a singular byte to a given register.                                                         | esp32               |
+| `i2c.write_raw`   | `(addr:int, val:bytes) -> nil`<br/>Write a raw sequence of bytes to the given device.                                                         | esp32               |
+| `i2c.read_raw`    | `(addr:int, val:bytes, size: int) -> int or nil`<br/>Writes the val sequence of bytes on the i2c line, and then reads `size` bytes.           | esp32               |
 
 ### Example
 
@@ -188,12 +192,12 @@ Controls GPIO pins on supported platforms. Mainly used in different drivers.
 
 ### Commands
 
-| Command              | Signature                                                                                                                                                                                                                                                                                                          | Supported platforms |
-|:---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
-| `gpio.digital_write` | `(gpio: int, state: int) -> void`<br/>Sets GPIO to LOW/HIGH. Needs physical pin number                                                                                                                                                                                                                             | esp32               |
-| `gpio.digital_read`  | `(gpio: int) -> int`<br/>Returns digital state of given physical GPIO. Either 0 or 1.                                                                                                                                                                                                                              | esp32               |
-| `gpio.pin_mode`      | `(gpio: int, mode: int) -> int`<br/>Changes the GPIO mode. Only use if if you know what you're doing, by default Euphonium handles GPIO mode itself. Mode can have the following values: gpio.INPUT, gpio.OUTPUT, gpio.PULLUP, gpio.INPUT_PULLUP, gpio.PULLDOWN, gpio.OPEN_DRAIN, gpio.OUTPUT_OPEN_DRAIN, gpio.DAC | esp32               |
-| `gpio.adc_voltage`   | `(gpio: int) -> real`.<br/>Returns the voltage on a given pin in mV. **Only used with DAC pins.**                                                                                                                                                                                                                  | esp32               |
+| Command              | Signature                                                                                                                                                                                                                                                       | Supported platforms |
+|:---------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| `gpio.digital_write` | `(gpio: int, state: int) -> void`<br/>Sets GPIO to LOW/HIGH. Needs physical pin number                                                                                                                                                                          | esp32               |
+| `gpio.digital_read`  | `(gpio: int) -> int`<br/>Returns digital state of given physical GPIO. Either `gpio.LOW` or `gpio.HIGH`                                                                                                                                                             | esp32               |
+| `gpio.pin_mode`      | `(gpio: int, mode: int) -> int`<br/>Changes the GPIO mode. Only use if if you know what you're doing, by default Euphonium handles GPIO mode itself. Mode can have the following values: gpio.INPUT, gpio.OUTPUT, gpio.PULLUP, gpio.INPUT_PULLUP, gpio.PULLDOWN | esp32               |
+| `gpio.analog_read`   | `(gpio: int) -> real`.<br/>Returns the voltage on a given pin in mV. **Only used with DAC pins.**                                                                                                                                                               | esp32               |
 
 ### Example
 

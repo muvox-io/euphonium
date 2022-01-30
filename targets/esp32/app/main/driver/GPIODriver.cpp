@@ -1,16 +1,42 @@
 #include "GPIODriver.h"
 
-void gpioSetState(int gpio, int state) {
-    gpio_config_t  io_conf;
-    memset(&io_conf, 0, sizeof(io_conf));
-    io_conf.mode = GPIO_MODE_OUTPUT;
-    io_conf.pin_bit_mask = BIT64(gpio);
-    io_conf.pull_down_en = (gpio_pulldown_t) 0;
-    io_conf.pull_up_en = (gpio_pullup_t) 0;
-    gpio_config(&io_conf);
-    gpio_set_level((gpio_num_t) gpio, state);
+void gpioDigitalWrite(int pin, int value) {
+    gpio_set_level((gpio_num_t) pin, value);
+}
+
+int gpioDigitalRead(int pin) {
+    return gpio_get_level((gpio_num_t) pin);
+}
+
+// @TODO
+int gpioAnalogRead(int pin) {
+    return 0;
+}
+
+void gpioPinMode(int pin, int mode) {
+    int selectedMode = 0;
+    switch (mode) {
+    case 1:
+        selectedMode = GP_INPUT;
+        break;
+    case 2:
+        selectedMode = GP_INPUT_PULLUP;
+        break;
+    case 3:
+        selectedMode = GP_INPUT_PULLDOWN;
+        break;
+    case 4:
+        selectedMode = GP_OUTPUT;
+        break;
+    }
+
+    gpio_set_direction((gpio_num_t)pin, (gpio_mode_t)(selectedMode & 0xFF));
+    gpio_set_pull_mode((gpio_num_t)pin, (gpio_pull_mode_t)(selectedMode >> 8));
 }
 
 void exportGPIODriver(std::shared_ptr<berry::VmState> berry) {
-    berry->export_function("gpio_digital_write", &gpioSetState);
+    berry->export_function("digital_write", &gpioDigitalWrite, "gpio");
+    berry->export_function("digital_read", &gpioDigitalRead, "gpio");
+    berry->export_function("pin_mode", &gpioPinMode, "gpio");
+    berry->export_function("analog_read", &gpioAnalogRead, "gpio");
 }
