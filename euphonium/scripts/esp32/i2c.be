@@ -31,6 +31,7 @@ class I2C
     def read_bytes(addr, reg, size)
         var intResult = list()
         intResult.push(reg)
+
         var res = _i2c.master_write_read_device(0, addr, intResult, size)
 
         var resultBytes = bytes()

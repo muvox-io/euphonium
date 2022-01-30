@@ -62,7 +62,7 @@ class AC101Driver : DACDriver
         value = i2c.read_bytes(ADDRESS, 0x02, 2)
         print(value)
 		value |= 0x8000
-		i2c_write16(ADDRESS, 0x02, value);
+		i2c.write_bytes(ADDRESS, 0x02, bytes().add(value, -2));
     end
 
     def unload_i2s()
@@ -74,8 +74,8 @@ class AC101Driver : DACDriver
         var ADDRESS = 0x1a
         var convVolume = (real(volume) / 100) * 255
         var value = int(((convVolume)*0x3f)/255) << 4;
-        value |= i2c_read16(ADDRESS, 0x56) & ~(0x3f << 4)
-        i2c_write16(ADDRESS, 0x56, value)
+        value |= i2c.read_bytes(ADDRESS, 0x56, 2) & ~(0x3f << 4)
+        i2c.write_bytes(ADDRESS, 0x56, bytes().add(value, -2))
     end
 end
 

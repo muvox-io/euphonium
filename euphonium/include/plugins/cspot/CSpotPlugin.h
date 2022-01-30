@@ -32,6 +32,8 @@ private:
     authCallback createPlayerCallback;
     std::shared_ptr<LoginBlob> authBlob;
     std::shared_ptr<ZeroconfAuthenticator> authenticator = nullptr;
+    bell::Queue<int> loginBlobQueue;
+
     void mapConfig();
 
 public:

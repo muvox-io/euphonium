@@ -13,15 +13,19 @@ HTTPAudioStream::~HTTPAudioStream()
 {
 }
 
+void HTTPAudioStream::closeStream() {
+    stream->close();
+}
+
 void HTTPAudioStream::querySongFromUrl(std::string url, AudioCodec audioCodec)
 {
     codec = audioCodec;
-    BELL_LOG(info, "webradio", "Doing request");
+    if (stream != nullptr) {
+        stream->close();
+    }
     stream = bell::HTTPClient::execute(bell::HTTPClient::HTTPRequest{
         .url = url
     });
-    BELL_LOG(info, "webradio", "Got headers");
-    BELL_LOG(info, "webradio", "moved");
     decodePtr = inputBuffer.data();
     bytesLeft = 0;
     offset = 0;

@@ -36,6 +36,7 @@ class HTTPAudioStream {
     public:
     HTTPAudioStream();
     ~HTTPAudioStream();
+    void closeStream();
     uint32_t currentSampleRate = 0;
 
     void querySongFromUrl(std::string url, AudioCodec audioCodec);

@@ -32,7 +32,6 @@ public:
     void process(uint8_t* data, size_t nBytes)
     {
         int16_t *psample;
-        uint32_t pmax;
         psample = (int16_t *)(data);
         for (int32_t i = 0; i < (nBytes / 2); i++)
         {
@@ -43,7 +42,7 @@ public:
 
     void setBindings(std::shared_ptr<berry::VmState> berry)
     {
-        berry->export_this("setVolume", this, &SoftwareVolumeProcessor::setVolume);
+        berry->export_this("set_soft_volume", this, &SoftwareVolumeProcessor::setVolume, "playback");
     }
 };
 

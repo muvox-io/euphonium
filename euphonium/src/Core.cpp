@@ -176,7 +176,7 @@ void Core::setupBindings() {
                        &Core::startAudioThreadForPlugin, "core");
     berry->export_function("sleep_ms", &sleepMS);
     berry->export_function("dupa", &dupa, "core");
-    berry->export_this("empty_buffers", this, &Core::emptyBuffers, "core");
+    berry->export_this("empty_buffers", this, &Core::emptyBuffers, "playback");
     berry->export_this("version", this, &Core::getVersion, "core");
     berry->export_this("platform", this, &Core::getPlatform, "core");
     berry->export_this("load", this, &Core::loadScript, "core");

@@ -117,5 +117,5 @@ void app_main(void) {
     init_littlefs();
 
     auto taskHandle = xTaskCreatePinnedToCore(&euphoniumTask, "euphonium", 1024 * 8,
-                                              NULL, 5, NULL, 0);
+                                              NULL, 6, NULL, 0);
 }

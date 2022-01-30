@@ -79,6 +79,7 @@ void WebRadioPlugin::runTask() {
                         BELL_SLEEP_MS(100);
                     }
                 }
+                audioStream->closeStream();
             } catch (...) {
                 BELL_LOG(error, "webradio", "Cannot play requested radio");
                 auto source = std::string("webradio");
@@ -86,6 +87,7 @@ void WebRadioPlugin::runTask() {
                 auto event = std::make_unique<PlaybackError>(source, error);
                 this->luaEventBus->postEvent(std::move(event));
             }
+            //audioStream->close();
             mainAudioBuffer->unlockAccess();
         }
     }

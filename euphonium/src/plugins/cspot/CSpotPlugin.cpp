@@ -7,10 +7,15 @@
 
 std::shared_ptr<ConfigJSON> configMan;
 
-CSpotPlugin::CSpotPlugin() : bell::Task("cspot", 4 * 1024, 1, 1) {
+CSpotPlugin::CSpotPlugin() : bell::Task("cspot", 4 * 1024, 1, 0) {
     auto file = std::make_shared<CliFile>();
     configMan = std::make_shared<ConfigJSON>("", file);
     name = "cspot";
+#ifdef ESP_PLATFORM
+    // setup mdns
+    mdns_init();
+    mdns_hostname_set("cspot");
+#endif
 }
 
 void CSpotPlugin::loadScript(std::shared_ptr<ScriptLoader> scriptLoader) {
@@ -57,11 +62,6 @@ void CSpotPlugin::shutdown() {
 }
 
 void CSpotPlugin::runTask() {
-#ifdef ESP_PLATFORM
-            // setup mdns
-        mdns_init();
-        mdns_hostname_set("cspot");
-#endif
     status = ModuleStatus::RUNNING;
     std::scoped_lock lock(runningMutex);
     this->isRunning = true;
@@ -105,11 +105,10 @@ void CSpotPlugin::runTask() {
             }
             case CSpotEventType::PLAY_PAUSE: {
                 // Handle stop pause
-                EUPH_LOG(info, "cspot", "Gor PLAY_PAUSE");
-//                bool isPaused = std::get<bool>(event.data);
-//                auto event = std::make_unique<PauseChangedEvent>(isPaused);
-//                this->luaEventBus->postEvent(std::move(event));
-//                this->audioBuffer->clearBuffer();
+                bool isPaused = std::get<bool>(event.data);
+                auto event = std::make_unique<PauseChangedEvent>(isPaused);
+                this->luaEventBus->postEvent(std::move(event));
+                this->audioBuffer->clearBuffer();
                 break;
             }
             default:
