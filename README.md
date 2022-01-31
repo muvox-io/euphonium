@@ -8,8 +8,5 @@ Highly extensible streaming audio player targetting low cost MCUs like ESP32. Cu
 
 Current state: Feature freeze until end of January.
 
-### Web IDE
-You can access the web-ide [here](https://feelfreelinux.github.io/euphonium/).
-
-### Wiki
-Basic setup instructions are available [on the wiki](https://github.com/feelfreelinux/euphonium/wiki)
+### Documentation
+You can access the project's documentation [here](https://feelfreelinux.github.io/euphonium/).
