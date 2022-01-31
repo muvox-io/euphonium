@@ -41,6 +41,9 @@ class EuphoniumInstance
             end,
             'handleConfigLoaded': def (config)
                 self.load_configuration_for(config)
+            end,
+            'hookEvent' : def (ev)
+                hooks.call(ev['hook'])
             end
         }
         self.plugins = []
@@ -139,7 +142,7 @@ class EuphoniumInstance
 
     def load_configuration()
         for plugin : self.plugins
-            persistor.load(plugin.name + ".config.json")
+            persistor.load("configuration/" + plugin.name + ".config.json")
         end
     end
 
@@ -172,8 +175,9 @@ class EuphoniumInstance
         var str_index = string.find(conf['key'], ".config.json")
         if (str_index > 0)
             var plugin_name = string.split(conf['key'], str_index)[0]
+            plugin_name = (string.split(plugin_name, string.find(plugin_name, "/") + 1)[1])
             plugin = self.get_plugin(plugin_name)
-            plugin.load_config(conf['value'])
+            plugin.load_config("configuration/" + conf['value'])
             plugin.configuration_loaded = true
             self.load_plugins_when_ready()
         end

@@ -80,6 +80,9 @@ void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader) {
     }
     loader->loadScript("internal/bindings.be", berry);
     loader->loadScript("internal/init.be", berry);
+
+    // Emit ON_INIT hook event
+    mainEventBus->postEvent(std::move(std::make_unique<HookEvent>("ON_INIT")));
     berry->execute_string("load_plugins()");
 }
 

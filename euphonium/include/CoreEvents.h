@@ -34,6 +34,24 @@ class SongChangedEvent : public Event {
     }
 };
 
+class HookEvent : public Event {
+  private:
+    std::string hook;
+
+  public:
+    HookEvent(std::string hook) {
+        this->hook = hook;
+        this->subType = "hookEvent";
+        this->eventType = EventType::LUA_MAIN_EVENT;
+    };
+
+    berry::map toBerry() {
+        berry::map result;
+        result["hook"] = this->hook;
+        return result;
+    }
+};
+
 class PauseChangedEvent : public Event {
   private:
     bool isPaused;

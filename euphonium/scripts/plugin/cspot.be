@@ -35,5 +35,4 @@ class CSpotPlugin : Plugin
         end
     end
 end
-
 euphonium.register_plugin(CSpotPlugin())
