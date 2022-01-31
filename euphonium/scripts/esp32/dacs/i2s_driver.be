@@ -1,24 +1,28 @@
 class I2SDriver : DACDriver
     def init()
         self.name = "I2S"
-        self.hardwareVolumeControl = false
+        self.hardware_volume_control = false
     end
 
-    def initI2S()
-        # 0x01: I2S STAND MODE
-        i2s_install(0, 0x01, 16, 44100, true, int(self.getGPIO('bck')), int(self.getGPIO('ws')), int(self.getGPIO('data')), 0)
+    def init_i2s()
+        # I2S STAND MODE
+        var config = I2SConfig()
+        config.sample_rate = 44100
+        config.bits_per_sample = 16
+        config.mclk = 0
+        config.comm_format = I2S_CHANNEL_FMT_RIGHT_LEFT
+        config.channel_format = I2S_COMM_FORMAT_I2S
+
+        i2s.install(config)
+        i2s.set_pins(self.get_i2s_pins())
     end
 
-    def unloadI2S()
-        i2s_delete()
-        i2c_delete()
+    def unload_i2s()
+        i2s.uninstall()
     end
 
-    def setDacVolume(volume)
-    end
-
-    def setVolume(volume)
+    def set_volume(volume)
     end
 end
 
-dac.registerDriver(I2SDriver())
+dac.register_driver(I2SDriver())

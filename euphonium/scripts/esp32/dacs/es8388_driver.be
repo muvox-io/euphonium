@@ -1,25 +1,14 @@
 class ES8388Driver : DACDriver
     def init()
         self.name = "ES8388"
-        self.has_hardware_volume = true
+        self.hardware_volume_control = true
     end
 
     def init_i2s()
         var ADDRESS = 0x10
-
-        var config = I2SConfig()
-        config.sample_rate = 44100
-        config.bits_per_sample = 16
-        config.mclk = 0
-        config.comm_format = I2S_CHANNEL_FMT_RIGHT_LEFT
-        config.channel_format = I2S_COMM_FORMAT_I2S
-
-        i2s.install(config)
-        i2s.set_pins(self.get_i2s_pins())
-
-        i2c.install(int(self.get_gpio('sda')), int(self.get_gpio('scl')))
         sleep_ms(50)
-        
+        i2c.install(int(self.get_gpio('sda')), int(self.get_gpio('scl')))
+
         # init
         i2c.write(ADDRESS, 0x08, 0x00) # set slave mode
         i2c.write(ADDRESS, 0x02, 0xFF) # chip power down
@@ -52,13 +41,20 @@ class ES8388Driver : DACDriver
         # power on
         i2c.write(ADDRESS, 0x02, 0x00)
 
-        i2s_enable_mclk()
-        i2s_install(0, 0x01, 16, 44100, true, int(self.getGPIO('bck')), int(self.getGPIO('ws')), int(self.getGPIO('data')), 0)
-        
-  
+        var config = I2SConfig()
+        config.sample_rate = 44100
+        config.bits_per_sample = 16
+        config.mclk = 0
+        config.comm_format = I2S_CHANNEL_FMT_RIGHT_LEFT
+        config.channel_format = I2S_COMM_FORMAT_I2S
+
+        i2s.install(config)
+        i2s.set_pins(self.get_i2s_pins())
 
         # enable DAC
-        gpio_digital_write(21, 1)
+        gpio.pin_mode(21, gpio.OUTPUT)
+        gpio.digital_write(21, gpio.HIGH)
+
         # magic values
         i2c.write(ADDRESS, 0x27, 144)
         i2c.write(ADDRESS, 0x2a, 144)
@@ -76,4 +72,4 @@ class ES8388Driver : DACDriver
     end
 end
 
-euphonium.register_driver(ES8388Driver())
+dac.register_driver(ES8388Driver())

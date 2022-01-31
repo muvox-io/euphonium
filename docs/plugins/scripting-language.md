@@ -11,8 +11,6 @@ Global utilities
 | Command    | Signature                                                                                 | Supported platforms |
 |:-----------|-------------------------------------------------------------------------------------------|---------------------|
 | `sleep_ms` | `(milliseconds: number) -> void`. <br/>Pauses execution for given amount of milliseconds. | All                 |
-| `bin`      | `(binary: string) -> int`. <br/>Converts binary string to int.                            | All                 |
-
 
 ## `core`
 
@@ -24,7 +22,7 @@ Manages euphonium's core functionality, mostly shared utils.
 
 | Command              | Signature                                                                                                              | Supported platforms |
 |:---------------------|------------------------------------------------------------------------------------------------------------------------|---------------------|
- | `core.start_plugin`  | `(pluginName: string, pluginConfig: map) -> void`<br/>Starts given plugin's audio thread with following configuration. | All                 |
+| `core.start_plugin`  | `(pluginName: string, pluginConfig: map) -> void`<br/>Starts given plugin's audio thread with following configuration. | All                 |
 | `core.platform`      | `() -> string`.<br/>Returns platform on which euphonium is currently running. Result being either `esp32` or `desktop` | All                 |
 | `core.version`       | `() -> string`.<br/>Returns current version of the system. Example result: `0.0.14`                                    | All                 |
 
@@ -41,7 +39,6 @@ Allows for registering endpoints on the internal HTTP server.
 | `http.emit_event` | `(type: string, body: map) -> void`.<br/>Broadcasts a server-side event to all connected devices. `body` will be serialized into json string.                                                                                            | All                 |
 
 ### Object `HTTPRequest`
-
 
 | Command        | Signature                                                                                                                                                                                       | Supported platforms |
 |:---------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
@@ -92,6 +89,15 @@ Manages playback state of the system.
 | `playback.set_pause`     | `(paused: boolean) -> void`.<br/>Pauses the playback state. This also triggers a pause event.                                                                                    | All                 |
 | `playback.empty_buffers` | `() -> void`.<br/>Empties internal audio buffers of the system. Call this during playback changes / stop pause.                                                                  | All                 |
 | `playback.soft_volume`   | `(volume: int) -> void`<br/>Changes the system's software volume. Volume is between `0` and `100`.                                                                               | All                 |
+
+## `euphonium`
+Global euphonium instance object. Handles main events, and keeps a state of plugin registry.
+
+### Commands
+
+| Command                     | Signature                                                                                                                                     | Supported platforms |
+|:----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| `euphonium.register_plugin` | `(plugin: Plugin) -> void`<br/>Registers a new euphonium plugin. `plugin` is a instance of plugin to register in the system.                  | All                 |
 
 ## `hooks`
 
@@ -184,6 +190,20 @@ Controls I2C bus on supported platforms. Mainly used in different drivers.
 | `i2c.read_raw`    | `(addr:int, val:bytes, size: int) -> int or nil`<br/>Writes the val sequence of bytes on the i2c line, and then reads `size` bytes.           | esp32               |
 
 ### Example
+!!! example "Write few bytes to I2C device"
+
+    Configure I2C on 21 and 23 pins, then perform two writes.
+    ```python
+    i2c.install(21, 23)
+
+    var deviceAddr = 0x10
+
+    # Write 0x01 to register 0x00
+    i2c.write(deviceAddr, 0x00, 0x01)
+
+    # Write byte sequence to register 0x01
+    i2c.write_bytes(deviceAddr, 0x01, bytes('1a01'))
+    ```
 
 ## `gpio`
 Controls GPIO pins on supported platforms. Mainly used in different drivers.
@@ -195,12 +215,19 @@ Controls GPIO pins on supported platforms. Mainly used in different drivers.
 | Command              | Signature                                                                                                                                                                                                                                                       | Supported platforms |
 |:---------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
 | `gpio.digital_write` | `(gpio: int, state: int) -> void`<br/>Sets GPIO to LOW/HIGH. Needs physical pin number                                                                                                                                                                          | esp32               |
-| `gpio.digital_read`  | `(gpio: int) -> int`<br/>Returns digital state of given physical GPIO. Either `gpio.LOW` or `gpio.HIGH`                                                                                                                                                             | esp32               |
+| `gpio.digital_read`  | `(gpio: int) -> int`<br/>Returns digital state of given physical GPIO. Either `gpio.LOW` or `gpio.HIGH`                                                                                                                                                         | esp32               |
 | `gpio.pin_mode`      | `(gpio: int, mode: int) -> int`<br/>Changes the GPIO mode. Only use if if you know what you're doing, by default Euphonium handles GPIO mode itself. Mode can have the following values: gpio.INPUT, gpio.OUTPUT, gpio.PULLUP, gpio.INPUT_PULLUP, gpio.PULLDOWN | esp32               |
 | `gpio.analog_read`   | `(gpio: int) -> real`.<br/>Returns the voltage on a given pin in mV. **Only used with DAC pins.**                                                                                                                                                               | esp32               |
 
 ### Example
 
+!!! example "GPIO Driver usage"
+
+    Sets GPIO 21 as output, writes its state to HIGH.
+    ```python
+    gpio.pin_mode(21, gpio.OUTPUT)
+    gpio.digital_write(21, gpio.HIGH)
+    ```
 ## `wifi`
 
 Controls internal state of the platform's WiFi. Used internally by `wifi.be`.
@@ -215,5 +242,3 @@ Controls internal state of the platform's WiFi. Used internally by `wifi.be`.
 | `wifi.connect`         | `(ssid: string, password: string, fromAP: bool) -> void`<br/>Attempts WiFi connection. `fromAP` should be set according to the current WiFi mode. | esp32               |
 | `wifi.start_ap`        | `(ssid: string, password: string) -> void`<br/>Starts an access point with given credentials.                                                     | esp32               |
 | `wifi.start_scan`      | `() -> boid`.<br/>Starts scanning of WiFi networks.                                                                                               | esp32               |
-
-### Example

@@ -15,23 +15,23 @@ int gpioAnalogRead(int pin) {
 
 void gpioPinMode(int pin, int mode) {
     int selectedMode = 0;
+    gpio_reset_pin((gpio_num_t) pin);
     switch (mode) {
     case 1:
-        selectedMode = GP_INPUT;
+        gpio_set_direction((gpio_num_t) pin, GPIO_MODE_INPUT);
         break;
     case 2:
-        selectedMode = GP_INPUT_PULLUP;
+        gpio_set_direction((gpio_num_t) pin, GPIO_MODE_INPUT);
+        gpio_set_pull_mode((gpio_num_t) pin, GPIO_PULLUP_ONLY);
         break;
     case 3:
-        selectedMode = GP_INPUT_PULLDOWN;
+        gpio_set_direction((gpio_num_t) pin, GPIO_MODE_INPUT);
+        gpio_set_pull_mode((gpio_num_t) pin, GPIO_PULLDOWN_ONLY);
         break;
     case 4:
-        selectedMode = GP_OUTPUT;
+        gpio_set_direction((gpio_num_t) pin, GPIO_MODE_OUTPUT);
         break;
     }
-
-    gpio_set_direction((gpio_num_t)pin, (gpio_mode_t)(selectedMode & 0xFF));
-    gpio_set_pull_mode((gpio_num_t)pin, (gpio_pull_mode_t)(selectedMode >> 8));
 }
 
 void exportGPIODriver(std::shared_ptr<berry::VmState> berry) {

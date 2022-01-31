@@ -12,7 +12,7 @@ class I2C
     end
 
     def read(addr, reg)
-        return self.read_bytes(adddr, reg, 1)
+        return self.read_bytes(addr, reg, 1)
     end
 
     def write(addr, reg, val)

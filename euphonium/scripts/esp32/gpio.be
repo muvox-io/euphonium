@@ -7,7 +7,7 @@ class GPIO
     var OUTPUT
 
     def member(name)
-        return get_native('i2s', name)
+        return get_native('gpio', name)
     end
 end
 
