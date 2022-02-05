@@ -1,0 +1,7 @@
+{
+  "name": "euphonium-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

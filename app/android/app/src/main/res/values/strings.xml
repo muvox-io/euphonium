@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Euphonium App</string>
+    <string name="title_activity_main">Euphonium App</string>
+    <string name="package_name">com.euphonium.app2</string>
+    <string name="custom_url_scheme">com.euphonium.app2</string>
+</resources>
