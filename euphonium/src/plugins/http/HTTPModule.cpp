@@ -2,6 +2,7 @@
 #include "BellLogger.h"
 #include "EuphoniumLog.h"
 #include "HTTPEvents.h"
+#include "cJSON.h"
 
 void listFiles(const std::string &path,
                std::function<void(const std::string &)> cb) {
@@ -139,11 +140,38 @@ void HTTPModule::runTask() {
 
     auto indexHandler = [this](bell::HTTPRequest &request) {
         std::string fileName = "index.html";
-        if (request.url.find("/file/") != std::string::npos) {
-            fileName = request.url.substr(request.url.find("/file/") + 6,
+        if (request.url.find("/devtools/file") != std::string::npos) {
+            fileName = request.url.substr(request.url.find("/devtools/file") + 15,
                                           request.url.size());
         }
         mainPersistor->serveFile(request.connection, fileName);
+    };
+
+    auto renameFileHandler = [this](bell::HTTPRequest &request) {
+        auto body = request.body;
+        // parse body with cjson
+        cJSON *root = cJSON_Parse(body.c_str());
+        if (!root) {
+            BELL_LOG(error, "http", "Error parsing JSON");
+        }
+
+        std::string oldName = cJSON_GetObjectItem(root, "currentName")->valuestring;
+        std::string newName = cJSON_GetObjectItem(root, "newName")->valuestring;
+
+        cJSON_Delete(root);
+        std::string prefix = "../../../euphonium/scripts/";
+#ifdef ESP_PLATFORM
+        prefix = "/spiffs/";
+#endif
+        std::rename(std::string(prefix + oldName).c_str(), std::string(prefix + newName).c_str());
+
+        bell::HTTPResponse response = {
+            .connectionFd = request.connection,
+            .status = 200,
+            .body = "{ \"status\": \"ok\"}",
+            .contentType = "application/json",
+        };
+        mainServer->respond(response);
     };
 
     // redirect all requests to /web
@@ -154,17 +182,18 @@ void HTTPModule::runTask() {
     // mainServer->registerHandler(bell::RequestType::GET, "/assets/:asset",
     // assetHandler);
     mainServer->registerHandler(bell::RequestType::GET, "/web/*", indexHandler);
-    mainServer->registerHandler(bell::RequestType::GET, "/assets/:asset",
-                                assetHandler);
-    mainServer->registerHandler(bell::RequestType::GET, "/file/*",
+    mainServer->registerHandler(bell::RequestType::GET, "/assets/:asset", assetHandler);
+    mainServer->registerHandler(bell::RequestType::GET, "/devtools/file/*",
                                 indexHandler);
-    mainServer->registerHandler(bell::RequestType::GET, "/directories",
+    mainServer->registerHandler(bell::RequestType::GET, "/devtools/file",
                                 directoriesHandler);
-    mainServer->registerHandler(bell::RequestType::GET, "/request_logs",
+    mainServer->registerHandler(bell::RequestType::GET, "/devtools/logs",
                                 requestLogsHandler);
     mainServer->registerHandler(bell::RequestType::GET, "/", rootHandler);
-    mainServer->registerHandler(bell::RequestType::POST, "/file/*)",
+    mainServer->registerHandler(bell::RequestType::POST, "/devtools/file/*)",
                                 uploadFileHandler);
+    mainServer->registerHandler(bell::RequestType::POST, "/devtools/rename-file",
+                                renameFileHandler);
     mainServer->listen();
 }
 
