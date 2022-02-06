@@ -113,8 +113,9 @@ void HTTPModule::runTask() {
     auto uploadFileHandler = [this](bell::HTTPRequest &request) {
         BELL_LOG(info, "http", "Received file update of len %d",
                  request.body.size());
-        BELL_LOG(info, "http", "File name: %s", request.url.c_str());
-        mainPersistor->persist(request.url.substr(6, request.url.size()),
+        BELL_LOG(info, "http", "File name: %s",
+                 request.url.substr(15, request.url.size()).c_str());
+        mainPersistor->persist(request.url.substr(15, request.url.size()),
                                request.body);
         bell::HTTPResponse response = {
             .connectionFd = request.connection,
@@ -141,10 +142,23 @@ void HTTPModule::runTask() {
     auto indexHandler = [this](bell::HTTPRequest &request) {
         std::string fileName = "index.html";
         if (request.url.find("/devtools/file") != std::string::npos) {
-            fileName = request.url.substr(request.url.find("/devtools/file") + 15,
+            fileName = request.url.substr(request.url.find("/devtools") + 15,
                                           request.url.size());
         }
         mainPersistor->serveFile(request.connection, fileName);
+    };
+
+    auto restartHandler = [this](bell::HTTPRequest &request) {
+        bell::HTTPResponse response = {
+            .connectionFd = request.connection,
+            .status = 200,
+            .body = "{ \"status\": \"ok\"}",
+            .contentType = "application/json",
+        };
+        mainServer->respond(response);
+#ifdef ESP_PLATFORM
+        esp_restart();
+#endif
     };
 
     auto renameFileHandler = [this](bell::HTTPRequest &request) {
@@ -155,7 +169,8 @@ void HTTPModule::runTask() {
             BELL_LOG(error, "http", "Error parsing JSON");
         }
 
-        std::string oldName = cJSON_GetObjectItem(root, "currentName")->valuestring;
+        std::string oldName =
+            cJSON_GetObjectItem(root, "currentName")->valuestring;
         std::string newName = cJSON_GetObjectItem(root, "newName")->valuestring;
 
         cJSON_Delete(root);
@@ -163,7 +178,8 @@ void HTTPModule::runTask() {
 #ifdef ESP_PLATFORM
         prefix = "/spiffs/";
 #endif
-        std::rename(std::string(prefix + oldName).c_str(), std::string(prefix + newName).c_str());
+        std::rename(std::string(prefix + oldName).c_str(),
+                    std::string(prefix + newName).c_str());
 
         bell::HTTPResponse response = {
             .connectionFd = request.connection,
@@ -182,7 +198,8 @@ void HTTPModule::runTask() {
     // mainServer->registerHandler(bell::RequestType::GET, "/assets/:asset",
     // assetHandler);
     mainServer->registerHandler(bell::RequestType::GET, "/web/*", indexHandler);
-    mainServer->registerHandler(bell::RequestType::GET, "/assets/:asset", assetHandler);
+    mainServer->registerHandler(bell::RequestType::GET, "/assets/:asset",
+                                assetHandler);
     mainServer->registerHandler(bell::RequestType::GET, "/devtools/file/*",
                                 indexHandler);
     mainServer->registerHandler(bell::RequestType::GET, "/devtools/file",
@@ -192,8 +209,10 @@ void HTTPModule::runTask() {
     mainServer->registerHandler(bell::RequestType::GET, "/", rootHandler);
     mainServer->registerHandler(bell::RequestType::POST, "/devtools/file/*)",
                                 uploadFileHandler);
-    mainServer->registerHandler(bell::RequestType::POST, "/devtools/rename-file",
-                                renameFileHandler);
+    mainServer->registerHandler(bell::RequestType::POST,
+                                "/devtools/rename-file", renameFileHandler);
+    mainServer->registerHandler(bell::RequestType::POST,
+                                "/system/restart", restartHandler);
     mainServer->listen();
 }
 

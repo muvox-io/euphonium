@@ -12,6 +12,7 @@
 #include "plugins/persistor/ConfigPersistor.h"
 #include "HTTPServer.h"
 #include "HTTPInstance.h"
+#include "HTTPDevTools.h"
 #ifdef ESP_PLATFORM
 #include "freertos/task.h"
 #endif
