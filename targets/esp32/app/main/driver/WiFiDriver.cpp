@@ -73,7 +73,7 @@ static void event_handler(void *arg, esp_event_base_t event_base,
         publishWiFiEvent("connected", berry::map(), std::string(strIp));
         // setup mdns
         mdns_init();
-        mdns_hostname_set("cspot");
+        mdns_hostname_set("euphonium");
     }
 }
 

@@ -3,6 +3,7 @@
 #include "EuphoniumLog.h"
 #include "HTTPEvents.h"
 #include "cJSON.h"
+#include "MDNSService.h"
 
 void listFiles(const std::string &path,
                std::function<void(const std::string &)> cb) {
@@ -213,6 +214,13 @@ void HTTPModule::runTask() {
                                 "/devtools/rename-file", renameFileHandler);
     mainServer->registerHandler(bell::RequestType::POST,
                                 "/system/restart", restartHandler);
+
+    // Register for MDNS
+    auto mdnsMap = std::map<std::string, std::string>();
+    mdnsMap["CPath"] = "/system";
+    mdnsMap["VERSION"] = "1.0";
+    MDNSService::registerService("Euphonium instance", "_euphonium", "_tcp", "", 80, mdnsMap);
+
     mainServer->listen();
 }
 

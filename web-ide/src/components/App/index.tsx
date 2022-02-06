@@ -9,9 +9,9 @@ const App = ({}) => {
     setIpAddr(newIp);
   }
 
-  useEffect(() => {
-    setIpAddress("192.168.1.234");
-  }, []);
+  // useEffect(() => {
+  //   setIpAddress("192.168.1.234");
+  // }, []);
 
   const [curVal, setCurVal] = useState<string>("");
   if (ipAddr == "") {
