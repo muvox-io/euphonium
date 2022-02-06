@@ -33,7 +33,7 @@ jobs:
         echo ${{github.ref_name}} > targets/esp32/app/spiffs/scripts-version
         echo ${{github.ref_name}} > euphonium/scripts/scripts-version
         docker run --rm -v $PWD:/project --env EUPH_VER=${{github.ref_name}} --env IDF_CCACHE_ENABLE=1 -w /project espressif/idf:release-v4.4 /bin/bash -c "python3 -m pip install --upgrade pip setuptools wheel && \
-          pip3 install grpcio-tools && cd targets/esp32 && sh generate_full_build.sh"
+          pip3 install grpcio-tools && cd targets/esp32 && export EUPH_VER="${{github.ref_name}}" && sh generate_full_build.sh"
         ls -la targets/esp32/build
         cat euphonium/scripts/scripts-version
     

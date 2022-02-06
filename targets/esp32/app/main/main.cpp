@@ -27,15 +27,6 @@
 #include <string>
 #include "esp_littlefs.h"
 
-//void *operator new(std::size_t count) {
-//    return heap_caps_malloc(count, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-//}
-//
-//void operator delete(void *ptr) noexcept {
-//    if (ptr)
-//        free(ptr);
-//}
-
 static const char *TAG = "euphonium";
 
 extern "C" {
@@ -116,6 +107,5 @@ void app_main(void) {
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     init_littlefs();
 
-    auto taskHandle = xTaskCreatePinnedToCore(&euphoniumTask, "euphonium", 1024 * 8,
-                                              NULL, 6, NULL, 0);
+    auto taskHandle = xTaskCreatePinnedToCore(&euphoniumTask, "euphonium", 1024 * 8, NULL, 6, NULL, 0);
 }
