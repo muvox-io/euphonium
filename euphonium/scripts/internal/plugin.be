@@ -52,7 +52,7 @@ class Plugin
     # saves raw confugration into memory
     def persist_config()
         var bare_values = self.get_raw_config()
-        persistor.persist(self.name + ".config.json", json.dump(bare_values))
+        persistor.persist("configuration/" + self.name + ".config.json", json.dump(bare_values))
     end
 
     # Loads raw configuration from schema
