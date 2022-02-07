@@ -170,15 +170,10 @@ std::string Core::getVersion() {
 #endif
 }
 
-void dupa() {
-    std::cout << "dupa" << std::endl;
-}
-
 void Core::setupBindings() {
     berry->export_this("start_plugin", this,
                        &Core::startAudioThreadForPlugin, "core");
     berry->export_function("sleep_ms", &sleepMS);
-    berry->export_function("dupa", &dupa, "core");
     berry->export_this("empty_buffers", this, &Core::emptyBuffers, "playback");
     berry->export_this("version", this, &Core::getVersion, "core");
     berry->export_this("platform", this, &Core::getPlatform, "core");

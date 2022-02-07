@@ -18,12 +18,3 @@ set(COMPONENT_SRCS
 set(COMPONENT_ADD_INCLUDEDIRS "." "driver/." "bluetooth/." "ota/.")
 register_component(REQUIRES "euphonium")
 component_compile_options(-std=gnu++17)
-
-if (DEFINED ENV{EUPH_VER})
-    message("Setting euphonium version")
-    message("version = $ENV{EUPH_VER}")
-    add_definitions(-DEUPH_VERSION="$ENV{EUPH_VER}")
-else()
-    message("Euphonium version not set")
-    add_definitions(-DEUPH_VERSION="debug")
-endif()

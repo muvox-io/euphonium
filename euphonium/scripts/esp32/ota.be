@@ -24,17 +24,17 @@ end
 
 euphonium.register_plugin(OTAPlugin())
 
-# http.handle('POST', '/set_ota', def (request)
-#     var body = json.load(request['body'])
-#
-#     var result = {
-#         'status': 'ok'
-#     }
-#     print(body['url'])
-#     print(body['sha256'])
-#     conf_persist('ota.config.json', json.dump(body))
-#
-#     http.sendJSON(result, request['connection'], 200)
-#     sleep_ms(500)
-#     ota_reboot_recovery()
-# end)
+http.handle('POST', '/ota', def (request)
+    var body = request.json_body()
+
+    var result = {
+        'status': 'ok'
+    }
+    print(body['url'])
+    print(body['sha256'])
+    persistor.persist('ota.config.json', json.dump(body))
+
+    http.sendJSON(result, request['connection'], 200)
+    sleep_ms(500)
+    ota_reboot_recovery()
+end)
