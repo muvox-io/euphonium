@@ -34,7 +34,7 @@ http.handle('POST', '/ota', def (request)
     print(body['sha256'])
     persistor.persist('configuration/ota.config.json', json.dump(body))
 
-    http.sendJSON(result, request['connection'], 200)
+    request.write_json(result, 200)
     sleep_ms(500)
     ota_reboot_recovery()
 end)
