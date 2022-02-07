@@ -177,7 +177,7 @@ class EuphoniumInstance
             var plugin_name = string.split(conf['key'], str_index)[0]
             plugin_name = (string.split(plugin_name, string.find(plugin_name, "/") + 1)[1])
             plugin = self.get_plugin(plugin_name)
-            plugin.load_config("configuration/" + conf['value'])
+            plugin.load_config(conf['value'])
             plugin.configuration_loaded = true
             self.load_plugins_when_ready()
         end
