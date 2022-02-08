@@ -30,7 +30,7 @@ jobs:
       - name: Build
         run: yarn build:native:android
       - name: Build debug APK
-        working-directory: ./android
+        working-directory: app/android
         run: bash ./gradlew assembleDebug --stacktrace
       - name: Upload APK
         uses: actions/upload-artifact@v2
