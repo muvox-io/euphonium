@@ -31,7 +31,7 @@ export class HomePage implements OnInit {
   async scan(event?) {
     this.loading = true;
 
-    Zeroconf.watch('_http._tcp.', 'local.').subscribe((result) => {
+    Zeroconf.watch('_euphonium._tcp.', 'local.').subscribe((result) => {
       console.log('Zeroconf', result);
 
       if (result.service?.ipv4Addresses[0]) {
