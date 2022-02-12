@@ -1282,6 +1282,11 @@
   resolved "https://registry.npmjs.org/@capacitor/status-bar/-/status-bar-1.0.7.tgz"
   integrity sha512-Z4flqIGCeVDQ/IwFZEjHS0uLun2r70CG+6bs24ENKsSnirXFXvmzDOY60qff9eywP6pNLYqgcSaznnQ0eIu3Vw==
 
+"@capacitor/storage@^1.2.4":
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/@capacitor/storage/-/storage-1.2.4.tgz#7aed6c311587857ce6a11d31783904170453ae98"
+  integrity sha512-AqA4KnCQNOmFJ1HuSfmyPf5jz80JY2cX04Uy4j1hpo5ex9bY6W8mUKLsePakTzt4ScDnYuOaXsmusUrpglgPfQ==
+
 "@cspotcode/source-map-consumer@0.8.0":
   version "0.8.0"
   resolved "https://registry.npmjs.org/@cspotcode/source-map-consumer/-/source-map-consumer-0.8.0.tgz"

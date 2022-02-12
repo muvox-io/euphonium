@@ -2,6 +2,8 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Browser } from '@capacitor/browser';
 import { Zeroconf } from '@ionic-native/zeroconf';
+import { Storage } from '@capacitor/storage';
+
 
 @Component({
   selector: 'app-home',
@@ -9,15 +11,44 @@ import { Zeroconf } from '@ionic-native/zeroconf';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage implements OnInit {
-  devices = [];
+  devices: any = [];
   filteredDevices = [];
+  favorites = [];
   loading = false;
+  debug = false;
 
   constructor(private cdr: ChangeDetectorRef) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     Zeroconf.watchAddressFamily = 'ipv4';
-    this.scan();
+    this.loading = false;
+    // this.scan();
+    const { value } = await Storage.get({ key: 'favorites' });
+    if(value) {
+      this.favorites = JSON.parse(value);
+    }
+    console.log('value', this.favorites);
+
+  }
+
+  async clearFavorites() {
+    this.favorites = [];
+    await Storage.remove({ key: 'favorites' });
+  }
+
+  isInWishlist(device) {
+    return this.favorites?.includes(device);
+  }
+
+  async favorite(event, device) {
+    event.preventDefault();
+    event.stopPropagation();
+    console.log('favorite', device);
+    this.favorites.push(device);
+    await Storage.set({
+      key: 'favorites',
+      value: JSON.stringify(this.favorites),
+    });
   }
 
   async refresh(event) {

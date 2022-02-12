@@ -22,6 +22,35 @@
   </ion-refresher>
 
   <ion-list>
+    <ion-list-header>
+      <ion-text class="w-full">Favorites</ion-text>
+      <ion-button color="dark" size="small" fill="clear" (click)="clearFavorites()">
+        <ion-icon name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-list-header>
+    <ion-item
+      button
+      (click)="openDevice(device)"
+      *ngFor="let device of favorites; let i = index"
+    >
+      <ion-badge slot="start">{{i+1}}</ion-badge>
+      <ion-label>
+        <h2>{{ device.service?.name }}</h2>
+        <p>
+          <span *ngFor="let ip of device.service?.ipv4Addresses">{{ip}}</span>
+        </p>
+      </ion-label>
+
+      <ion-button color="dark" slot="end" fill="clear" (click)="favorite($event, device)">
+        <ion-icon [name]="isInWishlist(device) ? 'star' : 'star-outline'"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-list>
+
+  <ion-list class="mt-5">
+    <ion-list-header>
+      <ion-text>Devices</ion-text>
+    </ion-list-header>
     <ion-item
       button
       (click)="openDevice(device)"
@@ -32,8 +61,13 @@
         <h2>{{ device.service?.name }}</h2>
         <p>
           <span *ngFor="let ip of device.service?.ipv4Addresses">{{ip}}</span>
+          <span *ngIf="device.service?.txtRecord?.VERSION">&nbsp;-&nbsp;{{device.service?.txtRecord?.VERSION}}</span>
         </p>
       </ion-label>
+
+      <ion-button color="dark" slot="end" fill="clear" (click)="favorite($event, device)">
+        <ion-icon [name]="isInWishlist(device) ? 'star' : 'star-outline'"></ion-icon>
+      </ion-button>
     </ion-item>
 
     <ion-item *ngIf="loading">
@@ -61,7 +95,7 @@
     </div>
   </ion-list>
 
-  <div class="p-5">
+  <div class="p-5" *ngIf="debug">
     <div class="w-full rounded-md bg-gray-800 text-gray-400 text-xs p-3">
       {{ devices | json }}
     </div>

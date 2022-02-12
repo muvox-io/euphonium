@@ -27,6 +27,7 @@
     "@capacitor/ios": "3.4.0",
     "@capacitor/keyboard": "1.2.1",
     "@capacitor/status-bar": "1.0.7",
+    "@capacitor/storage": "^1.2.4",
     "@ionic-native/core": "^5.36.0",
     "@ionic-native/zeroconf": "^5.36.0",
     "@ionic/angular": "^6.0.5",
