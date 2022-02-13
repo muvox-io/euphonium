@@ -4,7 +4,6 @@ import { Browser } from '@capacitor/browser';
 import { Zeroconf } from '@ionic-native/zeroconf';
 import { Storage } from '@capacitor/storage';
 
-
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -21,14 +20,13 @@ export class HomePage implements OnInit {
 
   async ngOnInit() {
     Zeroconf.watchAddressFamily = 'ipv4';
-    this.loading = false;
-    // this.scan();
+
     const { value } = await Storage.get({ key: 'favorites' });
-    if(value) {
+    if (value) {
       this.favorites = JSON.parse(value);
     }
-    console.log('value', this.favorites);
 
+    this.scan();
   }
 
   async clearFavorites() {
@@ -43,8 +41,15 @@ export class HomePage implements OnInit {
   async favorite(event, device) {
     event.preventDefault();
     event.stopPropagation();
+
     console.log('favorite', device);
-    this.favorites.push(device);
+    if (this.isInWishlist(device)) {
+      // Remove from favorites
+      this.favorites = this.favorites.filter((_) => _ != device);
+    } else {
+      this.favorites.push(device);
+    }
+
     await Storage.set({
       key: 'favorites',
       value: JSON.stringify(this.favorites),
@@ -54,9 +59,7 @@ export class HomePage implements OnInit {
   async refresh(event) {
     this.devices = [];
     await Zeroconf.reInit();
-    setTimeout(() => {
-      this.scan(event);
-    }, 200);
+    this.scan(event);
   }
 
   async scan(event?) {
@@ -86,7 +89,6 @@ export class HomePage implements OnInit {
 
       this.loading = false;
       this.cdr.detectChanges();
-
       event?.target?.complete();
     });
   }
