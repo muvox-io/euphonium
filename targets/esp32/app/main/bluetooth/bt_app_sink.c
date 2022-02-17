@@ -42,11 +42,14 @@
 #define CONFIG_BT_NAME	"ESP32-BT"
 #endif
 
+char bt_sink_name[64];
+
 /* event for handler "bt_av_hdl_stack_up */
 enum {
     BT_APP_EVT_STACK_UP = 0,
 };
 char * bt_name = NULL;
+
 
 static bool (*bt_app_a2d_cmd_cb)(bt_sink_cmd_t cmd, ...);
 static void (*bt_app_a2d_data_cb)(const uint8_t *data, uint32_t len);
@@ -691,8 +694,8 @@ static void bt_av_hdl_stack_evt(uint16_t event, void *p_param)
     case BT_APP_EVT_STACK_UP: {
         /* set up device name */
 		//bt_name = (char * )config_alloc_get_default(NVS_TYPE_STR, "bt_name", CONFIG_BT_NAME, 0);
-        bt_name = "Euphonium";
-		esp_bt_dev_set_device_name(bt_name);
+        
+		esp_bt_dev_set_device_name(bt_sink_name);
         esp_bt_gap_register_callback(bt_app_gap_cb);
 
         /* initialize AVRCP controller */

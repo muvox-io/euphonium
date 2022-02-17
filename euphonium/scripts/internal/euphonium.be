@@ -125,7 +125,7 @@ class EuphoniumInstance
 
         core.start_plugin('cspot', self.get_plugin('cspot').get_raw_config())
         core.start_plugin('webradio', self.get_plugin('webradio').get_raw_config())
-        core.start_plugin('bluetooth', {})
+        core.start_plugin('bluetooth', self.get_plugin('bluetooth').get_raw_config())
 
         self.init_http()
     end

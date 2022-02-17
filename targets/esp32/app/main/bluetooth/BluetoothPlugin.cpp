@@ -96,6 +96,8 @@ void BluetoothPlugin::runTask() {
     while (true) {
         if (this->btEventQueue.wpop(event)) {
             if (event == BTEvent::Initialize) {
+                std::string deviceName = std::any_cast<std::string>(config["name"]);
+                snprintf(bt_sink_name, sizeof bt_sink_name, "%s", deviceName.c_str());
                 bt_sink_init(bt_sink_cmd_handler, sink_data_handler);
             }
 
