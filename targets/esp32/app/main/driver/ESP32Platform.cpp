@@ -22,4 +22,5 @@ void ESP32PlatformPlugin::setupBindings() {
     exportI2CDriver(berry);
     exportI2SDriver(berry);
     exportGPIODriver(berry);
+    BootloopDetector::exportBerryBindings(berry);
 }

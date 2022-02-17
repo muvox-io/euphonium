@@ -2,6 +2,7 @@ set(COMPONENT_SRCS
     "SPIFFSScriptLoader.cpp"
     "DACAudioOutput.cpp"
     "ScriptsUpdater.cpp"
+    "BootloopDetector.cpp"
     "driver/ESP32Platform.cpp"
     "driver/I2CDriver.cpp"
     "driver/I2SDriver.cpp"
