@@ -160,9 +160,19 @@ void setupAP(std::string ssid, std::string password) {
     ESP_ERROR_CHECK(esp_wifi_start());
 }
 
+std::string getMacAddress() {
+    uint8_t mac[6];
+    esp_read_mac(mac, ESP_MAC_WIFI_STA);
+    char macStr [18];
+    sprintf(macStr, "%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2],
+            mac[3], mac[4], mac[5]);
+    return std::string(macStr);
+}
+
 void exportWiFiDriver(std::shared_ptr<berry::VmState> berry) {
     berry->export_function("init_stack", &initializeWiFiStack, "wifi");
     berry->export_function("connect", &tryToConnect, "wifi");
     berry->export_function("start_ap", &setupAP, "wifi");
     berry->export_function("start_scan", &startFastScan, "wifi");
+    berry->export_function("get_mac", &getMacAddress, "wifi");
 }
