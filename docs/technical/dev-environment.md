@@ -19,7 +19,7 @@ Depending on the target platform, esp32 or cli targets differ in required depend
 
 #### Both platforms
 - `python` with `pip`
-- `pip3 install grpcio-tools`
+- `pip3 install grpcio-tools protobuf`
 
 #### Desktop specific dependencies
 - PortAudio library
