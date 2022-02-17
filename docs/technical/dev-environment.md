@@ -83,7 +83,7 @@ There are a few tricks to make the development faster
 
 Every flash of the spiffs partition will reset the internal configuration. It's a bit of a pain when dealing with esp32, as you have to deal with reconfiguration of the system through the AP network with every flash. To avoid this, you can preconfigure the WiFi settings (any any other setting!) to be included in the flashed partition.
 
-To configure WiFi, create a file inside of `euphonium/scripts` folder, named `wifi.config.json`, containing following data
+To configure WiFi, create a file inside of `euphonium/scripts/configuration` folder, named `wifi.config.json`, containing following data
 
 ```
 {
