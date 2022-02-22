@@ -8,6 +8,7 @@ class EuphoniumInstance
 
     # Setup initial values
     def init()
+        self.playback_state = {}
         self.plugins_initialized = false
         self.event_handlers = {
             'handleRouteEvent': def (request)
@@ -157,7 +158,14 @@ class EuphoniumInstance
         self.plugins.push(plugin)
     end
 
+    def persist_playback_state()
+        persistor.persist("configuration/playback.config.json", json.dump(self.playback_state))
+    end
+
     def load_configuration()
+        # load playback config
+        persistor.load("configuration/playback.config.json")
+
         for plugin : self.plugins
             persistor.load("configuration/" + plugin.name + ".config.json")
         end
@@ -192,12 +200,18 @@ class EuphoniumInstance
         var str_index = string.find(conf['key'], ".config.json")
         if (str_index > 0)
             var plugin_name = string.split(conf['key'], str_index)[0]
-            plugin_name = (string.split(plugin_name, string.find(plugin_name, "/") + 1)[1])
-            plugin = self.get_plugin(plugin_name)
-            print(conf)
-            plugin.load_config(conf['value'])
-            plugin.configuration_loaded = true
-            self.load_plugins_when_ready()
+            plugin_name = string.split(plugin_name, string.find(plugin_name, "/") + 1)[1]
+
+            if plugin_name == "playback"
+                if conf['value'] != ''
+                    self.playback_state = json.load(conf['value'])
+                end
+            else 
+                plugin = self.get_plugin(plugin_name)
+                plugin.load_config(conf['value'])
+                plugin.configuration_loaded = true
+                self.load_plugins_when_ready()
+            end
         end
     end
 
@@ -220,6 +234,10 @@ class EuphoniumInstance
 
             if core.platform() == 'desktop'
                 self.init_required_plugins()
+            end
+
+            if self.playback_state != nil
+                self.apply_volume(self.playback_state['volume'])
             end
         end
     end

@@ -9,6 +9,7 @@ build/
 scripts-version
 wifi.config.json
 euphonium/scripts/*.json
+euphonium/scripts/configuration/*.json
 targets/esp32/app/spiffs/*
 py/
 *.d

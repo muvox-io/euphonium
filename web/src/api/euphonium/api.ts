@@ -1,9 +1,4 @@
 import {
-  ConfigurationField,
-  PlaybackState,
-  PluginConfiguration,
-  PluginEntry,
-  EqSettings,
   EuphoniumInfo,
   WiFiState,
   DACPreset,
@@ -13,18 +8,10 @@ export let apiUrl = "";
 let currentVersion = "";
 
 if (import.meta.env.MODE !== "production") {
-  apiUrl = "http://192.168.1.108"
-  //apiUrl = "http://localhost";
+  apiUrl = "http://localhost";
 }
 
 let eventsUrl = apiUrl + "/events";
-
-const getPlaybackState = async (): Promise<PlaybackState> => {
-  return await fetch(apiUrl + "/playback")
-    .then((e) => e.json())
-    .then((e) => e as PlaybackState);
-};
-
 
 const getDACPresets = async (): Promise<DACPreset[]> => {
   return await fetch(
@@ -45,28 +32,6 @@ const playRadio = async (
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ stationUrl, codec, stationName, favicon }),
-  }).then((e) => e.json());
-};
-
-const updateEq = async (settings: EqSettings): Promise<any> => {
-  return await fetch(apiUrl + "/playback/eq", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(settings),
-  }).then((e) => e.json());
-};
-
-const updateVolume = async (volume: number): Promise<any> => {
-  return await fetch(apiUrl + "/playback/volume", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ volume }),
   }).then((e) => e.json());
 };
 
@@ -127,9 +92,6 @@ let eventSource = new EventSource(eventsUrl);
 export {
   eventSource,
   playRadio,
-  getPlaybackState,
-  updateEq,
-  updateVolume,
   setPaused,
   getWifiStatus,
   getInfo,

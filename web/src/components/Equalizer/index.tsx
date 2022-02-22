@@ -1,11 +1,10 @@
 import { useState } from "preact/hooks";
-import { updateEq } from "../../api/euphonium/api";
-import {EqSettings} from "../../api/euphonium/models";
+import { EqSettings, updateEq } from "../../api/euphonium/playback";
 
 interface IEqBandParams {
   type: string;
   value: number;
-  onValueChanged: (a: number) => void;
+  onValueChanged: (a: number, blur: boolean) => void;
 }
 
 const EqBand = ({ type, onValueChanged, value }: IEqBandParams) => {
@@ -18,7 +17,12 @@ const EqBand = ({ type, onValueChanged, value }: IEqBandParams) => {
         onInput={(e) => {
           const value = (e.target as any).value / 2;
           setBandValue(value - 4);
-          onValueChanged((value - 4 ));
+          onValueChanged((value - 4 ), false);
+        }}
+        onBlur={(e) => {
+          const value = (e.target as any).value / 2;
+          setBandValue(value - 4);
+          onValueChanged((value - 4 ), true);
         }}
         type="range"
         id="volume"
@@ -45,29 +49,29 @@ interface IEqualizerParams {
 export default ({ eq }: IEqualizerParams) => {
   const [eqSettings, setEqSettings] = useState<EqSettings>(eq);
 
-  const updateSettings = (value: any, type: any) => {
+  const updateSettings = (value: any, type: any, persist: boolean) => {
     const newSettings = { ...eqSettings, [type]: value };
     setEqSettings(newSettings);
-    updateEq(newSettings);
+    updateEq(newSettings, persist);
   };
   return (
       <div class="flex flex-row mt-2 ml-4">
         <EqBand
           type="bass"
           value={eqSettings["low"]}
-          onValueChanged={(val) => updateSettings(val, "low")}
+          onValueChanged={(val, blur) => updateSettings(val, "low", blur)}
         />
 
         <EqBand
           type="mid"
           value={eqSettings["mid"]}
-          onValueChanged={(val) => updateSettings(val, "mid")}
+          onValueChanged={(val, blur) => updateSettings(val, "mid", blur)}
         />
 
         <EqBand
           type="treble"
           value={eqSettings["high"]}
-          onValueChanged={(val) => updateSettings(val, "high")}
+          onValueChanged={(val, blur) => updateSettings(val, "high", blur)}
         />
       </div>
   );

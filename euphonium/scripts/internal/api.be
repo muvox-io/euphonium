@@ -93,6 +93,11 @@ http.handle('POST', '/playback/volume', def (request)
     var body = request.json_body()
     euphonium.apply_volume(int(body['volume']))
 
+    # save to file if persist is requrested
+    if body.find('persist') != nil && body['persist']
+        euphonium.persist_playback_state()
+    end
+
     request.write_json(euphonium.playback_state, 200)
 end)
 
@@ -101,6 +106,12 @@ http.handle('POST', '/playback/eq', def (request)
     playback.set_eq(real(body['low']), real(body['mid']), real(body['high']))
     euphonium.playback_state['eq'] = body
     euphonium.update_playback()
+    
+    # save to file if persist is requrested
+    if body.find('persist') != nil && body['persist']
+        euphonium.persist_playback_state()
+    end
+
     request.write_json(euphonium.playback_state, 200)
 end)
 

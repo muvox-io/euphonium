@@ -1,16 +1,13 @@
 import {
     eventSource,
-    getPlaybackState,
     setPaused,
-    updateVolume,
 } from "../../api/euphonium/api";
 import Icon from "../Icon";
 import {useEffect, useState} from "preact/hooks";
 import useIsMobile from "../../utils/isMobile.hook";
 import Equalizer from "../Equalizer";
-import {PlaybackState, PlaybackStatus} from "../../api/euphonium/models";
 import Modal from "../Modal";
-import Button from "../Button";
+import { getPlaybackState, PlaybackState, PlaybackStatus, updateVolume } from "../../api/euphonium/playback";
 
 export function debounce<T extends unknown[], U>(
     callback: (...args: T) => PromiseLike<U> | U,
@@ -42,12 +39,12 @@ const PlaybackBar = ({themeColor = "#fff"}) => {
     const [eqOpen, setEqOpen] = useState<boolean>(false);
     const [mobileDialogOpen, setMobileDialogOpen] = useState<boolean>(false);
 
-    const volUpdatedInstant = (volume: number) => {
-        updateVolume(Math.round((volume / 15) * 100));
+    const volUpdatedInstant = (volume: number, persist: boolean) => {
+        updateVolume(Math.round((volume / 15) * 100), persist);
     };
 
     const volUpdated = debounce(
-        (volume: number) => volUpdatedInstant(volume),
+        (volume: number, persist: boolean = false) => volUpdatedInstant(volume, persist),
         100
     );
 
@@ -96,6 +93,7 @@ const PlaybackBar = ({themeColor = "#fff"}) => {
                             name="volume"
                             value={((playbackState?.volume || 0) / 100) * 15}
                             onInput={(e: any) => volUpdated(e.target.value)}
+                            onBlur={(e: any) => volUpdated(e.target.value, true)}
                             min="0"
                             max="15"
                         />

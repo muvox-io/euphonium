@@ -1,6 +1,6 @@
 import {useState, useEffect} from "preact/hooks";
-import {eventSource, getPlaybackState, updateVolume} from "../../api/euphonium/api";
-import {PlaybackState} from "../../api/euphonium/models";
+import {eventSource } from "../../api/euphonium/api";
+import { getPlaybackState, PlaybackState, updateVolume } from "../../api/euphonium/playback";
 import Card from "../Card";
 import Equalizer from "../Equalizer";
 import Icon from "../Icon";
