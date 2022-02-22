@@ -2,12 +2,12 @@ import math
 
 class DACDriver
     var hardware_volume_control
-    var current_config
+    var state
     var name
     var signedness
 
     def get_gpio(pin)
-        return int(self.current_config[pin]['value'])
+        return int(self.state[pin])
     end
 
     def get_i2s_pins()
@@ -46,45 +46,7 @@ class DACPlugin : Plugin
     var selected_driver
 
     def init()
-        self.config_schema = {
-            'dac': {
-                'tooltip': 'Select driver',
-                'type': 'stringList',
-                'listValues': ["I2S", "AC101", "ES8388", "TAS5711", "MA12070P", "Internal"],
-                'defaultValue': "I2S"
-            },
-            'mclk': {
-                'tooltip': 'I2S - MCLK',
-                'type': 'number',
-                'defaultValue': "0"
-            },
-            'bck': {
-                'tooltip': 'I2S - BCK / SCLK',
-                'type': 'number',
-                'defaultValue': "0"
-            },
-            'ws': {
-                'tooltip': 'I2S - WS / LRCLK',
-                'type': 'number',
-                'defaultValue': "0"
-            },
-            'data': {
-                'tooltip': 'I2S - DATA / DIN',
-                'type': 'number',
-                'defaultValue': "0"
-            },
-            'scl': {
-                'tooltip': 'I2C - SCL',
-                'type': 'number',
-                'defaultValue': "0"
-            },
-            'sda': {
-                'tooltip': 'I2C - SDA',
-                'type': 'number',
-                'defaultValue': "0"
-            },
-        }
-
+        self.registered_drivers = []
         self.apply_default_values()
 
         self.name = "dac"
@@ -92,19 +54,67 @@ class DACPlugin : Plugin
         self.type = "system"
         self.selected_driver = nil
         self.is_audio_output = true
-        self.registered_drivers = []
     end
 
-    # register driver implementation
-    def register_driver(driver)
-        self.registered_drivers.push(driver)
+    def make_form(ctx, state)
         var drivers = []
 
         for driver : self.registered_drivers
             drivers.push(driver.name)
         end
 
-        self.config_schema['dac']['listValues'] = drivers
+        ctx.create_group('driver', { 'label': 'Driver' })
+        ctx.create_group('i2s', { 'label': 'I2S GPIO' })
+        ctx.create_group('i2c', { 'label': 'I2C GPIO' })
+
+        ctx.select_field('dac', {
+            'label': "Select driver",
+            'default': "I2S",
+            'group': 'driver',
+            'values': drivers,
+            'type': 'number'
+        })
+
+        ctx.number_field('bck', {
+            'label': "BCK",
+            'default': "0",
+            'group': 'i2s',
+        })
+
+        ctx.number_field('ws', {
+            'label': "WS",
+            'default': "0",
+            'group': 'i2s',
+        })
+
+        ctx.number_field('data', {
+            'label': "DATA",
+            'default': "0",
+            'group': 'i2s',
+        })
+
+        ctx.number_field('mclk', {
+            'label': "MCLK",
+            'default': "0",
+            'group': 'i2s',
+        })
+
+        ctx.number_field('sda', {
+            'label': "SDA",
+            'default': "0",
+            'group': 'i2c',
+        })
+
+        ctx.number_field('scl', {
+            'label': "SCL",
+            'default': "0",
+            'group': 'i2c',
+        })
+    end
+
+    # register driver implementation
+    def register_driver(driver)
+        self.registered_drivers.push(driver)
     end
 
     def select_driver(driver_name)
@@ -116,7 +126,7 @@ class DACPlugin : Plugin
         for driver : self.registered_drivers
             if driver.name == driver_name
                 self.selected_driver = driver
-                self.selected_driver.current_config = self.config_schema
+                self.selected_driver.state = self.state
                 self.selected_driver.init_i2s()
                 i2s.set_readable(true)
             end
@@ -132,7 +142,7 @@ class DACPlugin : Plugin
 
     def on_event(event, data)
         if event == EVENT_CONFIG_UPDATED
-            self.select_driver(self.config_schema['dac']['value'])
+            self.select_driver(self.state['dac'])
         end
 
         if event == EVENT_VOLUME_UPDATED

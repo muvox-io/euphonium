@@ -40,6 +40,7 @@ class WiFiPlugin : Plugin
                 self.wifi_state['state'] = 'error'
                 http.emit_event('wifi_state', self.wifi_state)
                 print("No wifi access point found")
+                wifi.start_ap("Euphonium", "euphonium")
                 #wifi_start_ap("Euphonium", "euphonium")
             end
 

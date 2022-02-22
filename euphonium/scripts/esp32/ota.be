@@ -1,24 +1,23 @@
 class OTAPlugin : Plugin
     def init()
-        self.config_schema = {
-            'name': {
-                'type': 'hidden',
-                'defaultValue': ""
-            },
-            'url': {
-                'type': 'hidden',
-                'defaultValue': ""
-            },
-            'sha256': {
-                'type': 'hidden',
-                'defaultValue': ""
-            },
-        }
-
         self.apply_default_values()
         self.name = "ota"
         self.display_name = "System update"
         self.type = "system"
+    end
+
+    def make_form(ctx, state)
+        ctx.text_field('name', {
+            'label': "Update name",
+        })
+
+        ctx.text_field('url', {
+            'label': "Update URL",
+        })
+
+        ctx.text_field('sha256', {
+            'label': "sha256",
+        })
     end
 end
 

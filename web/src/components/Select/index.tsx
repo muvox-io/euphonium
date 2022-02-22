@@ -8,7 +8,7 @@ type SelectProps = {
 export default ({ tooltip = "", values = [], value, onChange }: SelectProps) => {
   return (
     <div>
-      <div class='text-app-text-secondary text-s mb-1'>{tooltip}</div>
+      <div class='text-app-text-secondary text-xs mb-1'>{tooltip}</div>
       <div class='bg-app-secondary border border-app-border rounded-xl pr-2'>
         <select class='bg-transparent p-3 h-[45px] w-full' value={value} onChange={(v: any) => onChange(v.target.value)}>
           {values.map((result, index) => (

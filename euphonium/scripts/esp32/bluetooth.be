@@ -51,19 +51,21 @@ class BluetoothPlugin : Plugin
         return opinions[opinionsIdx] + ' ' + colors[colorsIdx] + ' ' + things[thingsIdx] + ' ' + last2Bytes
     end
     def init()
-        self.config_schema = {
-            'name': {
-                'tooltip': 'Device name',
-                'type': 'string',
-                'defaultValue': self.generate_device_name()
-            },
-        }
-
         self.apply_default_values()
         self.theme_color = "#287AA9"
         self.name = "bluetooth"
         self.display_name = "Bluetooth"
         self.type = "plugin"
+    end
+
+    def make_form(ctx, state)
+        ctx.create_group('bluetooth', { 'label': 'General' })
+
+        ctx.text_field('name', {
+            'label': "Device's name",
+            'default': self.generate_device_name(),
+            'group': 'bluetooth'
+        })
     end
 end
 

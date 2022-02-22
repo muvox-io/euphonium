@@ -97,10 +97,16 @@ void ConfigPersistor::runTask() {
                     .contentType = contentType,
                 };
                 response.responseReader =
-                    std::make_unique<bell::FileResponseReader>(prefix + fileName);
+                    std::make_unique<bell::FileResponseReader>(prefix +
+                                                               fileName);
                 mainServer->respond(response);
             } else {
-                std::string value = scriptLoader->loadFile(request.key);
+                std::string prefix = "";
+#ifndef ESP_PLATFORM
+                prefix = "../../../euphonium/scripts/";
+#endif
+                std::string value =
+                    scriptLoader->loadFile(prefix + request.key);
                 BELL_LOG(info, "persistor", "Loaded key: %s",
                          request.key.c_str());
                 auto event =

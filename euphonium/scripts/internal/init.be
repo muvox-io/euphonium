@@ -1,5 +1,6 @@
 # Load essential modules
 core.load("internal/http.be")
+core.load("internal/form_ctx.be")
 core.load("internal/plugin.be")
 core.load("internal/hooks.be")
 core.load("internal/euphonium.be")

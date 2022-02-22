@@ -1,6 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
-import { getDACPresets, updatePluginConfValues } from "../../api/euphonium/api";
+import { getDACPresets } from "../../api/euphonium/api";
 import { DACPreset } from "../../api/euphonium/models";
+import { updatePluginConfiguration } from "../../api/euphonium/plugins";
 import Button from "../../components/Button";
 import Input from "../../components/Input";
 import Modal from "../../components/Modal";
@@ -56,12 +57,11 @@ export default function ({ configurationUpdated = () => {} }) {
               onClick={() => {
                 let dacConfig = selectedDAC as any;
                 delete dacConfig["board"];
-                updatePluginConfValues("dac", selectedDAC).then((e) => {
+                updatePluginConfiguration("dac", selectedDAC, false).then((e) => {
                   configurationUpdated();
                   setOpen(false);
                   setDac(null as any);
                   getDACPresets().then(setDacs);
-
                 });
               }}
             >

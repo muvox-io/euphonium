@@ -19,6 +19,9 @@ class YouTubePlugin : Plugin
         self.themeColor = "#FF0000"
     end
 
+    def make_form(ctx, state)
+    end
+
     def postBind(name, data)
         self.ofs += 1
         var postData = {

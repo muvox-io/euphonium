@@ -3,46 +3,56 @@ import { useState, useEffect, useContext } from "preact/hooks";
 import Input from "../Input";
 import Select from "../Select";
 import Modal from "../Modal";
-import {
-  ConfigurationField,
-  ConfigurationFieldType,
-} from "../../api/euphonium/models";
-import {
-  getPluginConfiguration,
-  updatePluginConfiguration,
-} from "../../api/euphonium/api";
+
 import Card from "../Card";
 import Button from "../Button";
 import DACConfig from "../../apps/DACConfig";
 import OTATrigger from "../../apps/ota/OTATrigger";
-import {PlaybackDataContext} from "../../utils/PlaybackContext";
+import { PlaybackDataContext } from "../../utils/PlaybackContext";
+import { getPluginConfiguration, updatePluginConfiguration, fieldsToValues, ConfigurationFieldType, ConfigurationField, PluginConfiguration } from "../../api/euphonium/plugins";
+import Checkbox from "../Checkbox";
 
 const renderConfigurationField = (
   field: ConfigurationField,
   updateField: (field: ConfigurationField, value: string) => void
 ) => {
-  let { type, tooltip, value, listValues } = field;
+  let { type, label, value, values } = field;
   const onChange = (e: string) => updateField(field, e);
   switch (type) {
-    case ConfigurationFieldType.String:
-      return <Input tooltip={tooltip} value={value} onChange={onChange} />;
-    case ConfigurationFieldType.Number:
-      return <Input tooltip={tooltip} value={value} onChange={onChange} />;
-    case ConfigurationFieldType.StringList:
+    case ConfigurationFieldType.TEXT:
+      return <Input tooltip={label} value={value} onBlur={onChange} />;
+    case ConfigurationFieldType.NUMBER:
+      return <Input tooltip={label} value={value} onBlur={onChange} type={'number'} />;
+    case ConfigurationFieldType.CHECKBOX:
+      return (<Checkbox value={value == "true"} label={label!!} onChange={(v) => {
+        updateField(field, v ? "true" : "false");
+      }} />);
+    case ConfigurationFieldType.SELECT:
       return (
         <Select
-          tooltip={tooltip}
+          tooltip={label!!}
           value={value}
-          values={listValues}
+          values={values!!}
           onChange={onChange}
         />
       );
-    case ConfigurationFieldType.Hidden:
-      return <></>;
     default:
       return <p>Unsupported field type</p>;
   }
 };
+
+const ConfigurationGroup = ({ fields = [], groupKey = "", updateField }: { fields: ConfigurationField[], groupKey: string, updateField: (field: ConfigurationField, value: string) => void }) => {
+  const group = fields.filter((e) => e.key == groupKey);
+  const groupFields = fields.filter((e) => e.group == groupKey);
+
+  return (<div class="flex flex-col w-full">
+    <span class="text-lg font-thin">{group[0].label}</span>
+    <div class="space-y-2 w-full">
+      {groupFields.map((field) => renderConfigurationField(field, updateField))}
+    </div>
+    <div class="w-full h-[0.5px] opacity-70 mt-6 bg-app-text-secondary mb-2"></div>
+  </div>);
+}
 
 export default ({ plugin = "" }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -51,15 +61,24 @@ export default ({ plugin = "" }) => {
     ConfigurationField[]
   >([]);
 
+  const [groups, setGroups] = useState<
+    ConfigurationField[]
+  >([]);
+
   const [dirty, setDirty] = useState<boolean>(false);
-  const {setPlaybackState} = useContext(PlaybackDataContext);
+  const { setPlaybackState } = useContext(PlaybackDataContext);
+
+  const setConfig = ({ configSchema, displayName }: PluginConfiguration) => {
+    setGroups(configSchema.filter((e) => e.type == ConfigurationFieldType.GROUP));
+    setIsLoading(false);
+    setConfigurationFields(configSchema);
+    setDisplayName(displayName);
+  }
 
   const loadConfig = () => {
     setIsLoading(true);
     getPluginConfiguration(plugin).then((e) => {
-      setIsLoading(false);
-      setConfigurationFields(e.fields);
-      setDisplayName(e.displayName);
+      setConfig(e);
     });
   };
 
@@ -67,16 +86,13 @@ export default ({ plugin = "" }) => {
     loadConfig();
   }, [plugin]);
 
-  const updateConfiguration = () => {
-    updatePluginConfiguration(plugin, configurationFields).then((e) => {
-      setConfigurationFields(e.fields);
-      setDisplayName(e.displayName);
-      setPlaybackState(e);
-      setDirty(false);
-    });
+  const updateConfiguration = async () => {
+    const config = await updatePluginConfiguration(plugin, fieldsToValues(configurationFields), false);
+    setConfig(config);
+    setDirty(false);
   };
 
-  const updateField = (field: ConfigurationField, value: string) => {
+  const updateField = async (field: ConfigurationField, value: string) => {
     setDirty(true);
     const newFields = configurationFields.map((f) => {
       if (f === field) {
@@ -84,7 +100,9 @@ export default ({ plugin = "" }) => {
       }
       return f;
     });
-    setConfigurationFields(newFields);
+    const config = await updatePluginConfiguration(plugin, fieldsToValues(newFields), true);
+
+    setConfig(config);
   };
 
   if (isLoading) return null;
@@ -101,14 +119,14 @@ export default ({ plugin = "" }) => {
         ) : null}
         {plugin == "ota" ? <OTATrigger /> : null}
 
-        {configurationFields.map((field) =>
-          renderConfigurationField(field, updateField)
-        )}
-        <div class="pt-3">
-          <Button disabled={!dirty} onClick={updateConfiguration}>
-            Apply changes
-          </Button>
-        </div>
+        {groups.length ? groups.map((field) => (<ConfigurationGroup
+          updateField={updateField}
+          fields={configurationFields}
+          groupKey={field.key} />)) : null}
+
+        <Button disabled={!dirty} onClick={updateConfiguration}>
+          Apply changes
+        </Button>
       </div>
     </Card>
   );

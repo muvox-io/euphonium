@@ -1,13 +1,5 @@
 class WebRadioPlugin : Plugin
     def init()
-        self.config_schema = {
-            'radioBrowserApi': {
-                'tooltip': 'Radio Browser instance url',
-                'type': 'string',
-                'defaultValue': 'http://webradio.radiobrowser.com/api/v1/stations/'
-            },
-        }
-
         self.apply_default_values()
         self.name = "webradio"
         self.theme_color = "#d2c464"
@@ -15,6 +7,17 @@ class WebRadioPlugin : Plugin
         self.type = "plugin"
         self.has_web_app = true
     end
+
+    def make_form(ctx, state)
+        ctx.create_group('webradio', { 'label': 'General' })
+
+        ctx.text_field('radioBrowserUrl', {
+            'label': "Radio Browser instance url",
+            'default': "http://webradio.radiobrowser.com/api/v1/stations/",
+            'group': 'webradio'
+        })
+    end
+
 
     def on_event(event, data)
         if event == EVENT_SET_PAUSE

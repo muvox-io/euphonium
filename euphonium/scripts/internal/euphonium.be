@@ -123,11 +123,28 @@ class EuphoniumInstance
             plugin.init_audio()
         end
 
-        core.start_plugin('cspot', self.get_plugin('cspot').get_raw_config())
-        core.start_plugin('webradio', self.get_plugin('webradio').get_raw_config())
-        core.start_plugin('bluetooth', self.get_plugin('bluetooth').get_raw_config())
+        self.init_plugin('cspot')
+        self.init_plugin('webradio')
+        self.init_plugin('bluetooth')
 
         self.init_http()
+    end
+
+    def init_plugin(plugin_name)
+        plugin = self.get_plugin(plugin_name)
+        if (plugin != nil)
+            var ctx = FormContext()
+            plugin.make_form(ctx, plugin.state)
+            ctx.apply_state(plugin.state)
+    
+            var raw_state = {}
+            for field : ctx.fields
+                if field['type'] != 'group'
+                    raw_state[field['key']] = field['value']
+                end
+            end
+            core.start_plugin(plugin_name, raw_state)
+        end
     end
 
     # Starts the HTTP thread
@@ -177,6 +194,7 @@ class EuphoniumInstance
             var plugin_name = string.split(conf['key'], str_index)[0]
             plugin_name = (string.split(plugin_name, string.find(plugin_name, "/") + 1)[1])
             plugin = self.get_plugin(plugin_name)
+            print(conf)
             plugin.load_config(conf['value'])
             plugin.configuration_loaded = true
             self.load_plugins_when_ready()

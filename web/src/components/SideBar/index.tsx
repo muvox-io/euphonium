@@ -1,7 +1,7 @@
 import { Link } from "preact-router/match";
 import { useState, useEffect } from "preact/hooks";
-import { getPlugins } from "../../api/euphonium/api";
 import { PluginEntry, PluginEntryType } from "../../api/euphonium/models";
+import { getPlugins } from "../../api/euphonium/plugins";
 import Icon from "../Icon";
 import SelectItem from "../SelectItem";
 

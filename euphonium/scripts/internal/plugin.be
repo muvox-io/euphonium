@@ -14,6 +14,7 @@ class Plugin
     var has_web_app
     var configuration_loaded
     var theme_color
+    var state
 
     # Call in init, sets default values
     def apply_default_values()
@@ -21,9 +22,13 @@ class Plugin
         self.configuration_loaded = false
         self.is_audio_output = false
         self.theme_color = "#fff"
-
-        for key : self.config_schema.keys()
-            self.config_schema[key]['value'] = self.config_schema[key]['defaultValue']
+        self.state = {}
+        var ctx = FormContext()
+        self.make_form(ctx, self.state)
+        for field : ctx.fields
+            if (field.find('default') != nil)
+                self.state[field['key']] = field['default']
+            end
         end
     end
 
@@ -36,23 +41,20 @@ class Plugin
 
     # Returns value of a given config key
     def config_value(key)
-        return self.config_schema[key]['value']
+        return self.state[key]
     end
 
     # Returns value-only state of config schema
     def get_raw_config()
-        var bare_values = {}
-        for key : self.config_schema.keys()
-            bare_values[key] = self.config_schema[key]['value']
-        end
-
-        return bare_values
+        return self.state
     end
 
     # saves raw confugration into memory
     def persist_config()
-        var bare_values = self.get_raw_config()
-        persistor.persist("configuration/" + self.name + ".config.json", json.dump(bare_values))
+        persistor.persist("configuration/" + self.name + ".config.json", json.dump(self.state))
+    end
+
+    def make_form(ctx, state)
     end
 
     # Loads raw configuration from schema
@@ -63,7 +65,7 @@ class Plugin
         end
 
         for key : schema_obj.keys()
-            self.config_schema[key]['value'] = schema_obj[key]
+            self.state = schema_obj
         end
     end
 end

@@ -8,6 +8,7 @@ type InputProps = {
   placeholder?: string;
   onChange?: (value: string) => void;
   onSubmit?: (value: string) => void;
+  onBlur?: (value: string) => void;
 };
 
 export default ({
@@ -17,11 +18,12 @@ export default ({
   onChange,
   onSubmit,
   icon,
+  onBlur,
   placeholder,
 }: InputProps) => {
   return (
     <div class='lg:min-w-[400px] min-w-full relative'>
-      <div class='text-app-text-secondary text-s mb-1'>{tooltip}</div>
+      <div class='text-app-text-secondary text-xs mb-1 mt-2'>{tooltip}</div>
       <input
         placeholder={placeholder}
         className={`${icon ? "pl-10" : ""} bg-app-secondary h-[45px] border border-app-border p-3 rounded-xl min-w-full`}
@@ -29,6 +31,8 @@ export default ({
         type={type}
         onChange={(e: any) => onSubmit && onSubmit(e.target.value)}
         onInput={(e: any) => onChange && onChange(e.target.value)}
+        onBlur={(e: any) => onBlur && onBlur(e.target.value)}
+
       ></input>
       {icon && (
         <div class='text-app-text-secondary left-1 top-3 absolute'>
