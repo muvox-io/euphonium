@@ -37,6 +37,7 @@ size_t CircularBuffer::write(const uint8_t *data, size_t bytes)
 
 void CircularBuffer::emptyBuffer() {
     std::lock_guard<std::mutex> guard(bufferMutex);
+    begIndex = 0;
     dataSize = 0;
     endIndex = 0;
 }
