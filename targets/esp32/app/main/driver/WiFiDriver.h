@@ -4,6 +4,8 @@
 #include "BerryBind.h"
 #include "esp_wifi.h"
 #include "esp_event.h"
+#include "BellUtils.h"
+
 #include "EventBus.h"
 #include <Core.h>
 #include <vector>
@@ -20,6 +22,7 @@ struct WiFiState {
     int reconnectCount = 0;
     bool connected = false;
     bool isConnecting = false;
+    bool fromAp = false;
 
     std::mutex stateMutex;
 };

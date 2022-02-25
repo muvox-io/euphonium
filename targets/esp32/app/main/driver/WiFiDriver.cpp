@@ -22,7 +22,8 @@ static void event_handler(void *arg, esp_event_base_t event_base,
         std::scoped_lock lock(globalWiFiState.stateMutex);
         if (!globalWiFiState.isConnecting) {
             publishWiFiEvent("ap_ready");
-            //start_dns_server();
+            globalWiFiState.fromAp = true;
+            captdnsInit();
         }
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_SCAN_DONE) {
         uint16_t number = DEFAULT_SCAN_LIST_SIZE;
@@ -71,6 +72,11 @@ static void event_handler(void *arg, esp_event_base_t event_base,
 
         BELL_LOG(info, "wifi", "Connected, ip addr: %s", strIp);
         publishWiFiEvent("connected", berry::map(), std::string(strIp));
+
+        if (globalWiFiState.fromAp) {
+            BELL_SLEEP_MS(1000);
+            esp_restart();
+        }
         // setup mdns
         mdns_init();
         mdns_hostname_set("euphonium");
@@ -106,7 +112,7 @@ wifi_config_t setWiFiConfigBase(bool ap) {
     } else {
         wifi_config.ap.channel = 1;
         wifi_config.ap.max_connection = 4;
-        wifi_config.ap.authmode = WIFI_AUTH_WPA_WPA2_PSK;
+        wifi_config.ap.authmode = WIFI_AUTH_OPEN;
     }
     return wifi_config;
 }

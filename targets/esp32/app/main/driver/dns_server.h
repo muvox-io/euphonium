@@ -1,6 +1,5 @@
-#ifndef EUPH_DNS_SERVER
-#define EUPH_DNS_SERVER
-
-void start_dns_server();
+#ifndef CAPTDNS_H
+#define CAPTDNS_H
+void captdnsInit(void);
 
 #endif
