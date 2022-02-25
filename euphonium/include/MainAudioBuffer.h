@@ -12,6 +12,10 @@
 #include <AudioOutput.h>
 #include <BellUtils.h>
 
+#ifndef ESP_PLATFORM
+#define EXT_RAM_ATTR
+#endif
+
 typedef std::function<void(std::string)> shutdownEventHandler;
 
 /**
@@ -29,7 +33,9 @@ class MainAudioBuffer {
     uint32_t sampleRate = 0;
 
     MainAudioBuffer() {
-        audioBuffer = std::make_shared<CircularBuffer>(AUDIO_BUFFER_SIZE);
+        // allocate static buffer
+        static uint8_t buffer[AUDIO_BUFFER_SIZE] EXT_RAM_ATTR;
+        audioBuffer = std::make_shared<CircularBuffer>(buffer, AUDIO_BUFFER_SIZE);
     }
 
     /**

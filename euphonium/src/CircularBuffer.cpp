@@ -1,9 +1,9 @@
 #include "CircularBuffer.h"
 
-CircularBuffer::CircularBuffer(size_t dataCapacity)
+CircularBuffer::CircularBuffer(uint8_t *static_buffer, size_t dataCapacity)
 {
     this->dataCapacity = dataCapacity;
-    buffer = std::vector<uint8_t>(dataCapacity);
+    buffer = static_buffer;
 };
 
 size_t CircularBuffer::write(const uint8_t *data, size_t bytes)
@@ -16,7 +16,7 @@ size_t CircularBuffer::write(const uint8_t *data, size_t bytes)
     // Write in a single step
     if (bytesToWrite <= dataCapacity - endIndex)
     {
-        memcpy(buffer.data() + endIndex, data, bytesToWrite);
+        memcpy(buffer + endIndex, data, bytesToWrite);
         endIndex += bytesToWrite;
         if (endIndex == dataCapacity)
             endIndex = 0;
@@ -25,9 +25,9 @@ size_t CircularBuffer::write(const uint8_t *data, size_t bytes)
     else
     {
         size_t firstChunkSize = dataCapacity - endIndex;
-        memcpy(buffer.data() + endIndex, data, firstChunkSize);
+        memcpy(buffer + endIndex, data, firstChunkSize);
         size_t secondChunkSize = bytesToWrite - firstChunkSize;
-        memcpy(buffer.data(), data + firstChunkSize, secondChunkSize);
+        memcpy(buffer, data + firstChunkSize, secondChunkSize);
         endIndex = secondChunkSize;
     }
 
@@ -53,7 +53,7 @@ size_t CircularBuffer::read(uint8_t *data, size_t bytes)
     // Read in a single step
     if (bytesToRead <= dataCapacity - begIndex)
     {
-        memcpy(data, buffer.data() + begIndex, bytesToRead);
+        memcpy(data, buffer + begIndex, bytesToRead);
         begIndex += bytesToRead;
         if (begIndex == dataCapacity)
             begIndex = 0;
@@ -62,9 +62,9 @@ size_t CircularBuffer::read(uint8_t *data, size_t bytes)
     else
     {
         size_t firstChunkSize = dataCapacity - begIndex;
-        memcpy(data, buffer.data() + begIndex, firstChunkSize);
+        memcpy(data, buffer + begIndex, firstChunkSize);
         size_t secondChunkSize = bytesToRead - firstChunkSize;
-        memcpy(data + firstChunkSize, buffer.data(), secondChunkSize);
+        memcpy(data + firstChunkSize, buffer, secondChunkSize);
         begIndex = secondChunkSize;
     }
 

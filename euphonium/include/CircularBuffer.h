@@ -9,7 +9,7 @@
 class CircularBuffer
 {
 public:
-    CircularBuffer(size_t dataCapacity);
+    CircularBuffer(uint8_t *static_buffer, size_t dataCapacity);
 
     size_t size() const { return dataSize; }
     size_t capacity() const { return dataCapacity; }
@@ -23,7 +23,7 @@ private:
     size_t endIndex = 0;
     size_t dataSize = 0;
     size_t dataCapacity = 0;
-    std::vector<uint8_t> buffer;
+    uint8_t *buffer;
 };
 
 #endif
