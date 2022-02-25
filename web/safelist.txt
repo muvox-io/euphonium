@@ -2,3 +2,5 @@ bg-notif-error
 bg-notif-success
 bg-notif-warning
 bg-notif-info
+bg-green-500
+bg-red-500

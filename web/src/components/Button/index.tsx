@@ -1,7 +1,7 @@
 type ButtonProps = {
   onClick: () => void;
   disabled?: boolean;
-  type?: "transparent" | "primary" | "progress";
+  type?: "transparent" | "primary" | "progress" | "danger";
   progress?: number;
   children: any;
 };
@@ -44,11 +44,17 @@ export default ({
     );
   }
 
+  let color = "bg-green-500";
+
+  if (type == "danger") {
+    color = "bg-red-500";
+  }
+
   return (
     <button
       disabled={disabled}
       className={`${
-        (disabled && "bg-app-text-secondary") || "bg-green-500"
+        (disabled && "bg-app-text-secondary") || color
       } font-bold relative rounded-xl text-white w-full h-[45px]`}
       onClick={(e) => onClick()}
     >

@@ -1,10 +1,11 @@
-import { useEffect, useState } from "preact/hooks"
+import { useCallback, useEffect, useState } from "preact/hooks"
 import { connectToWifi, eventSource, getWifiStatus, scanWifi } from "../../../api/euphonium/api"
 import { WiFiNetwork, WiFiState } from "../../../api/euphonium/models"
 import Button from "../../../components/Button"
 import Card from "../../../components/Card"
 import Input from "../../../components/Input"
 import SelectItem from "../../../components/SelectItem"
+import Spinner from "../../../components/Spinner"
 
 enum CurrentState {
     Scanning,
@@ -23,57 +24,101 @@ const ConnectedState = ({ ipAddr = "" }) => {
             }} type='primary'>Navigate to device</Button></div>));
 }
 
+const NetworkSelected = ({ network, onConnect, onCancel }: { network: WiFiNetwork, onConnect: (ssid: string, pass: string) => void, onCancel: () => void }) => {
+    const [password, setPassword] = useState("")
+    return (<div class="flex flex-col space-y-3">
+
+        <div class="flex flex-col space-y-3">
+            <div class='text-gray-400 text-s flex-row flex'>selected network</div>
+            <SelectItem isSelected={true}> {network.ssid} </SelectItem>
+            {network?.open ? <></> :
+                <><div class='text-gray-400 text-s flex-row flex'>Enter credentials</div>
+                    <input
+                        placeholder="password"
+                        className="bg-app-secondary h-[58px] border border-app-border p-3 rounded-xl min-w-full"
+                        value={password}
+                        type="password"
+                        onInput={(e: any) => setPassword(e.target.value)}
+                    ></input></>
+            }
+            <div class="pt-2"><Button onClick={() => {
+                onConnect(network.ssid, password);
+            }} type='primary'>Connect</Button>
+
+            </div>
+            <div class="pt-2"><Button onClick={() => {
+                onCancel();
+            }} type='danger'>Cancel</Button>
+
+            </div>
+        </div>
+
+    </div>)
+}
+
+const NetworkScanResults = ({ wifiState, setLocalState, setSelectedNetwork }: { wifiState: WiFiState, setLocalState: any, setSelectedNetwork: any }) => {
+    return (<div class="flex flex-col space-y-3">
+        <p><div class='text-gray-400 text-s mb-1 flex-row flex'>available networks (<div class='ml-1 mr-1 text-green-400 text-s animate-pulse'>scanning</div>)</div></p>
+        <div class="flex flex-col space-y-3 mt-2">
+            {wifiState.ssids.map(network => (
+                <SelectItem onClick={() => {
+                    if (network.open) {
+                        setLocalState(CurrentState.ReadyToConnect);
+                    } else {
+                        setLocalState(CurrentState.RequirePassword);
+                    }
+                    setSelectedNetwork(network);
+                }}> {network.ssid} </SelectItem>))}
+
+        </div>
+
+    </div>)
+}
+
 export default () => {
     const [wifiState, setWifiState] = useState<WiFiState>({ ssids: [], state: '', ipAddress: '' });
     const [localState, setLocalState] = useState<CurrentState>(CurrentState.Scanning);
     const [selectedNetwork, setSelectedNetwork] = useState<WiFiNetwork | null>(null);
-    const [password, setPassword] = useState<string>('');
+
+    const handleWiFiState = useCallback(({ data }: any) => {
+        let state: WiFiState = JSON.parse(data)
+
+        setWifiState({ ...state });
+
+        if (wifiState.state == 'connecting') {
+            setLocalState(CurrentState.Connecting);
+        }
+
+    }, []);
+
+    const handleOnOnline = useCallback(() => {
+        getWifiStatus().then(setWifiState);
+    }, []);
 
     useEffect(() => {
         scanWifi();
-        eventSource.addEventListener("wifi_state", ({ data }: any) => {
-            setWifiState(JSON.parse(data));
+        eventSource.addEventListener("wifi_state", handleWiFiState);
+        window.addEventListener('ononline', handleOnOnline);
+        return () => {
+            eventSource.removeEventListener("wifi_state", handleWiFiState);
+            window.removeEventListener("ononline", handleOnOnline);
+        };
+    }, [handleWiFiState]);
 
-            if (wifiState.state == 'connecting') {
-                setLocalState(CurrentState.Connecting);
-            }
-        });
-
-        window.addEventListener('ononline', (ev) => {
-            getWifiStatus().then(setWifiState);
-        });
-    }, []);
-
-    const startConnectWifi = async () => {
+    const startConnectWifi = async (ssid: string, password: string) => {
         connectToWifi(selectedNetwork!!.ssid, password);
     }
 
     return (
         <div class="md:w-[600px] md:absolute md:left-1/2 md:transform md:-translate-x-1/2 w-full">
             <Card enableButton={false} title="WiFi configuration" subtitle="initial configuration">
-                {wifiState.state == 'connected' ? <ConnectedState ipAddr={wifiState.ipAddress}/> : (
-                    <div class="flex flex-col space-y-3">
-                        <p><div class='text-gray-400 text-s mb-1 flex-row flex'>available networks (<div class='ml-1 mr-1 text-green-400 text-s animate-pulse'>scanning</div>)</div>
-                        </p>
-                        <div class="flex flex-col space-y-3 mt-2">
-                            {wifiState.ssids.map(network => (
-                                <SelectItem isSelected={selectedNetwork?.ssid == network.ssid} onClick={() => {
-                                    if (network.open) {
-                                        setLocalState(CurrentState.ReadyToConnect);
-                                    } else {
-                                        setLocalState(CurrentState.RequirePassword);
-                                    }
-                                    setSelectedNetwork(network);
-                                }}> {network.ssid} </SelectItem>))}
-                        </div>
-
-                        {localState == CurrentState.RequirePassword ? <Input type="password" value={password} tooltip="Please enter password" onChange={setPassword} placeholder="password"></Input> : null}
-                        {wifiState.state == 'connecting' ? <div class='ml-1 mr-1 text-green-400 text-sm animate-pulse'>connecting to {selectedNetwork?.ssid}</div> : null}
-                        {wifiState.state == 'error' ? <div class='ml-1 mr-1 text-red-400 text-sm'>cannot connect to network</div> : null}
-                        <div class="pt-2"><Button onClick={() => {
-                            startConnectWifi();
-                            setWifiState({ ssids: [], state: '', ipAddress: '' });
-                        }} disabled={localState != CurrentState.ReadyToConnect && localState != CurrentState.RequirePassword} type='primary'>Connect to WiFi</Button>
-                        </div></div>)}
-            </Card></div>)
+                {!selectedNetwork && wifiState.state == 'scanning' ? (<NetworkScanResults wifiState={wifiState} setSelectedNetwork={setSelectedNetwork} setLocalState={setLocalState} />) : <></>}
+                {selectedNetwork && wifiState.state == 'scanning' ? (<NetworkSelected
+                    onCancel={() => setSelectedNetwork(null)}
+                    onConnect={startConnectWifi}
+                    network={selectedNetwork} />) : <></>}
+                {wifiState.state == 'connecting' ? <p><div class='ml-1 mr-1 text-green-400 text-s animate-pulse'>Connecting to {selectedNetwork!!.ssid}</div></p> : null}
+                {wifiState.state == 'connected' ? <ConnectedState ipAddr={wifiState.ipAddress} /> : null}
+            </Card>
+        </div>)
 }

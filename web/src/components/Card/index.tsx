@@ -10,7 +10,7 @@ export default ({ title = "", subtitle = "", children = {}, enableButton = true 
       </div> : null }
       <div class='text-3xl'>{title}</div>
       <div class='text-m mt-2 text-app-text-secondary'>{subtitle}</div>
-      <div class='md:shadow-lg md:bg-app-primary md:p-6 md:rounded-2xl mt-5 mb-[200px]'>
+      <div class='md:shadow-lg md:bg-app-primary md:p-6 md:rounded-2xl mt-5'>
         {children}
       </div>
     </div>

@@ -1,19 +1,6 @@
 class WiFiPlugin : Plugin
     var wifi_state
     def init()
-        self.config_schema = {
-            'ssid': {
-                'tooltip': 'WiFi SSID',
-                'type': 'string',
-                'value': '',
-                'defaultValue': ""
-            },
-            'password': {
-                'tooltip': 'WiFi password',
-                'type': 'string',
-                'defaultValue': ""
-            },
-        }
         self.wifi_state = {}
 
         self.apply_default_values()
@@ -22,7 +9,6 @@ class WiFiPlugin : Plugin
         self.type = "init_handler"
 
         euphonium.register_handler('wifiStateChanged', def (state)
-            print(state)
             if state['state'] == 'connected'
                 print("Connected to wifi")
                 self.wifi_state['state'] = 'connected'
@@ -32,6 +18,7 @@ class WiFiPlugin : Plugin
                 http.emit_event('wifi_state', self.wifi_state)
                 euphonium.init_required_plugins()
             end
+
             if state['state'] == 'ap_ready'
                 euphonium.init_http()
             end
@@ -41,6 +28,7 @@ class WiFiPlugin : Plugin
                 http.emit_event('wifi_state', self.wifi_state)
                 print("No wifi access point found")
                 wifi.start_ap("Euphonium", "euphonium")
+                self.wifi_state['state'] = 'scanning';
                 #wifi_start_ap("Euphonium", "euphonium")
             end
 
@@ -58,6 +46,7 @@ class WiFiPlugin : Plugin
                         'open': state['networks'][ssid]['open']
                     })
                 end
+                self.wifi_state['state'] = 'scanning'
 
                 http.emit_event('wifi_state', self.wifi_state)
                 wifi.start_scan()
@@ -76,6 +65,18 @@ class WiFiPlugin : Plugin
                 wifi.start_ap("Euphonium", "euphonium")
             end
         end
+    end
+
+    def make_form(ctx, state)
+        ctx.text_field('ssid', {
+            'label': "WiFi SSID",
+            'default': ''
+        })
+
+        ctx.text_field('password', {
+            'label': "WiFi password",
+            'default': ''
+        })
     end
 end
 
@@ -104,8 +105,8 @@ http.handle('POST', '/wifi/connect', def (request)
     print(body['ssid'])
     print(body['password'])
 
-    wifi_plugin.config_schema['ssid']['value'] = body['ssid']
-    wifi_plugin.config_schema['password']['value'] = body['password']
+    wifi_plugin.state['ssid'] = body['ssid']
+    wifi_plugin.state['password'] = body['password']
 
     wifi_plugin.wifi_state['state'] = 'connecting'
     http.emit_event('wifi_state', wifi_plugin.wifi_state)
