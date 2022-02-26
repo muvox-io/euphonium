@@ -1,23 +1,5 @@
 class JellyfinPlugin : Plugin
     def init()
-        # self.configSchema = {
-        #     'jellyfin_url': {
-        #         'tooltip': 'Jellyfin instance url',
-        #         'type': 'string',
-        #         'defaultValue': 'https://jellyfin.cf'
-        #     },
-        #     'jellyfin_username': {
-        #         'tooltip': 'Username',
-        #         'type': 'string',
-        #         'defaultValue': 'test'
-        #     },
-        #     'jellyfin_password': {
-        #         'tooltip': 'Password',
-        #         'type': 'string',
-        #         'defaultValue': 'dupa12'
-        #     },
-        # }
-
         self.apply_default_values()
         self.name = "jellyfin"
         self.theme_color = "#4B0082"
@@ -29,9 +11,21 @@ class JellyfinPlugin : Plugin
     def make_form(ctx, state)
         ctx.create_group('jellyfin', { 'label': 'General' })
 
-        ctx.text_field('jellyfin_url', {
+        ctx.text_field('url', {
             'label': "Jellyfin instance url",
-            'default': "https://jellyfin.cf",
+            'default': "",
+            'group': 'jellyfin'
+        })
+
+        ctx.text_field('username', {
+            'label': "Username",
+            'default': "",
+            'group': 'jellyfin'
+        })
+
+        ctx.text_field('password', {
+            'label': "Password",
+            'default': "",
             'group': 'jellyfin'
         })
     end
@@ -53,5 +47,5 @@ euphonium.register_plugin(JellyfinPlugin())
 http.handle('POST', '/jellyfin/playByTrackID', def(request)
     var body = request.json_body()
     jellyfin_playSongByID(body['TrackID'])
-    request.write_json({ 'status': 'playing'}, request['connection'], 200)
+    request.write_json({ 'status': 'playing'}, 200)
 end)

@@ -21,13 +21,9 @@ void JellyfinPlugin::setupBindings() {
 }
 
 void JellyfinPlugin::configurationUpdated() {
-    // todo: load config
-    url = "https://jellyfin.cf";
-    username = "test";
-    password = "dupa12"; // dummy account for testing
-    // url = std::any_cast<std::string>(config["jellyfin_url"]);
-    // username = std::any_cast<std::string>(config["jellyfin_username"]);
-    // password = std::any_cast<std::string>(config["jellyfin_password"]);
+    url = std::any_cast<std::string>(config["url"]);
+    username = std::any_cast<std::string>(config["username"]);
+    password = std::any_cast<std::string>(config["password"]);
     deviceName = "Euphonium";
     EUPH_LOG(info, "jellyfin", "Config updated");
     shutdown();
