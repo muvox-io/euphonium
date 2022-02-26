@@ -46,7 +46,7 @@ export function App() {
         <PlaybackDataContextProvider>
           <div class="md:bg-app-secondary bg-app-primary h-screen w-screen">
             <Notifications />
-            {/* {info?.networkState == "recovery" ? <OTACard /> : null}
+            {info?.networkState == "recovery" ? <OTACard /> : null}
             {info?.networkState == "online" ? (
               <div class="flex-row flex">
                 {!isMobile ? (
@@ -72,9 +72,9 @@ export function App() {
                   <Playback />
                 </div>
               </div>
-            ) : info?.networkState == "offline" ? ( */}
+            ) : info?.networkState == "offline" ? (
               <WiFiConfigurator />
-            {/* ) : null} */}
+            ) : null}
           </div>
         </PlaybackDataContextProvider>
       </div>
