@@ -6,6 +6,7 @@ import Playback from "../Playback";
 import Router, { Route } from "preact-router";
 import "../../theme/main.scss";
 import RadioBrowser from "../../apps/radiobrowser/RadioBrowser";
+import Jellyfin from "../../apps/jellyfin/Jellyfin";
 import "../../index.css";
 import useIsMobile from "../../utils/isMobile.hook";
 import WiFiConfigurator from "../../apps/wifi/WiFiConfigurator";
@@ -67,6 +68,7 @@ export function App() {
                     <Route path="/web" component={SplashScreen} />
 
                     <Route path="/web/apps/webradio" component={RadioBrowser} />
+                    <Route path="/web/apps/jellyfin" component={Jellyfin} />
                     <Route path="/web/playback" component={PlaybackMobile} />
                   </Router>
                   <Playback />

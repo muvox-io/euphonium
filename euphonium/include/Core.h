@@ -19,6 +19,7 @@
 #include "plugins/http/HTTPModule.h"
 #include "plugins/cspot/CSpotPlugin.h"
 #include "plugins/webradio/WebRadioPlugin.h"
+#include "plugins/jellyfin/JellyfinPlugin.h"
 #include "plugins/youtube/YouTubePlugin.h"
 #include "plugins/persistor/ConfigPersistor.h"
 

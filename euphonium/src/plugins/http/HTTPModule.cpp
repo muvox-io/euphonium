@@ -23,7 +23,7 @@ void listFiles(const std::string &path,
 
 HTTPModule::HTTPModule() : bell::Task("http", 1024 * 6, 0, 0, false) {
     name = "http";
-    mainServer = std::make_shared<bell::HTTPServer>(80);
+    mainServer = std::make_shared<bell::HTTPServer>(8000);
 }
 
 void HTTPModule::loadScript(std::shared_ptr<ScriptLoader> loader) {

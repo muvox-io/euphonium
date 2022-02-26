@@ -37,6 +37,7 @@ Core::Core() : bell::Task("Core", 4 * 1024, 2, 0) {
 
     registeredPlugins = {
         std::make_shared<CSpotPlugin>(), std::make_shared<WebRadioPlugin>(),
+        std::make_shared<JellyfinPlugin>()
         // std::make_shared<YouTubePlugin>()
     };
     requiredModules = {std::make_shared<HTTPModule>(), mainPersistor};
