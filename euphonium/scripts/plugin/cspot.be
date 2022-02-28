@@ -28,10 +28,6 @@ class CSpotPlugin : Plugin
             cspot_set_pause(data)
         end
 
-        if event == EVENT_CONFIG_UPDATED
-            #cspot_config_updated()
-        end
-
         if event == EVENT_VOLUME_UPDATED
             cspot_set_volume_remote(data)
         end

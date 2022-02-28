@@ -144,6 +144,8 @@ class EuphoniumInstance
                     raw_state[field['key']] = field['value']
                 end
             end
+
+            raw_state['volume'] = self.playback_state['volume'];
             core.start_plugin(plugin_name, raw_state)
         end
     end
