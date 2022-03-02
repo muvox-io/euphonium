@@ -115,6 +115,10 @@ void CSpotPlugin::runTask() {
                 this->audioBuffer->clearBuffer();
                 break;
             }
+            case CSpotEventType::SEEK: {
+                this->audioBuffer->clearBuffer();
+                break;
+            }
             default:
                 break;
             }
