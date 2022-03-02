@@ -36,7 +36,6 @@ void DACAudioOutput::feedPCMFrames(uint8_t* data, size_t nBytes) {
         if (isReading) {
             std::scoped_lock lock(readingMutex);
             if (doWriteExpand) {
-                BELL_LOG(info, "dac", "expanding from %d to %d bits", srcBits, dstBits);
                 i2s_write_expand((i2s_port_t)0, data + written, nBytes - written, srcBits, dstBits, &written, portMAX_DELAY);
             } else {
                 i2s_write((i2s_port_t)0, data + written, nBytes - written,
