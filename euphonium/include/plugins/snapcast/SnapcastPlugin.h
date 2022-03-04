@@ -11,12 +11,12 @@
 #include <mutex>
 #include "Queue.h"
 #include "Task.h"
-#include "HTTPAudioStream.h"
+#include "SnapcastConnection.h"
 
 class SnapcastPlugin : public bell::Task, public Module
 {
   private:
-
+    std::unique_ptr<Snapcast::Connection> connection;
   public:
     SnapcastPlugin();
     void loadScript(std::shared_ptr<ScriptLoader> scriptLoader);
