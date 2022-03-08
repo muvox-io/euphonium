@@ -25,6 +25,7 @@ private:
     bool doWriteExpand = false;
     int srcBits = 16;
     int dstBits = 16;
+    size_t curr_written;
 
 public:
     DACAudioOutput();
