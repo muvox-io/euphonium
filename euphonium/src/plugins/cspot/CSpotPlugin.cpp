@@ -138,6 +138,9 @@ void CSpotPlugin::runTask() {
 
 void CSpotPlugin::mapConfig() {
     configMan->deviceName = std::any_cast<std::string>(config["receiverName"]);
+    if (config.count("apAddress")) {
+        configMan->apOverride = std::any_cast<std::string>(config["apAddress"]);
+    }
     std::string bitrateString =
         std::any_cast<std::string>(config["audioBitrate"]);
     switch (std::stoi(bitrateString)) {
