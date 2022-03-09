@@ -1,5 +1,5 @@
 @font-face {
-  font-family: "icomoon";
+  font-family: "euphonium";
   src: url("../../assets/icons.ttf");
   font-weight: normal;
   font-style: normal;
@@ -9,7 +9,7 @@
 [class^="icon-"],
 [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: "icomoon" !important;
+  font-family: "euphonium" !important;
   speak: never;
   font-style: normal;
   font-weight: normal;
@@ -23,39 +23,60 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-eq:before {
-  content: "\e90a";
+.icon-edit:before {
+  content: "\e911";
 }
-.icon-vol-up:before {
-  content: "\e907";
-}
-.icon-vol-down:before {
-  content: "\e909";
-}
-.icon-save:before {
-  content: "\e908";
-}
-.icon-sun:before {
-  content: "\e906";
-}
-.icon-moon:before {
+.icon-search:before {
   content: "\e900";
 }
-.icon-prev:before {
+.icon-close:before {
   content: "\e901";
 }
-.icon-next:before {
+.icon-pause:before {
   content: "\e902";
 }
 .icon-play:before {
   content: "\e903";
 }
-.icon-pause:before {
+.icon-volume-up:before {
   content: "\e904";
 }
-.icon-search:before {
+.icon-volume-off:before {
   content: "\e905";
 }
-.icon-close:before {
-  content: "\ea0f";
+.icon-volume-down:before {
+  content: "\e906";
+}
+.icon-home:before {
+  content: "\e907";
+}
+.icon-info:before {
+  content: "\e908";
+}
+.icon-music:before {
+  content: "\e909";
+}
+.icon-playlist:before {
+  content: "\e90a";
+}
+.icon-dac_settings:before {
+  content: "\e90b";
+}
+.icon-settings:before {
+  content: "\e90c";
+}
+.icon-equalizer:before {
+  content: "\e90d";
+}
+.icon-speaker_group:before {
+  content: "\e90e";
+}
+.icon-speaker:before {
+  content: "\e90f";
+}
+.icon-radio:before {
+  content: "\e910";
+}
+.icon-rss:before {
+  content: "\ea9b";
 }
