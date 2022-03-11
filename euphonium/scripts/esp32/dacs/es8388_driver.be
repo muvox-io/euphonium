@@ -35,8 +35,8 @@ class ES8388Driver : DACDriver
         # set volume -45db
         i2c.write(ADDRESS, 0x2e, 32)
         i2c.write(ADDRESS, 0x2f, 32)
-        i2c.write(ADDRESS, 0x30, 0x00)
-        i2c.write(ADDRESS, 0x31, 0x00)
+        i2c.write(ADDRESS, 0x30, 32)
+        i2c.write(ADDRESS, 0x31, 32)
 
         # power on
         i2c.write(ADDRESS, 0x02, 0x00)
@@ -69,6 +69,8 @@ class ES8388Driver : DACDriver
         var realVolume = int((volume / 100.0) * 33)
         i2c.write(0x10, 0x2e, realVolume)
         i2c.write(0x10, 0x2f, realVolume)
+        i2c.write(0x10, 0x30, realVolume)
+        i2c.write(0x10, 0x31, realVolume)
     end
 end
 

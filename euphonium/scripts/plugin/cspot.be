@@ -21,15 +21,24 @@ class CSpotPlugin : Plugin
             'values': ['320', '160', '96'],
             'group': 'spotify'
         })
+        ctx.checkbox_field('overrideAp', {
+            'label': "Override access point address",
+            'default': "false",
+            'group': 'spotify'
+        })
+
+        if state.find('overrideAp') != nil && state['overrideAp'] == 'true'
+            ctx.text_field('apAddress', {
+                'label': "Access point address",
+                'default': "",
+                'group': 'spotify'
+            })
+        end
     end
 
     def on_event(event, data)
         if event == EVENT_SET_PAUSE
             cspot_set_pause(data)
-        end
-
-        if event == EVENT_CONFIG_UPDATED
-            #cspot_config_updated()
         end
 
         if event == EVENT_VOLUME_UPDATED

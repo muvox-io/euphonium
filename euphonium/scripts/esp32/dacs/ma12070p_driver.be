@@ -1,62 +1,83 @@
 class MA12070P : DACDriver
-    var volumeTable
     def init()
         self.name = "MA12070P"
-        self.hardwareVolumeControl = false
+        self.hardware_volume_control = true
+
     end
 
-    def initI2S()
+    def init_i2s()
         # PINOUT: SDA: 23, SCL: 22, SDATA: 26, LRCLK: 25, BCLK: 5
         # All of I2S init logic goes here
-        var ADDR = 0x10 # IRL, ADDR: 0x20
+        
+        var ADDR = 0x20
 
-        # Note the stupid volume mapping. WIP.
-        self.volumeTable = [0x60,0x58,0x55,0x52,0x48,0x45,0x42,0x40,0x38,0x35,0x32,0x30,0x28,0x25,0x25,0x25,0x25,0x25,0x25,0x25,0x25,0x25,0x25,0x25,0x25,0x25,0x25,0x25,0x25,0x25,0x25,0x25,0x25]
+        var config = I2SConfig()
+        config.sample_rate = 44100
+        config.bits_per_sample = 32
+        
+        # MCLK: 22.58MHz @ 44.1KHz - sufficient for running the dedicated dsp!
+        config.mclk = 512       
+        config.comm_format = I2S_CHANNEL_FMT_RIGHT_LEFT
+        config.channel_format = I2S_COMM_FORMAT_I2S
+
+        i2s.install(config)
+        i2s.set_pins(self.get_i2s_pins())
 
         # Ensures we expand from 16 to 32 bit, to match MA12070P Clock system.
-        dac_set_expand(16, 32)
-
-        # 0x01 Standard I2S format. Note: MCLK FSx512
-        i2s_install(0, 0x01, 32, 44100, true, int(self.getGPIO('bck')), int(self.getGPIO('ws')), int(self.getGPIO('data')), 512)
-
-        # Enable mclk on GPIO 0
-        # i2s_enable_mclk()
+        i2s.expand(16, 32)
 
         # Start I2C Driver
-        # i2c_install(true, int(self.getGPIO('sda')), int(self.getGPIO('scl')), 250000) # 250000
+        i2c.install(int(self.get_gpio('sda')), int(self.get_gpio('scl')))
 
-        # Mute Amplifier before i2c comm & enable. Mute pin: 12
-        # gpio_digital_write(12, 0)
+        # Mute Amplifier before i2c comm & enable. Mute pin: 21
+        gpio.pin_mode(8, gpio.OUTPUT)
+        gpio.digital_write(8, gpio.LOW)
 
-        # Enable Amplifier. Enable pin: 14
-        # gpio_digital_write(14, 0)
+        # Enable Amplifier. Enable pin: 19
+        gpio.pin_mode(19, gpio.OUTPUT)
+        gpio.digital_write(19, gpio.LOW)
 
         # Set Amp to Left-justified format
-        i2c_write8(ADDR, 53, 8)
+        i2c.write(ADDR, 53, 8)
 
         # Set Volume to a safe level..
-        i2c_write8(ADDR, 64, 0x50)
+        i2c.write(ADDR, 64, 0x50)
 
         # Clear static error register.
-        # i2c_write8(ADDR, 45, 0x34)
-        #i2c_write8(ADDR, 45, 0x30)
+        i2c.write(ADDR, 45, 0x34)
+        i2c.write(ADDR, 45, 0x30)
+
         # Init done.
+
+        # Unmute Amplifier 
+        gpio.digital_write(8, gpio.HIGH)        
     end
 
-    def unloadI2S()
-        i2s_delete()
-        #dac_disable_expand()
-        i2c_delete()
+    def unload_i2s()
+        i2s.disable_expand()
+        i2s.uninstall()
+        i2c.delete()
     end
 
-    def setVolume(volume)
+    def set_volume(volume)
         # Volume is in range from 1 to 100
-        # Volume register is flipped in MA12070P.. Hence 128 - realvol.
-        var ADDR = 0x10 # IRL, ADDR: 0x20
-        var realVolume = int(128-((volume / 100.0) * 33))
+        # Volume register is flipped in MA12070P.. Hence 100 - realvol.
+        
+        var ADDR = 0x20 
+        var realVolume = int(100-volume)
+
         # Write it..
-        i2c_write8(ADDR, 64, realVolume)
+        i2c.write(ADDR, 64, realVolume)
+
     end
+
 end
 
-dac.registerDriver(MA12070P())
+dac.register_driver(MA12070P())
+
+hooks.add_handler(hooks.ON_INIT, def ()
+
+    gpio.pin_mode(27, gpio.OUTPUT)
+    gpio.digital_write(27, gpio.HIGH)
+
+end)

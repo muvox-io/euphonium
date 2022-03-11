@@ -10,12 +10,14 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
+#include <mutex>
 
 typedef std::function<void(std::string &)> onLogReceived;
 
 class EuphoniumLogger : public bell::AbstractLogger {
   private:
       std::vector<char> buffer = std::vector<char>(4096);
+      std::mutex logMutex;
 
   public:
     std::deque<std::string> logCache;
@@ -24,6 +26,7 @@ class EuphoniumLogger : public bell::AbstractLogger {
     // static bool enableColors = true;
     void debug(std::string filename, int line, std::string submodule,
                const char *format, ...) {
+        std::lock_guard<std::mutex> guard(logMutex);
         std::stringstream log;
         log << "D [" << submodule << "] ";
         printf(colorRed);
@@ -47,6 +50,7 @@ class EuphoniumLogger : public bell::AbstractLogger {
 
     void error(std::string filename, int line, std::string submodule,
                const char *format, ...) {
+        std::lock_guard<std::mutex> guard(logMutex);
         std::stringstream log;
         printf(colorRed);
         log << "E [" << submodule << "] ";
@@ -70,6 +74,7 @@ class EuphoniumLogger : public bell::AbstractLogger {
 
     void info(std::string filename, int line, std::string submodule,
               const char *format, ...) {
+        std::lock_guard<std::mutex> guard(logMutex);
         std::stringstream log;
         printf(colorBlue);
         log << "I [" << submodule << "] ";

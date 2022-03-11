@@ -37,10 +37,14 @@ void CSpotPlugin::setPause(bool pause) {
 }
 
 void CSpotPlugin::setVolumeRemote(int volume) {
+    double volStep = MAX_VOLUME / 100.0;
+    auto mappedVolume = ((int)volStep * volume);
+
     if (spircController != nullptr) {
-        double volStep = MAX_VOLUME / 100.0;
-        spircController->setRemoteVolume((int)volStep * volume);
+        spircController->setRemoteVolume(mappedVolume);
     }
+
+    configMan->volume = mappedVolume;
 }
 
 void CSpotPlugin::configurationUpdated() {
@@ -111,6 +115,10 @@ void CSpotPlugin::runTask() {
                 this->audioBuffer->clearBuffer();
                 break;
             }
+            case CSpotEventType::SEEK: {
+                this->audioBuffer->clearBuffer();
+                break;
+            }
             default:
                 break;
             }
@@ -129,8 +137,10 @@ void CSpotPlugin::runTask() {
 }
 
 void CSpotPlugin::mapConfig() {
-    configMan->volume = 65535;
     configMan->deviceName = std::any_cast<std::string>(config["receiverName"]);
+    if (config.count("apAddress")) {
+        configMan->apOverride = std::any_cast<std::string>(config["apAddress"]);
+    }
     std::string bitrateString =
         std::any_cast<std::string>(config["audioBitrate"]);
     switch (std::stoi(bitrateString)) {
