@@ -26,6 +26,7 @@ const SideBarItem = ({ displayName = "", name = "", type = "" }) => {
         <span class="text-2xl -ml-2 mr-1"><Icon name={PluginIconMap[name] ?? (PluginIconMap[type] ?? 'home')} /></span>
 
         <span class="font-thin">{displayName}</span>
+        { matches ? <div class="w-1 h-[30px] bg-app-accent ml-auto -mr-4 rounded-l-lg"></div> : <></>}
       </div>)}
       </Match>
     </Link>
