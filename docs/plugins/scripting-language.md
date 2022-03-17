@@ -26,6 +26,33 @@ Manages euphonium's core functionality, mostly shared utils.
 | `core.platform`      | `() -> string`.<br/>Returns platform on which euphonium is currently running. Result being either `esp32` or `desktop` | All                 |
 | `core.version`       | `() -> string`.<br/>Returns current version of the system. Example result: `0.0.14`                                    | All                 |
 
+## `FormContext`
+
+Class used in plugins that handles UI creation and interaction in the web-ui.
+
+**Implemented by `form_ctx.be`**
+
+### Class methods
+
+All of the following methods are available on the `FormContext` class instance.
+
+| Command          | Signature                                                                                                                                          | Supported platforms |
+|:-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| `text_field`     | `(key: string, config: FieldConfig) -> void`<br/>Adds a text field to the configuration. See `FieldConfig` below for parameters.                   | All                 |
+| `select_field`   | `(key: string, config: FieldConfig) -> void`<br/>Adds a option select / picker field to the configuration. See `FieldConfig` below for parameters. | All                 |
+| `checkbox_field` | `(key: string, config: FieldConfig) -> void`<br/>Adds a checkbox to the configuration. See `FieldConfig` below for parameters.                     | All                 |
+| `create_group`   | `(key: string, config: [key: string, label: string]) -> void`<br/>Adds a new config group to the configuration.                                    | All                 |
+
+### Interface `FieldConfig`
+
+| Field     | Signature                                                                                    | Field type     |
+|:----------|----------------------------------------------------------------------------------------------|----------------|
+| `label`   | `string`<br/>Configuration field's label visible over the control in the interface.          | All            |
+| `hint`    | `string`<br/>Used as a hint in the text field.                                               | `text_field`   |
+| `default` | `string`<br/>Field's default value.                                                          | All            |
+| `values`  | `list`<br/>All of select field's available values.                                           | `select_field` |
+| `group`   | `string`<br/>Group that a given field belongs to, previously registered with `create_group`  | All            |
+
 ## `http`
 Allows for registering endpoints on the internal HTTP server.
 
