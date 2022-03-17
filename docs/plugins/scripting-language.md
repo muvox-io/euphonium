@@ -126,6 +126,36 @@ Global euphonium instance object. Handles main events, and keeps a state of plug
 |:----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
 | `euphonium.register_plugin` | `(plugin: Plugin) -> void`<br/>Registers a new euphonium plugin. `plugin` is a instance of plugin to register in the system.                  | All                 |
 
+## `input`
+*ESP32 specific*
+
+Allows registration of callbacks for input events. Useful for adding buttons, encoders and such.
+### Commands
+
+| Command                 | Signature                                                                                                                                                                                                                           | Supported platforms |
+|:------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| `input.register_button` | `(gpio: int, event_type: input.EVENT_TYPE,  handler: [() -> void], config: map) -> void`<br/>Registers a new handler called after interaction with a given button on provided `gpio`. Supports press, double press, and long press. | esp32               |                                                                                            | esp32               |
+
+### enum `input.EVENT_TYPE`
+
+| Command              | Description                         | Supported platforms  |
+|:---------------------|-------------------------------------|----------------------|
+| `input.PRESS`        | Called on single press of a button. | esp32                |
+| `input.DOUBLE_PRESS` | Called on double press of a button. | esp32                |
+| `input.LONG_PRESS`   | Called on long press of a button.   | esp32                |
+
+### Example
+
+!!! example "Example button that changes volume when pressed"
+
+    Register a button on gpio 5, and call a function from `playback` when pressed.
+    ```python
+    input.register_button(5, input.PRESS, def ()
+        print("Volume up called!")
+        playback.set_volume(playback.volume + 5)
+    end, {})
+    ```
+
 ## `hooks`
 
 Hooks allow to run different instructions during certain boot stages. Used for example to pull up an IO during boot.
