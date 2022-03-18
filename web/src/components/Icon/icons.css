@@ -23,6 +23,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-moon:before {
+  content: "\e912";
+}
 .icon-edit:before {
   content: "\e911";
 }
@@ -76,6 +79,9 @@
 }
 .icon-radio:before {
   content: "\e910";
+}
+.icon-sun:before {
+  content: "\e9d4";
 }
 .icon-rss:before {
   content: "\ea9b";

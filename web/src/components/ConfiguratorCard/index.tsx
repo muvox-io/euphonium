@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "preact/hooks";
+import { useState, useEffect, useContext, useRef } from "preact/hooks";
 
 import Input from "../Input";
 import Select from "../Select";
@@ -11,6 +11,9 @@ import OTATrigger from "../../apps/ota/OTATrigger";
 import { PlaybackDataContext } from "../../utils/PlaybackContext";
 import { getPluginConfiguration, updatePluginConfiguration, fieldsToValues, ConfigurationFieldType, ConfigurationField, PluginConfiguration } from "../../api/euphonium/plugins";
 import Checkbox from "../Checkbox";
+import Icon from "../Icon";
+import NumberInput from "../NumberInput";
+import Dashboard from "../Dashboard";
 
 const renderConfigurationField = (
   field: ConfigurationField,
@@ -22,7 +25,7 @@ const renderConfigurationField = (
     case ConfigurationFieldType.TEXT:
       return <Input tooltip={label} value={value} onBlur={onChange} />;
     case ConfigurationFieldType.NUMBER:
-      return <Input tooltip={label} value={value} onBlur={onChange} type={'number'} />;
+      return <NumberInput tooltip={label} value={value} onBlur={onChange} />;
     case ConfigurationFieldType.CHECKBOX:
       return (<Checkbox value={value == "true"} label={label!!} onChange={(v) => {
         updateField(field, v ? "true" : "false");
@@ -45,16 +48,25 @@ const ConfigurationGroup = ({ fields = [], groupKey = "", updateField }: { field
   const group = fields.filter((e) => e.key == groupKey);
   const groupFields = fields.filter((e) => e.group == groupKey);
 
-  return (<div class="flex flex-col w-full">
-    <span class="text-lg font-thin">{group[0].label}</span>
-    <div class="space-y-2 w-full">
+  return (<div class="w-full bg-app-primary mt-8 md:p-4 rounded-2xl flex flex-col">
+    <div class="flex flex-row text-bold items-center text-l text-app-accent">
+      <span class="text-2xl">
+        <Icon name="settings"></Icon>
+      </span>
+      {group[0].label}
+    </div>
+    <div class="flex flex-col pl-2 pr-2 space-y-5 mt-2 mb-2">
       {groupFields.map((field) => renderConfigurationField(field, updateField))}
     </div>
-    <div class="w-full h-[0.5px] opacity-70 mt-6 bg-app-text-secondary mb-2"></div>
   </div>);
 }
 
 export default ({ plugin = "" }) => {
+  if (plugin == "home") {
+    return <Dashboard />;
+  }
+
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [displayName, setDisplayName] = useState<string>("");
   const [configurationFields, setConfigurationFields] = useState<
@@ -106,28 +118,47 @@ export default ({ plugin = "" }) => {
   };
 
   if (isLoading) return null;
+  const btnRef = useRef<HTMLDivElement>(null);
 
   return (
+    // <div class="flex flex-col m-10">
+    //   <div class="flex flex-row items-center">
+    //     <div class="flex flex-col">
+    //       <div class='text-3xl'>{displayName}</div>
+    //       <div class='text-m mt-2 text-app-text-secondary'>plugin configuration</div>
+    //     </div>
+    //     <div class="ml-auto flex-col text-red-400 animate-pulse mr-4">
+    //       {dirty ? 'Unsaved changes' : ''}
+    //     </div>
     <Card title={displayName} subtitle={"plugin configuration"}>
-      <div class="flex flex-col items-start space-y-2 md:max-w-[400px]">
-        {plugin == "dac" ? (
-          <DACConfig
-            configurationUpdated={() => {
-              loadConfig();
-            }}
-          ></DACConfig>
-        ) : null}
-        {plugin == "ota" ? <OTATrigger /> : null}
 
+      <div class="grid grid-cols-3 gap-4">
         {groups.length ? groups.map((field) => (<ConfigurationGroup
           updateField={updateField}
           fields={configurationFields}
           groupKey={field.key} />)) : null}
-
-        <Button disabled={!dirty} onClick={updateConfiguration}>
-          Apply changes
-        </Button>
       </div>
     </Card>
+    // <Card title={displayName} subtitle={"plugin configuration"}>
+    //   <div class="flex flex-col items-start space-y-2 md:max-w-[400px]">
+    //     {plugin == "dac" ? (
+    //       <DACConfig
+    //         configurationUpdated={() => {
+    //           loadConfig();
+    //         }}
+    //       ></DACConfig>
+    //     ) : null}
+    //     {plugin == "ota" ? <OTATrigger /> : null}
+
+    //     {groups.length ? groups.map((field) => (<ConfigurationGroup
+    //       updateField={updateField}
+    //       fields={configurationFields}
+    //       groupKey={field.key} />)) : null}
+
+    //     <Button disabled={!dirty} onClick={updateConfiguration}>
+    //       Apply changes
+    //     </Button>
+    //   </div>
+    // </Card>
   );
 };

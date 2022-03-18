@@ -23,10 +23,10 @@ export default ({
 }: InputProps) => {
   return (
     <div class='lg:min-w-[400px] min-w-full relative'>
-      <div class='text-app-text-secondary text-xs mb-1 mt-2'>{tooltip}</div>
+      <div class='text-app-text-secondary font-thin text-[14px] mb-2 mt-2'>{tooltip}</div>
       <input
         placeholder={placeholder}
-        className={`${icon ? "pl-10" : ""} bg-app-secondary h-[45px] border border-app-border p-3 rounded-xl min-w-full`}
+        className={`${icon ? "pl-10" : ""} bg-app-secondary h-[45px]  p-3 rounded-xl min-w-full`}
         value={value}
         type={type}
         onChange={(e: any) => onSubmit && onSubmit(e.target.value)}

@@ -83,9 +83,9 @@ const PlaybackBar = ({themeColor = "#fff"}) => {
                                     <Equalizer eq={playbackState!!.eq}/>
                                 </div>
                             ) : null}
-                            <Icon onClick={() => setEqOpen(!eqOpen)} name="eq"/>
+                            <Icon onClick={() => setEqOpen(!eqOpen)} name="equalizer"/>
                         </div>
-                        <Icon name="vol-up"/>
+                        <Icon name="volume-up"/>
                         <input
                             class="w-20"
                             type="range"

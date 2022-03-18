@@ -30,8 +30,6 @@ const SideBarItem = ({ displayName = "", name = "", type = "" }) => {
       </div>)}
       </Match>
     </Link>
-
-
     // </SelectItem>
   );
 };
@@ -85,7 +83,6 @@ export default ({ version = "", theme = "", onThemeChange = () => { } }) => {
         filterType={PluginEntryType.Plugin}
         header="Plugin configuration"
       />
-
 
       <div class="absolute bottom-4 left-4 text-xs">{version}</div>
       <div onClick={(v) => onThemeChange()} class="absolute bg-app-secondary rounded-full w-8 h-8 right-4 bottom-4 flex text-xl items-center justify-center cursor-pointer">
