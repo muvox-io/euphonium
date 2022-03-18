@@ -20,11 +20,11 @@ As of January 2022, most of the core functionality is already implemented. Curre
  - [x] Try to get more feedback on the platform.
 
 **March**
-- [x] Design and implement new web interface
-- [x] Provide more mature hardware APIs
-- [x] Mobile app as scanner
-- [ ] Implement snapcast client (in progress)
+ - [x] Design and implement new web interface
+ - [x] Provide more mature hardware APIs
+ - [x] Mobile app as scanner
+ - [ ] Implement snapcast client (in progress)
 
 **TODO**
-- [ ] YouTube client
-- [ ] Test vendor APIs
+ - [ ] YouTube client
+ - [ ] Test vendor APIs
