@@ -11,14 +11,20 @@ As of January 2022, most of the core functionality is already implemented. Curre
  - [x] Setup a documentation page.
  - [x] Get basic infrastucture working via GitHub.
  - [x] Setup reference API for berry and HTTP API.
- - [ ] Stabilize Spotify, WebRadio and Bluetooth functionality.
- - [ ] Clean up web interface code.
  
 
 **Feburary:**
 
- - [ ] Try to get more feedback on the platform.
- - [ ] Implement AirPlay.
- - [ ] Implement Snapcast client.
- - [ ] Implement YouTube.
- - [ ] Assemble some basic hardware, test out battery efficiency.
+ - [x] Stabilize Spotify, WebRadio and Bluetooth functionality.
+ - [x] Assemble some basic hardware, test out battery efficiency.
+ - [x] Try to get more feedback on the platform.
+
+**March**
+- [x] Design and implement new web interface
+- [x] Provide more mature hardware APIs
+- [x] Mobile app as scanner
+- [ ] Implement snapcast client (in progress)
+
+**TODO**
+- [ ] YouTube client
+- [ ] Test vendor APIs
