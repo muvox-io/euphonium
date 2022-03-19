@@ -150,6 +150,8 @@ void Core::startAudioThreadForPlugin(std::string pluginName,
             return;
         }
     }
+
+    std::cout << "Plugin " << pluginName << " not found" << std::endl;
 }
 
 void sleepMS(int ms) { BELL_SLEEP_MS(ms); }

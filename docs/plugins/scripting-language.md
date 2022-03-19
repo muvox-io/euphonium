@@ -134,27 +134,6 @@ Allows registration of callbacks for input events. Useful for adding buttons, en
 
 | Command                 | Signature                                                                                                                                                                                                                           | Supported platforms |
 |:------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
-| `input.register_button` | `(gpio: int, event_type: input.EVENT_TYPE,  handler: [() -> void], config: map) -> void`<br/>Registers a new handler called after interaction with a given button on provided `gpio`. Supports press, double press, and long press. | esp32               |                                                                                            | esp32               |
-
-### enum `input.EVENT_TYPE`
-
-| Command              | Description                         | Supported platforms  |
-|:---------------------|-------------------------------------|----------------------|
-| `input.PRESS`        | Called on single press of a button. | esp32                |
-| `input.DOUBLE_PRESS` | Called on double press of a button. | esp32                |
-| `input.LONG_PRESS`   | Called on long press of a button.   | esp32                |
-
-### Example
-
-!!! example "Example button that changes volume when pressed"
-
-    Register a button on gpio 5, and call a function from `playback` when pressed.
-    ```python
-    input.register_button(5, input.PRESS, def ()
-        print("Volume up called!")
-        playback.set_volume(playback.volume + 5)
-    end, {})
-    ```
 
 ## `hooks`
 
@@ -269,12 +248,21 @@ Controls GPIO pins on supported platforms. Mainly used in different drivers.
 
 ### Commands
 
-| Command              | Signature                                                                                                                                                                                                                                                       | Supported platforms |
-|:---------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
-| `gpio.digital_write` | `(gpio: int, state: int) -> void`<br/>Sets GPIO to LOW/HIGH. Needs physical pin number                                                                                                                                                                          | esp32               |
-| `gpio.digital_read`  | `(gpio: int) -> int`<br/>Returns digital state of given physical GPIO. Either `gpio.LOW` or `gpio.HIGH`                                                                                                                                                         | esp32               |
-| `gpio.pin_mode`      | `(gpio: int, mode: int) -> int`<br/>Changes the GPIO mode. Only use if if you know what you're doing, by default Euphonium handles GPIO mode itself. Mode can have the following values: gpio.INPUT, gpio.OUTPUT, gpio.PULLUP, gpio.INPUT_PULLUP, gpio.PULLDOWN | esp32               |
-| `gpio.analog_read`   | `(gpio: int) -> real`.<br/>Returns the voltage on a given pin in mV. **Only used with DAC pins.**                                                                                                                                                               | esp32               |
+| Command                | Signature                                                                                                                                                                                                                                                       | Supported platforms |
+|:-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| `gpio.digital_write`   | `(gpio: int, state: int) -> void`<br/>Sets GPIO to LOW/HIGH. Needs physical pin number                                                                                                                                                                          | esp32               |
+| `gpio.digital_read`    | `(gpio: int) -> int`<br/>Returns digital state of given physical GPIO. Either `gpio.LOW` or `gpio.HIGH`                                                                                                                                                         | esp32               |
+| `gpio.pin_mode`        | `(gpio: int, mode: int) -> int`<br/>Changes the GPIO mode. Only use if if you know what you're doing, by default Euphonium handles GPIO mode itself. Mode can have the following values: gpio.INPUT, gpio.OUTPUT, gpio.PULLUP, gpio.INPUT_PULLUP, gpio.PULLDOWN | esp32               |
+| `gpio.analog_read`     | `(gpio: int) -> real`.<br/>Returns the voltage on a given pin in mV. **Only used with DAC pins.**                                                                                                                                                               | esp32               |
+| `gpio.register_button` | `(gpio: int, event_type: gpio.EVENT_TYPE,  handler: [() -> void], config: map([high_state: bool])) -> void`<br/>Registers a new handler called after interaction with a given button on provided `gpio`. Supports press, double press, and long press.          | esp32               |                                                                                            | esp32               |
+
+### enum `input.EVENT_TYPE`
+
+| Command             | Description                         | Supported platforms  |
+|:--------------------|-------------------------------------|----------------------|
+| `gpio.PRESS`        | Called on single press of a button. | esp32                |
+| `gpio.DOUBLE_PRESS` | Called on double press of a button. | esp32                |
+| `gpio.LONG_PRESS`   | Called on long press of a button.   | esp32                |
 
 ### Example
 
@@ -285,6 +273,19 @@ Controls GPIO pins on supported platforms. Mainly used in different drivers.
     gpio.pin_mode(21, gpio.OUTPUT)
     gpio.digital_write(21, gpio.HIGH)
     ```
+
+### Example
+
+!!! example "Example button that changes volume when pressed"
+
+    Register a button on gpio 5, and call a function from `playback` when pressed.
+    ```python
+    gpio.register_button(5, input.PRESS, def ()
+        print("Volume up called!")
+        playback.set_volume(playback.volume + 5)
+    end, { 'high_state': true })
+    ```
+
 ## `wifi`
 
 Controls internal state of the platform's WiFi. Used internally by `wifi.be`.

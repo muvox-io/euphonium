@@ -274,3 +274,7 @@ def load_plugins()
 end
 
 core.start_plugin('persistor', {})
+
+if (core.platform() == 'esp32')
+    core.start_plugin('platform', {})
+end
