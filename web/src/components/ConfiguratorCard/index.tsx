@@ -132,7 +132,7 @@ export default ({ plugin = "" }) => {
     //     </div>
     <Card title={displayName} subtitle={"plugin configuration"}>
 
-      <div class="grid grid-cols-3 gap-4">
+      <div class="grid grid-cols-3 gap-4 items-start">
         {groups.length ? groups.map((field) => (<ConfigurationGroup
           updateField={updateField}
           fields={configurationFields}

@@ -22,7 +22,7 @@ export default ({
   placeholder,
 }: InputProps) => {
   return (
-    <div class='lg:min-w-[400px] min-w-full relative'>
+    <div class='min-w-full relative'>
       <div class='text-app-text-secondary font-thin text-[14px] mb-2 mt-2'>{tooltip}</div>
       <input
         placeholder={placeholder}
