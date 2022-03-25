@@ -1,19 +1,20 @@
 import { useState, useEffect, useContext, useRef } from "preact/hooks";
 
-import Input from "../Input";
-import Select from "../Select";
+import Input from "../ui/Input";
+import Select from "../ui/Select";
 import Modal from "../Modal";
 
-import Card from "../Card";
-import Button from "../Button";
+import Card from "../ui/Card";
+import Button from "../ui/Button";
 import DACConfig from "../../apps/DACConfig";
 import OTATrigger from "../../apps/ota/OTATrigger";
 import { PlaybackDataContext } from "../../utils/PlaybackContext";
 import { getPluginConfiguration, updatePluginConfiguration, fieldsToValues, ConfigurationFieldType, ConfigurationField, PluginConfiguration } from "../../api/euphonium/plugins";
-import Checkbox from "../Checkbox";
-import Icon from "../Icon";
-import NumberInput from "../NumberInput";
+import Checkbox from "../ui/Checkbox";
+import Icon from "../ui/Icon";
+import NumberInput from "../ui/NumberInput";
 import Dashboard from "../Dashboard";
+import IconCard from "../ui/IconCard";
 
 const renderConfigurationField = (
   field: ConfigurationField,
@@ -48,17 +49,13 @@ const ConfigurationGroup = ({ fields = [], groupKey = "", updateField }: { field
   const group = fields.filter((e) => e.key == groupKey);
   const groupFields = fields.filter((e) => e.group == groupKey);
 
-  return (<div class="w-full bg-app-primary mt-8 md:p-4 rounded-2xl flex flex-col">
-    <div class="flex flex-row text-bold items-center text-l text-app-accent">
-      <span class="text-2xl">
-        <Icon name="settings"></Icon>
-      </span>
-      {group[0].label}
-    </div>
-    <div class="flex flex-col pl-2 pr-2 space-y-5 mt-2 mb-2">
-      {groupFields.map((field) => renderConfigurationField(field, updateField))}
-    </div>
-  </div>);
+  return (
+    <IconCard iconName="settings" label={group[0].label}>
+      <div class="flex flex-col space-y-5 -mt-3">
+        {groupFields.map((field) => renderConfigurationField(field, updateField))}
+      </div>
+    </IconCard>
+  )
 }
 
 export default ({ plugin = "" }) => {

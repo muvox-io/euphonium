@@ -9,13 +9,55 @@ class WebRadioPlugin : Plugin
     end
 
     def make_form(ctx, state)
-        ctx.create_group('webradio', { 'label': 'General' })
 
-        ctx.text_field('radioBrowserUrl', {
-            'label': "Radio Browser instance url",
-            'default': "http://webradio.radiobrowser.com/api/v1/stations/",
-            'group': 'webradio'
+        ctx.create_group('driver', { 'label': 'Driver' })
+        ctx.create_group('i2s', { 'label': 'I2S GPIO' })
+        ctx.create_group('i2c', { 'label': 'I2C GPIO' })
+
+        ctx.select_field('dac', {
+            'label': "Select driver",
+            'default': "I2S",
+            'group': 'driver',
+            'values': ['TAS5711', 'MA12070P', 'I2S'],
+            'type': 'number'
         })
+
+        ctx.number_field('bck', {
+            'label': "BCK",
+            'default': "0",
+            'group': 'i2s',
+        })
+
+        ctx.number_field('ws', {
+            'label': "WS",
+            'default': "0",
+            'group': 'i2s',
+        })
+
+        ctx.number_field('data', {
+            'label': "DATA",
+            'default': "0",
+            'group': 'i2s',
+        })
+
+        ctx.number_field('mclk', {
+            'label': "MCLK",
+            'default': "0",
+            'group': 'i2s',
+        })
+
+        ctx.number_field('sda', {
+            'label': "SDA",
+            'default': "0",
+            'group': 'i2c',
+        })
+
+        ctx.number_field('scl', {
+            'label': "SCL",
+            'default': "0",
+            'group': 'i2c',
+        })
+
     end
 
 

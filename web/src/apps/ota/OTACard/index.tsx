@@ -1,9 +1,9 @@
 import { useEffect, useState } from "preact/hooks";
 import { eventSource, getOTAManifest, triggerOTA } from "../../../api/euphonium/api";
 import {OTAManifest} from "../../../api/euphonium/models";
-import Button from "../../../components/Button";
-import Card from "../../../components/Card";
-import SelectItem from "../../../components/SelectItem";
+import Button from "../../../components/ui/Button";
+import Card from "../../../components/ui/Card";
+import SelectItem from "../../../components/ui/SelectItem";
 
 const UpdateRequested = ({ onClick = () => {} }) => {
     const [otaManifest, setOtaManifest] = useState<OTAManifest>(null as any);

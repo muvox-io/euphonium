@@ -1,9 +1,9 @@
 import {useState, useEffect} from "preact/hooks";
 import {eventSource } from "../../api/euphonium/api";
 import { getPlaybackState, PlaybackState, updateVolume } from "../../api/euphonium/playback";
-import Card from "../Card";
+import Card from "../ui/Card";
 import Equalizer from "../Equalizer";
-import Icon from "../Icon";
+import Icon from "../ui/Icon";
 
 export default function () {
   const [playbackState, setPlaybackState] = useState<PlaybackState>();

@@ -2,8 +2,8 @@ import { Link, Match } from "preact-router/match";
 import { useState, useEffect } from "preact/hooks";
 import { PluginEntry, PluginEntryType } from "../../api/euphonium/models";
 import { getPlugins } from "../../api/euphonium/plugins";
-import Icon from "../Icon";
-import SelectItem from "../SelectItem";
+import Icon from "../ui/Icon";
+import SelectItem from "../ui/SelectItem";
 
 const PluginIconMap = {
   'dashboard': 'home',

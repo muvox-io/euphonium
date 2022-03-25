@@ -1,4 +1,4 @@
-import SelectItem from "../SelectItem";
+import SelectItem from "../ui/SelectItem";
 
 export default function ({ header = "", children = {} }) {
   return (

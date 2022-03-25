@@ -2,10 +2,10 @@ import { useEffect, useState } from "preact/hooks";
 import { getDACPresets } from "../../api/euphonium/api";
 import { DACPreset } from "../../api/euphonium/models";
 import { updatePluginConfiguration } from "../../api/euphonium/plugins";
-import Button from "../../components/Button";
-import Input from "../../components/Input";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
 import Modal from "../../components/Modal";
-import SelectItem from "../../components/SelectItem";
+import SelectItem from "../../components/ui/SelectItem";
 
 export default function ({ configurationUpdated = () => {} }) {
   const [dacs, setDacs] = useState<DACPreset[]>([]);

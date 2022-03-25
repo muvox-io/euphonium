@@ -1,6 +1,5 @@
 import Icon from "../Icon";
 import { route } from 'preact-router';
-import Button from "../Button";
 
 export default ({ title = "", subtitle = "", children = {}, enableButton = true }) => {
   return (

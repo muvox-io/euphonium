@@ -1,5 +1,3 @@
-import Icon from "../Icon";
-
 type CheckboxProps = {
     label: string;
     value: boolean;
@@ -13,7 +11,7 @@ export default ({
 }: CheckboxProps) => {
     return (
         <div class='lg:min-w-[400px] min-w-full relative'>
-            <div class="flex items-start items-center mt-3 mb-1">
+            <div class="flex items-center mt-3 mb-1">
                 <input 
                     onChange={(e:any) => {onChange(e.target.checked)}}
                     checked={value!!}

@@ -2,9 +2,9 @@ import { useEffect, useState } from "preact/hooks";
 import { playRadio } from "../../../api/euphonium/api";
 import { getStationsByName } from "../../../api/radiobrowser/api";
 import { Station } from "../../../api/radiobrowser/models";
-import Card from "../../../components/Card";
-import Icon from "../../../components/Icon";
-import Input from "../../../components/Input";
+import Card from "../../../components/ui/Card";
+import Icon from "../../../components/ui/Icon";
+import Input from "../../../components/ui/Input";
 
 const Radio = ({
   name = "",

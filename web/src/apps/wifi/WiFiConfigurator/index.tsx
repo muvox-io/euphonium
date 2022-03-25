@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "preact/hooks"
 import { connectToWifi, eventSource, getWifiStatus, scanWifi } from "../../../api/euphonium/api"
 import { WiFiNetwork, WiFiState } from "../../../api/euphonium/models"
-import Button from "../../../components/Button"
-import Card from "../../../components/Card"
-import Input from "../../../components/Input"
-import SelectItem from "../../../components/SelectItem"
+import Button from "../../../components/ui/Button"
+import Card from "../../../components/ui/Card"
+import Input from "../../../components/ui/Input"
+import SelectItem from "../../../components/ui/SelectItem"
 import Spinner from "../../../components/Spinner"
 
 enum CurrentState {

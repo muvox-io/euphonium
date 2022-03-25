@@ -2,7 +2,7 @@ import {
     eventSource,
     setPaused,
 } from "../../api/euphonium/api";
-import Icon from "../Icon";
+import Icon from "../ui/Icon";
 import {useEffect, useState} from "preact/hooks";
 import useIsMobile from "../../utils/isMobile.hook";
 import Equalizer from "../Equalizer";

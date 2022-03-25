@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { eventSource } from "../../api/euphonium/api";
+import { eventSource } from "../../../api/euphonium/api";
 import Icon from "../Icon";
 
 const Nofitication = ({
