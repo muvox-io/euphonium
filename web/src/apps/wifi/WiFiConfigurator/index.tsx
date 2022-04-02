@@ -3,9 +3,7 @@ import { connectToWifi, eventSource, getWifiStatus, scanWifi } from "../../../ap
 import { WiFiNetwork, WiFiState } from "../../../api/euphonium/models"
 import Button from "../../../components/ui/Button"
 import Card from "../../../components/ui/Card"
-import Input from "../../../components/ui/Input"
 import SelectItem from "../../../components/ui/SelectItem"
-import Spinner from "../../../components/Spinner"
 
 enum CurrentState {
     Scanning,
