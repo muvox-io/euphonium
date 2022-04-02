@@ -1,20 +1,17 @@
-import { useState, useEffect, useContext, useRef } from "preact/hooks";
-
-import Input from "../ui/Input";
-import Select from "../ui/Select";
-import Modal from "../Modal";
-
-import Card from "../ui/Card";
-import Button from "../ui/Button";
-import DACConfig from "../../apps/DACConfig";
-import OTATrigger from "../../apps/ota/OTATrigger";
+import { useContext, useEffect, useRef, useState } from "preact/hooks";
+import {
+  ConfigurationField, ConfigurationFieldType, fieldsToValues, getPluginConfiguration, PluginConfiguration, updatePluginConfiguration
+} from "../../api/euphonium/plugins";
 import { PlaybackDataContext } from "../../utils/PlaybackContext";
-import { getPluginConfiguration, updatePluginConfiguration, fieldsToValues, ConfigurationFieldType, ConfigurationField, PluginConfiguration } from "../../api/euphonium/plugins";
-import Checkbox from "../ui/Checkbox";
-import Icon from "../ui/Icon";
-import NumberInput from "../ui/NumberInput";
 import Dashboard from "../Dashboard";
+import Card from "../ui/Card";
+import Checkbox from "../ui/Checkbox";
 import IconCard from "../ui/IconCard";
+import Input from "../ui/Input";
+import NumberInput from "../ui/NumberInput";
+import Select from "../ui/Select";
+
+
 
 const renderConfigurationField = (
   field: ConfigurationField,
@@ -28,9 +25,15 @@ const renderConfigurationField = (
     case ConfigurationFieldType.NUMBER:
       return <NumberInput tooltip={label} value={value} onBlur={onChange} />;
     case ConfigurationFieldType.CHECKBOX:
-      return (<Checkbox value={value == "true"} label={label!!} onChange={(v) => {
-        updateField(field, v ? "true" : "false");
-      }} />);
+      return (
+        <Checkbox
+          value={value == "true"}
+          label={label!!}
+          onChange={(v) => {
+            updateField(field, v ? "true" : "false");
+          }}
+        />
+      );
     case ConfigurationFieldType.SELECT:
       return (
         <Select
@@ -45,24 +48,33 @@ const renderConfigurationField = (
   }
 };
 
-const ConfigurationGroup = ({ fields = [], groupKey = "", updateField }: { fields: ConfigurationField[], groupKey: string, updateField: (field: ConfigurationField, value: string) => void }) => {
+const ConfigurationGroup = ({
+  fields = [],
+  groupKey = "",
+  updateField,
+}: {
+  fields: ConfigurationField[];
+  groupKey: string;
+  updateField: (field: ConfigurationField, value: string) => void;
+}) => {
   const group = fields.filter((e) => e.key == groupKey);
   const groupFields = fields.filter((e) => e.group == groupKey);
 
   return (
     <IconCard iconName="settings" label={group[0].label}>
       <div class="flex flex-col space-y-5 -mt-3">
-        {groupFields.map((field) => renderConfigurationField(field, updateField))}
+        {groupFields.map((field) =>
+          renderConfigurationField(field, updateField)
+        )}
       </div>
     </IconCard>
-  )
-}
+  );
+};
 
 export default ({ plugin = "" }) => {
   if (plugin == "home") {
     return <Dashboard />;
   }
-
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [displayName, setDisplayName] = useState<string>("");
@@ -70,19 +82,19 @@ export default ({ plugin = "" }) => {
     ConfigurationField[]
   >([]);
 
-  const [groups, setGroups] = useState<
-    ConfigurationField[]
-  >([]);
+  const [groups, setGroups] = useState<ConfigurationField[]>([]);
 
   const [dirty, setDirty] = useState<boolean>(false);
   const { setPlaybackState } = useContext(PlaybackDataContext);
 
   const setConfig = ({ configSchema, displayName }: PluginConfiguration) => {
-    setGroups(configSchema.filter((e) => e.type == ConfigurationFieldType.GROUP));
+    setGroups(
+      configSchema.filter((e) => e.type == ConfigurationFieldType.GROUP)
+    );
     setIsLoading(false);
     setConfigurationFields(configSchema);
     setDisplayName(displayName);
-  }
+  };
 
   const loadConfig = () => {
     setIsLoading(true);
@@ -96,7 +108,11 @@ export default ({ plugin = "" }) => {
   }, [plugin]);
 
   const updateConfiguration = async () => {
-    const config = await updatePluginConfiguration(plugin, fieldsToValues(configurationFields), false);
+    const config = await updatePluginConfiguration(
+      plugin,
+      fieldsToValues(configurationFields),
+      false
+    );
     setConfig(config);
     setDirty(false);
   };
@@ -109,7 +125,11 @@ export default ({ plugin = "" }) => {
       }
       return f;
     });
-    const config = await updatePluginConfiguration(plugin, fieldsToValues(newFields), true);
+    const config = await updatePluginConfiguration(
+      plugin,
+      fieldsToValues(newFields),
+      true
+    );
 
     setConfig(config);
   };
@@ -128,12 +148,16 @@ export default ({ plugin = "" }) => {
     //       {dirty ? 'Unsaved changes' : ''}
     //     </div>
     <Card title={displayName} subtitle={"plugin configuration"}>
-
       <div class="grid grid-cols-3 gap-4 items-start">
-        {groups.length ? groups.map((field) => (<ConfigurationGroup
-          updateField={updateField}
-          fields={configurationFields}
-          groupKey={field.key} />)) : null}
+        {groups.length
+          ? groups.map((field) => (
+              <ConfigurationGroup
+                updateField={updateField}
+                fields={configurationFields}
+                groupKey={field.key}
+              />
+            ))
+          : null}
       </div>
     </Card>
     // <Card title={displayName} subtitle={"plugin configuration"}>
