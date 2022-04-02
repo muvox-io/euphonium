@@ -1,6 +1,10 @@
-import {useState, useEffect} from "preact/hooks";
-import {eventSource } from "../../api/euphonium/api";
-import { getPlaybackState, PlaybackState, updateVolume } from "../../api/euphonium/playback";
+import { useState, useEffect } from "preact/hooks";
+import { eventSource } from "../../api/euphonium/api";
+import {
+  getPlaybackState,
+  PlaybackState,
+  updateVolume,
+} from "../../api/euphonium/playback";
 import Card from "../ui/Card";
 import Equalizer from "../Equalizer";
 import Icon from "../ui/Icon";
@@ -26,7 +30,10 @@ export default function () {
   return (
     <Card title="Playback" subtitle="Currently playing">
       <div class="flex flex-col items-center">
-        <img src={playbackState?.song?.icon} class="bg-white w-[250px] h-[250px] rounded-xl border border-app-border" />
+        <img
+          src={playbackState?.song?.icon}
+          class="bg-white w-[250px] h-[250px] rounded-xl border border-app-border"
+        />
         <div>Danny</div>
         <div>Minecraft volume Alpha | C418</div>
         <div>
@@ -42,8 +49,7 @@ export default function () {
           />
         </div>
 
-              <div class="text-center rounded-xl w-[170px] p-4 z-index-2 bg-app-secondary mb-1">
-        </div>
+        <div class="text-center rounded-xl w-[170px] p-4 z-index-2 bg-app-secondary mb-1"></div>
       </div>
     </Card>
   );

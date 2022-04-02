@@ -1,22 +1,22 @@
-import css from "./App.module.scss";
-
-import SideBar from "../SideBar";
-import ConfiguratorCard from "../ConfiguratorCard";
-import Playback from "../Playback";
 import Router, { Route } from "preact-router";
-import "../../theme/main.scss";
-import RadioBrowser from "../../apps/webradio/RadioBrowser";
-import "../../index.css";
-import useIsMobile from "../../utils/isMobile.hook";
-import WiFiConfigurator from "../../apps/wifi/WiFiConfigurator";
 import { useEffect, useState } from "preact/hooks";
-import { EuphoniumInfo } from "../../api/euphonium/models";
 import { getInfo } from "../../api/euphonium/api";
-import Notifications from "../ui/Notifications";
-import { PlaybackDataContextProvider } from "../../utils/PlaybackContext";
-import PlaybackMobile from "../PlaybackMobile";
+import { EuphoniumInfo } from "../../api/euphonium/models";
 import OTACard from "../../apps/ota/OTACard";
+import RadioBrowser from "../../apps/webradio/RadioBrowser";
+import WiFiConfigurator from "../../apps/wifi/WiFiConfigurator";
+import "../../index.css";
+import "../../theme/main.scss";
+import useIsMobile from "../../utils/isMobile.hook";
+import { PlaybackDataContextProvider } from "../../utils/PlaybackContext";
+import ConfiguratorCard from "../ConfiguratorCard";
+import ConnectionLostModal from "../ConnectionLostModal";
+import Playback from "../Playback";
+import PlaybackMobile from "../PlaybackMobile";
+import SideBar from "../SideBar";
 import SplashScreen from "../SplashScreen";
+import Notifications from "../ui/Notifications";
+import css from "./App.module.scss";
 
 export function App() {
   const [info, setInfo] = useState<EuphoniumInfo>();
@@ -43,6 +43,7 @@ export function App() {
   return (
     <>
       <div className={css.mainWrapper}>
+        <ConnectionLostModal></ConnectionLostModal>
         <PlaybackDataContextProvider>
           <div class="md:bg-app-secondary bg-app-primary h-screen w-screen">
             <Notifications />

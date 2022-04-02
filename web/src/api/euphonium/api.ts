@@ -1,14 +1,16 @@
-import {
-  EuphoniumInfo,
-  WiFiState,
-  DACPreset,
-} from "./models";
+import { EuphoniumInfo, WiFiState, DACPreset } from "./models";
 
 export let apiUrl = "";
 let currentVersion = "";
 
 if (import.meta.env.MODE !== "production") {
   apiUrl = "http://localhost";
+}
+
+let apiUrlFromEnv = import.meta.env.VITE_API_URL || "";
+
+if (apiUrlFromEnv) {
+  apiUrl = apiUrlFromEnv.toString();
 }
 
 let eventsUrl = apiUrl + "/events";
@@ -73,7 +75,7 @@ const getOTAManifest = async () => {
 const setOTAManifest = async (manifest: any) => {
   return await fetch(apiUrl + "/ota", {
     method: "POST",
-    body: JSON.stringify(manifest)
+    body: JSON.stringify(manifest),
   }).then((e) => e.json());
 };
 
@@ -84,7 +86,9 @@ const getWifiStatus = async (): Promise<WiFiState> => {
 };
 
 const getInfo = async (): Promise<EuphoniumInfo> => {
-  return await fetch(apiUrl + "/system", { method: "GET" }).then((e) => e.json());
+  return await fetch(apiUrl + "/system", { method: "GET" }).then((e) =>
+    e.json()
+  );
 };
 
 let eventSource = new EventSource(eventsUrl);
@@ -100,5 +104,5 @@ export {
   setOTAManifest,
   connectToWifi,
   getOTAManifest,
-  triggerOTA
+  triggerOTA,
 };
