@@ -3,8 +3,11 @@ import Button from "../../../components/ui/Button";
 import { useEffect, useState } from "preact/hooks";
 import { getInfo, setOTAManifest } from "../../../api/euphonium/api";
 import SelectItem from "../../../components/ui/SelectItem";
+import useAPI from "../../../utils/useAPI.hook";
+import OtaAPI from "../../../api/euphonium/ota/OtaAPI";
 
 export default function ({ }) {
+    const otaAPI = useAPI(OtaAPI);
     const [otaUrl, setOtaUrl] = useState<string>("");
     const [sha256, setSha256] = useState<string>("");
     const [newVersion, setNewVersion] = useState<string>("");
@@ -13,7 +16,7 @@ export default function ({ }) {
         fetch("https://api.github.com/repos/feelfreelinux/euphonium/releases/latest")
             .then((e) => e.json())
             .then(async ({ tag_name, assets, body }) => {
-                const info = await getInfo();
+                const info = await otaAPI.getInfo();
                 const otaBin = assets.find((asset: any) => asset.name == "ota.bin")
                 const checkSumIndex = body.indexOf("ota_checksum: ") + 14
                 const sha256 = body.substring(checkSumIndex, checkSumIndex + 64);
@@ -40,7 +43,7 @@ export default function ({ }) {
         <Input tooltip="sha256" value={sha256} onChange={setSha256} />
         <div class="pt-2 w-full">
             <Button disabled={!otaUrl.length || !sha256.length} type="primary" onClick={() => {
-                setOTAManifest({ url: otaUrl, sha256: sha256 });
+                otaAPI.setOTAManifest({ url: otaUrl, sha256: sha256 });
             }}>Reboot to bootloader</Button>
         </div>
     </>);

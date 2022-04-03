@@ -1,31 +1,20 @@
 import { useState, useEffect } from "preact/hooks";
-import { eventSource } from "../../api/euphonium/api";
-import {
-  getPlaybackState,
-  PlaybackState,
-  updateVolume,
-} from "../../api/euphonium/playback";
 import Card from "../ui/Card";
 import Equalizer from "../Equalizer";
 import Icon from "../ui/Icon";
+import eventSource from "../../api/euphonium/eventSource";
+import usePlaybackState from "../../utils/usePlaybackState.hook";
+import useAPI from "../../utils/useAPI.hook";
+import PlaybackAPI from "../../api/euphonium/playback/PlaybackAPI";
 
 export default function () {
-  const [playbackState, setPlaybackState] = useState<PlaybackState>();
-
-  useEffect(() => {
-    getPlaybackState().then((e) => setPlaybackState(e));
-  }, []);
-
-  useEffect(() => {
-    eventSource.addEventListener("playback", ({ data }: any) => {
-      setPlaybackState(JSON.parse(data));
-    });
-  }, []);
+  const playbackState = usePlaybackState();
+  const api = useAPI(PlaybackAPI);
 
   const [eqOpen, setEqOpen] = useState<boolean>(false);
 
   const volUpdated = (volume: number) => {
-    updateVolume(Math.round((volume / 15) * 100));
+    api.updateVolume(Math.round((volume / 15) * 100));
   };
   return (
     <Card title="Playback" subtitle="Currently playing">

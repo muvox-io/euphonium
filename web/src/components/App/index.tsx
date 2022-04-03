@@ -1,7 +1,8 @@
 import Router, { Route } from "preact-router";
 import { useEffect, useState } from "preact/hooks";
-import { getInfo } from "../../api/euphonium/api";
-import { EuphoniumInfo } from "../../api/euphonium/models";
+import { EuphoniumInfo } from "../../api/euphonium/system/models";
+import SystemAPI from "../../api/euphonium/system/SystemAPI";
+
 import OTACard from "../../apps/ota/OTACard";
 import RadioBrowser from "../../apps/webradio/RadioBrowser";
 import WiFiConfigurator from "../../apps/wifi/WiFiConfigurator";
@@ -9,6 +10,7 @@ import "../../index.css";
 import "../../theme/main.scss";
 import useIsMobile from "../../utils/isMobile.hook";
 import { PlaybackDataContextProvider } from "../../utils/PlaybackContext";
+import APIFetcher from "../APIFetcher";
 import ConfiguratorCard from "../ConfiguratorCard";
 import ConnectionLostModal from "../ConnectionLostModal";
 import Playback from "../Playback";
@@ -19,17 +21,11 @@ import Notifications from "../ui/Notifications";
 import css from "./App.module.scss";
 
 export function App() {
-  const [info, setInfo] = useState<EuphoniumInfo>();
-
   const updateTheme = () => {
     const isLight = localStorage.getItem("theme") == "light";
     document.documentElement.className = isLight ? "themeLight" : "themeDark";
   };
 
-  useEffect(() => {
-    updateTheme();
-    getInfo().then(setInfo);
-  }, []);
   const isMobile = useIsMobile();
 
   updateTheme();
@@ -47,35 +43,49 @@ export function App() {
         <PlaybackDataContextProvider>
           <div class="md:bg-app-secondary bg-app-primary h-screen w-screen">
             <Notifications />
-            {info?.networkState == "recovery" ? <OTACard /> : null}
-            {info?.networkState == "online" ? (
-              <div class="flex-row flex">
-                {!isMobile ? (
-                  <SideBar
-                    version={info?.version}
-                    onThemeChange={() => toggleTheme()}
-                  />
-                ) : null}
-                <div class="flex-grow h-screen overflow-y-auto">
-                  <Router>
-                    {isMobile ? (
-                      <Route path="/web" component={SideBar} />
-                    ) : null}
-                    <Route
-                      path="/web/plugin/:plugin"
-                      component={ConfiguratorCard}
-                    />
-                    <Route path="/web" component={SplashScreen} />
+            <APIFetcher api={SystemAPI} fetch={(api) => api.getSystemInfo()}>
+              {(info: EuphoniumInfo) => {
+                return (
+                  <>
+                    {info?.networkState == "recovery" ? <OTACard /> : null}
+                    {info?.networkState == "online" ? (
+                      <div class="flex-row flex">
+                        {!isMobile ? (
+                          <SideBar
+                            version={info?.version}
+                            onThemeChange={() => toggleTheme()}
+                          />
+                        ) : null}
+                        <div class="flex-grow h-screen overflow-y-auto">
+                          <Router>
+                            {isMobile ? (
+                              <Route path="/web" component={SideBar} />
+                            ) : null}
+                            <Route
+                              path="/web/plugin/:plugin"
+                              component={ConfiguratorCard}
+                            />
+                            <Route path="/web" component={SplashScreen} />
 
-                    <Route path="/web/apps/webradio" component={RadioBrowser} />
-                    <Route path="/web/playback" component={PlaybackMobile} />
-                  </Router>
-                  <Playback />
-                </div>
-              </div>
-            ) : info?.networkState == "offline" ? (
-              <WiFiConfigurator />
-            ) : null}
+                            <Route
+                              path="/web/apps/webradio"
+                              component={RadioBrowser}
+                            />
+                            <Route
+                              path="/web/playback"
+                              component={PlaybackMobile}
+                            />
+                          </Router>
+                          <Playback />
+                        </div>
+                      </div>
+                    ) : info?.networkState == "offline" ? (
+                      <WiFiConfigurator />
+                    ) : null}
+                  </>
+                );
+              }}
+            </APIFetcher>
           </div>
         </PlaybackDataContextProvider>
       </div>

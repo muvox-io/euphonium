@@ -1,5 +1,7 @@
 import { useState } from "preact/hooks";
-import { EqSettings, updateEq } from "../../api/euphonium/playback";
+import { EqSettings } from "../../api/euphonium/playback/models";
+import PlaybackAPI from "../../api/euphonium/playback/PlaybackAPI";
+import useAPI from "../../utils/useAPI.hook";
 
 interface IEqBandParams {
   type: string;
@@ -42,17 +44,18 @@ const EqBand = ({ type, onValueChanged, value }: IEqBandParams) => {
   );
 };
 
-interface IEqualizerParams {
+interface IEqualizerProps {
     eq: EqSettings
 }
 
-export default ({ eq }: IEqualizerParams) => {
+export default ({ eq }: IEqualizerProps) => {
   const [eqSettings, setEqSettings] = useState<EqSettings>(eq);
+  const api = useAPI(PlaybackAPI);
 
   const updateSettings = (value: any, type: any, persist: boolean) => {
     const newSettings = { ...eqSettings, [type]: value };
     setEqSettings(newSettings);
-    updateEq(newSettings, persist);
+    api.updateEq(newSettings, persist);
   };
   return (
       <div class="flex flex-row mt-2 ml-4">

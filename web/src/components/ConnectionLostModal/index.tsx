@@ -1,5 +1,8 @@
-import { useEffect, useState } from "preact/hooks";
-import { apiUrl, eventSource } from "../../api/euphonium/api";
+import { useContext, useEffect, useState } from "preact/hooks";
+import { APIAccessorContext } from "../../api/APIAccessor";
+import {} from "../../api/euphonium/api";
+import getBaseUrl from "../../api/euphonium/baseUrl";
+import eventSource from "../../api/euphonium/eventSource";
 import Modal from "../Modal";
 import Spinner from "../ui/Spinner";
 
@@ -10,7 +13,7 @@ import Spinner from "../ui/Spinner";
 export default function ConnectionLostModal() {
   let [open, setOpen] = useState(false); // determines whether the modal should be shown
   let [showImpulse, setShowImpulse] = useState(false); // determines whether the modal should show the impulse animation, which is shown on every error
-
+  let apiAccessor = useContext(APIAccessorContext);
   useEffect(() => {
     let errorListener = (e: any) => {
       console.log(e);
@@ -22,6 +25,7 @@ export default function ConnectionLostModal() {
     };
     let openListener = (e: any) => {
       setOpen(false);
+      apiAccessor.notifyReconnect();
     };
     eventSource.addEventListener("error", errorListener);
     eventSource.addEventListener("open", openListener);
@@ -41,7 +45,7 @@ export default function ConnectionLostModal() {
           ></Spinner>
           <div class="self-center inline-block mt-4">Reconnecting...</div>
           <div class="self-center inline-block mt-4 text-app-text-secondary">
-            {apiUrl}
+            {getBaseUrl()}
           </div>
         </div>
         <p class="mt-16 text-app-text-secondary">

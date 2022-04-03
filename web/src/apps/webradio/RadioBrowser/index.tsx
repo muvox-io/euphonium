@@ -1,10 +1,11 @@
 import { useEffect, useState } from "preact/hooks";
-import { playRadio } from "../../../api/euphonium/api";
+import PlaybackAPI from "../../../api/euphonium/playback/PlaybackAPI";
 import { getStationsByName } from "../../../api/radiobrowser/api";
 import { Station } from "../../../api/radiobrowser/models";
 import Card from "../../../components/ui/Card";
 import Icon from "../../../components/ui/Icon";
 import Input from "../../../components/ui/Input";
+import useAPI from "../../../utils/useAPI.hook";
 
 const Radio = ({
   name = "",
@@ -14,6 +15,8 @@ const Radio = ({
   countrycode = "",
   url_resolved = "",
 }) => {
+  const playbackAPI = useAPI(PlaybackAPI);
+
   return (
     <div class="bg-app-secondary shadow-m p-5 border border-app-border flex flex-col relative rounded-xl">
       <img
@@ -30,7 +33,9 @@ const Radio = ({
       <div class="bg-green-600 active:bg-green-800 text-white w-10 h-10 rounded-full absolute flex -bottom-2 -right-2 cursor-pointer">
         <div class="mt-[9px] ml-[5px]">
           <Icon
-            onClick={() => playRadio(name, favicon, url_resolved, codec)}
+            onClick={() =>
+              playbackAPI.playRadio(name, favicon, url_resolved, codec)
+            }
             name="play"
           />
         </div>
@@ -63,8 +68,8 @@ export default () => {
         )}
         {radios.length == 0 && (
           <div class="text-app-text-secondary text-xl mt-2 flex-col flex w-full items-center p-5">
-              <Icon name="close" />
-              Results empty.
+            <Icon name="close" />
+            Results empty.
           </div>
         )}
       </Card>
