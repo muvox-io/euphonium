@@ -1,3 +1,4 @@
+import { JSX } from "preact";
 import { useContext, useEffect, useState } from "preact/hooks";
 import { APIAccessorContext } from "../../api/APIAccessor";
 import {} from "../../api/euphonium/api";
@@ -10,7 +11,7 @@ import Spinner from "../ui/Spinner";
  * ConnectionLostModal dects wjen the eventSource used for notifications fails and displays a modal
  * prompting the user to check his connection.
  */
-export default function ConnectionLostModal() {
+export default function ConnectionLostModal(): JSX.Element {
   let [open, setOpen] = useState(false); // determines whether the modal should be shown
   let [showImpulse, setShowImpulse] = useState(false); // determines whether the modal should show the impulse animation, which is shown on every error
   let apiAccessor = useContext(APIAccessorContext);

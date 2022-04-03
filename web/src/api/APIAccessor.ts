@@ -2,7 +2,12 @@ import { createContext } from "preact";
 import getBaseUrl from "./euphonium/baseUrl";
 
 export default class APIAccessor extends EventTarget {
+  /**
+   * Caches instances of API classes.
+   */
   apiCache: { [key: string]: any } = {};
+
+  responseCache: { [key: string]: any } = {};
 
   constructor(private baseURL: string) {
     super();
@@ -28,6 +33,7 @@ export default class APIAccessor extends EventTarget {
   }
 
   notifyReconnect() {
+    this.responseCache = {};
     this.dispatchEvent(new Event("reconnect"));
   }
 }

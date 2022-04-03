@@ -11,6 +11,7 @@ export interface APIFetcherProps<A, R> {
   loadingComponent?: Component;
   children: (resp: R) => JSX.Element;
   dependencies?: any[];
+  cacheKey?: string;
 }
 
 enum State {
@@ -24,6 +25,7 @@ export default function APIFetcher<A, R>({
   children,
   fetch: fetchFunc,
   dependencies = [],
+  cacheKey,
 }: APIFetcherProps<A, R>) {
   const apiAccessor = useContext(APIAccessorContext);
   const apiInstance = useAPI(api);
@@ -32,11 +34,20 @@ export default function APIFetcher<A, R>({
   const [response, setResponse] = useState<R | undefined>();
 
   async function fetch() {
-    console.log("fetching...", fetchFunc.toString());
+    let cacheKeyWithDependencies = cacheKey + dependencies.join("_");
+    if (cacheKey && apiAccessor.responseCache[cacheKeyWithDependencies]) {
+      setState(State.Loaded);
+      setResponse(apiAccessor.responseCache[cacheKeyWithDependencies]);
+      return;
+    }
+
     try {
       setState(State.Loading);
       const response = await fetchFunc(apiInstance);
       setState(State.Loaded);
+      if (cacheKey) {
+        apiAccessor.responseCache[cacheKeyWithDependencies] = response;
+      }
       setResponse(response);
     } catch (e) {
       setState(State.Error);

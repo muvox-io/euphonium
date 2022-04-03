@@ -86,42 +86,48 @@ export default ({ version = "", theme = "", onThemeChange = () => {} }) => {
   ];
 
   return (
-    <APIFetcher api={PluginsAPI} fetch={(api) => api.getPlugins()}>
-      {(pluginsFromAPI: PluginEntry[]) => {
-        let plugins = [...pluginsFromAPI, ...extraPlugins];
-        return (
-          <div className="flex align-start relative md:w-[220px] md:min-w-[220px] flex-col bg-app-primary p-8 md:p-4 h-screen text-m space-y-2 overflow-y-auto">
-            <div className="text-3xl md:text-2xl">Euphonium</div>
-            <div className="text-xs md:text-m text-app-text-secondary pb-3">
-              tiny audio platform
-            </div>
-            <SideBarItem displayName="Dashboard" name="home"></SideBarItem>
-            <SideBarCategory
-              plugins={plugins}
-              filterType={PluginEntryType.App}
-              header="Applications"
-            />
-            <SideBarCategory
-              plugins={plugins}
-              filterType={PluginEntryType.System}
-              header="System configuration"
-            />
-            <SideBarCategory
-              plugins={plugins}
-              filterType={PluginEntryType.Plugin}
-              header="Plugin configuration"
-            />
+    <div className="flex align-start relative md:w-[220px] md:min-w-[220px] flex-col bg-app-primary p-8 md:p-4 h-screen text-m space-y-2 overflow-y-auto">
+      <div className="text-3xl md:text-2xl">Euphonium</div>
+      <div className="text-xs md:text-m text-app-text-secondary pb-3">
+        tiny audio platform
+      </div>
+      <APIFetcher
+        api={PluginsAPI}
+        fetch={(api) => api.getPlugins()}
+        cacheKey="sidebar"
+      >
+        {(pluginsFromAPI: PluginEntry[]) => {
+          let plugins = [...pluginsFromAPI, ...extraPlugins];
+          return (
+            <>
+              <SideBarItem displayName="Dashboard" name="home"></SideBarItem>
+              <SideBarCategory
+                plugins={plugins}
+                filterType={PluginEntryType.App}
+                header="Applications"
+              />
+              <SideBarCategory
+                plugins={plugins}
+                filterType={PluginEntryType.System}
+                header="System configuration"
+              />
+              <SideBarCategory
+                plugins={plugins}
+                filterType={PluginEntryType.Plugin}
+                header="Plugin configuration"
+              />
 
-            <div class="absolute bottom-4 left-4 text-xs">{version}</div>
-            <div
-              onClick={(v) => onThemeChange()}
-              class="absolute bg-app-secondary rounded-full w-8 h-8 right-4 bottom-4 flex text-xl items-center justify-center cursor-pointer"
-            >
-              <Icon name="moon" />
-            </div>
-          </div>
-        );
-      }}
-    </APIFetcher>
+              <div class="absolute bottom-4 left-4 text-xs">{version}</div>
+            </>
+          );
+        }}
+      </APIFetcher>
+      <div
+        onClick={(v) => onThemeChange()}
+        class="absolute bg-app-secondary rounded-full w-8 h-8 right-4 bottom-4 flex text-xl items-center justify-center cursor-pointer"
+      >
+        <Icon name="moon" />
+      </div>
+    </div>
   );
 };
