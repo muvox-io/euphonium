@@ -1,9 +1,11 @@
-import { Component, AnyComponent ,JSX } from "preact";
+import { Component, AnyComponent, JSX } from "preact";
 
-export default function ErrorBoundaryWrapper<P, S>(Component: AnyComponent<P, S>) {
+export default function ErrorBoundaryWrapper<P, S>(
+  Component: AnyComponent<P, S>
+) {
   return (props: P) => {
     return (
-      <ErrorBoundary>
+      <ErrorBoundary component={Component} componentProps={props}>
         <Component {...props} />
       </ErrorBoundary>
     );
@@ -12,10 +14,14 @@ export default function ErrorBoundaryWrapper<P, S>(Component: AnyComponent<P, S>
 
 export interface ErrorBoundaryProps {
   children: JSX.Element;
+  component: any;
+  componentProps: any;
 }
 
 export interface ErrorBoundaryState {
   error: Error | null;
+  timestamp: number | null;
+  lastComponentProps: any;
 }
 
 export class ErrorBoundary extends Component<
@@ -24,12 +30,43 @@ export class ErrorBoundary extends Component<
 > {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { error: null };
+    this.state = { error: null, timestamp: null };
   }
 
   static getDerivedStateFromError(error: Error) {
+    console.log("STATE_FROM_ERROR");
     // Update state so the next render will show the fallback UI.
-    return { error };
+    return { error, timestamp: Date.now() };
+  }
+
+  static getDerivedStateFromProps(
+    props: ErrorBoundaryProps,
+    state: ErrorBoundaryState
+  ) {
+    // do a shallow compare of componment props and clear error if they are diffrent
+    // also check the timestamp, and don't clear if the rror happened in the last 100ms
+    console.log("STATE_FROM_PROPS", Date.now() - state.timestamp!);
+    console.log(
+      JSON.stringify(props.componentProps) !==
+        JSON.stringify(state.lastComponentProps)
+    );
+    if (
+      state.lastComponentProps &&
+      state.error &&
+      JSON.stringify(props.componentProps) !==
+        JSON.stringify(state.lastComponentProps) &&
+      Date.now() - state.timestamp! < 100
+    ) {
+      return {
+        error: null,
+        timestamp: null,
+        lastComponentProps: props.componentProps,
+      };
+    }
+
+    return {
+      lastComponentProps: props.componentProps,
+    };
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
@@ -41,12 +78,25 @@ export class ErrorBoundary extends Component<
     if (this.state.error) {
       // You can render any custom fallback UI
       return (
-        <div class="bg-app-primary md:min-w-[600px] rounded-2xl p-7 m-7 text-red-100">
+        <div class="bg-app-primary md:min-w-[600px] rounded-2xl p-7 m-7 text-danger">
           <div class="text-2xl mb-3 text-rose-600">An error has occured!</div>
           <div class="text-m mt-2 text-app-text-secondary">
             <code>Error: {this.state.error.message}</code>
-            <div><code>Stack trace:</code></div>
-            <pre><code>{this.state.error.stack}</code></pre>
+            <div>
+              <code>Stack trace:</code>
+            </div>
+            <pre>
+              <code>{this.state.error.stack}</code>
+            </pre>
+            <br />
+            <br />
+            <code>
+              <pre>
+                Component: {this.props?.component?.name}
+                <br />
+                Timestamp: {new Date(this.state.timestamp!).toString()}
+              </pre>
+            </code>
           </div>
         </div>
       );

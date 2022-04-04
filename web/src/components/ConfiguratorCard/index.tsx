@@ -19,7 +19,7 @@ function CardContents({ pluginConfig }: { pluginConfig: PluginConfiguration }) {
           </IconCard>
         );
       })}
-      <Button>
+      <Button type="primary">
         {" "}
         {/* disabled={!dirty} onClick={updateConfiguration}*/}
         Apply changes
@@ -28,7 +28,7 @@ function CardContents({ pluginConfig }: { pluginConfig: PluginConfiguration }) {
   );
 }
 
-export default ({ plugin }: { plugin: string }) => {
+export default function ConfiguratorCard({ plugin }: { plugin: string }) {
   return (
     <APIFetcher
       api={PluginsAPI}
@@ -40,7 +40,7 @@ export default ({ plugin }: { plugin: string }) => {
       }}
     </APIFetcher>
   );
-};
+}
 
 // import { useContext, useEffect, useRef, useState } from "preact/hooks";
 // import {
