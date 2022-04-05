@@ -8,7 +8,7 @@ Highly extensible streaming audio player targeting low cost MCUs like ESP32. Cur
 
 Current state: Feature freeze until end of January.
 
-### Documentation
+## Documentation
 You can access the project's documentation [here](https://feelfreelinux.github.io/euphonium/).
 
 ## Get involved
