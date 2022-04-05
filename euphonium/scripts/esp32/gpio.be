@@ -5,7 +5,7 @@ class GPIO
     var INPUT_PULLUP
     var INPUT_PULLDOWN
     var OUTPUT
-    var BUTTON_PRESS
+    var PRESS
     var LONG_PRESS
     var DOUBLE_PRESS
 
