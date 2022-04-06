@@ -18,7 +18,7 @@ const Radio = ({
   const playbackAPI = useAPI(PlaybackAPI);
 
   return (
-    <div class="bg-app-secondary shadow-m p-5 border border-app-border flex flex-col relative rounded-xl">
+    <div class="bg-app-primary p-5 flex flex-col relative rounded-xl">
       <img
         class="w-10 h-10 rounded-full bg-white border-app-border border absolute -right-2 -top-2 shadow-xl object-contain"
         src={
@@ -51,16 +51,28 @@ export default () => {
   return (
     <div class="mb-[150px]">
       <Card title="Web radio" subtitle="application">
-        <Input
+        <div class="min-w-full relative mt-5">
+          <input
+            placeholder={"Search radios"}
+            className="pl-10 bg-app-primary h-[45px] p-3 rounded-xl min-w-full"
+            onChange={(e: any) =>
+              getStationsByName(e.target.value).then(setRadios)
+            }
+          ></input>
+          <div class="text-app-text-secondary left-1 top-3 absolute">
+            <Icon name="search" />
+          </div>
+        </div>
+        {/* <Input
           onSubmit={(e) => {
             getStationsByName(e).then(setRadios);
           }}
           value=""
           placeholder="Search radio-browser.info"
           icon="search"
-        />
+        /> */}
         {radios.length > 0 && (
-          <div class="grid md:grid-cols-2 grid-cols-1 xl:grid-cols-5 gap-8 mt-10">
+          <div class="grid md:grid-cols-2 grid-cols-1 xl:grid-cols-5 gap-8 mt-5">
             {radios.map((radio) => (
               <Radio {...radio}></Radio>
             ))}
