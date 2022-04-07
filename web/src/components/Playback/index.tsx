@@ -81,7 +81,7 @@ const PlaybackBar = ({
           <div class="mr-3 text-xl text-app-text-secondary ml-auto flex flex-row">
             <div class="relative flex justify-center">
               {eqOpen && playbackState?.eq ? (
-                <div class="absolute bottom-[50px] shadow-xl text-center rounded-xl w-[170px] p-4 z-index-2 bg-app-primary mb-1">
+                <div class="absolute bottom-[50px] shadow-xl text-center rounded-xl w-[170px] p-4 z-30 bg-app-primary mb-1">
                   equalizer
                   <Equalizer eq={playbackState!!.eq} />
                 </div>

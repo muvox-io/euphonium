@@ -28,7 +28,7 @@ export default function NormalComponent({ info }: { info: EuphoniumInfo }) {
       {!isMobile ? (
         <SideBar version={info?.version} onThemeChange={() => toggleTheme()} />
       ) : null}
-      <div class="flex-grow h-screen overflow-y-auto">
+      <div class="flex-grow h-screen overflow-y-auto pb-20">
         <Router>
           {isMobile ? <Route path="/web" component={SideBar} /> : null}
           <Route

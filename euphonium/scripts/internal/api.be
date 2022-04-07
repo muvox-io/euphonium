@@ -21,23 +21,25 @@ http.handle('GET', '/plugins', def (request)
 end)
 
 http.handle('GET', '/plugins/:name', def (request)
-    var result = {
-        'status': 'error'
-    }
+  
 
     for plugin : euphonium.plugins
         if plugin.name == request.url_params()['name']
             var ctx = FormContext()
             plugin.make_form(ctx, plugin.state)
 
-            result = {
+            request.write_json({
                 'displayName': plugin.display_name,
                 'themeColor': plugin.theme_color,
                 'configSchema': ctx.apply_state(plugin.state)
-            }
+            }, 200)
+            return
         end
     end
-    request.write_json(result, 200)
+    request.write_json({
+        "status": "error",
+        "error": "Plugin not found"
+    }, 404)
 end)
 
 http.handle('POST', '/plugins/:name', def (request)

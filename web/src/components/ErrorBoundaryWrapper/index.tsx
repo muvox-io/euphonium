@@ -1,7 +1,7 @@
-import { Component, AnyComponent, JSX } from "preact";
+import { Component, AnyComponent, JSX, FunctionComponent } from "preact";
 
-export default function ErrorBoundaryWrapper<P, S>(
-  Component: AnyComponent<P, S>
+export default function ErrorBoundaryWrapper<P>(
+  Component: FunctionComponent<P>
 ) {
   return (props: P) => {
     return (
@@ -30,7 +30,7 @@ export class ErrorBoundary extends Component<
 > {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { error: null, timestamp: null };
+    this.state = { error: null, timestamp: null, lastComponentProps: null };
   }
 
   static getDerivedStateFromError(error: Error) {

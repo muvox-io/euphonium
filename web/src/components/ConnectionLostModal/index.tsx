@@ -11,7 +11,7 @@ import Spinner from "../ui/Spinner";
  * ConnectionLostModal dects wjen the eventSource used for notifications fails and displays a modal
  * prompting the user to check his connection.
  */
-export default function ConnectionLostModal(): JSX.Element {
+export default function ConnectionLostModal(): JSX.Element | null {
   let [open, setOpen] = useState(false); // determines whether the modal should be shown
   let [showImpulse, setShowImpulse] = useState(false); // determines whether the modal should show the impulse animation, which is shown on every error
   let apiAccessor = useContext(APIAccessorContext);
@@ -35,35 +35,34 @@ export default function ConnectionLostModal(): JSX.Element {
       eventSource.removeEventListener("open", openListener);
     };
   }, [eventSource, setShowImpulse, setOpen]);
+  if (!open) return null;
   return (
-    open && (
-      <Modal header="Connection lost">
-        <div class="flex flex-col mt-16">
-          <Spinner
-            class="inline-block self-center"
-            spinnerSize="large"
-            showImpulse={showImpulse}
-          ></Spinner>
-          <div class="self-center inline-block mt-4">Reconnecting...</div>
-          <div class="self-center inline-block mt-4 text-app-text-secondary">
-            {getBaseUrl()}
-          </div>
+    <Modal header="Connection lost">
+      <div class="flex flex-col mt-16">
+        <Spinner
+          class="inline-block self-center"
+          spinnerSize="large"
+          showImpulse={showImpulse}
+        ></Spinner>
+        <div class="self-center inline-block mt-4">Reconnecting...</div>
+        <div class="self-center inline-block mt-4 text-app-text-secondary">
+          {getBaseUrl()}
         </div>
-        <p class="mt-16 text-app-text-secondary">
-          If the problem persists:
-          <ul class="list-disc ml-8 mt-4">
-            <li>Make sure your Euphonium device is turned on</li>
-            <li>
-              Check if your device is connected to the same network as this
-              browser
-            </li>
-            <li>
-              Ensure that both your Euphonium device and this browser have a
-              strong Wi-Fi signal
-            </li>
-          </ul>
-        </p>
-      </Modal>
-    )
+      </div>
+      <p class="mt-16 text-app-text-secondary">
+        If the problem persists:
+        <ul class="list-disc ml-8 mt-4">
+          <li>Make sure your Euphonium device is turned on</li>
+          <li>
+            Check if your device is connected to the same network as this
+            browser
+          </li>
+          <li>
+            Ensure that both your Euphonium device and this browser have a
+            strong Wi-Fi signal
+          </li>
+        </ul>
+      </p>
+    </Modal>
   );
 }

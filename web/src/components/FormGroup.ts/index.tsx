@@ -1,4 +1,4 @@
-import { AnyComponent } from "preact";
+import { AnyComponent, FunctionComponent } from "preact";
 import {
   ConfigurationField,
   ConfigurationFieldType,
@@ -18,7 +18,7 @@ export interface FormGroupProps {
 }
 
 export const FIELD_COMPONENTS: {
-  [key in ConfigurationFieldType]: AnyComponent<FieldProps>;
+  [key in any]: FunctionComponent<FieldProps<any>>;
 } = {
   [ConfigurationFieldType.TEXT]: TextField,
   [ConfigurationFieldType.NUMBER]: NumberField,

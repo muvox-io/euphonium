@@ -29,7 +29,12 @@ export default class APIAccessor extends EventTarget {
         `${response.status} ${response.statusText}: ${await response.text()}`
       );
     }
-    return await response.json();
+
+    try {
+      return await response.json();
+    } catch(e) {
+      throw new Error(`Failed to parse JSON from ${method} ${url}: ${e}`);
+    }
   }
 
   notifyReconnect() {
