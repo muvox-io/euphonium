@@ -5,8 +5,15 @@
   margin: 0.5rem 0;
   color: var(--accent);
   position: relative;
+  transition: 300ms;
+  z-index: 999;
+  @media screen and (max-width: 768px) {
+    padding: 1rem 3rem;
+  }
+
   /* hack to add some opacity to the border */
   &:after {
+    z-index: 888;
     content: " ";
     position: absolute;
     top: 0;

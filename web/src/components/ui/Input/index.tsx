@@ -22,7 +22,7 @@ export default ({
   placeholder,
 }: InputProps) => {
   return (
-    <div class="min-w-full flex flex-row items-center">
+    <div class="min-w-full flex flex-col items-start lg:flex-row lg:items-center">
       <div class="text-app-text-secondary font-thin text-l mb-2 mt-2">
         {tooltip}
       </div>
@@ -30,7 +30,7 @@ export default ({
         placeholder={placeholder}
         className={`${
           icon ? "pl-10" : ""
-        } bg-app-secondary h-[45px]  p-3 rounded-xl min-w-[420px] ml-auto`}
+        } bg-app-secondary h-[45px]  p-3 rounded-xl min-w-[420px] self-stretch lg:self-auto lg:ml-auto`}
         value={value}
         type={type}
         onChange={(e: any) => onSubmit && onSubmit(e.target.value)}

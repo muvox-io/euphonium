@@ -1,24 +1,25 @@
 type CheckboxProps = {
-    label: string;
-    value: boolean;
-    onChange: (value: boolean) => void;
+  label: string;
+  value: boolean;
+  onChange: (value: boolean) => void;
 };
 
-export default ({
-    label = "",
-    value,
-    onChange
-}: CheckboxProps) => {
-    return (
-        <div class='lg:min-w-[400px] min-w-full relative'>
-            <div class="flex items-center mt-3 mb-1">
-                <input 
-                    onChange={(e:any) => {onChange(e.target.checked)}}
-                    checked={value!!}
-                    id="checkbox" aria-describedby="checkbox" type="checkbox" class="bg-gray-50 border-gray-300 focus:ring-3 focus:ring-blue-300 h-4 w-4 rounded" />
-                <label for="checkbox" class="text-sm ml-3 font-medium text-app-text-secondary">{label}</label>
-            </div>
-
-        </div>
-    );
+export default ({ label = "", value, onChange }: CheckboxProps) => {
+  return (
+    <div class="min-w-full flex flex-col items-start lg:flex-row lg:items-center">
+      <div class="text-app-text-secondary font-thin text-l mb-2 mt-2">
+        {label}
+      </div>
+      <input
+        onChange={(e: any) => {
+          onChange(e.target.checked);
+        }}
+        checked={value!!}
+        id="checkbox"
+        aria-describedby="checkbox"
+        type="checkbox"
+        class="bg-app-secondary h-[45px]  p-3 rounded-xl min-w-[20px] self-stretch lg:self-auto lg:ml-auto"
+      />
+    </div>
+  );
 };

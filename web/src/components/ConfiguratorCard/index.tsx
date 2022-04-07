@@ -1,71 +1,47 @@
-import { ConfigurationField, ConfigurationFieldType, PluginConfiguration } from "../../api/euphonium/plugins/models";
+import { useState } from "preact/hooks";
+import {
+  ConfigurationFieldType,
+  PluginConfiguration,
+} from "../../api/euphonium/plugins/models";
 import PluginsAPI from "../../api/euphonium/plugins/PluginsAPI";
 import APIFetcher from "../APIFetcher";
 import Dashboard from "../Dashboard";
+import FormGroup from "../FormGroup.ts";
 import Button from "../ui/Button";
 import Card from "../ui/Card";
-import Checkbox from "../ui/Checkbox";
-import IconCard from "../ui/IconCard";
-import Input from "../ui/Input";
-import NumberInput from "../ui/NumberInput";
-import Select from "../ui/Select";
-
-const renderConfigurationField = (
-  field: ConfigurationField,
-  updateField: (field: ConfigurationField, value: string) => void
-) => {
-  let { type, label, value, values } = field;
-  const onChange = (e: string) => updateField(field, e);
-  switch (type) {
-    case ConfigurationFieldType.TEXT:
-      return <Input tooltip={label} value={value} onBlur={onChange} />;
-    case ConfigurationFieldType.NUMBER:
-      return <NumberInput tooltip={label} value={value} onBlur={onChange} />;
-    case ConfigurationFieldType.CHECKBOX:
-      return (
-        <Checkbox
-          value={value == "true"}
-          label={label!!}
-          onChange={(v) => {
-            updateField(field, v ? "true" : "false");
-          }}
-        />
-      );
-    case ConfigurationFieldType.SELECT:
-      return (
-        <Select
-          tooltip={label!!}
-          value={value}
-          values={values!!}
-          onChange={onChange}
-        />
-      );
-    default:
-      return <p>Unsupported field type: {field}</p>;
-  }
-};
 
 function CardContents({ pluginConfig }: { pluginConfig: PluginConfiguration }) {
   const groupFields = pluginConfig.configSchema.filter(
-    (field) => field.type == "group"
+    (field) => field.type === ConfigurationFieldType.GROUP
+  );
+  const [formValue, setFormValue] = useState(
+    Object.fromEntries(
+      pluginConfig.configSchema
+        .filter((f) => f.type !== ConfigurationFieldType.GROUP)
+        .map((field) => [field.key, field.value])
+    )
   );
   return (
     <Card title={pluginConfig.displayName} subtitle={"plugin configuration"}>
       {groupFields.map((group) => {
-        const fieldsInGroup = pluginConfig.configSchema.filter((field) => field.group == group.key);
+        const fieldsInGroup = pluginConfig.configSchema.filter(
+          (field) => field.group == group.key
+        );
         return (
-          <IconCard iconName="settings" label={group.label}>
-            <div class="flex flex-col space-y-5">
-              { fieldsInGroup.map((e) => renderConfigurationField(e, (a, b) => {})) }
-            </div>
-          </IconCard>
+          <FormGroup
+            key={group.key}
+            label={group.label}
+            fields={fieldsInGroup}
+            onChange={(value) => setFormValue({ ...formValue, ...value })}
+            value={formValue}
+          />
         );
       })}
-      <Button type="primary">
-        {" "}
-        {/* disabled={!dirty} onClick={updateConfiguration}*/}
-        Apply changes
-      </Button>
+      <div class="flex flex-col">
+        <Button type="primary" class="self-stretch md:self-end">
+          Apply changes
+        </Button>
+      </div>
     </Card>
   );
 }
@@ -74,14 +50,14 @@ export default function ConfiguratorCard({ plugin }: { plugin: string }) {
   if (plugin == "home") {
     return <Dashboard />;
   }
-  
+
   return (
     <APIFetcher
       api={PluginsAPI}
       fetch={(api) => api.getPluginConfiguration(plugin)}
       dependencies={[plugin]}
     >
-      {(pluginConfig) => {
+      {(pluginConfig: PluginConfiguration) => {
         return <CardContents pluginConfig={pluginConfig} />;
       }}
     </APIFetcher>
