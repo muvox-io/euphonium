@@ -1,4 +1,5 @@
 #include "WiFiDriver.h"
+#include <esp_netif.h>
 
 WiFiState globalWiFiState;
 wifi_ap_record_t ap_info[DEFAULT_SCAN_LIST_SIZE];
@@ -169,7 +170,7 @@ void setupAP(std::string ssid, std::string password) {
 std::string getMacAddress() {
     uint8_t mac[6];
     esp_read_mac(mac, ESP_MAC_WIFI_STA);
-    char macStr [18];
+    char macStr[18];
     sprintf(macStr, "%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2],
             mac[3], mac[4], mac[5]);
     return std::string(macStr);
@@ -181,4 +182,22 @@ void exportWiFiDriver(std::shared_ptr<berry::VmState> berry) {
     berry->export_function("start_ap", &setupAP, "wifi");
     berry->export_function("start_scan", &startFastScan, "wifi");
     berry->export_function("get_mac", &getMacAddress, "wifi");
+    berry->export_function("set_hostname", &setHostname, "wifi");
+}
+
+void setHostname(std::string hostname) {
+    mdns_hostname_set(hostname.c_str());
+    EUPH_LOG(info, "wifi", "Setting hostname to '%s' with length of %d", hostname.c_str(), hostname.size());
+    esp_err_t result =
+        tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, hostname.c_str());
+    if (result != ESP_OK) {
+        if (result == ESP_ERR_TCPIP_ADAPTER_INVALID_PARAMS) {
+             EUPH_LOG(error, "wifi", "failed to set hostname: ESP_ERR_TCPIP_ADAPTER_INVALID_PARAMS");
+        } else if (result == ESP_ERR_TCPIP_ADAPTER_IF_NOT_READY) {
+            EUPH_LOG(error, "wifi",
+                     "TCPIP_ADAPTER_IF_STA not ready to set hostname");
+        } else {
+            EUPH_LOG(error, "wifi", "Failed to set hostname: %d", result);
+        }
+    }
 }

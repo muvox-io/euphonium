@@ -1,8 +1,9 @@
 #include <SPIFFSScriptLoader.h>
 #include <sys/stat.h>
 
-SPIFFSScriptLoader::SPIFFSScriptLoader()
+SPIFFSScriptLoader::SPIFFSScriptLoader(std::weak_ptr<Core> core)
 {
+    this->core = core;
     struct stat st;
     if (stat("/spiffs/configuration", &st) != 0 || !S_ISDIR(st.st_mode))
     {
@@ -17,6 +18,7 @@ void SPIFFSScriptLoader::loadScript(std::string scriptName, std::shared_ptr<berr
     if (!berry->execute_string(scriptContent))
     {
         EUPH_LOG(error, "script_loader", "Failed to load script %s", scriptName.c_str());
+        // this->core.lock()->luaEventBus->postEvent(std::make_unique<BerryErrorEvent>(scriptName, berry->get_error_message()));
     }
 }
 

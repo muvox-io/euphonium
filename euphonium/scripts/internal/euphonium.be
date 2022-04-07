@@ -230,7 +230,6 @@ class EuphoniumInstance
             for plugin : self.plugins
                 if plugin.type == 'init_handler'
                     plugin.on_event(EVENT_SYSTEM_INIT, {})
-                    return
                 end
             end
 

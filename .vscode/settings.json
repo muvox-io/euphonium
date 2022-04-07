@@ -96,6 +96,10 @@
         "cassert": "cpp",
         "__functional_03": "cpp",
         "*.inc": "cpp",
-        "__bits": "cpp"
+        "__bits": "cpp",
+        "hash_map": "cpp",
+        "strstream": "cpp",
+        "shared_mutex": "cpp",
+        "valarray": "cpp"
     }
 }

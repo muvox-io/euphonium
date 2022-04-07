@@ -8,6 +8,21 @@ struct PlaybackInfo {
     std::string songName, albumName, artistName, sourceName, icon;
 };
 
+class BerryErrorEvent : public Event {
+  public: 
+    BerryErrorEvent(std::string errorMessage) {
+        this->subType = "error";
+        this->eventType = EventType::BERRY_ERROR_EVENT;
+        this->errorMessage = errorMessage;
+    }
+    std::string errorMessage;
+    berry::map toBerry() {
+        berry::map result;
+        result["error"] = this->errorMessage;
+        return result;
+    }
+};
+
 class SongChangedEvent : public Event {
   public:
     PlaybackInfo playbackInfo;

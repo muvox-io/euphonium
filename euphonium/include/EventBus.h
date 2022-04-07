@@ -10,7 +10,8 @@
 #include <BerryBind.h>
 
 enum class EventType : uint32_t {
-    LUA_MAIN_EVENT
+    LUA_MAIN_EVENT,
+    BERRY_ERROR_EVENT
 };
 
 class Event {

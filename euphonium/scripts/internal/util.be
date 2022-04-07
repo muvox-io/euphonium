@@ -51,6 +51,32 @@ class Util
         return opinions[opinionsIdx] + ' ' + colors[colorsIdx] + ' ' + things[thingsIdx] + ' ' + last2Bytes
     end
 
+    # converts a string to a hostname safe string
+    def to_hostname(name)
+        hostname = ""
+        for i: 0..(size(name) - 1)
+            var c = name[i]
+            if c == ' ' || c == '-' && size(hostname) > 0 && hostname[size(hostname) - 1] != '-'
+                hostname += '-'
+            elif string.byte(c) >= 65 && string.byte(c) <= 90
+                hostname += string.char(string.byte(c) + 32)
+            else
+                hostname += c
+            end
+        end
+        if hostname[size(hostname) - 1] == '-'
+            hostname = hostname[0..size(hostname) - 2]
+        end
+        if size(hostname) >  32
+            hostname = hostname[0..32]
+        end
+        if size(hostname) <  1
+            hostname = "DDD-UPA"
+        end
+        
+        return hostname
+    end
+
 end
 
 util = Util()

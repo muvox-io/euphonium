@@ -11,7 +11,6 @@ class GeneralSettingsPlugin : Plugin
         ctx.create_group('general', { 'label': 'General' })
         var default_name = "Euphonium"
         if core.platform() == "esp32"
-            print("ASSSS ESP32")
             default_name = util.generate_device_name()
         end
         ctx.text_field('deviceName', {
@@ -20,6 +19,13 @@ class GeneralSettingsPlugin : Plugin
             'group': 'general'
         })
        
+    end
+    def set_hostname()
+        if core.platform() == "esp32"
+            var hn = util.to_hostname(self.config_value('deviceName'))
+            print("setting hostname to ", hn)
+            wifi.set_hostname(hn)
+        end
     end
 end
 

@@ -47,7 +47,7 @@ static void euphoniumTask(void *pvParameters) {
             std::make_shared<ESP32PlatformPlugin>());
         core->registeredPlugins.push_back(std::make_shared<OTAPlugin>());
         core->registeredPlugins.push_back(bluetoothPlugin);
-        auto loader = std::make_shared<SPIFFSScriptLoader>();
+        auto loader = std::make_shared<SPIFFSScriptLoader>(core);
         auto output = std::make_shared<DACAudioOutput>();
         core->selectAudioOutput(output);
         core->setupBindings();
