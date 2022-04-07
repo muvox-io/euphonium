@@ -78,11 +78,6 @@ export default ({ version = "", theme = "", onThemeChange = () => {} }) => {
       displayName: "General",
       type: PluginEntryType.System,
     },
-    {
-      name: "dac",
-      displayName: "DAC Settings",
-      type: PluginEntryType.System,
-    },
   ];
 
   return (
