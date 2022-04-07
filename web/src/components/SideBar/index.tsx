@@ -72,14 +72,6 @@ const SideBarCategory = ({ plugins, filterType, header }: CategoryProps) => {
 };
 
 export default ({ version = "", theme = "", onThemeChange = () => {} }) => {
-  let extraPlugins = [
-    {
-      name: "general",
-      displayName: "General",
-      type: PluginEntryType.System,
-    },
-  ];
-
   return (
     <div className="flex align-start relative md:w-[220px] md:min-w-[220px] flex-col bg-app-primary p-8 md:p-4 h-screen text-m space-y-2 overflow-y-auto">
       <div className="text-3xl md:text-2xl">Euphonium</div>
@@ -92,7 +84,7 @@ export default ({ version = "", theme = "", onThemeChange = () => {} }) => {
         cacheKey="sidebar"
       >
         {(pluginsFromAPI: PluginEntry[]) => {
-          let plugins = [...pluginsFromAPI, ...extraPlugins];
+          let plugins = [...pluginsFromAPI];
           return (
             <>
               <SideBarItem displayName="Dashboard" name="home"></SideBarItem>
