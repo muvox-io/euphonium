@@ -61,7 +61,18 @@ function CardContents({
         );
       })}
       <div class="flex flex-col">
-        <Button type="primary" class="self-stretch md:self-end">
+        <Button
+          type="primary"
+          class="self-stretch md:self-end"
+          onClick={async () => {
+            const resp = await pluginsAPI.updatePluginConfiguration(
+              plugin,
+              formValue,
+              false // no preview
+            );
+            setPluginConfig(resp);
+          }}
+        >
           Apply changes
         </Button>
       </div>
