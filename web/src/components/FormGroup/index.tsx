@@ -15,6 +15,7 @@ export interface FormGroupProps {
   value: any;
   onChange: (value: any) => void;
   label?: string;
+  onChangeFinished?: () => void;
 }
 
 export const FIELD_COMPONENTS: {
@@ -31,6 +32,7 @@ export default function FormGroup({
   value,
   onChange,
   label,
+  onChangeFinished
 }: FormGroupProps) {
   return (
     <IconCard iconName="settings" label={label}>
@@ -46,9 +48,10 @@ export default function FormGroup({
               key={field.key}
               field={field}
               value={value[field.key]}
-              onChange={(value: any) =>
-                onChange({ ...value, [field.key]: value })
+              onChange={(fieldValue: any) =>
+                onChange({ ...value, [field.key]: fieldValue })
               }
+              onChangeFinished={onChangeFinished}
             />
           );
         })}

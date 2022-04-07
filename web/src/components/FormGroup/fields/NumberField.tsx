@@ -5,6 +5,7 @@ export default function NumberField({
   field,
   value,
   onChange,
+  onChangeFinished,
 }: FieldProps<string>) {
   return (
     <Input
@@ -12,6 +13,7 @@ export default function NumberField({
       tooltip={field.label}
       value={value}
       onChange={(str) => onChange(str)}
+      onBlur={onChangeFinished}
     />
   );
 }

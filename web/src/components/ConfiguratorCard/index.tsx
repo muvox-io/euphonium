@@ -4,16 +4,25 @@ import {
   PluginConfiguration,
 } from "../../api/euphonium/plugins/models";
 import PluginsAPI from "../../api/euphonium/plugins/PluginsAPI";
+import useAPI from "../../utils/useAPI.hook";
+import { useDebouncedCallback } from "../../utils/useDebouncedCallback";
 import APIFetcher from "../APIFetcher";
 import Dashboard from "../Dashboard";
-import FormGroup from "../FormGroup.ts";
+import FormGroup from "../FormGroup";
 import Button from "../ui/Button";
 import Card from "../ui/Card";
 
-function CardContents({ pluginConfig }: { pluginConfig: PluginConfiguration }) {
-  const groupFields = pluginConfig.configSchema.filter(
-    (field) => field.type === ConfigurationFieldType.GROUP
-  );
+function CardContents({
+  pluginConfig,
+  plugin,
+  setPluginConfig,
+}: {
+  plugin: string;
+  pluginConfig: PluginConfiguration;
+  setPluginConfig: (pluginConfig: PluginConfiguration) => void;
+}) {
+  const pluginsAPI = useAPI(PluginsAPI);
+
   const [formValue, setFormValue] = useState(
     Object.fromEntries(
       pluginConfig.configSchema
@@ -21,6 +30,19 @@ function CardContents({ pluginConfig }: { pluginConfig: PluginConfiguration }) {
         .map((field) => [field.key, field.value])
     )
   );
+  const sendPreviewRequest = useDebouncedCallback(async () => {
+    const resp = await pluginsAPI.updatePluginConfiguration(
+      plugin,
+      formValue,
+      true
+    );
+    setPluginConfig(resp);
+  }, 500);
+
+  const groupFields = pluginConfig.configSchema.filter(
+    (field) => field.type === ConfigurationFieldType.GROUP
+  );
+
   return (
     <Card title={pluginConfig.displayName} subtitle={"plugin configuration"}>
       {groupFields.map((group) => {
@@ -33,6 +55,7 @@ function CardContents({ pluginConfig }: { pluginConfig: PluginConfiguration }) {
             label={group.label}
             fields={fieldsInGroup}
             onChange={(value) => setFormValue({ ...formValue, ...value })}
+            onChangeFinished={sendPreviewRequest}
             value={formValue}
           />
         );
@@ -57,8 +80,18 @@ export default function ConfiguratorCard({ plugin }: { plugin: string }) {
       fetch={(api) => api.getPluginConfiguration(plugin)}
       dependencies={[plugin]}
     >
-      {(pluginConfig: PluginConfiguration) => {
-        return <CardContents pluginConfig={pluginConfig} />;
+      {(
+        pluginConfig: PluginConfiguration,
+        refresh: () => void,
+        setPluginConfig: (p: PluginConfiguration) => void
+      ) => {
+        return (
+          <CardContents
+            plugin={plugin}
+            pluginConfig={pluginConfig}
+            setPluginConfig={setPluginConfig}
+          />
+        );
       }}
     </APIFetcher>
   );

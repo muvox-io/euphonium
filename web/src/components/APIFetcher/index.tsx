@@ -9,7 +9,11 @@ export interface APIFetcherProps<A, R> {
   fetch: (api: A) => Promise<R>;
   errorComponent?: Component<{ error: string }, {}>;
   loadingComponent?: Component;
-  children: (resp: R) => JSX.Element;
+  children: (
+    resp: R,
+    refresh: () => void,
+    setResponse: (r: R) => void
+  ) => JSX.Element;
   dependencies?: any[];
   cacheKey?: string;
 }
@@ -75,5 +79,5 @@ export default function APIFetcher<A, R>({
     return <div>Error: {error}</div>;
   }
 
-  return <div>{children(response as R)}</div>;
+  return <div>{children(response as R, fetch, setResponse)}</div>;
 }

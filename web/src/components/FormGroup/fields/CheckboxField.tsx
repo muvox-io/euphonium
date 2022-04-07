@@ -6,7 +6,10 @@ export default function CheckboxField(props: FieldProps<string>) {
     <Checkbox
       label={props.field.label || "???"}
       value={props.value === "true"}
-      onChange={(v) => props.onChange(v ? "true" : "false")}
+      onChange={(v) => {
+        props.onChange(v ? "true" : "false");
+        props.onChangeFinished && props.onChangeFinished();
+      }}
     />
   );
 }
