@@ -23,6 +23,22 @@ class FormContext
         self.fields.push(field)
     end
 
+
+    def link_button(key, configuration)
+        var field = {
+            'key': key,
+            'type': 'link_button',
+            'label': configuration['label'],
+            'link': configuration['link'],
+            'placeholder': configuration['placeholder']
+        }
+        self.safe_copy_field(configuration, field, 'hint')
+        self.safe_copy_field(configuration, field, 'default')
+        self.safe_copy_field(configuration, field, 'group')
+
+        self.fields.push(field)
+    end
+
     def number_field(key, configuration)
         var field = {
             'key': key,

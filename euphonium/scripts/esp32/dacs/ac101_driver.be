@@ -2,6 +2,7 @@ class AC101Driver : DACDriver
     def init()
         self.name = "AC101"
         self.hardware_volume_control = true
+        self.datasheet_link = "https://www.alldatasheet.com/datasheet-pdf/pdf/1134488/XPOWER/AC101.html"
     end
 
     def init_i2s()

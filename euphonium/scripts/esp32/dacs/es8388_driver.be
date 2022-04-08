@@ -2,6 +2,7 @@ class ES8388Driver : DACDriver
     def init()
         self.name = "ES8388"
         self.hardware_volume_control = true
+        self.datasheet_link = "http://www.everest-semi.com/pdf/ES8388%20DS.pdf"
     end
 
     def init_i2s()

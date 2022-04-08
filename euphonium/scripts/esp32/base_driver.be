@@ -5,6 +5,7 @@ class DACDriver
     var state
     var name
     var signedness
+    var datasheet_link
 
     def get_gpio(pin)
         return int(self.state[pin])

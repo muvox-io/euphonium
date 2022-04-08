@@ -49,6 +49,14 @@ class HardwarePlugin : Plugin
             if driver.name == state['dac']
                 print("Found driver", driver)
                 print("driver.make_config_form", driver.make_config_form)
+                if driver.datasheet_link != nil && driver.datasheet_link != ""
+                    ctx.link_button('datasheet', {
+                        'label': "Datasheet",
+                        'link': driver.datasheet_link,
+                        'group': 'driver',
+                        'placeholder': 'PDF'
+                    })
+                end
                 driver.make_config_form(ctx, state)
                 break
             end

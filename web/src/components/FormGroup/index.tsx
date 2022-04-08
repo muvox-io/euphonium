@@ -6,6 +6,7 @@ import {
 import IconCard from "../ui/IconCard";
 import CheckboxField from "./fields/CheckboxField";
 import { FieldProps } from "./fields/FieldProps";
+import LinkButton from "./fields/LinkButton";
 import NumberField from "./fields/NumberField";
 import SelectField from "./fields/SelectField";
 import TextField from "./fields/TextField";
@@ -25,6 +26,7 @@ export const FIELD_COMPONENTS: {
   [ConfigurationFieldType.NUMBER]: NumberField,
   [ConfigurationFieldType.CHECKBOX]: CheckboxField,
   [ConfigurationFieldType.SELECT]: SelectField,
+  [ConfigurationFieldType.LINK_BUTTON]: LinkButton
 };
 
 export default function FormGroup({
