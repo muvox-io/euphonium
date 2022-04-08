@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useCallback, useEffect, useState } from "preact/hooks";
 import {
   ConfigurationFieldType,
   PluginConfiguration,
@@ -22,7 +22,6 @@ function CardContents({
   setPluginConfig: (pluginConfig: PluginConfiguration) => void;
 }) {
   const pluginsAPI = useAPI(PluginsAPI);
-
   const [formValue, setFormValue] = useState(
     Object.fromEntries(
       pluginConfig.configSchema
@@ -30,14 +29,22 @@ function CardContents({
         .map((field) => [field.key, field.value])
     )
   );
-  const sendPreviewRequest = useDebouncedCallback(async () => {
-    const resp = await pluginsAPI.updatePluginConfiguration(
-      plugin,
-      formValue,
-      true
-    );
-    setPluginConfig(resp);
-  }, 500);
+
+  const [shouldMakeRequest, setShouldMakeRequest] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      if (shouldMakeRequest) {
+        setShouldMakeRequest(false);
+        const resp = await pluginsAPI.updatePluginConfiguration(
+          plugin,
+          formValue,
+          true
+        );
+        setPluginConfig(resp);
+      }
+    })();
+  }, [formValue, shouldMakeRequest]);
 
   const groupFields = pluginConfig.configSchema.filter(
     (field) => field.type === ConfigurationFieldType.GROUP
@@ -54,8 +61,12 @@ function CardContents({
             key={group.key}
             label={group.label}
             fields={fieldsInGroup}
-            onChange={(value) => setFormValue({ ...formValue, ...value })}
-            onChangeFinished={sendPreviewRequest}
+            onChange={(value) => {
+              setFormValue({ ...formValue, ...value });
+            }}
+            onChangeFinished={() => {
+              setShouldMakeRequest(true);
+            }}
             value={formValue}
           />
         );

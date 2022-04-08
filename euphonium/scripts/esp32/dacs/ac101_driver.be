@@ -74,6 +74,9 @@ class AC101Driver : DACDriver
         value |= i2c.read_bytes(ADDRESS, 0x56, 2) & ~(0x3f << 4)
         i2c.write_bytes(ADDRESS, 0x56, bytes().add(value, -2))
     end
+    def make_config_form(ctx, state) 
+        super(self).make_config_form(ctx, state)
+    end
 end
 
-dac.register_driver(AC101Driver())
+hardware.register_driver(AC101Driver())

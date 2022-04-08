@@ -14,7 +14,7 @@ const PluginIconMap = {
   webradio: "radio",
   plugin: "playlist",
   general: "settings",
-  dac: "dac_settings",
+  hardware: "dac_settings",
 } as { [key: string]: string };
 
 const SideBarItem = ({ displayName = "", name = "", type = "" }) => {

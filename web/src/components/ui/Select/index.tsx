@@ -23,7 +23,11 @@ export default ({
           onChange={(v: any) => onChange(v.target.value)}
         >
           {values.map((result, index) => (
-            <option class="bg-app-secondary" value={result}>
+            <option
+              class="bg-app-secondary"
+              value={result}
+              selected={result == value}
+            >
               {result}
             </option>
           ))}

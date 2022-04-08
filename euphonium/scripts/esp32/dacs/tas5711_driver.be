@@ -46,6 +46,10 @@ class TAS5711Driver : DACDriver
         var actual_volume = int(volume_step * 32)
         i2c.write(0x1a, 0x07, self.volume_table[actual_volume])
     end
+
+    def make_config_form(ctx, state) 
+        super(self).make_config_form(ctx, state)
+    end
 end
 
-dac.register_driver(TAS5711Driver())
+hardware.register_driver(TAS5711Driver())

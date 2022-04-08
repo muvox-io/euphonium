@@ -72,6 +72,10 @@ class ES8388Driver : DACDriver
         i2c.write(0x10, 0x30, realVolume)
         i2c.write(0x10, 0x31, realVolume)
     end
+
+    def make_config_form(ctx, state) 
+        super(self).make_config_form(ctx, state)
+    end
 end
 
-dac.register_driver(ES8388Driver())
+hardware.register_driver(ES8388Driver())

@@ -23,6 +23,10 @@ class I2SDriver : DACDriver
 
     def set_volume(volume)
     end
+
+    def make_config_form(ctx, state) 
+        super(self).make_config_form(ctx, state)
+    end
 end
 
-dac.register_driver(I2SDriver())
+hardware.register_driver(I2SDriver())
