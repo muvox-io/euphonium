@@ -14,7 +14,7 @@
   "resolved" "https://registry.npmjs.org/@babel/compat-data/-/compat-data-7.16.4.tgz"
   "version" "7.16.4"
 
-"@babel/core@^7.0.0", "@babel/core@^7.12.10", "@babel/core@^7.9.6", "@babel/core@7.x":
+"@babel/core@^7.9.6":
   "integrity" "sha512-aeLaqcqThRNZYmbMqtulsetOQZ/5gbR/dWruUCJcpas4Qoyy+QeagfDsPdMrqwsPRDNxJvBlRiZxxX7THO7qtA=="
   "resolved" "https://registry.npmjs.org/@babel/core/-/core-7.16.7.tgz"
   "version" "7.16.7"
@@ -301,7 +301,7 @@
   "resolved" "https://registry.npmjs.org/arg/-/arg-5.0.1.tgz"
   "version" "5.0.1"
 
-"autoprefixer@^10.0.2", "autoprefixer@^10.4.0":
+"autoprefixer@^10.4.0":
   "integrity" "sha512-7FdJ1ONtwzV1G43GDD0kpVMn/qbiNqyOPMFTX5nRffI+7vgWoFEc6DcXOxHJxrWNDXrZh18eDsZjvZGUljSRGA=="
   "resolved" "https://registry.npmjs.org/autoprefixer/-/autoprefixer-10.4.0.tgz"
   "version" "10.4.0"
@@ -595,11 +595,6 @@
   "integrity" "sha1-FQStJSMVjKpA20onh8sBQRmU6k8="
   "resolved" "https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz"
   "version" "1.0.0"
-
-"fsevents@~2.3.2":
-  "integrity" "sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA=="
-  "resolved" "https://registry.npmjs.org/fsevents/-/fsevents-2.3.2.tgz"
-  "version" "2.3.2"
 
 "function-bind@^1.1.1":
   "integrity" "sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A=="
@@ -971,7 +966,7 @@
   "resolved" "https://registry.npmjs.org/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz"
   "version" "4.2.0"
 
-"postcss@^8.0.9", "postcss@^8.1.0", "postcss@^8.1.6", "postcss@^8.2.14", "postcss@^8.3.5", "postcss@^8.3.6", "postcss@^8.4.4":
+"postcss@^8.1.6", "postcss@^8.3.5", "postcss@^8.3.6", "postcss@^8.4.4":
   "integrity" "sha512-joU6fBsN6EIer28Lj6GDFoC/5yOZzLCfn0zHAn/MYXI7aPt4m4hK5KC5ovEZXy+lnCjmYIbQWngvju2ddyEr8Q=="
   "resolved" "https://registry.npmjs.org/postcss/-/postcss-8.4.4.tgz"
   "version" "8.4.4"
@@ -985,7 +980,7 @@
   "resolved" "https://registry.npmjs.org/preact-router/-/preact-router-3.2.1.tgz"
   "version" "3.2.1"
 
-"preact@^10.0.0", "preact@^10.4.0", "preact@^10.5.13", "preact@>=10":
+"preact@^10.5.13":
   "integrity" "sha512-KojoltCrshZ099ksUZ2OQKfbH66uquFoxHSbnwKbTJHeQNvx42EmC7wQVWNuDt6vC5s3nudRHFtKbpY4ijKlaQ=="
   "resolved" "https://registry.npmjs.org/preact/-/preact-10.5.14.tgz"
   "version" "10.5.14"
@@ -1214,7 +1209,7 @@
     "debug" "^4.3.2"
     "fs-extra" "^10.0.0"
 
-"vite@^2.5.4", "vite@>=2.0.0", "vite@>=2.0.0-beta.3", "vite@2.x":
+"vite@^2.5.4":
   "integrity" "sha512-P++qzXuOPhTql8iDamsatlJfD7/yGi8NCNwzyqkB2p0jrNJC567WEdXiKn3hQ+ZV8amQmB2dTH6svo3Z2tJ6MQ=="
   "resolved" "https://registry.npmjs.org/vite/-/vite-2.5.6.tgz"
   "version" "2.5.6"

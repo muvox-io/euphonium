@@ -12,6 +12,7 @@ module.exports = {
         "secondary-dark": "var(--secondary-dark)",
         border: "var(--border-color)",
         primary: "var(--primary-color)",
+        accent: "var(--accent)",
       },
       "app-text": {
         primary: "var(--text-primary)",

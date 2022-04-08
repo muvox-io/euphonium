@@ -1,6 +1,8 @@
 #ifndef BERRY_BIND_H
 #define BERRY_BIND_H
 #include "be_vm.h"
+#include "be_debug.h"
+#include "berry.h"
 #include <EuphoniumLog.h>
 #include <any>
 #include <cstring>
@@ -32,6 +34,7 @@ class VmState {
     std::vector<std::function<int(VmState &)> *> lambdas;
     static int call(bvm *vm);
     static int get_module_member(bvm *vm);
+    static void berryObservability(bvm *vm, int event...);
 
     template <class T> T arg(const int i) { return *(T *)tocomptr(i); }
 

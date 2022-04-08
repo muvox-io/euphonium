@@ -2,6 +2,7 @@ class AC101Driver : DACDriver
     def init()
         self.name = "AC101"
         self.hardware_volume_control = true
+        self.datasheet_link = "https://www.alldatasheet.com/datasheet-pdf/pdf/1134488/XPOWER/AC101.html"
     end
 
     def init_i2s()
@@ -74,6 +75,9 @@ class AC101Driver : DACDriver
         value |= i2c.read_bytes(ADDRESS, 0x56, 2) & ~(0x3f << 4)
         i2c.write_bytes(ADDRESS, 0x56, bytes().add(value, -2))
     end
+    def make_config_form(ctx, state) 
+        super(self).make_config_form(ctx, state)
+    end
 end
 
-dac.register_driver(AC101Driver())
+hardware.register_driver(AC101Driver())

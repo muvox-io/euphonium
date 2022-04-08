@@ -7,7 +7,6 @@ class WiFiPlugin : Plugin
         self.name = "wifi"
         self.display_name = "WiFi"
         self.type = "init_handler"
-
         euphonium.register_handler('wifiStateChanged', def (state)
             if state['state'] == 'connected'
                 print("Connected to wifi")
@@ -60,6 +59,7 @@ class WiFiPlugin : Plugin
             print(self.config_schema)
             if self.config_value('ssid') != ""
                 wifi.connect(self.config_value('ssid'), self.config_value('password'), false)
+                euphonium.get_plugin('general').set_hostname()
             else
                 # start access point for config
                 wifi.start_ap("Euphonium", "euphonium")

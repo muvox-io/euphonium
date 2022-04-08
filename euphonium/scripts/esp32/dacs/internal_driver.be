@@ -16,6 +16,10 @@ class InternalDriver : DACDriver
 
     def setVolume(volume)
     end
+
+    def make_config_form(ctx, state) 
+        super(self).make_config_form(ctx, state)
+    end
 end
 
 dac.registerDriver(InternalDriver())

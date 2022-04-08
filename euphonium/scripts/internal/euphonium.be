@@ -230,7 +230,6 @@ class EuphoniumInstance
             for plugin : self.plugins
                 if plugin.type == 'init_handler'
                     plugin.on_event(EVENT_SYSTEM_INIT, {})
-                    return
                 end
             end
 
@@ -248,8 +247,8 @@ class EuphoniumInstance
         if core.platform() == 'desktop'
             playback.set_soft_volume(volume)
         else
-            var dac_plugin = self.get_plugin('dac')
-            if !dac_plugin.has_hardware_volume()
+            var hardware_plugin = self.get_plugin('hardware')
+            if !hardware_plugin.has_hardware_volume()
                 playback.set_soft_volume(volume)
             end
         end

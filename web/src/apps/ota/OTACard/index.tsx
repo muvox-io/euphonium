@@ -1,40 +1,55 @@
 import { useEffect, useState } from "preact/hooks";
-import { eventSource, getOTAManifest, triggerOTA } from "../../../api/euphonium/api";
-import {OTAManifest} from "../../../api/euphonium/models";
-import Button from "../../../components/Button";
-import Card from "../../../components/Card";
-import SelectItem from "../../../components/SelectItem";
+import eventSource from "../../../api/euphonium/eventSource";
+import { OTAManifest } from "../../../api/euphonium/ota/models";
+import OtaAPI from "../../../api/euphonium/ota/OtaAPI";
+import APIFetcher from "../../../components/APIFetcher";
+import Button from "../../../components/ui/Button";
+import Card from "../../../components/ui/Card";
+import SelectItem from "../../../components/ui/SelectItem";
+import useAPI from "../../../utils/useAPI.hook";
 
 const UpdateRequested = ({ onClick = () => {} }) => {
-    const [otaManifest, setOtaManifest] = useState<OTAManifest>(null as any);
-    useEffect(() => {
-        getOTAManifest().then(setOtaManifest);
-    }, []);
-
+  const otaAPI = useAPI(OtaAPI);
   return (
-    <div class="flex flex-col space-y-3">
-      <div class="text-app-text-secondary text-s flex-row flex">
-        requested update
-      </div>
-      <SelectItem>
-        <div class="text-lg">New firmware</div>
-        <div class="text-m text-app-text-secondary">
-          {otaManifest?.name || '' }
-        </div>
-        <div class="text-xs text-app-text-secondary">
-          {otaManifest?.sha256 || ''} 
-        </div>
-      </SelectItem>
-      <div class="pt-1">
-        <Button onClick={() => { triggerOTA(); onClick(); }} type="primary">
-          Flash update
-        </Button>
-      </div>
-    </div>
+    <APIFetcher api={OtaAPI} fetch={(api) => api.getOTAManifest()}>
+      {(otaManifest: OTAManifest) => {
+        return (
+          <div class="flex flex-col space-y-3">
+            <div class="text-app-text-secondary text-s flex-row flex">
+              requested update
+            </div>
+            <SelectItem>
+              <div class="text-lg">New firmware</div>
+              <div class="text-m text-app-text-secondary">
+                {otaManifest?.name || ""}
+              </div>
+              <div class="text-xs text-app-text-secondary">
+                {otaManifest?.sha256 || ""}
+              </div>
+            </SelectItem>
+            <div class="pt-1">
+              <Button
+                onClick={() => {
+                  otaAPI.triggerOTA();
+                  onClick();
+                }}
+                type="primary"
+              >
+                Flash update
+              </Button>
+            </div>
+          </div>
+        );
+      }}
+    </APIFetcher>
   );
 };
 
-const UpdateInProgress = ({ progress = 0, total = 0, state = "downloading" }) => {
+const UpdateInProgress = ({
+  progress = 0,
+  total = 0,
+  state = "downloading",
+}) => {
   const totalMB = Math.round(total / (100 * 1024)) / 10;
   const progressMB = Math.round(progress / (100 * 1024)) / 10;
 
@@ -53,10 +68,10 @@ const UpdateInProgress = ({ progress = 0, total = 0, state = "downloading" }) =>
     <div class="flex flex-col space-y-3">
       <div class="text-xl flex-row flex">update in progress</div>
       <div>
-        { state == "flashing" ? <div class="text-m text-green-500">Update hash valid</div> : null }
-        <div class="text-m text-app-text-secondary">
-          {subtext}
-        </div>
+        {state == "flashing" ? (
+          <div class="text-m text-green-500">Update hash valid</div>
+        ) : null}
+        <div class="text-m text-app-text-secondary">{subtext}</div>
       </div>
 
       <div class="pt-1">
@@ -68,15 +83,26 @@ const UpdateInProgress = ({ progress = 0, total = 0, state = "downloading" }) =>
   );
 };
 
-const UpdateResult = ({state=""}) => {
+const UpdateResult = ({ state = "" }) => {
   return (
     <div class="flex flex-col space-y-3">
-      <div class="text-xl flex-row flex">{state == "finished" ? "update successful" : "update failed" }</div>
+      <div class="text-xl flex-row flex">
+        {state == "finished" ? "update successful" : "update failed"}
+      </div>
       <div>
-        { state == "invalid_sha" ? <div class="text-m text-red-500">Update hash invalid</div> : null }
-        { state == "finished" ? <div class="text-m text-green-500">OTA finished, your device will now reboot.</div> : null }
-        { state != "finished" ? <div class="text-m text-red-500">OTA failed, your device will now reboot.</div> : null }
-
+        {state == "invalid_sha" ? (
+          <div class="text-m text-red-500">Update hash invalid</div>
+        ) : null}
+        {state == "finished" ? (
+          <div class="text-m text-green-500">
+            OTA finished, your device will now reboot.
+          </div>
+        ) : null}
+        {state != "finished" ? (
+          <div class="text-m text-red-500">
+            OTA failed, your device will now reboot.
+          </div>
+        ) : null}
       </div>
 
       <div class="pt-1">
@@ -115,8 +141,14 @@ export default function ({}) {
         subtitle="firmware update"
       >
         <>
-          {otaState == "waiting" ? <UpdateRequested onClick={() => setOtaState("downloading") } /> : null}
-          {otaState == "finished"  || otaState == 'invalid_sha' || otaState == 'failed' ? <UpdateResult state={otaState}/> : null }
+          {otaState == "waiting" ? (
+            <UpdateRequested onClick={() => setOtaState("downloading")} />
+          ) : null}
+          {otaState == "finished" ||
+          otaState == "invalid_sha" ||
+          otaState == "failed" ? (
+            <UpdateResult state={otaState} />
+          ) : null}
           {otaState == "downloading" || otaState == "flashing" ? (
             <UpdateInProgress {...otaProgress} state={otaState} />
           ) : null}

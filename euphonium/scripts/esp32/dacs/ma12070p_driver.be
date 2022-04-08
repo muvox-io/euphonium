@@ -2,7 +2,7 @@ class MA12070P : DACDriver
     def init()
         self.name = "MA12070P"
         self.hardware_volume_control = true
-
+        self.datasheet_link = "https://www.infineon.com/dgdl/Infineon-MA12070P-DS-v01_00-EN.pdf?fileId=5546d46264a8de7e0164b761f2f261e4"
     end
 
     def init_i2s()
@@ -71,9 +71,26 @@ class MA12070P : DACDriver
 
     end
 
+    def make_config_form(ctx, state)
+        ctx.create_group('MA12070P_pins', { 'label': 'DAC binary pins' })
+        
+        ctx.number_field('enablePin', {
+            'label': "Enable Pin",
+            'default': "0",
+            'group': 'MA12070P_pins',
+        })
+
+        ctx.number_field('mutePin', {
+            'label': "Mute Pin",
+            'default': "0",
+            'group': 'MA12070P_pins',
+        })
+        super(self).make_config_form(ctx, state)
+    end
+
 end
 
-dac.register_driver(MA12070P())
+hardware.register_driver(MA12070P())
 
 hooks.add_handler(hooks.ON_INIT, def ()
 

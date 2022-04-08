@@ -4,3 +4,4 @@ bg-notif-warning
 bg-notif-info
 bg-green-500
 bg-red-500
+grow

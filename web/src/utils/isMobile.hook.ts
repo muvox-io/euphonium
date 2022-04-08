@@ -5,14 +5,14 @@ function useIsMobile() {
     useLayoutEffect(() => {
         function updateSize() {
             const newIsMobile = window.innerWidth < 768;
-            if (newIsMobile != isMobile) {
+            if (newIsMobile !== isMobile) {
                 setIsMobile(newIsMobile);
             }
         }
         window.addEventListener('resize', updateSize);
         updateSize();
         return () => window.removeEventListener('resize', updateSize);
-    }, []);
+    }, [isMobile]);
     return isMobile;
 }
 

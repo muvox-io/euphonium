@@ -8,9 +8,28 @@ VmState::VmState(bvm *vm) : vm(vm) {}
 
 VmState::VmState() {
     vm = be_vm_new();
+    be_set_obs_hook(vm, &VmState::berryObservability);
     be_pushntvfunction(vm, VmState::get_module_member);
     be_setglobal(vm, "get_native");
     be_pop(vm, 1);
+}
+
+void VmState::berryObservability(bvm *vm, int event...) {
+    va_list param;
+    va_start(param, event);
+    switch (event) {
+    case BE_OBS_PCALL_ERROR: // error after be_pcall
+    {
+        int32_t top = be_top(vm);
+        // check if we have two strings for an Exception
+        if (top >= 2 && be_isstring(vm, -1) && be_isstring(vm, -2)) {
+            EUPH_LOG(error, "Berry error: %s", be_tostring(vm, -2),
+                     be_tostring(vm, -1));
+            // be_tracestack(vm);
+        }
+    }
+    }
+    va_end(param);
 }
 
 VmState::~VmState() {}

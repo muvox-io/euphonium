@@ -56,4 +56,5 @@ void initializeWiFiStack();
 void tryToConnect(std::string ssid, std::string password, bool fromAp);
 void setupAP(std::string ssid, std::string password);
 void exportWiFiDriver(std::shared_ptr<berry::VmState> berry);
+void setHostname(std::string hostname);
 #endif
