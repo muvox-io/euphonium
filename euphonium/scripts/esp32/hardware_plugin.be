@@ -35,6 +35,31 @@ class HardwarePlugin : Plugin
             'type': 'number'
         })
 
+        # if the user has selected a board, show a dialog asking if he wants to 
+        # change the gpio settings to this board
+        if state.find("board") != self.state.find("board") 
+            ctx.modal_confirm("boardChanged", {
+                    'label': "Board changed",
+                    'hint': "The board you selected has changed to " + state.find("board") + ". Do you want to apply the new settings?",
+                    'group': 'boardGroup',
+                    'default': nil,
+                    'okValue': "confirmed_" + state.find("board"),
+                    'cancelValue': "cancelled_" + state.find("board")
+            })
+            if state.find("boardChanged") == "confirmed_" + state.find("board")
+                state["boardChanged"] = "cancelled_" + state.find("board")
+                for board : ESP32_BOARDS
+                    if board["name"] == state.find("board")
+                        # copy the state defined for the board
+                        for key : board["state"].keys()
+                            state.setitem(key, board["state"][key])
+                        end
+                        break
+                    end
+                end
+            end
+        end
+
         ctx.create_group('driver', { 'label': 'DAC Driver' })
        
 

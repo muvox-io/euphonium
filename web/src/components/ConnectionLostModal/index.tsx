@@ -1,7 +1,6 @@
 import { JSX } from "preact";
 import { useContext, useEffect, useState } from "preact/hooks";
 import { APIAccessorContext } from "../../api/APIAccessor";
-import {} from "../../api/euphonium/api";
 import getBaseUrl from "../../api/euphonium/baseUrl";
 import eventSource from "../../api/euphonium/eventSource";
 import Modal from "../Modal";

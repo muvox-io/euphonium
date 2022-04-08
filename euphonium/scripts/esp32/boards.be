@@ -1,5 +1,17 @@
 ESP32_BOARDS = [
     {
+        "name":"custom",
+        "state": {
+            "dac":"dummy",
+            "mclk":"0",
+            "bck":"0",
+            "ws":"0",
+            "data":"0",
+            "scl":"0",
+            "sda":"0"
+        }
+    },
+    {
        "name":"AI-Thinker Audio board (A1S AC101)",
         "state": {
             "dac":"AC101",

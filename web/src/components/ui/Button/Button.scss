@@ -27,4 +27,21 @@
     color: var(--text-primary);
     background: var(--accent);
   }
+
+  &.primary {
+    background: var(--accent-dark);
+    color: var(--text-primary);
+
+    &:hover {
+      background: var(--accent);
+    }
+  }
+  &.borderless {
+    &:before {
+      border: none;
+    }
+    &:hover {
+      background: transparent;
+    }
+  }
 }

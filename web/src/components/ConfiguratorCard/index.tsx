@@ -30,6 +30,17 @@ function CardContents({
     )
   );
 
+  useEffect(() => {
+    setFormValue({
+      ...formValue,
+      ...Object.fromEntries(
+        pluginConfig.configSchema
+          .filter((f) => f.type !== ConfigurationFieldType.GROUP)
+          .map((field) => [field.key, field.value])
+      ),
+    });
+  }, [pluginConfig]);
+
   const [shouldMakeRequest, setShouldMakeRequest] = useState(false);
 
   useEffect(() => {

@@ -39,6 +39,21 @@ class FormContext
         self.fields.push(field)
     end
 
+    def modal_confirm(key, configuration)
+        var field = {
+            'key': key,
+            'type': 'modal_confirm',
+            'label': configuration['label'],
+            'hint': configuration['hint'],
+        }
+        self.safe_copy_field(configuration, field, 'hint')
+        self.safe_copy_field(configuration, field, 'default')
+        self.safe_copy_field(configuration, field, 'group')
+        self.safe_copy_field(configuration, field, 'okValue')
+        self.safe_copy_field(configuration, field, 'cancelValue')
+        self.fields.push(field)
+    end
+
     def number_field(key, configuration)
         var field = {
             'key': key,
