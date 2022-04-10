@@ -16,6 +16,7 @@
 #include "BellUtils.h"
 #include "driver/gpio.h"
 #include "WiFiDriver.h"
+#include "LEDDriver.h"
 
 class ButtonInteractionEvent : public Event {
   private:
