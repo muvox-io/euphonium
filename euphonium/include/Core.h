@@ -21,6 +21,7 @@
 #include "plugins/webradio/WebRadioPlugin.h"
 #include "plugins/youtube/YouTubePlugin.h"
 #include "plugins/persistor/ConfigPersistor.h"
+#include "plugins/mqtt/MQTTPlugin.h"
 
 #define PCMBUF_SIZE (1024*4)
 

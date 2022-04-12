@@ -126,6 +126,7 @@ class EuphoniumInstance
 
         self.init_plugin('cspot')
         self.init_plugin('webradio')
+        self.init_plugin('mqtt')
         self.init_plugin('bluetooth')
 
         self.init_http()
