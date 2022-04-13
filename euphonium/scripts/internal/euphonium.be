@@ -5,9 +5,11 @@ class EuphoniumInstance
     var plugins_initialized
     var network_state
     var current_source
+    var last_volume
 
     # Setup initial values
     def init()
+        self.last_volume = 0
         self.playback_state = {}
         self.plugins_initialized = false
         self.event_handlers = {
@@ -126,9 +128,8 @@ class EuphoniumInstance
 
         self.init_plugin('cspot')
         self.init_plugin('webradio')
-        self.init_plugin('mqtt')
         self.init_plugin('bluetooth')
-
+        self.broadcast_event(EVENT_PLUGIN_INIT, {})
         self.init_http()
     end
 
@@ -245,19 +246,21 @@ class EuphoniumInstance
     end
 
     def apply_volume(volume)
-        if core.platform() == 'desktop'
-            playback.set_soft_volume(volume)
-        else
-            var hardware_plugin = self.get_plugin('hardware')
-            if !hardware_plugin.has_hardware_volume()
+        if self.last_volume != volume && volume >= 0 && volume <= 100
+            self.last_volume = volume
+            if core.platform() == 'desktop'
                 playback.set_soft_volume(volume)
+            else
+                var hardware_plugin = self.get_plugin('hardware')
+                if !hardware_plugin.has_hardware_volume()
+                    playback.set_soft_volume(volume)
+                end
             end
-        end
 
-        self.playback_state['volume'] = volume
-        self.update_playback()
-        print("Broadcasting volume data")
-        self.broadcast_event(EVENT_VOLUME_UPDATED, volume)
+            self.playback_state['volume'] = volume
+            self.update_playback()
+            self.broadcast_event(EVENT_VOLUME_UPDATED, volume)
+        end
     end
 end
 

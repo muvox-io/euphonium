@@ -117,7 +117,7 @@ class HardwarePlugin : Plugin
 
     def has_hardware_volume()
         if self.selected_driver != nil
-            return self.selected_driver.has_hardware_volume()
+            return self.selected_driver.hardware_volume_control
         end
         return false
     end

@@ -55,6 +55,7 @@ private:
     uint8_t sendbuf[2048];
     uint8_t recvbuf[1024];
     bell::Queue<MQTTMessage> mqttQueue;
+    std::mutex connectedMutex;
 
 public:
     MQTTPlugin();
@@ -63,7 +64,7 @@ public:
     void shutdown();
     void configurationUpdated();
     void startAudioThread();
-    void connectToBroker(std::string url, std::string port, std::string user, std::string password);
+    bool connectToBroker(std::string url, std::string port, std::string user, std::string password);
     void publish(std::string topic, std::string msg);
     void subscribe(std::string topic);
     void runTask();
