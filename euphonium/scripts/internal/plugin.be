@@ -4,6 +4,7 @@ EVENT_CONFIG_UPDATED = 'conf_updated'
 EVENT_VOLUME_UPDATED = 'volume_updated'
 EVENT_SYSTEM_INIT = 'system_init'
 EVENT_SET_PAUSE = 'set_pause'
+EVENT_PLUGIN_INIT = 'plugin_init'
 
 class Plugin
     var name
