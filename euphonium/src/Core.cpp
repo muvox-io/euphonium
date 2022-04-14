@@ -3,6 +3,10 @@
 #include <EuphoniumLog.h>
 #include <cassert>
 #include <string.h>
+#include <chrono>
+#include <iostream>
+#include <sys/time.h>
+#include <ctime>
 #ifdef ESP_PLATFORM
 #include "esp_heap_caps.h"
 #endif
@@ -36,6 +40,7 @@ Core::Core() : bell::Task("Core", 4 * 1024, 2, 0) {
 
     registeredPlugins = {
         std::make_shared<CSpotPlugin>(), std::make_shared<WebRadioPlugin>(),
+        std::make_shared<MQTTPlugin>()
         // std::make_shared<YouTubePlugin>()
     };
     requiredModules = {std::make_shared<HTTPModule>(), mainPersistor};
@@ -156,6 +161,12 @@ void Core::startAudioThreadForPlugin(std::string pluginName,
 
 void sleepMS(int ms) { BELL_SLEEP_MS(ms); }
 
+int getTimeMs() {
+    time_t now = time(nullptr);
+    time_t mnow = now * 1000;
+    return (int) mnow;
+}
+
 std::string Core::getPlatform() {
 #ifdef ESP_PLATFORM
     return "esp32";
@@ -180,6 +191,7 @@ void Core::setupBindings() {
     berry->export_this("version", this, &Core::getVersion, "core");
     berry->export_this("platform", this, &Core::getPlatform, "core");
     berry->export_this("load", this, &Core::loadScript, "core");
+    berry->export_function("get_time_ms", &getTimeMs);
 }
 
 void Core::runTask() {

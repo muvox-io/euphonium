@@ -23,9 +23,25 @@ class WiFi
     end
 end
 
+class MQTT
+    var topic_listeners
+    def init()
+        self.topic_listeners = {}
+    end
+
+    def member(name)
+        return get_native('mqtt', name)
+    end
+
+    def on_publish(topic, listener)
+        self.topic_listeners[topic] = listener
+    end
+end
+
 
 # Export APIs
 core = Core()
 persistor = Persistor()
 playback = Playback()
 wifi = WiFi()
+mqtt = MQTT()
