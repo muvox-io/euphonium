@@ -26,6 +26,7 @@
 #include <string.h>
 #include <string>
 #include "esp_littlefs.h"
+#include "led_strip.h"
 
 static const char *TAG = "euphonium";
 
@@ -107,5 +108,17 @@ void app_main(void) {
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     init_littlefs();
 
-    auto taskHandle = xTaskCreatePinnedToCore(&euphoniumTask, "euphonium", 1024 * 10, NULL, 6, NULL, 0);
+    led_strip_t strip = {
+        .type = LED_STRIP_WS2812,
+        .brightness = 255,
+        .length = 12,
+        .gpio = (gpio_num_t) 21,
+        .buf = NULL,
+    };
+    led_strip_install();
+    led_strip_init(&strip);
+    led_strip_fill(&strip, 0, 11, 100, 10, 10);
+    led_strip_flush(&strip);
+    while(true);
+    //auto taskHandle = xTaskCreatePinnedToCore(&euphoniumTask, "euphonium", 1024 * 10, NULL, 6, NULL, 0);
 }
