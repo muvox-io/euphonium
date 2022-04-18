@@ -18,6 +18,7 @@
 #include "mdns.h"
 #include "nvs_flash.h"
 #include "sdkconfig.h"
+#include <LedStrip.h>
 #include <arpa/inet.h>
 #include <esp_heap_caps.h>
 #include <memory.h>
@@ -25,13 +26,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <string>
+
 #include "esp_littlefs.h"
-#include "led_strip.h"
 
 static const char *TAG = "euphonium";
 
 extern "C" {
-    void app_main(void);
+void app_main(void);
 }
 
 static void euphoniumTask(void *pvParameters) {
@@ -64,9 +65,9 @@ static void euphoniumTask(void *pvParameters) {
 
 void init_littlefs() {
     esp_vfs_littlefs_conf_t conf = {.base_path = "/spiffs",
-                                  .partition_label = "storage",
-                                  .format_if_mount_failed = true,
-                                  .dont_mount = false};
+                                    .partition_label = "storage",
+                                    .format_if_mount_failed = true,
+                                    .dont_mount = false};
 
     esp_err_t ret = esp_vfs_littlefs_register(&conf);
     bell::setDefaultLogger();
@@ -108,17 +109,6 @@ void app_main(void) {
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     init_littlefs();
 
-    led_strip_t strip = {
-        .type = LED_STRIP_WS2812,
-        .brightness = 255,
-        .length = 12,
-        .gpio = (gpio_num_t) 21,
-        .buf = NULL,
-    };
-    led_strip_install();
-    led_strip_init(&strip);
-    led_strip_fill(&strip, 0, 11, 100, 10, 10);
-    led_strip_flush(&strip);
-    while(true);
-    //auto taskHandle = xTaskCreatePinnedToCore(&euphoniumTask, "euphonium", 1024 * 10, NULL, 6, NULL, 0);
+    auto taskHandle = xTaskCreatePinnedToCore(&euphoniumTask, "euphonium",
+                                              1024 * 10, NULL, 6, NULL, 0);
 }

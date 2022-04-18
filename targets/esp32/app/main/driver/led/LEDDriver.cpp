@@ -1,34 +1,39 @@
 #include "LEDDriver.h"
 #include "BellUtils.h"
 
-void exportLEDDriver(std::shared_ptr<berry::VmState> berry) {
-    led_strip_t strip = {
-        .type = LED_STRIP_WS2812,
-        .brightness = 255,
-        .length = 12,
-        .gpio = (gpio_num_t) 21,
-        .buf = NULL,
-    };
-    led_strip_install();
-    led_strip_init(&strip);
-    led_strip_fill(&strip, 0, 12, 100, 10, 10);
-    led_strip_flush(&strip);
-    // std::cout << "INITIALIZING LED" << std::endl;
-    // struct led_strip_t led_strip = {
-    //     .rgb_led_type = RGB_LED_TYPE_WS2812,
-    //     .led_strip_length = 12,
-    //     .rmt_channel = RMT_CHANNEL_0,
-    //     .rmt_interrupt_num = 19U,
-    //     .gpio = GPIO_NUM_21,
-    //     .led_strip_buf_1 = led_strip_buf_1,
-    //     .led_strip_buf_2 = led_strip_buf_2,
-    // };
-    // led_strip.access_semaphore = xSemaphoreCreateBinary();
-    // BELL_SLEEP_MS(500);
+std::map<uint8_t, std::unique_ptr<LedStrip>> registeredStrips;
 
-    // bool led_init_ok = led_strip_init(&led_strip);
-    // BELL_SLEEP_MS(500);
-    // led_strip_set_pixel_rgb(&led_strip, 1, 100, 10, 10);
-    // BELL_SLEEP_MS(10);
-    // led_strip_show(&led_strip);
+void setPixelRgb(int channel, int index, int r, int g, int b) {
+    (*registeredStrips[channel].get())[index] =
+        Rgb{static_cast<uint8_t>(r), static_cast<uint8_t>(g),
+            static_cast<uint8_t>(b)};
+}
+
+void showPixels(int channel) { registeredStrips[channel]->show(); }
+
+void createStrip(int channel, int type, int length, int pin, int brightness) {
+    auto ledType = LED_WS2812;
+    switch (type) {
+        case 1:
+            ledType = LED_WS2812B;
+            break;
+        case 2:
+            ledType = LED_SK6812;
+            break;
+        case 3:
+            ledType = LED_WS2813;
+            break;
+        default:
+            ledType = LED_WS2812;
+    }
+
+    registeredStrips.insert(
+        {channel, std::make_unique<LedStrip>(ledType, length, pin, channel, brightness,
+                                             DoubleBuffer)});
+}
+
+void exportLEDDriver(std::shared_ptr<berry::VmState> berry) {
+    berry->export_function("create_strip", &createStrip, "led");
+    berry->export_function("set_pixel_rgb", &setPixelRgb, "led");
+    berry->export_function("show", &showPixels, "led");
 }

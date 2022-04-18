@@ -1,5 +1,6 @@
 class EuphoniumInstance
     var event_handlers
+    var internal_handlers
     var plugins
     var playback_state
     var plugins_initialized
@@ -67,11 +68,19 @@ class EuphoniumInstance
             'status': 'paused'
         }
         self.network_state = 'offline'
+        self.internal_handlers = {}
     end
 
     # Registers a new event handler
     def register_handler(type, handler)
         self.event_handlers[type] = handler
+    end
+
+    def on_event(type, handler)
+        if (self.internal_handlers.find(type) == nil)
+            self.internal_handlers[type] = []
+        end
+        self.internal_handlers[type].push(handler)
     end
 
     # Pass event to given handler
@@ -190,6 +199,12 @@ class EuphoniumInstance
     def broadcast_event(event_type, event_data)
         for plugin : self.plugins
             plugin.on_event(event_type, event_data)
+        end
+
+        if (self.internal_handlers.find(event_type) != nil)
+            for handler : self.internal_handlers[event_type]
+                handler(event_data)
+            end
         end
     end
 
