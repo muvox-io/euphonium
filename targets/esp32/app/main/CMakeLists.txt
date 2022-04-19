@@ -6,6 +6,9 @@ set(COMPONENT_SRCS
     "driver/I2CDriver.cpp"
     "driver/I2SDriver.cpp"
     "driver/GPIODriver.cpp"
+    "driver/led/LEDDriver.cpp"
+    "driver/led/Color.cpp"
+    "driver/led/LedStrip.cpp"
     "driver/WiFiDriver.cpp"
     "driver/dns_server.c"
     "ota/OTAPlugin.cpp"
@@ -15,6 +18,6 @@ set(COMPONENT_SRCS
     "main.cpp"
 )
 
-set(COMPONENT_ADD_INCLUDEDIRS "." "driver/." "bluetooth/." "ota/.")
+set(COMPONENT_ADD_INCLUDEDIRS "." "driver/." "driver/led/." "bluetooth/." "ota/.")
 register_component(REQUIRES "euphonium")
 component_compile_options(-std=gnu++17)

@@ -50,6 +50,7 @@ void ESP32PlatformPlugin::setupBindings() {
     exportI2CDriver(berry);
     exportI2SDriver(berry);
     exportGPIODriver(berry);
+    exportLEDDriver(berry);
 
     // Export platform functions to berry
     berry->export_this("register_button", this,

@@ -10,7 +10,7 @@ Global utilities
 
 | Command    | Signature                                                                                 | Supported platforms |
 |:-----------|-------------------------------------------------------------------------------------------|---------------------|
-| `sleep_ms` | `(milliseconds: number) -> void`. <br/>Pauses execution for given amount of milliseconds. | All                 |
+| `sleep_ms` | `(milliseconds: int) -> void`. <br/>Pauses execution for given amount of milliseconds. | All                 |
 
 ## `core`
 
@@ -285,6 +285,45 @@ Controls GPIO pins on supported platforms. Mainly used in different drivers.
         playback.set_volume(playback.volume + 5)
     end, { 'high_state': true })
     ```
+
+## `led_strip`
+Allows for control of addressable LEDs like the WS28xx and SK6812. Underneath it uses esp32's RMT driver, to drive up to 8 separate strip instances.
+
+**Implemented by `LEDDriver.cpp`**
+
+### Class `LEDStrip`
+
+| Field                | Signature                                                                                                                                                                                                                                                                                                            | Supported platforms  |
+|:---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------|
+| `init / constructor` |`(type: LED_TYPE, pin: int, len: int, channel: RMT_CHANNEL, brightness: int?)`<br/>`LEDStrip` constructor. Allows control of a singular strip, with a driver `type`, connected under a GPIO `pin`. `channel` is the RMT channel to use. If `brightness` is provided, the entire LED chain will be dimmed accordingly. | esp32                |
+| `show`               |`() -> void`<br/> Called on existing instance. Will update the LED strip with previously assigned color values                                                                                                                                                                                                        | esp32                |
+| `set_item`           | `(index, item: [r: number, g: number, b: number]) -> void`<br/>This implements the API for setting color of individual LEDs via a standard color assign. See example below for usage. `r`, `g` and `b` range from 0 to 255.                                                                                          | esp32                |
+
+### enum `led_strip.LED_TYPE`
+
+| Value               | Description                         |
+|:--------------------|-------------------------------------|
+| `LED_WS2812`        | Indicates WS2812 LED type.          |
+| `LED_WS2812B`       | Indicates WS2812B LED type.         | 
+| `LED_SK6812`        | Indicates SK6812 LED type.          |
+| `LED_WS2813`        | Indicates WS2813 LED type.          |
+
+### Example
+
+!!! example "LED Driver usage"
+
+    Registers a new LED strip under pin 21, consisting of 12 WS2812 leds, at lower brightness. Then turns the first LED red, the second one green.
+    ```python
+    volume_strip = LEDStrip(LED_WS2812, 21, 12, RMT_CHANNEL_0, 150)
+
+    # change the first LED to red and second one to green.
+    volume_strip[0] = [255, 0, 0] # red in RGB format
+    volume_strip[1] = [0, 255, 0] # green in RGB format
+
+    # display the changes on the strip
+    volume_strip.show()
+    ```
+
 
 ## `wifi`
 

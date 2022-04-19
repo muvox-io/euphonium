@@ -18,6 +18,7 @@
 #include "mdns.h"
 #include "nvs_flash.h"
 #include "sdkconfig.h"
+#include <LedStrip.h>
 #include <arpa/inet.h>
 #include <esp_heap_caps.h>
 #include <memory.h>
@@ -25,12 +26,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <string>
+
 #include "esp_littlefs.h"
 
 static const char *TAG = "euphonium";
 
 extern "C" {
-    void app_main(void);
+void app_main(void);
 }
 
 static void euphoniumTask(void *pvParameters) {
@@ -63,9 +65,9 @@ static void euphoniumTask(void *pvParameters) {
 
 void init_littlefs() {
     esp_vfs_littlefs_conf_t conf = {.base_path = "/spiffs",
-                                  .partition_label = "storage",
-                                  .format_if_mount_failed = true,
-                                  .dont_mount = false};
+                                    .partition_label = "storage",
+                                    .format_if_mount_failed = true,
+                                    .dont_mount = false};
 
     esp_err_t ret = esp_vfs_littlefs_register(&conf);
     bell::setDefaultLogger();
@@ -107,5 +109,6 @@ void app_main(void) {
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     init_littlefs();
 
-    auto taskHandle = xTaskCreatePinnedToCore(&euphoniumTask, "euphonium", 1024 * 10, NULL, 6, NULL, 0);
+    auto taskHandle = xTaskCreatePinnedToCore(&euphoniumTask, "euphonium",
+                                              1024 * 10, NULL, 6, NULL, 0);
 }

@@ -19,7 +19,7 @@ cd ../../
 cp app/spiffs/scripts.tar scripts.tar
 
 echo -e "${YELLOW}### building release file ${NC}"
-tar -czvf euphonium-$EUPH_VER.tar.gz build/*.bin build/partition_table/partition-table.bin build/bootloader/bootloader.bin flash_all.sh
+tar -czvf euphonium-$EUPH_VER.tar.gz build/*.bin build/partition_table/partition-table.bin build/bootloader/bootloader.bin flash_all.sh || true
 #flash_all.sh
 
 echo -e "${YELLOW}### building OTA file ${NC}"
