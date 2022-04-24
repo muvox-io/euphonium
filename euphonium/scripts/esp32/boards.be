@@ -58,5 +58,19 @@ ESP32_BOARDS = [
             "scl":"23",
             "sda":"18"
        }
+    },
+    {
+       "name":"μVox",
+       "state": {
+            "dac":"MA12070P",
+            "mclk":"0",
+            "bck":"5",
+            "ws":"25",
+            "data":"26",
+            "scl":"22",
+            "sda":"21",
+            "enablePin": "19",
+            "mutePin": "8"
+       }
     }
  ]
