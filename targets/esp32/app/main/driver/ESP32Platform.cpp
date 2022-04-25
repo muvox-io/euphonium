@@ -1,8 +1,22 @@
 #include "ESP32Platform.h"
+#include "Rotary.h"
+#include "driver/gpio.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/queue.h"
+#include "freertos/task.h"
 
 ESP32PlatformPlugin::ESP32PlatformPlugin()
-    : bell::Task("platform", 2048, 2, 0) {
+    : bell::Task("platform", 2048, 5, 0) {
     name = "platform";
+}
+
+static QueueHandle_t gpio_evt_queue = NULL;
+
+Rotary encoder(2, 20);
+
+static void IRAM_ATTR gpio_isr_handler(void *arg) {
+    unsigned char result = encoder.process();
+    xQueueSendFromISR(gpio_evt_queue, &result, NULL);
 }
 
 void ESP32PlatformPlugin::loadScript(
@@ -19,28 +33,28 @@ void ESP32PlatformPlugin::loadScript(
 }
 
 void ESP32PlatformPlugin::registerButton(int gpio, bool highState) {
-    buttonList.push_back(gpio);
-    buttonStateMap[gpio] = {false, highState};
 }
-
+auto volume = 0;
 void ESP32PlatformPlugin::runTask() {
-    // Quick and dirty button press detector. @TODO: Replace with proper implementation
-    while (true) {
-        for (auto button : buttonList) {
-            bool buttonState = gpio_get_level((gpio_num_t)button);
-            if (buttonState != buttonStateMap[button].first) {
-                buttonStateMap[button].first = buttonState;
-                if (buttonStateMap[button].first ==
-                    buttonStateMap[button].second) {
-                    auto event =
-                        std::make_unique<ButtonInteractionEvent>("PRESS", button);
-                    this->luaEventBus->postEvent(std::move(event));
-                } else {
-                    // berry->call("button_released", button);
+    // Quick and dirty button press detector. @TODO: Replace with proper
+    // implementation
+    unsigned char dir;
+    for (;;) {
+        if (xQueueReceive(gpio_evt_queue, &dir, portMAX_DELAY)) {
+            if (dir == DIR_CCW) {
+                if (volume < 100) {
+                    volume += 5;
                 }
+                auto event = std::make_unique<VolumeChangedEvent>(volume);
+                this->luaEventBus->postEvent(std::move(event));
+            } else if (dir == DIR_CW) {
+                if (volume > 0) {
+                    volume -= 5;
+                }
+                auto event = std::make_unique<VolumeChangedEvent>(volume);
+                this->luaEventBus->postEvent(std::move(event));
             }
         }
-        BELL_SLEEP_MS(30);
     }
 }
 
@@ -55,4 +69,21 @@ void ESP32PlatformPlugin::setupBindings() {
     // Export platform functions to berry
     berry->export_this("register_button", this,
                        &ESP32PlatformPlugin::registerButton, "gpio");
+
+    gpio_config_t io_conf = {};
+    // disable interrupt
+    io_conf.intr_type = GPIO_INTR_DISABLE;
+    io_conf.pin_bit_mask = ((1ULL << 20) | (1ULL << 2));
+    io_conf.pull_down_en = (gpio_pulldown_t)0;
+    io_conf.pull_up_en = (gpio_pullup_t)1;
+    io_conf.intr_type = GPIO_INTR_ANYEDGE;
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pull_up_en = (gpio_pullup_t)1;
+    gpio_config(&io_conf);
+    gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
+    // install gpio isr service
+    gpio_install_isr_service(0);
+    // hook isr handler for specific gpio pin
+    gpio_isr_handler_add((gpio_num_t)2, gpio_isr_handler, (void *)2);
+    gpio_isr_handler_add((gpio_num_t)20, gpio_isr_handler, (void *)20);
 }

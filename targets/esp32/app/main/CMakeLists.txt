@@ -9,6 +9,7 @@ set(COMPONENT_SRCS
     "driver/led/LEDDriver.cpp"
     "driver/led/Color.cpp"
     "driver/led/LedStrip.cpp"
+    "driver/Rotary.cpp"
     "driver/WiFiDriver.cpp"
     "driver/dns_server.c"
     "ota/OTAPlugin.cpp"

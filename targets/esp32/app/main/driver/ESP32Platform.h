@@ -18,6 +18,8 @@
 #include "WiFiDriver.h"
 #include "LEDDriver.h"
 
+#define BUTTON_DEBOUNCE_US 5000
+
 class ButtonInteractionEvent : public Event {
   private:
     std::string type;
@@ -42,6 +44,7 @@ class ButtonInteractionEvent : public Event {
 class ESP32PlatformPlugin : public bell::Task, public Module
 {
 private:
+    std::map<int, uint64_t> buttonDebounceMap;
     std::map<int, std::pair<bool, bool>> buttonStateMap;
     std::vector<int> buttonList;
 

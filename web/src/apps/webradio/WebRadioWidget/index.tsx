@@ -12,13 +12,13 @@ export default () => {
         <IconCard iconName="radio" label="Internet Radio">
             <div class="flex flex-col">
                 <div class="text-app-text-secondary text-sm mb-1">Favorites</div>
+                {/* <SingleRadio />
                 <SingleRadio />
-                <SingleRadio />
-                <SingleRadio />
+                <SingleRadio /> */}
                 <div class="text-app-text-secondary text-sm mb-1 mt-2">Recently played</div>
+                {/* <SingleRadio />
                 <SingleRadio />
-                <SingleRadio />
-                <SingleRadio />
+                <SingleRadio /> */}
             </div>
         </IconCard>
     )

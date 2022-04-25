@@ -78,9 +78,7 @@ static void event_handler(void *arg, esp_event_base_t event_base,
             BELL_SLEEP_MS(1000);
             esp_restart();
         }
-        // setup mdns
-        mdns_init();
-        mdns_hostname_set("euphonium");
+
     }
 }
 
@@ -186,7 +184,8 @@ void exportWiFiDriver(std::shared_ptr<berry::VmState> berry) {
 }
 
 void setHostname(std::string hostname) {
-    mdns_hostname_set(hostname.c_str());
+    mdns_init();
+    mdns_hostname_set(strdup(hostname.c_str()));
     EUPH_LOG(info, "wifi", "Setting hostname to '%s' with length of %d", hostname.c_str(), hostname.size());
     esp_err_t result =
         tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, hostname.c_str());

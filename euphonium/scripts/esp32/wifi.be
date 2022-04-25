@@ -16,6 +16,8 @@ class WiFiPlugin : Plugin
                 self.persist_config()
                 http.emit_event('wifi_state', self.wifi_state)
                 euphonium.init_required_plugins()
+                euphonium.get_plugin('general').set_mdns()
+
             end
 
             if state['state'] == 'ap_ready'
@@ -26,8 +28,9 @@ class WiFiPlugin : Plugin
                 self.wifi_state['state'] = 'error'
                 http.emit_event('wifi_state', self.wifi_state)
                 print("No wifi access point found")
-                wifi.start_ap("Euphonium", "euphonium")
+                wifi.start_ap("Euphonium " + util.generate_device_name(), "")
                 self.wifi_state['state'] = 'scanning';
+                wifi.start_scan()
                 #wifi_start_ap("Euphonium", "euphonium")
             end
 
@@ -62,7 +65,7 @@ class WiFiPlugin : Plugin
                 euphonium.get_plugin('general').set_hostname()
             else
                 # start access point for config
-                wifi.start_ap("Euphonium", "euphonium")
+                wifi.start_ap("Euphonium " + util.generate_device_name(), "")
             end
         end
     end

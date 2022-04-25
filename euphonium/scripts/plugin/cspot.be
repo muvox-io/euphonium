@@ -12,7 +12,7 @@ class CSpotPlugin : Plugin
 
         ctx.text_field('receiverName', {
             'label': "Speaker's name",
-            'default': "Euphonium",
+            'default': "Euphonium " + util.generate_device_name(),
             'group': 'spotify'
         })
         ctx.select_field('audioBitrate', {

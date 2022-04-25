@@ -26,6 +26,7 @@ public:
     std::shared_ptr<ScriptLoader> scriptLoader;
     void loadScript(std::shared_ptr<ScriptLoader> scriptLoader);
     void setupBindings();
+    void registerMdns(std::string hostname);
     void registerHandler(std::string routeUrl, const std::string reqType, int handlerId);
     void respond(int connectionFd, int status, std::string body, std::string contentType);
     void runTask();

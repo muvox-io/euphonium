@@ -12,9 +12,9 @@ CSpotPlugin::CSpotPlugin() : bell::Task("cspot", 4 * 1024, 0, 0) {
     configMan = std::make_shared<ConfigJSON>("", file);
     name = "cspot";
 #ifdef ESP_PLATFORM
-    // setup mdns
-    mdns_init();
-    mdns_hostname_set("cspot");
+    // // setup mdns
+    // mdns_init();
+    // mdns_hostname_set("cspot");
 #endif
 }
 

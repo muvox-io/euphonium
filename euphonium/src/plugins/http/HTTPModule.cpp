@@ -4,6 +4,7 @@
 #include "HTTPEvents.h"
 #include "cJSON.h"
 #include "MDNSService.h"
+#include "mdns.h"
 
 void listFiles(const std::string &path,
                std::function<void(const std::string &)> cb) {
@@ -31,12 +32,22 @@ void HTTPModule::loadScript(std::shared_ptr<ScriptLoader> loader) {
     this->scriptLoader = loader;
 }
 
+void HTTPModule::registerMdns(std::string name) {
+    // Register for MDNS
+    auto mdnsMap = std::map<std::string, std::string>();
+    mdnsMap["CPath"] = "/system";
+    mdnsMap["VERSION"] = "1.0";
+
+    MDNSService::registerService(name, "_http", "_tcp", "", 80, mdnsMap);
+}
+
 void HTTPModule::setupBindings() {
     BELL_LOG(info, "http", "Registering handlers");
     berry->export_this("_http_register_handler", this,
                        &HTTPModule::registerHandler);
     berry->export_this("_http_respond", this, &HTTPModule::respond);
     berry->export_this("_http_publish_event", this, &HTTPModule::publishEvent);
+    berry->export_this("_register_mdns", this, &HTTPModule::registerMdns);
 }
 
 void HTTPModule::publishEvent(std::string event, std::string data) {
@@ -214,13 +225,6 @@ void HTTPModule::runTask() {
                                 "/devtools/rename-file", renameFileHandler);
     mainServer->registerHandler(bell::RequestType::POST,
                                 "/system/restart", restartHandler);
-
-    // Register for MDNS
-    auto mdnsMap = std::map<std::string, std::string>();
-    mdnsMap["CPath"] = "/system";
-    mdnsMap["VERSION"] = "1.0";
-    MDNSService::registerService("Euphonium instance", "_euphonium", "_tcp", "", 80, mdnsMap);
-
     mainServer->listen();
 }
 

@@ -1,5 +1,8 @@
 class MA12070P : DACDriver
+    var volume_table
     def init()
+        # define a volume table, saves up on log10
+        self.volume_table = [255,160,120,100,90,85,80, 75, 70, 65, 61, 57, 53, 50, 47, 44, 41, 38, 35, 32, 29, 26, 23, 20, 17, 14, 12, 10, 8, 6, 4, 2, 0]
         self.name = "MA12070P"
         self.hardware_volume_control = true
         self.datasheet_link = "https://www.infineon.com/dgdl/Infineon-MA12070P-DS-v01_00-EN.pdf?fileId=5546d46264a8de7e0164b761f2f261e4"
@@ -62,12 +65,13 @@ class MA12070P : DACDriver
     def set_volume(volume)
         # Volume is in range from 1 to 100
         # Volume register is flipped in MA12070P.. Hence 100 - realvol.
-        
+        var volume_step = volume / 100.0
+        var actual_volume = int(volume_step * 32)
+
         var ADDR = 0x20 
-        var realVolume = int(100-volume)
 
         # Write it..
-        i2c.write(ADDR, 64, realVolume)
+        i2c.write(ADDR, 64, self.volume_table[actual_volume])
 
     end
 
@@ -93,8 +97,6 @@ end
 hardware.register_driver(MA12070P())
 
 hooks.add_handler(hooks.ON_INIT, def ()
-
-    gpio.pin_mode(27, gpio.OUTPUT)
-    gpio.digital_write(27, gpio.HIGH)
-
+     gpio.pin_mode(27, gpio.OUTPUT)
+     gpio.digital_write(27, gpio.HIGH)
 end)

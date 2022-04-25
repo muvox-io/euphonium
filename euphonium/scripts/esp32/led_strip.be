@@ -46,14 +46,14 @@ euphonium.on_event(EVENT_VOLUME_UPDATED, def (volume)
     leds_to_show = int((real(volume) /100) * 12)
     step = ((real(volume) /100) * 12) - leds_to_show
     for led_index : 0..(leds_to_show-1)
-        test_strip[led_index] = [255, 0, 255]
+        test_strip[led_index] = [255, 255, 255]
     end
 
     for led_index : leds_to_show..11
         test_strip[led_index] = [0, 0, 0]
     end
 
-    test_strip[leds_to_show] = [int(255 * step), 0, int(255 * step)]
+    test_strip[leds_to_show] = [int(255 * step), int(255 * step), int(255 * step)]
 
     test_strip.show()
 end)

@@ -6,7 +6,7 @@ const Widgets = () => {
     <div class="grid grid-cols-3 gap-4 items-start">
       <WebRadioWidget/>
       <IconCard iconName="speaker" label="Feedback">
-        </IconCard>
+      </IconCard>
     </div>
   );
 };
