@@ -17,6 +17,7 @@
 #include "driver/gpio.h"
 #include "WiFiDriver.h"
 #include "LEDDriver.h"
+#include "Rotary.h"
 
 #define BUTTON_DEBOUNCE_US 5000
 
@@ -44,9 +45,9 @@ class ButtonInteractionEvent : public Event {
 class ESP32PlatformPlugin : public bell::Task, public Module
 {
 private:
-    std::map<int, uint64_t> buttonDebounceMap;
     std::map<int, std::pair<bool, bool>> buttonStateMap;
     std::vector<int> buttonList;
+    std::vector<std::unique_ptr<Rotary>> registeredEncodersList;
 
 public:
     ESP32PlatformPlugin();
@@ -57,6 +58,7 @@ public:
     std::string dumpTaskInfo();
     void reportRAM();
     void configurationUpdated() {};
+    void registerEncoder(int gpioA, int gpioB);
     void registerButton(int gpio, bool highState);
     void startAudioThread() {
         startTask();

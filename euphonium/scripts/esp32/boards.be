@@ -72,5 +72,19 @@ ESP32_BOARDS = [
             "enablePin": "19",
             "mutePin": "8"
        }
-    }
+    },
+    {
+        "name":"pVox",
+        "state": {
+             "dac":"JP2137",
+             "mclk":"0",
+             "bck":"5",
+             "ws":"25",
+             "data":"26",
+             "scl":"22",
+             "sda":"23",
+             "enablePin": "19",
+             "mutePin": "21"
+        }
+     }
  ]

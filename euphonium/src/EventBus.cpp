@@ -3,6 +3,7 @@
 EventBus::EventBus()
 {
     // this->registeredListeners = std::map<EventType, std::set<eventListener*>>();
+    eventSemaphore = std::make_unique<WrappedSemaphore>(5);
 }
 
 bool EventBus::update()
@@ -30,6 +31,7 @@ bool EventBus::update()
 void EventBus::postEvent(std::unique_ptr<Event> event)
 {
     eventQueue.push(std::move(event));
+    eventSemaphore->give();
 }
 
 void EventBus::addListener(EventType eventType, EventSubscriber& eventSubscriber)

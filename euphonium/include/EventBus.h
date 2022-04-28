@@ -7,6 +7,7 @@
 #include <any>
 #include <unordered_map>
 #include <set>
+#include <WrappedSemaphore.h>
 #include <BerryBind.h>
 
 enum class EventType : uint32_t {
@@ -34,6 +35,7 @@ private:
     std::unordered_map<EventType, std::vector<std::reference_wrapper<EventSubscriber>>> registeredListeners;
 public:
     EventBus();
+    std::unique_ptr<WrappedSemaphore> eventSemaphore;
     bool update();
     void postEvent(std::unique_ptr<Event> event);
     void addListener(EventType eventType, EventSubscriber& eventSubscriber);

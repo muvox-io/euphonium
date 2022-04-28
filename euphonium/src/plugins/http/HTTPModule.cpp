@@ -4,7 +4,7 @@
 #include "HTTPEvents.h"
 #include "cJSON.h"
 #include "MDNSService.h"
-#include "mdns.h"
+
 
 void listFiles(const std::string &path,
                std::function<void(const std::string &)> cb) {

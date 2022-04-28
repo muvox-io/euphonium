@@ -10,13 +10,13 @@ ESP32PlatformPlugin::ESP32PlatformPlugin()
     name = "platform";
 }
 
-static QueueHandle_t gpio_evt_queue = NULL;
+static QueueHandle_t buttonEventQueue = NULL;
+static QueueHandle_t encoderEventQueue = NULL;
 
-Rotary encoder(2, 20);
 
 static void IRAM_ATTR gpio_isr_handler(void *arg) {
-    unsigned char result = encoder.process();
-    xQueueSendFromISR(gpio_evt_queue, &result, NULL);
+    uint32_t gpio = (uint32_t) arg;
+    xQueueSendFromISR(buttonEventQueue, &gpio, NULL);
 }
 
 void ESP32PlatformPlugin::loadScript(
@@ -33,27 +33,40 @@ void ESP32PlatformPlugin::loadScript(
 }
 
 void ESP32PlatformPlugin::registerButton(int gpio, bool highState) {
+    return;
+    buttonList.push_back(gpio);
+
+    std::cout << "Registering button " << gpio << std::endl;
+
+    gpio_config_t io_conf = {};
+    io_conf.intr_type = GPIO_INTR_DISABLE;
+    io_conf.pin_bit_mask = ((1ULL << 18));
+    io_conf.pull_down_en = (gpio_pulldown_t)0;
+    io_conf.pull_up_en = (gpio_pullup_t)1;
+    io_conf.intr_type = GPIO_INTR_ANYEDGE;
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pull_up_en = (gpio_pullup_t)1;
+
+    uint64_t pinBitMask = (1ULL << buttonList[0]);
+
+    for (int x = 1; x < buttonList.size(); x++) {
+        pinBitMask = pinBitMask | (1ULL << buttonList[x]);
+    }
+    io_conf.pin_bit_mask = pinBitMask;
+
+    gpio_config(&io_conf);
+    gpio_isr_handler_add((gpio_num_t)gpio, gpio_isr_handler, (void *)gpio);
 }
-auto volume = 0;
+
+void ESP32PlatformPlugin::registerEncoder(int gpioA, int gpioB) {
+    this->registeredEncodersList.push_back(std::make_unique<Rotary>(gpioA, gpioB));
+}
+
 void ESP32PlatformPlugin::runTask() {
-    // Quick and dirty button press detector. @TODO: Replace with proper
-    // implementation
-    unsigned char dir;
+    uint32_t gpioNumber;
     for (;;) {
-        if (xQueueReceive(gpio_evt_queue, &dir, portMAX_DELAY)) {
-            if (dir == DIR_CCW) {
-                if (volume < 100) {
-                    volume += 5;
-                }
-                auto event = std::make_unique<VolumeChangedEvent>(volume);
-                this->luaEventBus->postEvent(std::move(event));
-            } else if (dir == DIR_CW) {
-                if (volume > 0) {
-                    volume -= 5;
-                }
-                auto event = std::make_unique<VolumeChangedEvent>(volume);
-                this->luaEventBus->postEvent(std::move(event));
-            }
+        if (xQueueReceive(buttonEventQueue, &gpioNumber, portMAX_DELAY)) {
+            std::cout << "Received interrupt " << gpioNumber << std::endl;
         }
     }
 }
@@ -69,21 +82,8 @@ void ESP32PlatformPlugin::setupBindings() {
     // Export platform functions to berry
     berry->export_this("register_button", this,
                        &ESP32PlatformPlugin::registerButton, "gpio");
+    berry->export_this("register_encoder", this, &ESP32PlatformPlugin::registerEncoder, "gpio");
 
-    gpio_config_t io_conf = {};
-    // disable interrupt
-    io_conf.intr_type = GPIO_INTR_DISABLE;
-    io_conf.pin_bit_mask = ((1ULL << 20) | (1ULL << 2));
-    io_conf.pull_down_en = (gpio_pulldown_t)0;
-    io_conf.pull_up_en = (gpio_pullup_t)1;
-    io_conf.intr_type = GPIO_INTR_ANYEDGE;
-    io_conf.mode = GPIO_MODE_INPUT;
-    io_conf.pull_up_en = (gpio_pullup_t)1;
-    gpio_config(&io_conf);
-    gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
-    // install gpio isr service
+    buttonEventQueue = xQueueCreate(10, sizeof(uint32_t));
     gpio_install_isr_service(0);
-    // hook isr handler for specific gpio pin
-    gpio_isr_handler_add((gpio_num_t)2, gpio_isr_handler, (void *)2);
-    gpio_isr_handler_add((gpio_num_t)20, gpio_isr_handler, (void *)20);
 }

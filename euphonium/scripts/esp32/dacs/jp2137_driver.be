@@ -1,17 +1,19 @@
-class MA12070P : DACDriver
+class JP2137 : DACDriver
     var volume_table
     def init()
         # define a volume table, saves up on log10
         self.volume_table = [255,160,120,100,90,85,80, 75, 70, 65, 61, 57, 53, 50, 47, 44, 41, 38, 35, 32, 29, 26, 23, 20, 17, 14, 12, 10, 8, 6, 4, 2, 0]
-        self.name = "MA12070P"
+        self.name = "JP2137"
         self.hardware_volume_control = true
         self.datasheet_link = "https://www.infineon.com/dgdl/Infineon-MA12070P-DS-v01_00-EN.pdf?fileId=5546d46264a8de7e0164b761f2f261e4"
     end
 
     def init_i2s()
+        test_strip = LEDStrip(0, 4, 12, 0, 10)
+        test_strip[0] = [255, 0, 0]
+        test_strip.show()
         # PINOUT: SDA: 23, SCL: 22, SDATA: 26, LRCLK: 25, BCLK: 5
         # All of I2S init logic goes here
-        
         var ADDR = 0x20
 
         var config = I2SConfig()
@@ -33,27 +35,12 @@ class MA12070P : DACDriver
         i2c.install(int(self.get_gpio('sda')), int(self.get_gpio('scl')))
 
         # Mute Amplifier before i2c comm & enable. Mute pin: 21
-        gpio.pin_mode(8, gpio.OUTPUT)
-        gpio.digital_write(8, gpio.LOW)
-
+        gpio.pin_mode(21, gpio.OUTPUT)
         # Enable Amplifier. Enable pin: 19
         gpio.pin_mode(19, gpio.OUTPUT)
-        gpio.digital_write(19, gpio.LOW)
 
-        # Set Amp to Left-justified format
-        i2c.write(ADDR, 53, 8)
-
-        # Set Volume to a safe level..
-        i2c.write(ADDR, 64, 0x50)
-
-        # Clear static error register.
-        i2c.write(ADDR, 45, 0x34)
-        i2c.write(ADDR, 45, 0x30)
-
-        # Init done.
-
-        # Unmute Amplifier 
-        gpio.digital_write(8, gpio.HIGH)        
+        gpio.digital_write(19, gpio.HIGH)       
+        gpio.digital_write(21, gpio.HIGH) 
     end
 
     def unload_i2s()
@@ -68,35 +55,40 @@ class MA12070P : DACDriver
         var volume_step = volume / 100.0
         var actual_volume = int(volume_step * 32)
 
-        var ADDR = 0x20 
-
+        var ADDR = 0x20
+        var current_volume = self.volume_table[actual_volume]
+        if (current_volume < 32)
+            current_volume = 32
+        end
         # Write it..
-        i2c.write(ADDR, 64, self.volume_table[actual_volume])
+        i2c.write_raw(ADDR, bytes().add(0x00).add(0x03).add(current_volume))
 
     end
 
     def make_config_form(ctx, state)
-        ctx.create_group('MA12070P_pins', { 'label': 'DAC binary pins' })
+        ctx.create_group('JP2137_pins', { 'label': 'DAC binary pins' })
         
         ctx.number_field('enablePin', {
             'label': "Enable Pin",
             'default': "0",
-            'group': 'MA12070P_pins',
+            'group': 'JP2137_pins',
         })
 
         ctx.number_field('mutePin', {
             'label': "Mute Pin",
             'default': "0",
-            'group': 'MA12070P_pins',
+            'group': 'JP2137_pins',
         })
         super(self).make_config_form(ctx, state)
     end
 
 end
 
-hardware.register_driver(MA12070P())
-
-hooks.add_handler(hooks.ON_INIT, def ()
-     gpio.pin_mode(27, gpio.OUTPUT)
-     gpio.digital_write(27, gpio.HIGH)
+gpio.register_encoder(2, 18, def (state) 
+    print("Encoder state")
+    print(state)
 end)
+
+
+
+hardware.register_driver(JP2137())

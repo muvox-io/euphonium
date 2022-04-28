@@ -9,9 +9,12 @@ core.load("esp32/led_strip.be")
 core.load("esp32/boards.be")
 core.load("esp32/base_driver.be")
 core.load("esp32/hardware_plugin.be")
+
+# drivers
 core.load("esp32/dacs/es8388_driver.be")
 core.load("esp32/dacs/ac101_driver.be")
 core.load("esp32/dacs/tas5711_driver.be")
 core.load("esp32/dacs/ma12070p_driver.be")
+core.load("esp32/dacs/jp2137_driver.be")
 core.load("esp32/dacs/i2s_driver.be")
 core.load("esp32/dacs/dummy_driver.be")

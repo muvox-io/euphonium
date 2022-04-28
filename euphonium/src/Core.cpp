@@ -2,11 +2,11 @@
 #include "EventBus.h"
 #include <EuphoniumLog.h>
 #include <cassert>
-#include <string.h>
 #include <chrono>
-#include <iostream>
-#include <sys/time.h>
 #include <ctime>
+#include <iostream>
+#include <string.h>
+#include <sys/time.h>
 #ifdef ESP_PLATFORM
 #include "esp_heap_caps.h"
 #endif
@@ -39,9 +39,9 @@ Core::Core() : bell::Task("Core", 4 * 1024, 2, 0) {
     luaEventBus->addListener(EventType::LUA_MAIN_EVENT, *subscriber);
 
     registeredPlugins = {
-        std::make_shared<CSpotPlugin>(), std::make_shared<WebRadioPlugin>(),
+        std::make_shared<CSpotPlugin>(),
+        std::make_shared<WebRadioPlugin>(),
         std::make_shared<MQTTPlugin>()
-        // std::make_shared<YouTubePlugin>()
     };
     requiredModules = {std::make_shared<HTTPModule>(), mainPersistor};
 
@@ -93,12 +93,11 @@ void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader) {
 
 void Core::handleScriptingThread() {
     startTask();
-
     EUPH_LOG(info, "core", "Scripting thread listening");
+
     while (true) {
-        if (!luaEventBus->update()) {
-            BELL_SLEEP_MS(30);
-        };
+        luaEventBus->eventSemaphore->wait();
+        luaEventBus->update();
     }
 }
 
@@ -110,9 +109,7 @@ void Core::selectAudioOutput(std::shared_ptr<AudioOutput> output) {
 
 void Core::emptyBuffers() { audioBuffer->audioBuffer->emptyBuffer(); }
 
-void Core::loadScript(std::string file) {
-    loader->loadScript(file, berry);
-}
+void Core::loadScript(std::string file) { loader->loadScript(file, berry); }
 
 void Core::handleEvent(std::unique_ptr<Event> event) {
     EUPH_LOG(debug, "core", "Got event");
@@ -164,7 +161,7 @@ void sleepMS(int ms) { BELL_SLEEP_MS(ms); }
 int getTimeMs() {
     time_t now = time(nullptr);
     time_t mnow = now * 1000;
-    return (int) mnow;
+    return (int)mnow;
 }
 
 std::string Core::getPlatform() {
@@ -184,8 +181,8 @@ std::string Core::getVersion() {
 }
 
 void Core::setupBindings() {
-    berry->export_this("start_plugin", this,
-                       &Core::startAudioThreadForPlugin, "core");
+    berry->export_this("start_plugin", this, &Core::startAudioThreadForPlugin,
+                       "core");
     berry->export_function("sleep_ms", &sleepMS);
     berry->export_this("empty_buffers", this, &Core::emptyBuffers, "playback");
     berry->export_this("version", this, &Core::getVersion, "core");
@@ -207,12 +204,14 @@ void Core::runTask() {
         } else {
             EUPH_LOG(info, "core", "No data");
 #ifdef ESP_PLATFORM
-            auto memUsage = heap_caps_get_free_size(MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-            auto memUsage2 = heap_caps_get_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
-            EUPH_LOG(debug, "core", "Free memory: (psram) %d, (internal) %d", memUsage, memUsage2);
+            auto memUsage =
+                heap_caps_get_free_size(MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+            auto memUsage2 =
+                heap_caps_get_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+            EUPH_LOG(debug, "core", "Free memory: (psram) %d, (internal) %d",
+                     memUsage, memUsage2);
 #endif
             BELL_SLEEP_MS(1000);
-
         }
     }
 }

@@ -10,9 +10,11 @@ class GPIO
     var DOUBLE_PRESS
 
     var button_handler_map
+    var encoder_handler_map
 
     def init()
         self.button_handler_map = {}
+        self.encoder_handler_map = {}
 
         euphonium.register_handler('buttonInteractionEvent', def (interaction)
             if (self.button_handler_map.find(interaction['button']) != nil && self.button_handler_map[interaction['button']]['type'] == interaction['type']) 
@@ -40,6 +42,12 @@ class GPIO
         end
 
         register_button_native(button, default_high_state)
+    end
+
+    def register_encoder(pinA, pinB, callback)
+        register_encoder_native = get_native('gpio', 'register_encoder')
+        self.encoder_handler_map[str(pinA) + str(pinB)] = callback
+        register_encoder_native(gpioA, gpioB)
     end
 end
 
