@@ -72,13 +72,15 @@ class MQTTPlugin : Plugin
 
     # connects with an MQTT Broker
     def mqtt_connect(mqtt_config)
-        if mqtt.connect(mqtt_config['mqttBrokerUrl'], mqtt_config['mqttPort'], mqtt_config['mqttUsername'], mqtt_config['mqttPassword'])
-            euphonium.send_notification("success", "mqtt", "MQTT Connected to broker")
-            if mqtt_config['enableHomeAssistant']
-                self.setup_home_assistant()
+        if mqtt_config.find('mqttBrokerUrl') != nil
+            if mqtt.connect(mqtt_config['mqttBrokerUrl'], mqtt_config['mqttPort'], mqtt_config['mqttUsername'], mqtt_config['mqttPassword'])
+                euphonium.send_notification("success", "mqtt", "MQTT Connected to broker")
+                if mqtt_config['enableHomeAssistant']
+                    self.setup_home_assistant()
+                end
+            else
+                euphonium.send_notification("error", "mqtt", "MQTT cannot connect to broker")
             end
-        else
-            euphonium.send_notification("error", "mqtt", "MQTT cannot connect to broker")
         end
     end
 
