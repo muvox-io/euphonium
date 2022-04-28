@@ -88,7 +88,9 @@ class MQTTPlugin : Plugin
         end
 
         if event == EVENT_CONFIG_UPDATED
-            self.mqtt_connect(data)
+            if data.find('enableMqtt') != nil && data['enableMqtt']
+                self.mqtt_connect(data)
+            end
         end
 
         if event == EVENT_PLUGIN_INIT
