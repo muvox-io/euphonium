@@ -3,6 +3,10 @@ The best way to try euphonium is to flash a prebuilt version. However, if you wa
 
 ## Setup
 
+### Checkout
+
+When checking out the repository, use `--recursive` to retrieve all submodules. Alternately, after checkout use `git submodule update --init --recursive` to perform the same task.
+
 ### Setting up web UI bundler
 
 First, a required step is to setup all of the dependencies required to build the web UI.
@@ -10,8 +14,9 @@ First, a required step is to setup all of the dependencies required to build the
 #### Dependencies
 - `nodejs` in version of at least 14
 - `yarn`
+- `npm`
 
-Installation of both is platform specific, but mostly just comes down to installing them through a package manager.
+Installation of these are platform specific, but mostly just comes down to installing them through a package manager.
 
 ### Setting up dependencies
 
@@ -48,7 +53,8 @@ For a desktop run, please run the following commands
     ```
 
 
-This will output a binary `euphoniumcli` which can be later executed to run the platform. The web-ui will be available on port `80`.
+This will output a binary `euphoniumcli` which can be later executed to run the platform. The web-ui will be available on port `80` by default.
+If you have trouble using port 80 (on Linux for example), use `cmake .. -D HTTP_SERVER_PORT=8080` to change the web-ui port.
 
 ### Building and installing the project - ESP32
 
