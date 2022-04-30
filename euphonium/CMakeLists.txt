@@ -22,6 +22,11 @@ else()
     add_definitions(-Wno-sequence-point)
 endif()
 
+if (NOT DEFINED HTTP_SERVER_PORT)
+  set(HTTP_SERVER_PORT 80)
+endif()
+add_definitions( -DHTTP_SERVER_PORT=${HTTP_SERVER_PORT} )
+
 if(UNIX AND NOT APPLE)
     set(EXTRA_REQ_LIBS ${EXTRA_REQ_LIBS})
 endif()
