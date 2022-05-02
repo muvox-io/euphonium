@@ -84,10 +84,10 @@ class JP2137 : DACDriver
 
 end
 
-gpio.register_encoder(2, 18, def (state) 
-    print("Encoder state")
-    print(state)
-end)
+# gpio.register_encoder(2, 18, def (state) 
+#     print("Encoder state")
+#     print(state)
+# end)
 
 
 

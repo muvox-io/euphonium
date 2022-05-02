@@ -44,11 +44,11 @@ class GPIO
         register_button_native(button, default_high_state)
     end
 
-    def register_encoder(pinA, pinB, callback)
-        register_encoder_native = get_native('gpio', 'register_encoder')
-        self.encoder_handler_map[str(pinA) + str(pinB)] = callback
-        register_encoder_native(gpioA, gpioB)
-    end
+    # def register_encoder(pinA, pinB, callback)
+    #     register_encoder_native = get_native('gpio', 'register_encoder')
+    #     self.encoder_handler_map[str(pinA) + str(pinB)] = callback
+    #     register_encoder_native(gpioA, gpioB)
+    # end
 end
 
 gpio = GPIO()
