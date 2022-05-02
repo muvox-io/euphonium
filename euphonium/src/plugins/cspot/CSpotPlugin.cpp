@@ -104,7 +104,7 @@ void CSpotPlugin::runTask() {
                     track.imageUrl);
                 EUPH_LOG(info, "cspot", "Song name changed");
                 this->luaEventBus->postEvent(std::move(event));
-                this->audioBuffer->clearBuffer();
+                //this->audioBuffer->clearBuffer();
                 break;
             }
             case CSpotEventType::PLAY_PAUSE: {
@@ -112,6 +112,10 @@ void CSpotPlugin::runTask() {
                 bool isPaused = std::get<bool>(event.data);
                 auto event = std::make_unique<PauseChangedEvent>(isPaused);
                 this->luaEventBus->postEvent(std::move(event));
+                this->audioBuffer->clearBuffer();
+                break;
+            }
+            case CSpotEventType::PLAYBACK_START: {
                 this->audioBuffer->clearBuffer();
                 break;
             }
