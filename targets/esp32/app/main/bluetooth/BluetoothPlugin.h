@@ -13,11 +13,7 @@
 #include "Task.h"
 #include "WiFiDriver.h"
 #include <memory>
-
-extern "C" {
-#include "bt_app_sink.h"
-}
-
+#include "BluetoothDriver.h"
 class BluetoothPlugin : public bell::Task, public Module {
 
   private:
@@ -28,6 +24,7 @@ class BluetoothPlugin : public bell::Task, public Module {
         LockAccess,
     };
     bell::Queue<BTEvent> btEventQueue;
+    std::shared_ptr<BluetoothDriver> btDriver;
 
   public:
     BluetoothPlugin();
@@ -39,7 +36,5 @@ class BluetoothPlugin : public bell::Task, public Module {
     void runTask();
     void setStatus(ModuleStatus status);
 };
-
-extern std::shared_ptr<BluetoothPlugin> mainBluetoothPlugin;
 
 #endif

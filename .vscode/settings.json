@@ -81,6 +81,7 @@
         "algorithm": "cpp",
         "functional": "cpp",
         "iterator": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "bt_app_sink.h": "c"
     }
 }

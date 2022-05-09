@@ -44,7 +44,6 @@ static void euphoniumTask(void *pvParameters) {
     if (updater->versionMatches()) {
         auto core = std::make_shared<Core>();
         auto bluetoothPlugin = std::make_shared<BluetoothPlugin>();
-        mainBluetoothPlugin = bluetoothPlugin;
         core->registeredPlugins.push_back(
             std::make_shared<ESP32PlatformPlugin>());
         core->registeredPlugins.push_back(std::make_shared<OTAPlugin>());

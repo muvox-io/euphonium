@@ -105,7 +105,7 @@ void bt_app_task_start_up(void)
 
     s_bt_app_task_queue = xQueueCreate(10, sizeof(bt_app_msg_t));
     assert(s_bt_app_task_queue!=NULL);
-    assert(xTaskCreate(bt_app_task_handler, "BtAppT", 4096, NULL, configMAX_PRIORITIES - 3, &s_bt_app_task_handle)==pdPASS);
+    xTaskCreatePinnedToCore(bt_app_task_handler, "BtAppT", 4096, NULL, 3, &s_bt_app_task_handle, 0);
     return;
 }
 

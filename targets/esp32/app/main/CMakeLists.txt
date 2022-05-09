@@ -14,6 +14,7 @@ set(COMPONENT_SRCS
     "driver/dns_server.c"
     "ota/OTAPlugin.cpp"
     "bluetooth/BluetoothPlugin.cpp"
+    "bluetooth/BluetoothDriver.cpp"
     "bluetooth/bt_app_core.c"
     "bluetooth/bt_app_sink.c"
     "main.cpp"

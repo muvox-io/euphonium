@@ -50,14 +50,14 @@ public:
 
     void setBands(float low, float mid, float high)
     {
-        lowShelfLeft->generateLowShelfCoEffs(EQUALIZER_LOW_SHELF_FREQUENCY / SAMPLE_FREQUENCY, (low) * EQUALIZER_GAIN, Q_FACTOR);
-        lowShelfRight->generateLowShelfCoEffs(EQUALIZER_LOW_SHELF_FREQUENCY / SAMPLE_FREQUENCY, (low ) * EQUALIZER_GAIN, Q_FACTOR);
+        lowShelfLeft->generateLowShelfCoEffs(EQUALIZER_LOW_SHELF_FREQUENCY / SAMPLE_FREQUENCY, (low - 2) * EQUALIZER_GAIN, Q_FACTOR);
+        lowShelfRight->generateLowShelfCoEffs(EQUALIZER_LOW_SHELF_FREQUENCY / SAMPLE_FREQUENCY, (low - 2 ) * EQUALIZER_GAIN, Q_FACTOR);
 
-        notchLeft->generateNotchCoEffs(EQUALIZER_NOTCH_FREQUENCY / SAMPLE_FREQUENCY, (mid) * EQUALIZER_GAIN, Q_FACTOR / 2);
-        notchRight->generateNotchCoEffs(EQUALIZER_NOTCH_FREQUENCY / SAMPLE_FREQUENCY, (mid) * EQUALIZER_GAIN, Q_FACTOR / 2);
+        notchLeft->generateNotchCoEffs(EQUALIZER_NOTCH_FREQUENCY / SAMPLE_FREQUENCY, (mid - 2) * EQUALIZER_GAIN, Q_FACTOR / 2);
+        notchRight->generateNotchCoEffs(EQUALIZER_NOTCH_FREQUENCY / SAMPLE_FREQUENCY, (mid - 2) * EQUALIZER_GAIN, Q_FACTOR / 2);
 
-        highShelfLeft->generateHighShelfCoEffs(EQUALIZER_HIGH_SHELF_FREQUENCY / SAMPLE_FREQUENCY, (high) * EQUALIZER_GAIN, Q_FACTOR);
-        highShelfRight->generateHighShelfCoEffs(EQUALIZER_HIGH_SHELF_FREQUENCY / SAMPLE_FREQUENCY, (high) * EQUALIZER_GAIN, Q_FACTOR);
+        highShelfLeft->generateHighShelfCoEffs(EQUALIZER_HIGH_SHELF_FREQUENCY / SAMPLE_FREQUENCY, (high - 2) * EQUALIZER_GAIN, Q_FACTOR);
+        highShelfRight->generateHighShelfCoEffs(EQUALIZER_HIGH_SHELF_FREQUENCY / SAMPLE_FREQUENCY, (high - 2) * EQUALIZER_GAIN, Q_FACTOR);
 
         EUPH_LOG(info, "eq", "setBands: low: %.2f, mid: %.2f, high: %.2f", low, mid, high);
     }

@@ -11,6 +11,7 @@
 #include <memory>
 #include <AudioOutput.h>
 #include <BellUtils.h>
+#include <atomic>
 
 typedef std::function<void(std::string)> shutdownEventHandler;
 
@@ -27,6 +28,7 @@ class MainAudioBuffer {
     std::mutex accessMutex;
     shutdownEventHandler shutdownListener;
     uint32_t sampleRate = 0;
+    std::atomic<bool> isLocked = false;
 
     MainAudioBuffer() {
         audioBuffer = std::make_shared<CircularBuffer>(AUDIO_BUFFER_SIZE);
@@ -53,16 +55,22 @@ class MainAudioBuffer {
      * Locks access to audio buffer. Call after starting playback
      */
     void lockAccess() {
-        clearBuffer();
-        this->accessMutex.lock();
+        if (!isLocked) {
+            clearBuffer();
+            this->accessMutex.lock();
+            isLocked = true;
+        }
     }
 
     /**
      * Frees access to the audio buffer. Call during shutdown
      */
      void unlockAccess() {
-         clearBuffer();
-         this->accessMutex.unlock();
+        if (isLocked) {
+            clearBuffer();
+            this->accessMutex.unlock();
+            isLocked = false;
+        }
      }
 
     /**

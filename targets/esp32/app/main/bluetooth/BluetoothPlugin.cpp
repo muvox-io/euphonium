@@ -1,92 +1,46 @@
 #include "BluetoothPlugin.h"
 
-// @TODO Refactor all of this to proper C++. Global shared_ptr is not ideal.
-std::shared_ptr<BluetoothPlugin> mainBluetoothPlugin;
+BluetoothPlugin::BluetoothPlugin()
+    : bell::Task("bt_euph", 4 * 1024, 3, 0, false) {
+    name = "bluetooth";
+    this->btDriver = std::make_shared<BluetoothDriver>("bt");
+    globalBtDriver = this->btDriver;
 
-static void sink_data_handler(const uint8_t *data, uint32_t len) {
-    if (mainBluetoothPlugin->status == ModuleStatus::RUNNING) {
-        size_t bytesWritten = 0;
-        while (bytesWritten < len) {
-            bytesWritten +=
-                mainAudioBuffer->write(data + bytesWritten, len - bytesWritten);
+    this->btDriver->lockAccessCallback = [this](bool isLocked) {
+        if (isLocked) {
+            setStatus(ModuleStatus::RUNNING);
         }
-    }
-}
+    };
 
-static bool bt_sink_cmd_handler(bt_sink_cmd_t cmd, va_list args) {
-    switch (cmd) {
-    case BT_SINK_AUDIO_STARTED: {
+    this->btDriver->audioDataCallback = [this](const uint8_t *data, uint32_t len) {
+        if (status == ModuleStatus::RUNNING) {
+            size_t bytesWritten = 0;
+            while (bytesWritten < len) {
+                bytesWritten += mainAudioBuffer->write(data + bytesWritten,
+                                                       len - bytesWritten);
+            }
+        }
+    };
 
-        //mainAudioBuffer->lockAccess();
-        BELL_LOG(info, "bluetooth", "Audio sink started");
-        mainBluetoothPlugin->setStatus(ModuleStatus::RUNNING);
-        break;
-    }
-    case BT_SINK_AUDIO_STOPPED: {
-        BELL_LOG(info, "bluetooth", "Audio sink stopped");
-
-        break;
-    }
-    case BT_SINK_PLAY: {
-        auto event = std::make_unique<PauseChangedEvent>(false);
-        mainEventBus->postEvent(std::move(event));
-        // LOG_INFO("BT playing");
-        break;
-    }
-    case BT_SINK_STOP:
-
-        BELL_LOG(info, "bluetooth", "BT stopped");
-        break;
-    case BT_SINK_PAUSE: {
-        auto event = std::make_unique<PauseChangedEvent>(true);
-        mainEventBus->postEvent(std::move(event));
-        // LOG_INFO("BT paused, just silence");
-        break;
-    }
-    case BT_SINK_RATE: {
-        uint32_t sampleRate = va_arg(args, u32_t);
-        mainBluetoothPlugin->setStatus(ModuleStatus::RUNNING);
-        BELL_LOG(info, "bluetooth", "Sample rate changed to %d", sampleRate);
-        mainAudioBuffer->configureOutput(AudioOutput::SampleFormat::INT16,
-                                         sampleRate);
-        break;
-    }
-    case BT_SINK_METADATA: {
-        char *artist = va_arg(args, char *);
-        char *album = va_arg(args, char *);
-        char *title = va_arg(args, char *);
+    this->btDriver->metadataUpdatedCallback = [this](const std::string &artist,
+                                                     const std::string &album,
+                                                     const std::string &title) {
         auto event = std::make_unique<SongChangedEvent>(
             std::string(title), std::string(album), std::string(artist),
             "bluetooth", "https://i.imgur.com/Fuu73lv.png");
         EUPH_LOG(info, "bluetooth", "Song name changed");
         mainEventBus->postEvent(std::move(event));
+    };
 
-        break;
-    }
-    case BT_SINK_VOLUME: {
-        EUPH_LOG(info, "bluetooth", "Volume changed");
-        u32_t volume = va_arg(args, u32_t);
-        volume = 100 * powf(volume / 128.0f, 3);
+    this->btDriver->volumeChangedCallback = [this](uint8_t volume) {
         auto event = std::make_unique<VolumeChangedEvent>(volume);
         EUPH_LOG(info, "bluetooth", "Volume changed");
         mainEventBus->postEvent(std::move(event));
-        break;
-    }
-    default:
-        break;
-    }
-
-    return true;
-}
-
-BluetoothPlugin::BluetoothPlugin() : bell::Task("bt_euph", 4 * 1024, 3, 0, false) {
-    name = "bluetooth";
-    // bt_sink_init(bt_sink_cmd_handler, sink_data_handler);
+    };
 }
 
 void BluetoothPlugin::shutdown() {
     EUPH_LOG(info, "bluetooth", "Shutting down...");
-    //mainAudioBuffer->unlockAccess();
     setStatus(ModuleStatus::SHUTDOWN);
 }
 
@@ -96,30 +50,26 @@ void BluetoothPlugin::runTask() {
     while (true) {
         if (this->btEventQueue.wpop(event)) {
             if (event == BTEvent::Initialize) {
-                std::string deviceName = std::any_cast<std::string>(config["name"]);
-                snprintf(bt_sink_name, sizeof bt_sink_name, "%s", deviceName.c_str());
-                bt_sink_init(bt_sink_cmd_handler, sink_data_handler);
+                btDriver->name = std::any_cast<std::string>(config["name"]);
+                btDriver->start();
             }
 
             if (event == BTEvent::Deinitialize) {
-                bt_sink_deinit();
             }
 
             if (event == BTEvent::Disconnect) {
                 BELL_LOG(info, "bluetooth", "Disconnecting...");
                 bt_disconnect();
                 BELL_SLEEP_MS(1500);
-                //bt_sink_deinit();
                 mainAudioBuffer->unlockAccess();
                 status = ModuleStatus::SHUTDOWN;
-                //bt_sink_init(bt_sink_cmd_handler, sink_data_handler);
             }
 
             if (event == BTEvent::LockAccess) {
                 BELL_LOG(info, "bluetooth", "Locking access...");
                 mainAudioBuffer->shutdownExcept(name);
-                mainAudioBuffer->configureOutput(AudioOutput::SampleFormat::INT16,
-                                                 44100);
+                mainAudioBuffer->configureOutput(
+                    AudioOutput::SampleFormat::INT16, 44100);
                 mainAudioBuffer->lockAccess();
                 status = ModuleStatus::RUNNING;
             }
@@ -136,7 +86,8 @@ void BluetoothPlugin::startAudioThread() {
 }
 
 void BluetoothPlugin::setStatus(ModuleStatus status) {
-    if (this->status == status) return;
+    if (this->status == status)
+        return;
     this->status = status;
     if (status == ModuleStatus::SHUTDOWN) {
         btEventQueue.push(BTEvent::Disconnect);

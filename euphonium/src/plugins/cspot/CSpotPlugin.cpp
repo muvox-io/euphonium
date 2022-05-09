@@ -53,15 +53,9 @@ void CSpotPlugin::configurationUpdated() {
 }
 
 void CSpotPlugin::shutdown() {
+    EUPH_LOG(info, "cspot", "Shutting down CSpot");
     this->isRunning = false;
     std::scoped_lock(this->runningMutex);
-    spircController->stopPlayer();
-
-    mercuryManager->stop();
-    BELL_SLEEP_MS(100);
-    spircController.reset();
-    mercuryManager.reset();
-    BELL_SLEEP_MS(100);
     status = ModuleStatus::SHUTDOWN;
 }
 
@@ -104,7 +98,7 @@ void CSpotPlugin::runTask() {
                     track.imageUrl);
                 EUPH_LOG(info, "cspot", "Song name changed");
                 this->luaEventBus->postEvent(std::move(event));
-                //this->audioBuffer->clearBuffer();
+                // this->audioBuffer->clearBuffer();
                 break;
             }
             case CSpotEventType::PLAY_PAUSE: {
@@ -135,6 +129,21 @@ void CSpotPlugin::runTask() {
         while (this->isRunning) {
             mercuryManager->updateQueue();
         }
+
+        EUPH_LOG(info, "cspot", "Finished running");
+
+        spircController->stopPlayer();
+        EUPH_LOG(info, "cspot", "Player stopped");
+        mercuryManager->stop();
+        EUPH_LOG(info, "cspot", "Mercury stopped");
+        while (mercuryManager->isRunning) {
+            BELL_SLEEP_MS(100);
+        }
+        EUPH_LOG(info, "cspot", "Players Reset");
+        spircController.reset();
+        mercuryManager.reset();
+        BELL_SLEEP_MS(100);
+
         BELL_LOG(info, "cspot", "Unlocking audio mutex");
         audioBuffer->unlockAccess();
     }
