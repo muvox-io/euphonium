@@ -23,12 +23,27 @@ Installation of these are platform specific, but mostly just comes down to insta
 Depending on the target platform, esp32 or cli targets differ in required dependencies.
 
 #### Both platforms
-- `python` with `pip`
-- `pip3 install grpcio-tools protobuf`
+Ensure that you have `pip` installed. This can be done by:
+
+```
+python -m ensurepip --upgrade
+```
+
+Then we can install the needed dependencies by using the `requirements.txt` file. Execute this command to install the needed dependencies (from the root of the project):
+
+```
+pip install -r requirements.txt
+```
+
 
 #### Desktop specific dependencies
 - PortAudio library
 - OpenSSL library
+
+If you are on macOS then we can do this with `brew`:
+```
+brew install OpenSSL PortAudio
+```
 
 both can be installed with a package manager.
 
@@ -63,7 +78,7 @@ For ESP32 target, please run following commands (with esp-idf in the PATH)
 !!! note "Setup"
     ```
     cd targets/esp32
-    sh build_recovery.sh 
+    sh build_recovery.sh
     sh build_app.sh
     ```
 
