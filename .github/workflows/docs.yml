@@ -7,10 +7,13 @@ jobs:
     steps:
       - name: Checkout master
         uses: actions/checkout@v2
+        
+      - name: Remove file 
+        run: rm requirements.txt
 
       - name: Deploy docs
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CONFIG_FILE: mkdocs.yml
-          EXTRA_PACKAGES: build-base linux-headers
+          EXTRA_PACKAGES: build-base
