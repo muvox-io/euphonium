@@ -22,10 +22,11 @@ class Rotary
     Rotary(char, char);
     unsigned char process();
     void begin(bool internalPullup=true, bool flipLogicForPulldown=false);
-  private:
-    unsigned char state;
     unsigned char pin1;
     unsigned char pin2;
+  
+  private:
+    unsigned char state;
     unsigned char inverter;
 };
 

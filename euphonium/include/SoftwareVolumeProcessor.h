@@ -13,7 +13,7 @@ class SoftwareVolumeProcessor : public AudioProcessor {
          38,  35,  32,  29,  26, 23, 20, 17, 14, 12, 10, 8,  6,  4,  2,  0});
 
   public:
-    SoftwareVolumeProcessor() { setVolume(75); };
+    SoftwareVolumeProcessor() { setVolume(50); };
     ~SoftwareVolumeProcessor(){};
 
     void setVolume(int volume) {

@@ -1,3 +1,4 @@
+volume_strip = nil
 class MA12070P : DACDriver
     var volume_table
     def init()
@@ -53,7 +54,9 @@ class MA12070P : DACDriver
         # Init done.
 
         # Unmute Amplifier 
-        gpio.digital_write(8, gpio.HIGH)        
+        gpio.digital_write(8, gpio.HIGH)
+        sleep_ms(300)
+        volume_strip = LEDStrip(0, 4, 12, 0, 10)       
     end
 
     def unload_i2s()
@@ -96,7 +99,48 @@ end
 
 hardware.register_driver(MA12070P())
 
-hooks.add_handler(hooks.ON_INIT, def ()
-     gpio.pin_mode(27, gpio.OUTPUT)
-     gpio.digital_write(27, gpio.HIGH)
+def show_led_volume(led_volume)
+    if (volume_strip != nil)
+        leds_to_show = int((real(led_volume) /100) * 12)
+        step = ((real(led_volume) /100) * 12) - leds_to_show
+        for led_index : 0..(leds_to_show-1)
+            volume_strip[led_index] = [255, 255, 255]
+        end
+
+        for led_index : leds_to_show..11
+            volume_strip[led_index] = [0, 0, 0]
+        end
+
+        volume_strip[leds_to_show] = [int(255 * step), int(255 * step), int(255 * step)]
+
+        volume_strip.show()
+    end
+end
+
+local_volume = 0
+gpio.register_encoder(20, 2, def (interaction)
+    if interaction == gpio.ENCODER_CW
+        if (local_volume < 100)
+            local_volume += (100 / 20)
+        end
+
+        if (local_volume > 100)
+            local_volume = 100
+        end
+    else
+        if (local_volume > 0)
+            local_volume -= (100 / 20)
+        end
+
+        if (local_volume < 0)
+            local_volume = 0
+        end
+    end
+    show_led_volume(local_volume)
+    euphonium.apply_volume(local_volume)
+end)
+
+euphonium.on_event(EVENT_VOLUME_UPDATED, def (volume) 
+    local_volume = volume
+    show_led_volume(volume)
 end)

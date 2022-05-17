@@ -42,7 +42,7 @@ class CSpotPlugin : Plugin
         end
 
         if event == EVENT_VOLUME_UPDATED
-            cspot_set_volume_remote(data)
+            #cspot_set_volume_remote(data)
         end
     end
 end

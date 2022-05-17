@@ -82,6 +82,7 @@
         "functional": "cpp",
         "iterator": "cpp",
         "utility": "cpp",
-        "bt_app_sink.h": "c"
+        "bt_app_sink.h": "c",
+        "unordered_set": "cpp"
     }
 }
