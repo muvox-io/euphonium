@@ -6,6 +6,7 @@ core.load("internal/plugin.be")
 core.load("internal/hooks.be")
 core.load("internal/euphonium.be")
 core.load("internal/api.be")
+core.load("internal/dsp.be")
 core.load("internal/general_settings.be")
 
 # Load plugins

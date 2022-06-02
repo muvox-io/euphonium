@@ -26,6 +26,7 @@ Core::Core() : bell::Task("Core", 4 * 1024, 2, 0) {
     // Add preincluded audio processors
     audioProcessor->addProcessor(std::make_unique<SoftwareVolumeProcessor>());
     audioProcessor->addProcessor(std::make_unique<EqualizerProcessor>());
+    audioProcessor->addProcessor(std::make_unique<UserDSPProcessor>());
 
     // include berry
     berry = std::make_shared<berry::VmState>();
