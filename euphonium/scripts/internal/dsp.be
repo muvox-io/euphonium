@@ -31,6 +31,10 @@ class DSPProcessor
         get_native('dsp', 'set_mono_downmix')(true)
     end
 
+    def set_gain_db(gain_db)
+        get_native('dsp', 'set_gain_db')(real(gain_db))
+    end
+
     def add_biquad(channel, type, parameters)
         if (parameters.find('g') == nil)
             parameters['g'] = 0.0
