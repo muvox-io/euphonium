@@ -32,7 +32,11 @@ class DSPProcessor
     end
 
     def add_biquad(channel, type, parameters)
-        get_native('dsp', 'register_biquad')(channel, type, int(parameters['f']), int(parameters['g']), int(parameters['q']))
+        if (parameters.find('g') == nil)
+            parameters['g'] = 0.0
+        end
+
+        get_native('dsp', 'register_biquad')(channel, type, real(parameters['f']), real(parameters['g']), real(parameters['q']))
     end
 end
 
