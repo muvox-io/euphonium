@@ -17,8 +17,6 @@
 #define Q_FACTOR sqrt(2) / 2 // 0.7071067812
 #define EQUALIZER_GAIN 3     // dB
 
-#define MAX_INT16 32767
-
 class EqualizerProcessor : public AudioProcessor
 {
 private:
@@ -31,9 +29,6 @@ public:
     std::shared_ptr<BiquadFilter> highShelfRight;
     std::shared_ptr<BiquadFilter> notchLeft;
     std::shared_ptr<BiquadFilter> notchRight;
-
-    std::vector<float> dataLeft = std::vector<float>(1024);
-    std::vector<float> dataRight = std::vector<float>(1024);
 
     EqualizerProcessor()
     {
@@ -50,45 +45,29 @@ public:
 
     void setBands(float low, float mid, float high)
     {
-        lowShelfLeft->generateLowShelfCoEffs(EQUALIZER_LOW_SHELF_FREQUENCY / SAMPLE_FREQUENCY, (low - 2) * EQUALIZER_GAIN, Q_FACTOR);
-        lowShelfRight->generateLowShelfCoEffs(EQUALIZER_LOW_SHELF_FREQUENCY / SAMPLE_FREQUENCY, (low - 2 ) * EQUALIZER_GAIN, Q_FACTOR);
+        lowShelfLeft->generateLowShelfCoEffs(EQUALIZER_LOW_SHELF_FREQUENCY / SAMPLE_FREQUENCY, (low) * EQUALIZER_GAIN, Q_FACTOR);
+        lowShelfRight->generateLowShelfCoEffs(EQUALIZER_LOW_SHELF_FREQUENCY / SAMPLE_FREQUENCY, (low) * EQUALIZER_GAIN, Q_FACTOR);
 
-        notchLeft->generateNotchCoEffs(EQUALIZER_NOTCH_FREQUENCY / SAMPLE_FREQUENCY, (mid - 2) * EQUALIZER_GAIN, Q_FACTOR / 2);
-        notchRight->generateNotchCoEffs(EQUALIZER_NOTCH_FREQUENCY / SAMPLE_FREQUENCY, (mid - 2) * EQUALIZER_GAIN, Q_FACTOR / 2);
+        notchLeft->generateNotchCoEffs(EQUALIZER_NOTCH_FREQUENCY / SAMPLE_FREQUENCY, (mid) * EQUALIZER_GAIN, Q_FACTOR / 2);
+        notchRight->generateNotchCoEffs(EQUALIZER_NOTCH_FREQUENCY / SAMPLE_FREQUENCY, (mid) * EQUALIZER_GAIN, Q_FACTOR / 2);
 
-        highShelfLeft->generateHighShelfCoEffs(EQUALIZER_HIGH_SHELF_FREQUENCY / SAMPLE_FREQUENCY, (high - 2) * EQUALIZER_GAIN, Q_FACTOR);
-        highShelfRight->generateHighShelfCoEffs(EQUALIZER_HIGH_SHELF_FREQUENCY / SAMPLE_FREQUENCY, (high - 2) * EQUALIZER_GAIN, Q_FACTOR);
+        highShelfLeft->generateHighShelfCoEffs(EQUALIZER_HIGH_SHELF_FREQUENCY / SAMPLE_FREQUENCY, (high) * EQUALIZER_GAIN, Q_FACTOR);
+        highShelfRight->generateHighShelfCoEffs(EQUALIZER_HIGH_SHELF_FREQUENCY / SAMPLE_FREQUENCY, (high) * EQUALIZER_GAIN, Q_FACTOR);
 
         EUPH_LOG(info, "eq", "setBands: low: %.2f, mid: %.2f, high: %.2f", low, mid, high);
     }
 
-    void process(uint8_t *data, size_t nBytes)
+    void process(float* dataLeft, float* dataRight, size_t samplesPerChannel)
     {
 
-        int16_t *data_16 = (int16_t *)data;
+        lowShelfLeft->processSamples(dataLeft, samplesPerChannel);
+        lowShelfRight->processSamples(dataRight, samplesPerChannel);
 
-        int channel_length_16 = nBytes / 4;
+        notchLeft->processSamples(dataLeft, samplesPerChannel);
+        notchRight->processSamples(dataRight, samplesPerChannel);
 
-        for (size_t i = 0; i < channel_length_16; i++)
-        {
-            dataLeft[i] = data_16[i * 2] / (float) MAX_INT16;      // Normalize left
-            dataRight[i] = data_16[i * 2 + 1] / (float) MAX_INT16; // Normalize right
-        }
-
-        lowShelfLeft->processSamples(dataLeft.data(), channel_length_16);
-        lowShelfRight->processSamples(dataRight.data(), channel_length_16);
-
-        notchLeft->processSamples(dataLeft.data(), channel_length_16);
-        notchRight->processSamples(dataRight.data(), channel_length_16);
-
-        highShelfLeft->processSamples(dataLeft.data(), channel_length_16);
-        highShelfRight->processSamples(dataRight.data(), channel_length_16);
-
-        for (size_t i = 0; i < channel_length_16; i++)
-        {
-            data_16[i * 2] = dataLeft[i] * MAX_INT16;     // Denormalize left
-            data_16[i * 2 + 1] = dataRight[i] * MAX_INT16; // Denormalize right
-        }
+        highShelfLeft->processSamples(dataLeft, samplesPerChannel);
+        highShelfRight->processSamples(dataRight, samplesPerChannel);
     }
 
     void setBindings(std::shared_ptr<berry::VmState> berry)
