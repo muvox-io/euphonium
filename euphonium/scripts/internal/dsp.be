@@ -10,6 +10,7 @@ class DSPProcessor
     var BIQUAD_TYPE_PEAK
     var BIQUAD_TYPE_LOWSHELF
     var BIQUAD_TYPE_HIGHSHELF
+    var BIQUAD_TYPE_PEAKING_EQ
 
     def init()
         self.CHANNEL_LEFT = 0
@@ -21,6 +22,7 @@ class DSPProcessor
         self.BIQUAD_TYPE_PEAK = 3
         self.BIQUAD_TYPE_LOWSHELF = 4
         self.BIQUAD_TYPE_HIGHSHELF = 5
+        self.BIQUAD_TYPE_PEAKING_EQ = 6
     end
 
     def clear_chain()
