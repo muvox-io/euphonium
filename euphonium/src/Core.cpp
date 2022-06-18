@@ -14,7 +14,7 @@
 std::shared_ptr<MainAudioBuffer> mainAudioBuffer;
 std::shared_ptr<EventBus> mainEventBus;
 
-Core::Core() : bell::Task("Core", 4 * 1024, 2, 0) {
+Core::Core() : bell::Task("Core", 4 * 1024, 4, 0) {
     audioBuffer = std::make_shared<MainAudioBuffer>();
     luaEventBus = std::make_shared<EventBus>();
     mainPersistor = std::make_shared<ConfigPersistor>();
@@ -24,7 +24,7 @@ Core::Core() : bell::Task("Core", 4 * 1024, 2, 0) {
     audioProcessor = std::make_shared<AudioProcessors>();
 
     // Add preincluded audio processors
-    audioProcessor->addProcessor(std::make_unique<UserDSPProcessor>(mainAudioBuffer));
+    audioProcessor->addProcessor(std::make_unique<UserDSPProcessor>());
     //audioProcessor->addProcessor(std::make_unique<SoftwareVolumeProcessor>());
     audioProcessor->addProcessor(std::make_unique<EqualizerProcessor>());
 
@@ -108,7 +108,7 @@ void Core::selectAudioOutput(std::shared_ptr<AudioOutput> output) {
     this->outputConnected = true;
 }
 
-void Core::emptyBuffers() { audioBuffer->audioBuffer->emptyBuffer(); }
+void Core::emptyBuffers() { audioBuffer->clearBuffer(); }
 
 void Core::loadScript(std::string file) { loader->loadScript(file, berry); }
 
@@ -200,7 +200,7 @@ void Core::runTask() {
         if (audioBuffer->audioBuffer->size() > 0 && outputConnected) {
             auto readNumber =
                 audioBuffer->audioBuffer->read(pcmBuf.data(), PCMBUF_SIZE);
-            audioProcessor->process(pcmBuf.data(), readNumber, audioBuffer->audioBuffer->size());
+            audioProcessor->process(pcmBuf.data(), readNumber, audioBuffer->audioBuffer->size(), audioBuffer->getSampleRate() * 2);
             currentOutput->feedPCMFrames(pcmBuf.data(), readNumber);
         } else {
             EUPH_LOG(info, "core", "No data");

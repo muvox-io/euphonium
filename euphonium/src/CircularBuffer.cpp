@@ -48,6 +48,9 @@ void CircularBuffer::emptyExcept(size_t sizeToSet) {
         sizeToSet = dataSize;
     dataSize = sizeToSet;
     endIndex = begIndex + sizeToSet;
+    if (endIndex > dataCapacity) {
+        endIndex -= dataCapacity;
+    }
 }
 
 size_t CircularBuffer::read(uint8_t *data, size_t bytes)

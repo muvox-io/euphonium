@@ -58,6 +58,7 @@ class MainAudioBuffer {
      * Clears input buffer, to be called for track change and such
      */
     void clearBuffer() {
+         /*audioBuffer->emptyBuffer();*/ 
         // Leave 0.5s space for fadeout
         audioBuffer->emptyExcept(this->sampleRate * 2);
     }
