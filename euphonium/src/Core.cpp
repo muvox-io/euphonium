@@ -24,7 +24,7 @@ Core::Core() : bell::Task("Core", 4 * 1024, 2, 0) {
     audioProcessor = std::make_shared<AudioProcessors>();
 
     // Add preincluded audio processors
-    audioProcessor->addProcessor(std::make_unique<UserDSPProcessor>());
+    audioProcessor->addProcessor(std::make_unique<UserDSPProcessor>(mainAudioBuffer));
     //audioProcessor->addProcessor(std::make_unique<SoftwareVolumeProcessor>());
     audioProcessor->addProcessor(std::make_unique<EqualizerProcessor>());
 
@@ -200,7 +200,7 @@ void Core::runTask() {
         if (audioBuffer->audioBuffer->size() > 0 && outputConnected) {
             auto readNumber =
                 audioBuffer->audioBuffer->read(pcmBuf.data(), PCMBUF_SIZE);
-            audioProcessor->process(pcmBuf.data(), readNumber);
+            audioProcessor->process(pcmBuf.data(), readNumber, audioBuffer->audioBuffer->size());
             currentOutput->feedPCMFrames(pcmBuf.data(), readNumber);
         } else {
             EUPH_LOG(info, "core", "No data");

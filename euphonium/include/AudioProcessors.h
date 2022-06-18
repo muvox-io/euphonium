@@ -41,7 +41,7 @@ class AudioProcessors {
     void addProcessor(std::unique_ptr<AudioProcessor> processor) {
         processors.push_back(std::move(processor));
     }
-    void process(uint8_t *data, size_t nBytes) {
+    void process(uint8_t *data, size_t nBytes, size_t bytesLeftInBuffer) {
         int16_t *data_16 = (int16_t *)data;
 
         int channel_length_16 = nBytes / 4;
@@ -57,8 +57,13 @@ class AudioProcessors {
         }
 
         for (size_t i = 0; i < channel_length_16; i++) {
-            data_16[i * 2] = dataLeft[i] * MAX_INT16;      // Denormalize left
-            data_16[i * 2 + 1] = dataRight[i] * MAX_INT16; // Denormalize right
+            float multipler = 1;
+            if (((bytesLeftInBuffer + nBytes) - (channel_length_16 * 4)) < 44100 * 2) {
+                multipler = (float) ((bytesLeftInBuffer + nBytes) - (channel_length_16 * 4)) / (44100 * 2);
+            }
+
+            data_16[i * 2] = dataLeft[i] * MAX_INT16 * multipler;      // Denormalize left
+            data_16[i * 2 + 1] = dataRight[i] * MAX_INT16 * multipler; // Denormalize right
         }
 
         if (signedness) {
