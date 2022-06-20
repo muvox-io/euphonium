@@ -200,7 +200,7 @@ void Core::runTask() {
         if (audioBuffer->audioBuffer->size() > 0 && outputConnected) {
             auto readNumber =
                 audioBuffer->audioBuffer->read(pcmBuf.data(), PCMBUF_SIZE);
-            audioProcessor->process(pcmBuf.data(), readNumber, audioBuffer->audioBuffer->size(), audioBuffer->getSampleRate() * 2);
+            audioProcessor->process(pcmBuf.data(), readNumber, audioBuffer->audioBuffer->size(), audioBuffer->getSampleRate());
             currentOutput->feedPCMFrames(pcmBuf.data(), readNumber);
         } else {
             EUPH_LOG(info, "core", "No data");
