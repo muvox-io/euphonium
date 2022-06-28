@@ -129,15 +129,9 @@ class EuphoniumInstance
     # Initializes all plugins
     def init_required_plugins()
         self.network_state = 'online'
-        var plugin = self.get_audio_output()
-        if (plugin != nil)
-            plugin.on_event(EVENT_CONFIG_UPDATED, {})
-            plugin.init_audio()
-        end
-
         self.init_plugin('cspot')
         self.init_plugin('webradio')
-        self.init_plugin('bluetooth')
+        #self.init_plugin('bluetooth')
         self.broadcast_event(EVENT_PLUGIN_INIT, {})
         self.init_http()
     end
@@ -250,6 +244,13 @@ class EuphoniumInstance
                 end
             end
 
+            var pluginAudio = self.get_audio_output()
+            if (pluginAudio != nil)
+                pluginAudio.on_event(EVENT_CONFIG_UPDATED, {})
+                pluginAudio.init_audio()
+            end
+
+            self.init_plugin('bluetooth')
             if core.platform() == 'desktop'
                 self.init_required_plugins()
             end

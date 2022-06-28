@@ -40,7 +40,7 @@ extern "C" {
 class BluetoothDriver {
 private:
 public:
-    BluetoothDriver(std::string name);
+    BluetoothDriver(std::string name, std::string pin);
     // Callbacks
     bluetoothLockAccessCallback lockAccessCallback;
     bluetoothVolumeChangedCallback volumeChangedCallback;
@@ -49,6 +49,7 @@ public:
 
     bool isLocked = false;
     std::string name;
+    std::string pin;
 
     std::string getName();
     void setVolume(uint8_t volume);

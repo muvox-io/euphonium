@@ -18,6 +18,20 @@ class BluetoothPlugin : Plugin
             'default': util.generate_device_name(),
             'group': 'bluetooth'
         })
+
+        ctx.checkbox_field('usePin', {
+            'label': "Require PIN to connect",
+            'default': "false",
+            'group': 'bluetooth'
+        })
+
+        if state.find('usePin') != nil && state['usePin'] == 'true'
+            ctx.text_field('pin', {
+                'label': "Bluetooth PIN (restart to apply)",
+                'default': "2137",
+                'group': 'bluetooth'
+            })
+        end
     end
 end
 

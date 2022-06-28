@@ -3,7 +3,7 @@
 BluetoothPlugin::BluetoothPlugin()
     : bell::Task("bt_euph", 4 * 1024, 3, 0, false) {
     name = "bluetooth";
-    this->btDriver = std::make_shared<BluetoothDriver>("bt");
+    this->btDriver = std::make_shared<BluetoothDriver>("bt", "1234");
     globalBtDriver = this->btDriver;
 
     this->btDriver->lockAccessCallback = [this](bool isLocked) {
@@ -51,6 +51,11 @@ void BluetoothPlugin::runTask() {
         if (this->btEventQueue.wpop(event)) {
             if (event == BTEvent::Initialize) {
                 btDriver->name = std::any_cast<std::string>(config["name"]);
+
+                if (config.count("usePin") > 0 && std::any_cast<std::string>(config["usePin"]) == "true") {
+                    btDriver->pin = std::any_cast<std::string>(config["pin"]);
+                }
+                
                 btDriver->start();
             }
 

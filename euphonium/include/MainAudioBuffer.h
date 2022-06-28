@@ -60,7 +60,7 @@ class MainAudioBuffer {
     void clearBuffer() {
          /*audioBuffer->emptyBuffer();*/ 
         // Leave 0.5s space for fadeout
-        audioBuffer->emptyExcept(this->sampleRate * 2);
+        audioBuffer->emptyExcept(this->sampleRate);
     }
 
     /**

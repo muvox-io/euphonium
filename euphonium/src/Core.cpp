@@ -14,7 +14,7 @@
 std::shared_ptr<MainAudioBuffer> mainAudioBuffer;
 std::shared_ptr<EventBus> mainEventBus;
 
-Core::Core() : bell::Task("Core", 4 * 1024, 4, 0) {
+Core::Core() : bell::Task("Core", 4 * 1024, 2, 0) {
     audioBuffer = std::make_shared<MainAudioBuffer>();
     luaEventBus = std::make_shared<EventBus>();
     mainPersistor = std::make_shared<ConfigPersistor>();
@@ -200,7 +200,7 @@ void Core::runTask() {
         if (audioBuffer->audioBuffer->size() > 0 && outputConnected) {
             auto readNumber =
                 audioBuffer->audioBuffer->read(pcmBuf.data(), PCMBUF_SIZE);
-            audioProcessor->process(pcmBuf.data(), readNumber, audioBuffer->audioBuffer->size(), audioBuffer->getSampleRate() * 2);
+            audioProcessor->process(pcmBuf.data(), readNumber, audioBuffer->audioBuffer->size(), audioBuffer->getSampleRate());
             currentOutput->feedPCMFrames(pcmBuf.data(), readNumber);
         } else {
             EUPH_LOG(info, "core", "No data");
