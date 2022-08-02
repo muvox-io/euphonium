@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "generate_all",
+			"type": "shell",
+			"group": "build",
+			"command": "${config:idf.pythonBinPath} ${config:idf.espIdfPath}/tools/idf.py build",
+            "options": {
+                "cwd": "${workspaceFolder}/targets/esp32/app"
+            },
+		}
+	]
+}

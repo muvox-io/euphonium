@@ -1,29 +1,23 @@
-# Setting up development environment
+
+
+# Setup
 The best way to try euphonium is to flash a prebuilt version. However, if you want to build it yourself, or help out with development, you will need a few dependencies to get this project to build.
 
-## Setup
-
-### Checkout
+## Checkout code
 
 When checking out the repository, use `--recursive` to retrieve all submodules. Alternately, after checkout use `git submodule update --init --recursive` to perform the same task.
 
-### Setting up web UI bundler
+```
+git clone --recursive https://github.com/feelfreelinux/euphonium
+```
+
+## Setting up web UI bundler
 
 First, a required step is to setup all of the dependencies required to build the web UI.
 
-#### Dependencies
-- `nodejs` in version of at least 14
-- `yarn`
-- `npm`
-
-Installation of these are platform specific, but mostly just comes down to installing them through a package manager.
-
-### Setting up dependencies
-
-Depending on the target platform, esp32 or cli targets differ in required dependencies.
-
-#### Both platforms
-Ensure that you have `pip` installed. This can be done by:
+### python
+Python needs to be installed on your system.
+Ensure that you have `pip` installed. This can be done by
 
 ```
 python -m ensurepip --upgrade
@@ -36,7 +30,28 @@ pip install -r requirements.txt
 ```
 
 
-#### Desktop specific dependencies
+### nodejs
+you need at least version 14. Precompiled distrobution packages with installation instructions can be found here: https://github.com/nodesource/distributions
+
+### npm
+Npm should be included in the nodesource package. Otherwise the installation is platform specific, but mostly just comes down to installing it through a package manager.
+
+### yarn
+be careful: don't install yarn from default package repository on Debian or Ubuntu. It would install the package `cmdtest` for you. To be sure you may run `sudo apt remove cmdtest` first.
+
+The right package can be installed with: 
+```
+corepack enable
+yarn set version stablerm -rf bu        
+```
+
+## Setting up dependencies for target platform
+
+Depending on the target platform, (esp32 or cli) the dependencies are differnt.
+
+
+### Desktop specific dependencies
+
 - PortAudio library
 - OpenSSL library
 
@@ -48,8 +63,17 @@ brew install OpenSSL PortAudio
 both can be installed with a package manager.
 
 #### ESP32-Specific dependencies
-- `esp-idf` in version `4.4-rc1`. Please follow [Espressif's guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started-get-prerequisites).
 
+- `esp-idf` in version `4.4.1`. Please follow [Espressif's guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started-get-prerequisites).
+
+As an alternative you can install VSCode (https://code.visualstudio.com/) and open the euphonium folder.
+VSCode should recommend the following extensions to you:
+- "espressif.esp-idf-extension"
+- "platformio.platformio-ide" (optional)
+- "berry.berry" (optional)
+
+In this case the installation of ESP-IDF is managed by vscode.  
+If the extensions are installed you can open the ESP-IDF terminal (`STRG + E` followed by `T`) and continue building as described below.
 
 ### Building and installing the project - Desktop
 
