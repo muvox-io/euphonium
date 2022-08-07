@@ -9,8 +9,9 @@ enum {
 
 std::shared_ptr<BluetoothDriver> globalBtDriver;
 
-BluetoothDriver::BluetoothDriver(std::string name) {
+BluetoothDriver::BluetoothDriver(std::string name, std::string pin) {
     this->name = name;
+    this->pin = pin;
 }
 
 void local_write_audio(const uint8_t *data, uint32_t len) {
@@ -24,7 +25,8 @@ void local_active_audio(bool active) {
     globalBtDriver->setAudioActive(active);
 }
 
-void local_metadata_updated(char* artist, char* album, char* title, int duration) {
+void local_metadata_updated(char *artist, char *album, char *title,
+                            int duration) {
     auto artistStr = std::string(artist);
     auto albumStr = std::string(album);
     auto titleStr = std::string(title);
@@ -77,33 +79,55 @@ void BluetoothDriver::start() {
         return;
     }
 
-    if ((err = esp_spp_register_callback(esp_bt_spp_cb)) != ESP_OK) {
-        EUPH_LOG(error, "Bluetooth", "Bluetooth spp register failed: %s",
-                 esp_err_to_name(err));
-        return;
-    }
+    // if ((err = esp_spp_register_callback(esp_bt_spp_cb)) != ESP_OK) {
+    //     EUPH_LOG(error, "Bluetooth", "Bluetooth spp register failed: %s",
+    //              esp_err_to_name(err));
+    //     return;
+    // }
 
-    if ((err = esp_spp_init(ESP_SPP_MODE_CB)) != ESP_OK) {
-        EUPH_LOG(error, "Bluetooth", "Bluetooth spp init failed: %s",
-                 esp_err_to_name(err));
-        return;
-    }
+    // if ((err = esp_spp_init(ESP_SPP_MODE_CB)) != ESP_OK) {
+    //     EUPH_LOG(error, "Bluetooth", "Bluetooth spp init failed: %s",
+    //              esp_err_to_name(err));
+    //     return;
+    // }
 
     bt_app_task_start_up();
     bt_app_work_dispatch(bt_av_hdl_stack_evt, BT_APP_EVT_STACK_UP, NULL, 0,
                          NULL);
 
-    /* Set default parameters for Secure Simple Pairing */
+/* Set default parameters for Secure Simple Pairing */
+#if (CONFIG_BT_SSP_ENABLED == true)
+
     esp_bt_sp_param_t param_type = ESP_BT_SP_IOCAP_MODE;
-    esp_bt_io_cap_t iocap = ESP_BT_IO_CAP_IO;
+    esp_bt_io_cap_t iocap = ESP_BT_IO_CAP_OUT;
     esp_bt_gap_set_security_param(param_type, &iocap, sizeof(uint8_t));
+#endif
     esp_bt_pin_type_t pin_type = ESP_BT_PIN_TYPE_FIXED;
-    esp_bt_pin_code_t pin_code;
-    pin_code[0] = '1';
-    pin_code[1] = '2';
-    pin_code[2] = '3';
-    pin_code[3] = '4';
-    esp_bt_gap_set_pin(pin_type, 4, pin_code);
+
+    // check if this->pin is a number
+
+    bool stringIsPin = true;
+
+    esp_bt_pin_code_t pinCode;
+
+    for (int i = 0; i < this->pin.length(); i++) {
+        if (!std::isdigit(this->pin[i])) {
+            stringIsPin = false;
+            break;
+        } else {
+            pinCode[i] = this->pin[i];
+        }
+    }
+
+    if (stringIsPin && this->pin.length() <= 16) {
+        esp_bt_gap_set_pin(pin_type, this->pin.length(), pinCode);
+    } else {
+        pinCode[0] = '1';
+        pinCode[1] = '2';
+        pinCode[2] = '3';
+        pinCode[3] = '4';
+        esp_bt_gap_set_pin(pin_type, 4, pinCode);
+    }
 }
 
 void bt_app_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *param) {
@@ -154,8 +178,8 @@ static void esp_bt_spp_cb(esp_spp_cb_event_t event,
         esp_bt_dev_set_device_name(name.c_str());
         esp_bt_gap_set_scan_mode(ESP_BT_CONNECTABLE,
                                  ESP_BT_GENERAL_DISCOVERABLE);
-        esp_spp_start_srv(ESP_SPP_SEC_AUTHENTICATE, ESP_SPP_ROLE_SLAVE, 0,
-                          "SPP_SERVER");
+        // esp_spp_start_srv(ESP_SPP_SEC_AUTHENTICATE, ESP_SPP_ROLE_SLAVE, 0,
+        //                   "SPP_SERVER");
     } break;
     case ESP_SPP_DISCOVERY_COMP_EVT:
         ESP_LOGI(SPP_TAG, "ESP_SPP_DISCOVERY_COMP_EVT");

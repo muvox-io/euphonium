@@ -42,6 +42,17 @@ void CircularBuffer::emptyBuffer() {
     endIndex = 0;
 }
 
+void CircularBuffer::emptyExcept(size_t sizeToSet) {
+    std::lock_guard<std::mutex> guard(bufferMutex);
+    if (sizeToSet > dataSize)
+        sizeToSet = dataSize;
+    dataSize = sizeToSet;
+    endIndex = begIndex + sizeToSet;
+    if (endIndex > dataCapacity) {
+        endIndex -= dataCapacity;
+    }
+}
+
 size_t CircularBuffer::read(uint8_t *data, size_t bytes)
 {
     if (bytes == 0)

@@ -108,7 +108,7 @@ void Core::selectAudioOutput(std::shared_ptr<AudioOutput> output) {
     this->outputConnected = true;
 }
 
-void Core::emptyBuffers() { audioBuffer->audioBuffer->emptyBuffer(); }
+void Core::emptyBuffers() { audioBuffer->clearBuffer(); }
 
 void Core::loadScript(std::string file) { loader->loadScript(file, berry); }
 
@@ -200,7 +200,7 @@ void Core::runTask() {
         if (audioBuffer->audioBuffer->size() > 0 && outputConnected) {
             auto readNumber =
                 audioBuffer->audioBuffer->read(pcmBuf.data(), PCMBUF_SIZE);
-            audioProcessor->process(pcmBuf.data(), readNumber);
+            audioProcessor->process(pcmBuf.data(), readNumber, audioBuffer->audioBuffer->size(), audioBuffer->getSampleRate());
             currentOutput->feedPCMFrames(pcmBuf.data(), readNumber);
         } else {
             EUPH_LOG(info, "core", "No data");
