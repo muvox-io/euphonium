@@ -55,16 +55,21 @@ Depending on the target platform, (esp32 or cli) the dependencies are differnt.
 - PortAudio library
 - OpenSSL library
 
+both can be installed with a package manager.
+
 If you are on macOS then we can do this with `brew`:
 ```
 brew install OpenSSL PortAudio
 ```
 
-both can be installed with a package manager.
+If you are on Ubuntu/Debian you can install with:
+```
+sudo apt install libmbedtls-dev protobuf-compiler openssl libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0
+```
 
 #### ESP32-Specific dependencies
 
-- `esp-idf` in version `4.4.1`. Please follow [Espressif's guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started-get-prerequisites).
+- `esp-idf` in version `4.4.1`. Please follow [Espressif's guide](https://docs.espressif.com/projects/esp-idf/en/v4.4.1/esp32/get-started/index.html#get-started-get-prerequisites).
 
 As an alternative you can install VSCode (https://code.visualstudio.com/) and open the euphonium folder.
 VSCode should recommend the following extensions to you:
