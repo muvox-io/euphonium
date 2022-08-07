@@ -39,7 +39,7 @@ Npm should be included in the nodesource package. Otherwise the installation is 
 ### yarn
 be careful: don't install yarn from default package repository on Debian or Ubuntu. It would install the package `cmdtest` for you. To be sure you may run `sudo apt remove cmdtest` first.
 
-The right package can be installed with: 
+The right package can be installed with:
 ```
 corepack enable
 yarn set version stablerm -rf bu        
@@ -58,6 +58,13 @@ Depending on the target platform, (esp32 or cli) the dependencies are differnt.
 If you are on macOS then we can do this with `brew`:
 ```
 brew install OpenSSL PortAudio
+```
+
+#### Needed libs on Linux
+When building on linux you will also need the follwoing dependency: `libavahi-compat-libdnssd-dev`.
+This can be installed by
+```
+sudo apt-get install libavahi-compat-libdnssd-dev
 ```
 
 both can be installed with a package manager.
@@ -94,6 +101,16 @@ For a desktop run, please run the following commands
 
 This will output a binary `euphoniumcli` which can be later executed to run the platform. The web-ui will be available on port `80` by default.
 If you have trouble using port 80 (on Linux for example), use `cmake .. -D HTTP_SERVER_PORT=8080` to change the web-ui port.
+
+#### Hint for Linux Mint
+In order for the CLI build to work on Linux Mint I had to add a little extra CLI arg to the `cmake` command, as it doesn't know how to find the correct library it would seem.
+Maybe this could be added directly into the `cmake` setup?
+
+To fully compile the `cli` on Linux Mint execute the following
+```
+cmake -DCMAKE_CXX_STANDARD_LIBRARIES="-lX11 -ldl" ..
+make
+```
 
 ### Building and installing the project - ESP32
 

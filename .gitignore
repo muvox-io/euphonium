@@ -20,6 +20,7 @@ targets/esp32/scripts.tar
 targets/esp32/recovery/dependencies.lock
 targets/esp32/app/dependencies.lock
 targets/esp32/app/spiffs/*
+targets/esp32/ota_checksum.txt
 web/package-lock.json
 web/yarn.lock
 py/
