@@ -3,12 +3,7 @@ class MA12070P : DACDriver
     var volume_table
     def init()
         # define a volume table, saves up on log10
-        #self.volume_table = [255,160,120,100,90,85,80, 75, 70, 65, 61, 57, 53, 50, 47, 44, 41, 38, 35, 32, 29, 26, 23, 20, 17, 14, 12, 10, 8, 6, 4, 2, 0]
-
-        #self.volume_table = [255, 160, 100, 90, 80, 70, 65, 60, 57, 54, 51, 48, 46, 44, 42, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24]
-
-        self.volume_table = [255, 160, 100, 90, 80, 70, 65, 60, 57, 54, 51, 48, 46, 44, 42, 40, 38, 36, 34, 32, 30, 28, 26, 24, 22, 20, 19, 18, 17, 16, 15, 14]
-
+        self.volume_table = [255,160,120,100,90,85,80, 75, 70, 65, 61, 57, 53, 50, 47, 44, 41, 38, 35, 32, 29, 26, 23, 20, 17, 14, 12, 10, 8, 6, 4, 2, 0]
         self.name = "MA12070P"
         self.hardware_volume_control = true
         self.datasheet_link = "https://www.infineon.com/dgdl/Infineon-MA12070P-DS-v01_00-EN.pdf?fileId=5546d46264a8de7e0164b761f2f261e4"
@@ -48,9 +43,6 @@ class MA12070P : DACDriver
 
         # Set Amp to Left-justified format
         i2c.write(ADDR, 53, 8)
-
-        ## Setting power profile 2 as active
-#        i2c.write(ADDR, 0x1D, 0x02)
 
         # Set Volume to a safe level..
         i2c.write(ADDR, 64, 0x50)
