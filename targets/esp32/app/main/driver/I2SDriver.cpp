@@ -27,8 +27,8 @@ void i2sInstall(int sampleRate, int bitsPerSample, int channelFormatInt, int com
         .sample_rate = (uint32_t) sampleRate,
         .bits_per_sample = (i2s_bits_per_sample_t)bitsPerSample,
         .channel_format = channelFormat,
-        .communication_format = (i2s_comm_format_t)commFormat,
-        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, // Default interrupt priority
+        .communication_format = (i2s_comm_format_t)I2S_COMM_FORMAT_STAND_I2S,
+        .intr_alloc_flags = 0, // Default interrupt priority
         .dma_buf_count = 8,
         .dma_buf_len = 512,
         .use_apll = true,

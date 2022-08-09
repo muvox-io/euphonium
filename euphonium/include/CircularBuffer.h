@@ -16,6 +16,7 @@ public:
     size_t write(const uint8_t *data, size_t bytes);
     size_t read(uint8_t *data, size_t bytes);
     void emptyBuffer();
+    void emptyExcept(size_t size);
 
 private:
     std::mutex bufferMutex;

@@ -45,11 +45,23 @@ class MainAudioBuffer {
             audioOutput->configureOutput(format, sampleRate);
         }
     }
+    
+    /**
+     * Returns current sample rate
+     * @return sample rate
+     */
+    uint32_t getSampleRate() {
+        return sampleRate;
+    }
 
     /**
      * Clears input buffer, to be called for track change and such
      */
-    void clearBuffer() { audioBuffer->emptyBuffer(); }
+    void clearBuffer() {
+         /*audioBuffer->emptyBuffer();*/ 
+        // Leave 0.5s space for fadeout
+        audioBuffer->emptyExcept(this->sampleRate);
+    }
 
     /**
      * Locks access to audio buffer. Call after starting playback

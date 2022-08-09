@@ -12,6 +12,7 @@
 #include "EventBus.h"
 #include "AudioProcessors.h"
 #include "EqualizerProcessor.h"
+#include "UserDSPProcessor.h"
 #include <thread>
 #include "BerryBind.h"
 
