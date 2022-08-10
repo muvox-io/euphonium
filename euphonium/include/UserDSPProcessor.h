@@ -14,6 +14,7 @@
 #define BIQUAD_TYPE_PEAK 3
 #define BIQUAD_TYPE_LOWSHELF 4
 #define BIQUAD_TYPE_HIGHSHELF 5
+#define BIQUAD_TYPE_PEAKING_EQ 6
 
 class UserDSPProcessor : public AudioProcessor {
   private:
@@ -89,6 +90,9 @@ class UserDSPProcessor : public AudioProcessor {
             break;
         case BIQUAD_TYPE_HIGHSHELF:
             biquad->generateHighShelfCoEffs(f, g, q);
+            break;
+        case BIQUAD_TYPE_PEAKING_EQ:
+            biquad->generatePeakingEqCoEffs(f, g, q);
             break;
         }
 
