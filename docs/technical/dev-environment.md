@@ -39,7 +39,7 @@ Npm should be included in the nodesource package. Otherwise the installation is 
 ### yarn
 be careful: don't install yarn from default package repository on Debian or Ubuntu. It would install the package `cmdtest` for you. To be sure you may run `sudo apt remove cmdtest` first.
 
-The right package can be installed with: 
+The right package can be installed with:
 ```
 corepack enable
 yarn set version stablerm -rf bu        
@@ -67,6 +67,13 @@ If you are on Ubuntu/Debian you can install with:
 sudo apt install libmbedtls-dev protobuf-compiler openssl libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0
 ```
 
+#### Needed libs on Linux
+When building on linux you will also need the follwoing dependency: `libavahi-compat-libdnssd-dev`.
+This can be installed by
+```
+sudo apt-get install libavahi-compat-libdnssd-dev
+```
+
 #### ESP32-Specific dependencies
 
 - `esp-idf` in version `4.4.1`. Please follow [Espressif's guide](https://docs.espressif.com/projects/esp-idf/en/v4.4.1/esp32/get-started/index.html#get-started-get-prerequisites).
@@ -79,6 +86,16 @@ VSCode should recommend the following extensions to you:
 
 In this case the installation of ESP-IDF is managed by vscode.  
 If the extensions are installed you can open the ESP-IDF terminal (`STRG + E` followed by `T`) and continue building as described below.
+
+#### Hint for Linux Mint
+In order for the CLI build to work on Linux Mint I had to add a little extra CLI arg to the `cmake` command, as it doesn't know how to find the correct library it would seem.
+Maybe this could be added directly into the `cmake` setup?
+
+To fully compile the `cli` on Linux Mint execute the following
+```
+cmake -DCMAKE_CXX_STANDARD_LIBRARIES="-ldl" ..
+make
+```
 
 ### Building and installing the project - Desktop
 
