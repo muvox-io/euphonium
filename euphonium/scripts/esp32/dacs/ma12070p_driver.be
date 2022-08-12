@@ -31,15 +31,15 @@ class MA12070P : DACDriver
         i2s.expand(16, 32)
 
         # Start I2C Driver
-        i2c.install(int(self.get_gpio('sda')), int(self.get_gpio('scl')))
+        i2c.install(self.get_gpio('sda'), self.get_gpio('scl'))
 
         # Mute Amplifier before i2c comm & enable. Mute pin: 21
-        gpio.pin_mode(8, gpio.OUTPUT)
-        gpio.digital_write(8, gpio.LOW)
+        gpio.pin_mode(self.get_gpio('mutePin'), gpio.OUTPUT)
+        gpio.digital_write(self.get_gpio('mutePin'), gpio.LOW)
 
         # Enable Amplifier. Enable pin: 19
-        gpio.pin_mode(19, gpio.OUTPUT)
-        gpio.digital_write(19, gpio.LOW)
+        gpio.pin_mode(self.get_gpio('enablePin'), gpio.OUTPUT)
+        gpio.digital_write(self.get_gpio('enablePin'), gpio.LOW)
 
         # Set Amp to Left-justified format
         i2c.write(ADDR, 53, 8)
@@ -54,7 +54,7 @@ class MA12070P : DACDriver
         # Init done.
 
         # Unmute Amplifier 
-        gpio.digital_write(8, gpio.HIGH)
+        gpio.digital_write(self.get_gpio('mutePin'), gpio.HIGH)
         sleep_ms(300)
         volume_strip = LEDStrip(0, 4, 12, 0, 10)       
     end
