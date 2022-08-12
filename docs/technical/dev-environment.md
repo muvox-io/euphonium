@@ -39,7 +39,7 @@ Npm should be included in the nodesource package. Otherwise the installation is 
 ### yarn
 be careful: don't install yarn from default package repository on Debian or Ubuntu. It would install the package `cmdtest` for you. To be sure you may run `sudo apt remove cmdtest` first.
 
-The right package can be installed with: 
+The right package can be installed with:
 ```
 corepack enable
 yarn set version stablerm -rf bu        
@@ -59,8 +59,14 @@ If you are on macOS then we can do this with `brew`:
 ```
 brew install OpenSSL PortAudio
 ```
-
 both can be installed with a package manager.
+
+#### Needed libs on Linux
+When building on linux you will also need the follwoing dependency: `libavahi-compat-libdnssd-dev`.
+This can be installed by
+```
+sudo apt-get install libavahi-compat-libdnssd-dev
+```
 
 #### ESP32-Specific dependencies
 
@@ -74,6 +80,16 @@ VSCode should recommend the following extensions to you:
 
 In this case the installation of ESP-IDF is managed by vscode.  
 If the extensions are installed you can open the ESP-IDF terminal (`STRG + E` followed by `T`) and continue building as described below.
+
+#### Hint for Linux Mint
+In order for the CLI build to work on Linux Mint I had to add a little extra CLI arg to the `cmake` command, as it doesn't know how to find the correct library it would seem.
+Maybe this could be added directly into the `cmake` setup?
+
+To fully compile the `cli` on Linux Mint execute the following
+```
+cmake -DCMAKE_CXX_STANDARD_LIBRARIES="-ldl" ..
+make
+```
 
 ### Building and installing the project - Desktop
 
