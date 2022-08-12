@@ -63,7 +63,12 @@ brew install OpenSSL PortAudio
 ```
 
 #### Needed libs on Linux
-When building on linux you will also need the follwoing dependency: `libavahi-compat-libdnssd-dev`.
+If you are on Ubuntu/Debian you can install this with:
+```
+sudo apt install libmbedtls-dev protobuf-compiler openssl libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0
+```
+
+When building on linux you will likely also need the follwoing dependency: `libavahi-compat-libdnssd-dev`.
 This can be installed by
 ```
 sudo apt-get install libavahi-compat-libdnssd-dev
