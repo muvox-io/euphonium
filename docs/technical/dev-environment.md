@@ -55,6 +55,8 @@ Depending on the target platform, (esp32 or cli) the dependencies are differnt.
 - PortAudio library
 - OpenSSL library
 
+both can be installed with a package manager.
+
 If you are on macOS then we can do this with `brew`:
 ```
 brew install OpenSSL PortAudio
@@ -71,7 +73,7 @@ both can be installed with a package manager.
 
 #### ESP32-Specific dependencies
 
-- `esp-idf` in version `4.4.1`. Please follow [Espressif's guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started-get-prerequisites).
+- `esp-idf` in version `4.4.1`. Please follow [Espressif's guide](https://docs.espressif.com/projects/esp-idf/en/v4.4.1/esp32/get-started/index.html#get-started-get-prerequisites).
 
 As an alternative you can install VSCode (https://code.visualstudio.com/) and open the euphonium folder.
 VSCode should recommend the following extensions to you:
@@ -81,6 +83,16 @@ VSCode should recommend the following extensions to you:
 
 In this case the installation of ESP-IDF is managed by vscode.  
 If the extensions are installed you can open the ESP-IDF terminal (`STRG + E` followed by `T`) and continue building as described below.
+
+#### Hint for Linux Mint
+In order for the CLI build to work on Linux Mint I had to add a little extra CLI arg to the `cmake` command, as it doesn't know how to find the correct library it would seem.
+Maybe this could be added directly into the `cmake` setup?
+
+To fully compile the `cli` on Linux Mint execute the following
+```
+cmake -DCMAKE_CXX_STANDARD_LIBRARIES="-ldl" ..
+make
+```
 
 ### Building and installing the project - Desktop
 
