@@ -15,7 +15,9 @@ void SPIFFSScriptLoader::loadScript(std::string scriptName, std::shared_ptr<berr
 {
     BELL_LOG(info, "spiffs_loader", "Loading script: %s", scriptName.c_str());
     auto scriptContent = loadFile(scriptName);
-    if (!berry->execute_string(scriptContent))
+    auto scriptNameWithoutPath = scriptName.substr(scriptName.find_last_of("/") + 1);
+    
+    if (!berry->execute_string(scriptContent, scriptNameWithoutPath))
     {
         EUPH_LOG(error, "script_loader", "Failed to load script %s", scriptName.c_str());
         // this->core.lock()->luaEventBus->postEvent(std::make_unique<BerryErrorEvent>(scriptName, berry->get_error_message()));

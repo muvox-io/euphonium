@@ -18,7 +18,7 @@ extern "C" {
 #endif
 
 /* do not modify the version number! */
-#define BERRY_VERSION           "1.0.0"
+#define BERRY_VERSION           "1.1.0"
 
 #if BE_STACK_TOTAL_MAX < BE_STACK_FREE_MIN * 2
 #error "The value of the macro BE_STACK_TOTAL_MAX is too small."
@@ -174,6 +174,11 @@ typedef struct bntvmodule {
     const struct bmodule *module; /* const module object */
 } bntvmodule;
 
+/* native class object */
+struct bclass;    /* we need only the pointer to `bclass` here */
+typedef const struct bclass *bclass_ptr;
+typedef bclass_ptr bclass_array[];              /* array of bclass* pointers, NULL terminated */
+
 /* native module node definition macro */
 #ifndef __cplusplus
 #define be_native_module_nil(_name)                     \
@@ -223,10 +228,15 @@ typedef struct bntvmodule {
     static const bntvmodobj name##_attrs[] =
 
 #define be_native_module(name)  be_native_module_##name
+#define be_native_class(name)  be_class_##name
 
 /* native module declaration macro */
 #define be_extern_native_module(name)                   \
     extern const bntvmodule be_native_module(name)
+
+/* native class declaration macro */
+#define be_extern_native_class(name)                   \
+    extern const struct bclass be_native_class(name)
 
 /* native module definition macro */
 #ifndef __cplusplus
@@ -409,6 +419,8 @@ enum beobshookevents {
   BE_OBS_STACK_RESIZE_START,    /* Berry stack resized */
 };
 
+typedef int (*bctypefunc)(bvm*, const void*);
+
 /* FFI functions */
 #define be_writestring(s)       be_writebuffer((s), strlen(s))
 #define be_writenewline()       be_writebuffer("\n", 1)
@@ -487,7 +499,7 @@ BERRY_API bbool be_pushiter(bvm *vm, int index);
 BERRY_API void be_newlist(bvm *vm);
 BERRY_API void be_newmap(bvm *vm);
 BERRY_API void be_newmodule(bvm *vm);
-BERRY_API void be_newcomobj(bvm *vm, void *data, bntvfunc destory);
+BERRY_API void be_newcomobj(bvm *vm, void *data, bntvfunc destroy);
 BERRY_API void be_newobject(bvm *vm, const char *name);
 BERRY_API bbool be_copy(bvm *vm, int index);
 BERRY_API bbool be_setname(bvm *vm, int index, const char *name);
@@ -549,6 +561,8 @@ BERRY_API void be_vm_delete(bvm *vm);
 
 /* Observability hook */
 BERRY_API void be_set_obs_hook(bvm *vm, bobshook hook);
+BERRY_API void be_set_ctype_func_hanlder(bvm *vm, bctypefunc handler);
+BERRY_API bctypefunc be_get_ctype_func_hanlder(bvm *vm);
 
 /* code load APIs */
 BERRY_API int be_loadbuffer(bvm *vm,
@@ -564,11 +578,6 @@ BERRY_API void be_module_path_set(bvm *vm, const char *path);
 /* bytes operations */
 BERRY_API void* be_pushbytes(bvm *vm, const void *buf, size_t len);
 BERRY_API const void* be_tobytes(bvm *vm, int index, size_t *len);
-
-/* registry operation */
-BERRY_API int be_register(bvm *vm, int index);
-BERRY_API void be_unregister(bvm *vm, int id);
-BERRY_API void be_getregister(bvm *vm, int id);
 
 /* debug APIs */
 BERRY_API void be_sethook(bvm *vm, const char *mask);

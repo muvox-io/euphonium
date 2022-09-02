@@ -6,7 +6,9 @@ FileScriptLoader::FileScriptLoader() {
 void FileScriptLoader::loadScript(std::string scriptName, std::shared_ptr<berry::VmState> berry) {
     BELL_LOG(info, "fileloader", "Loading script: %s ", scriptName.c_str());
     auto content = loadFile("../../../euphonium/scripts/" + scriptName);
-    if (!berry->execute_string(content)) {
+    auto scriptNameWithoutPath = scriptName.substr(scriptName.find_last_of("/") + 1);
+
+    if (!berry->execute_string(content, scriptNameWithoutPath)) {
         EUPH_LOG(error, "script_loader", "Failed to load script %s", scriptName.c_str());
     }
 }

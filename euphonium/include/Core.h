@@ -48,6 +48,7 @@ public:
     void handleScriptingThread();
     void runTask();
     void emptyBuffers();
+    void berryLog(int level, std::string msg);
     void loadScript(std::string file);
     void handleEvent(std::unique_ptr<Event> event);
     void setupBindings();

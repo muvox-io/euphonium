@@ -18,11 +18,12 @@ struct bhookblock {
 void be_dumpclosure(bclosure *cl);
 void be_tracestack(bvm *vm);
 void be_callhook(bvm *vm, int mask);
+
 bbool be_debug_varname(bvm *vm, int level, int index);
 bbool be_debug_upvname(bvm *vm, int level, int index);
 
 #if BE_USE_DEBUG_MODULE
-void be_print_inst(binstruction ins, int pc);
+void be_print_inst(binstruction ins, int pc, void* fout);
 #endif
 
 #endif

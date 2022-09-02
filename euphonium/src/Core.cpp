@@ -32,8 +32,8 @@ Core::Core() : bell::Task("Core", 4 * 1024, 2, 0) {
     berry = std::make_shared<berry::VmState>();
 
     // Import necessary berry modules
-    berry->execute_string("import json");
-    berry->execute_string("import global");
+    berry->execute_string("import json", "core-native");
+    berry->execute_string("import global", "core-native");
 
     // Prepare lua event thread
     auto subscriber = dynamic_cast<EventSubscriber *>(this);
@@ -89,7 +89,7 @@ void Core::loadPlugins(std::shared_ptr<ScriptLoader> loader) {
 
     // Emit ON_INIT hook event
     mainEventBus->postEvent(std::move(std::make_unique<HookEvent>("ON_INIT")));
-    berry->execute_string("load_plugins()");
+    berry->execute_string("load_plugins()", "core-native");
 }
 
 void Core::handleScriptingThread() {
@@ -173,6 +173,23 @@ std::string Core::getPlatform() {
 #endif
 }
 
+void Core::berryLog(int level, std::string message) {
+    auto lineInfo = berry->debug_get_lineinfo();
+    switch (level)
+    {
+    case 0:
+        bell::bellGlobalLogger->info(lineInfo.second, lineInfo.first, "script", "%s", message.c_str());
+        break;
+    case 1:
+        bell::bellGlobalLogger->debug(lineInfo.second, lineInfo.first, "script", "%s", message.c_str());
+        break;
+
+    default:
+        bell::bellGlobalLogger->error(lineInfo.second, lineInfo.first, "script", "%s", message.c_str());
+        break;
+    }
+}
+
 std::string Core::getVersion() {
 #ifdef EUPH_VERSION
     return std::string(EUPH_VERSION);
@@ -190,6 +207,7 @@ void Core::setupBindings() {
     berry->export_this("platform", this, &Core::getPlatform, "core");
     berry->export_this("load", this, &Core::loadScript, "core");
     berry->export_function("get_time_ms", &getTimeMs);
+    berry->export_this("_log_native", this, &Core::berryLog);
 }
 
 void Core::runTask() {

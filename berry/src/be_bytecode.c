@@ -23,7 +23,7 @@
 #define MAGIC_NUMBER1       0xBE
 #define MAGIC_NUMBER2       0xCD
 #define MAGIC_NUMBER3       0xFE
-#define BYTECODE_VERSION    3
+#define BYTECODE_VERSION    4
 
 #define USE_64BIT_INT       (BE_INTGER_TYPE == 2 \
     || BE_INTGER_TYPE == 1 && LONG_MAX == 9223372036854775807L)
@@ -176,8 +176,8 @@ static void save_class(bvm *vm, void *fp, bclass *c)
 
 static void save_value(bvm *vm, void *fp, bvalue *v)
 {
-    save_byte(fp, (uint8_t)var_type(v)); /* type */
-    switch (var_type(v)) {
+    save_byte(fp, (uint8_t)var_primetype(v)); /* type */
+    switch (var_primetype(v)) {
     case BE_INT: save_int(fp, var_toint(v)); break;
     case BE_REAL: save_real(fp, var_toreal(v)); break;
     case BE_STRING: save_string(fp, var_tostr(v)); break;
@@ -214,8 +214,10 @@ static void save_proto_table(bvm *vm, void *fp, bproto *proto)
 {
     bproto **p = proto->ptab, **end;
     save_long(fp, proto->nproto); /* proto count */
-    for (end = p + proto->nproto; p < end; ++p) {
-        save_proto(vm, fp, *p);
+    if (p) {
+        for (end = p + proto->nproto; p < end; ++p) {
+            save_proto(vm, fp, *p);
+        }
     }
 }
 
@@ -223,9 +225,11 @@ static void save_upvals(void *fp, bproto *proto)
 {
     bupvaldesc *uv = proto->upvals, *end;
     save_byte(fp, proto->nupvals); /* upvals count */
-    for (end = uv + proto->nupvals; uv < end; ++uv) {
-        save_byte(fp, uv->instack);
-        save_byte(fp, uv->idx);
+    if (uv) {
+        for (end = uv + proto->nupvals; uv < end; ++uv) {
+            save_byte(fp, uv->instack);
+            save_byte(fp, uv->idx);
+        }
     }
 }
 
@@ -333,7 +337,6 @@ static int load_head(void *fp)
     res = buffer[0] == MAGIC_NUMBER1 &&
           buffer[1] == MAGIC_NUMBER2 &&
           buffer[2] == MAGIC_NUMBER3 &&
-          buffer[3] <= BYTECODE_VERSION &&
           buffer[4] == vm_sizeinfo();
     if (res) {
         return buffer[3];
@@ -425,7 +428,8 @@ static void load_class(bvm *vm, void *fp, bvalue *v, int version)
         be_incrtop(vm);
         if (load_proto(vm, fp, (bproto**)&var_toobj(value), -3, version)) {
             /* actual method */
-            be_class_method_bind(vm, c, name, var_toobj(value), bfalse);
+            bbool is_method = ((bproto*)var_toobj(value))->varg & BE_VA_METHOD;
+            be_class_method_bind(vm, c, name, var_toobj(value), !is_method);
         } else {
             /* no proto, static member set to nil */
             be_class_member_bind(vm, c, name, bfalse);
@@ -492,7 +496,7 @@ static void load_constant(bvm *vm, void *fp, bproto *proto, int version)
     }
 }
 
-static void load_proto_table(bvm *vm, void *fp, bproto *proto, int version)
+static void load_proto_table(bvm *vm, void *fp, bproto *proto, int info, int version)
 {
     int size = (int)load_long(fp); /* proto count */
     if (size) {
@@ -501,7 +505,7 @@ static void load_proto_table(bvm *vm, void *fp, bproto *proto, int version)
         proto->ptab = p;
         proto->nproto = size;
         while (size--) {
-            load_proto(vm, fp, p++, -1, version);
+            load_proto(vm, fp, p++, info, version);
         }
     }
 }
@@ -538,7 +542,7 @@ static bbool load_proto(bvm *vm, void *fp, bproto **proto, int info, int version
         }
         load_bytecode(vm, fp, *proto, info);
         load_constant(vm, fp, *proto, version);
-        load_proto_table(vm, fp, *proto, version);
+        load_proto_table(vm, fp, *proto, info, version);
         load_upvals(vm, fp, *proto);
         return btrue;
     }
@@ -572,7 +576,7 @@ bclosure* be_bytecode_load(bvm *vm, const char *filename)
             "can not open file '%s'.", filename));
     } else {
         int version = load_head(fp);
-        if (version) {
+        if (version == BYTECODE_VERSION) {
             bclosure *cl = be_newclosure(vm, 0);
             var_setclosure(vm->top, cl);
             be_stackpush(vm);
@@ -582,6 +586,8 @@ bclosure* be_bytecode_load(bvm *vm, const char *filename)
             be_fclose(fp);
             return cl;
         }
+        bytecode_error(vm, be_pushfstring(vm,
+            "invalid bytecode version '%s'.", filename));
     }
     bytecode_error(vm, be_pushfstring(vm,
         "invalid bytecode file '%s'.", filename));

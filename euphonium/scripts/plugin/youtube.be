@@ -40,16 +40,16 @@ class YouTubePlugin : Plugin
             postString += "&" + str(element) + "=" + str(postData[element])
         end
 
-        print("Got post string " + postString)
+        log_info("Got post string " + postString)
         yt_send_bind_data(postString)
     end
 
     def onEvent(ev, data)
-        print("Got event")
+        log_info("Got event")
         var eventBody = json.load(data['body'])
         var eventName = eventBody[1][0]
 
-        print("Received LEAN event " + eventName)
+        log_info("Received LEAN event " + eventName)
         if eventName == 'getNowPlaying'
             self.postBind('nowPlaying', {})
         end

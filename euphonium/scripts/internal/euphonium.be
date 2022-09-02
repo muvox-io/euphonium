@@ -288,7 +288,7 @@ def handle_event(event_type, event_data)
 end
 
 def load_plugins()
-    print("Load plugins called")
+    log_info("Load plugins called")
     euphonium.load_configuration()
 end
 

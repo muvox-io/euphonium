@@ -1,4 +1,5 @@
 #include "BerryBind.h"
+#include "BellUtils.h"
 
 using namespace berry;
 
@@ -36,6 +37,7 @@ VmState::~VmState() {}
 
 // Retrieves function pointer by module name and its function name
 int VmState::get_module_member(bvm *vm) {
+
     int top = be_top(vm);
     if (top == 2 && be_isstring(vm, 2)) {
         auto module = std::string(be_tostring(vm, 1));
@@ -65,9 +67,41 @@ int VmState::call(bvm *vm) {
     return (*function)(l);
 }
 
-bool VmState::execute_string(const std::string &data) {
+std::pair<int, std::string> VmState::debug_get_lineinfo() {
+    int line = -1;
+    std::string file;
+
+    be_save_stacktrace(vm);
+    bcallsnapshot *cf;
+    bcallsnapshot *base = (bcallsnapshot *)be_stack_base(&vm->tracestack);
+    bcallsnapshot *top = (bcallsnapshot *)be_stack_top(&vm->tracestack);
+
+    cf = top;
+    // decrease callstack until we find nearest closure
+    while (!var_isclosure(&cf->func) && cf >= base) {
+        cf--;
+    }
+    cf--;
+
+    // if we found a closure, get its line info and source name
+    if (var_isclosure(&cf->func)) {
+        bclosure *cl = (bclosure *)var_toobj(&cf->func);
+        auto proto = cl->proto;
+        blineinfo *it = (blineinfo *)proto->lineinfo;
+
+        if (it) {
+            line = it->linenumber;
+            file = std::string(str(cl->proto->source));
+        }
+    }
+
+    return std::make_pair(line, file);
+}
+
+bool VmState::execute_string(const std::string &data,
+                             const std::string &tag = "script") {
     // create an array
-    if (be_loadstring(vm, data.c_str()) == 0) {
+    if (be_loadbuffer(vm, tag.c_str(), data.c_str(), data.size()) == 0) {
         if (be_pcall(vm, 0) != 0) {
             be_dumpexcept(vm);
             return false;

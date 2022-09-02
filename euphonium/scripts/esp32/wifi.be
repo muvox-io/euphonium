@@ -9,10 +9,10 @@ class WiFiPlugin : Plugin
         self.type = "init_handler"
         euphonium.register_handler('wifiStateChanged', def (state)
             if state['state'] == 'connected'
-                print("Connected to wifi")
+                log_info("Connected to wifi")
                 self.wifi_state['state'] = 'connected'
                 self.wifi_state['ipAddress'] = state['ipAddress']
-                print(self.config_schema)
+                log_info(self.config_schema)
                 self.persist_config()
                 http.emit_event('wifi_state', self.wifi_state)
                 euphonium.init_required_plugins()
@@ -27,7 +27,7 @@ class WiFiPlugin : Plugin
             if state['state'] == 'no_ap'
                 self.wifi_state['state'] = 'error'
                 http.emit_event('wifi_state', self.wifi_state)
-                print("No wifi access point found")
+                log_info("No wifi access point found")
                 wifi.start_ap("Euphonium " + util.generate_device_name(), "")
                 self.wifi_state['state'] = 'scanning';
                 wifi.start_scan()
@@ -57,9 +57,9 @@ class WiFiPlugin : Plugin
     end
     def on_event(event, data)
         if event == EVENT_SYSTEM_INIT
-            print("Calling WiFi init")
+            log_info("Calling WiFi init")
             wifi.init_stack()
-            print(self.config_schema)
+
             if self.config_value('ssid') != ""
                 wifi.connect(self.config_value('ssid'), self.config_value('password'), false)
                 euphonium.get_plugin('general').set_hostname()
@@ -105,8 +105,8 @@ http.handle('POST', '/wifi/connect', def (request)
     var result = {
         'status': 'connecting'
     }
-    print(body['ssid'])
-    print(body['password'])
+    log_info(body['ssid'])
+    log_info(body['password'])
 
     wifi_plugin.state['ssid'] = body['ssid']
     wifi_plugin.state['password'] = body['password']

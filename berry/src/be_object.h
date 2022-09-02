@@ -21,6 +21,7 @@
 #define BE_FUNCTION     6
 
 #define BE_GCOBJECT     16      /* from this type can be gced */
+#define BE_GCOBJECT_MAX (3<<5)  /* from this type can't be gced */
 
 #define BE_STRING       16
 #define BE_CLASS        17
@@ -34,8 +35,16 @@
 #define BE_NTVFUNC      ((0 << 5) | BE_FUNCTION)
 #define BE_CLOSURE      ((1 << 5) | BE_FUNCTION)
 #define BE_NTVCLOS      ((2 << 5) | BE_FUNCTION)
+#define BE_CTYPE_FUNC   ((3 << 5) | BE_FUNCTION)
 #define BE_STATIC       (1 << 7)
 
+#define func_isstatic(o)       (((o)->type & BE_STATIC) != 0)
+#define func_setstatic(o)      ((o)->type |= BE_STATIC)
+#define func_clearstatic(o)    ((o)->type &= ~BE_STATIC)
+
+/* values for bproto.varg */
+#define BE_VA_VARARG    (1 << 0)    /* function has variable number of arguments */
+#define BE_VA_METHOD    (1 << 1)    /* function is a method (this is only a hint) */
 #define array_count(a)   (sizeof(a) / sizeof((a)[0]))
 
 #define bcommon_header          \
@@ -182,7 +191,7 @@ struct bntvclos {
 typedef struct {
     bcommon_header;
     void *data;
-    bntvfunc destory;
+    bntvfunc destroy;
 } bcommomobj;
 
 typedef const char* (*breader)(void*, size_t*);
@@ -196,7 +205,7 @@ typedef const char* (*breader)(void*, size_t*);
 #define var_basetype(_v)        basetype((_v)->type)
 #define var_primetype(_v)       (var_type(_v) & ~BE_STATIC)
 #define var_isstatic(_v)        ((var_type(_v) & BE_STATIC) == BE_STATIC)
-#define var_istype(_v, _t)      (var_type(_v) == _t)
+#define var_istype(_v, _t)      (var_primetype(_v) == _t)
 #define var_settype(_v, _t)     ((_v)->type = _t)
 #define var_markstatic(_v)      var_settype(_v, var_type(_v) | BE_STATIC)
 #define var_clearstatic(_v)     var_settype(_v, var_type(_v) & ~BE_STATIC)
@@ -250,5 +259,6 @@ typedef const char* (*breader)(void*, size_t*);
 const char* be_vtype2str(bvalue *v);
 bvalue* be_indexof(bvm *vm, int idx);
 void be_commonobj_delete(bvm *vm, bgcobject *obj);
+int be_commonobj_destroy_generic(bvm* vm);
 
 #endif

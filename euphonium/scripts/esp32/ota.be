@@ -29,8 +29,8 @@ http.handle('POST', '/ota', def (request)
     var result = {
         'status': 'ok'
     }
-    print(body['url'])
-    print(body['sha256'])
+    log_info(body['url'])
+    log_info(body['sha256'])
     persistor.persist('configuration/ota.config.json', json.dump(body))
 
     request.write_json(result, 200)

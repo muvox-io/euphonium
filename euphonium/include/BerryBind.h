@@ -1,9 +1,18 @@
 #ifndef BERRY_BIND_H
 #define BERRY_BIND_H
-#include "be_vm.h"
-#include "be_debug.h"
-#include "berry.h"
+
 #include <EuphoniumLog.h>
+
+#include "berry.h"
+extern "C" {
+    #include <be_vm.h>
+    #include <be_debug.h>
+    #include <be_string.h>
+    #include <be_strlib.h>
+    #include <be_exec.h>
+    #include <be_vector.h>
+    #include <be_gc.h>
+}
 #include <any>
 #include <cstring>
 #include <exception>
@@ -93,7 +102,9 @@ class VmState {
 
     bvm *raw_ptr() { return vm; }
 
-    bool execute_string(const std::string &string);
+    std::pair<int, std::string> debug_get_lineinfo();
+
+    bool execute_string(const std::string &string, const std::string &tag);
 
     void lambda(std::function<int(VmState &)> *function,
                 const std::string &name, const std::string &module = "");
@@ -111,7 +122,7 @@ class VmState {
     }
 
     void comptr(const void *d);
-    void* tocomptr(const int i = 1);
+    void *tocomptr(const int i = 1);
 
     void closure(int (*)(bvm *), const int i = -1);
     void set_global(const std::string &name);
@@ -171,7 +182,8 @@ class VmState {
 
     template <typename R, typename... Args>
     void export_function(const std::string &name,
-                         std::function<R(Args...)> callback, const std::string& module = "") {
+                         std::function<R(Args...)> callback,
+                         const std::string &module = "") {
         auto function =
             new std::function<int(VmState &)>([callback](VmState &vm) -> int {
                 // Remove first argument in case of called from class
@@ -195,7 +207,8 @@ class VmState {
     }
 
     template <typename R, typename... Args>
-    void export_function(const std::string &name, R (*callback)(Args...), const std::string& module = "") {
+    void export_function(const std::string &name, R (*callback)(Args...),
+                         const std::string &module = "") {
         auto function = new std::function<int(VmState &)>([callback](
                                                               VmState &vm)
                                                               -> int {
@@ -220,7 +233,8 @@ class VmState {
     }
 
     template <typename R>
-    void export_function(const std::string &name, R (*callback)(), const std::string& module = "") {
+    void export_function(const std::string &name, R (*callback)(),
+                         const std::string &module = "") {
         auto function =
             new std::function<int(VmState &)>([callback](VmState &vm) -> int {
                 if constexpr (std::is_same_v<R, void>) {
@@ -235,7 +249,8 @@ class VmState {
 
     template <typename R>
     void export_function(const std::string &name,
-                         std::function<R(void)> callback, const std::string& module = "") {
+                         std::function<R(void)> callback,
+                         const std::string &module = "") {
         auto function =
             new std::function<int(VmState &)>([callback](VmState &vm) -> int {
                 if constexpr (std::is_same_v<R, void>) {
@@ -249,7 +264,8 @@ class VmState {
     }
 
     template <class C, typename Ret, typename... Ts>
-    void export_this(const std::string &name, C *c, Ret (C::*m)(Ts...), const std::string& module = "") {
+    void export_this(const std::string &name, C *c, Ret (C::*m)(Ts...),
+                     const std::string &module = "") {
         std::function<Ret(Ts...)> res = [=](auto &&...args) {
             return (c->*m)(std::forward<decltype(args)>(args)...);
         };
@@ -279,7 +295,7 @@ template <> int VmState::ret<std::string>(const std::string r);
 
 template <> std::string VmState::arg<std::string>(const int i);
 
-template <> const std::string& VmState::arg<const std::string&>(const int i);
+template <> const std::string &VmState::arg<const std::string &>(const int i);
 
 template <> bint VmState::arg<bint>(const int i);
 

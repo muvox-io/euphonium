@@ -81,5 +81,25 @@ end
 
 util = Util()
 
-print("UTIL LOADED")
-print(util)
+def log(level, message, args)
+    full_msg = str(message)
+    for part : args
+        full_msg += ' ' + str(part)
+    end
+
+    _log_native(level, full_msg)
+end
+
+def log_info(msg, *args)
+    _log_native(0, msg, args)
+end
+
+def log_error(msg, *args)
+    _log_native(2, msg, args)
+end
+
+def log_debug(msg, *args)
+    _log_native(1, msg, args)
+end
+
+log_info("Util loaded")

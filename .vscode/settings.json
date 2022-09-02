@@ -90,6 +90,11 @@
         "memory_resource": "cpp",
         "stop_token": "cpp",
         "codecvt": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "be_debug.h": "c",
+        "be_func.h": "c",
+        "be_decoder.h": "c",
+        "be_object.h": "c",
+        "filesystem": "cpp"
     }
 }

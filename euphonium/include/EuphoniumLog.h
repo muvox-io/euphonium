@@ -114,7 +114,7 @@ class EuphoniumLogger : public bell::AbstractLogger {
         if (logCache.size() > 100) {
             logCache.pop_front();
         }
-        logCache.push_back(log.str());
+        // logCache.push_back(log.str());
         if (logReceived != nullptr) {
             //logReceived(logStr);
         }

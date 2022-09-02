@@ -46,10 +46,14 @@ typedef struct {
     int status;
 } bcallframe;
 
+struct gc16_t;           /* memory pool for 0-16 bytes or less objects */
+struct gc32_t;           /* memory pool for 17-32 bytes */
 struct bgc {
     bgcobject *list; /* the GC-object list */
     bgcobject *gray; /* the gray object list */
     bgcobject *fixed; /* the fixed objecct list  */
+    struct gc16_t* pool16;
+    struct gc32_t* pool32;
     size_t usage; /* the count of bytes currently allocated */
     size_t threshold; /* he threshold of allocation for the next GC */
     bbyte steprate; /* the rate of increase in the distribution between two GCs (percentage) */
@@ -98,8 +102,8 @@ struct bvm {
     struct bstringtable strtab; /* short string table */
     bstack tracestack; /* call state trace-stack */
     bmap *ntvclass; /* native class table */
-    blist *registry; /* registry list */
     struct bgc gc;
+    bctypefunc ctypefunc; /* handler to ctype_func */
     bbyte compopt; /* compilation options */
     bobshook obshook;
 #if BE_USE_PERF_COUNTERS
@@ -123,6 +127,7 @@ struct bvm {
 #define BASE_FRAME          (1 << 0)
 #define PRIM_FUNC           (1 << 1)
 
+int be_default_init_native_function(bvm *vm);
 void be_dofunc(bvm *vm, bvalue *v, int argc);
 bbool be_value2bool(bvm *vm, bvalue *v);
 bbool be_vm_iseq(bvm *vm, bvalue *a, bvalue *b);

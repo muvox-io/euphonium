@@ -72,8 +72,7 @@ class HardwarePlugin : Plugin
         })
         for driver : self.registered_drivers
             if driver.name == state['dac']
-                print("Found driver", driver)
-                print("driver.make_config_form", driver.make_config_form)
+                log_info("Found driver", driver)
                 if driver.datasheet_link != nil && driver.datasheet_link != ""
                     ctx.link_button('datasheet', {
                         'label': "Datasheet",
@@ -131,7 +130,7 @@ class HardwarePlugin : Plugin
             if self.selected_driver != nil
                 self.selected_driver.set_volume(data)
             else
-                print("Attempt to set volume on unselected driver")
+                log_error("Attempt to set volume on unselected driver")
             end
            
         end

@@ -5,7 +5,7 @@ class DummyDriver : DACDriver
     end
 
     def init_i2s()
-       print("INITIALIZING DUMMY DRIVER - NO AUDIO")
+       log_info("INITIALIZING DUMMY DRIVER - NO AUDIO")
     end
 
     def unload_i2s()

@@ -556,7 +556,7 @@ static void func_vararg(bparser *parser) {
     str = next_token(parser).u.s;
     match_token(parser, TokenId); /* match and skip ID */
     new_var(parser, str, &v); /* new variable */
-    parser->finfo->proto->varg = 1;   /* set varg flag */
+    parser->finfo->proto->varg |= BE_VA_VARARG;   /* set varg flag */
 }
 
 /* Parse function or method definition variable list */
@@ -605,6 +605,7 @@ static bproto* funcbody(bparser *parser, bstring *name, int type)
     finfo.proto->name = name;
     if (type & FUNC_METHOD) { /* If method, add an implicit first argument `self` */
         new_localvar(parser, parser_newstr(parser, "self"));
+        finfo.proto->varg |= BE_VA_METHOD;
     }
     func_varlist(parser); /* parse arg list */
     stmtlist(parser); /* parse statement without final `end` */
@@ -1438,26 +1439,32 @@ static void classdef_stmt(bparser *parser, bclass *c, bbool is_static)
 static void classstatic_stmt(bparser *parser, bclass *c, bexpdesc *e)
 {
     bstring *name;
-    /* 'static' ID ['=' expr] {',' ID ['=' expr] } */
+    /* 'static' ['var'] ID ['=' expr] {',' ID ['=' expr] } */
+    /* 'static' 'def' ID '(' varlist ')' block 'end' */
     scan_next_token(parser); /* skip 'static' */
     if (next_type(parser) == KeyDef) {  /* 'static' 'def' ... */
         classdef_stmt(parser, c, btrue);
-    } else if (match_id(parser, name) != NULL) {
-        check_class_attr(parser, c, name);
-        be_class_member_bind(parser->vm, c, name, bfalse);
-        class_static_assignment_expr(parser, e, name);
-
-        while (match_skip(parser, OptComma)) { /* ',' */
-            if (match_id(parser, name) != NULL) {
-                check_class_attr(parser, c, name);
-                be_class_member_bind(parser->vm, c, name, bfalse);
-                class_static_assignment_expr(parser, e, name);
-            } else {
-                parser_error(parser, "class static error");
-            }
-        }
     } else {
-        parser_error(parser, "class static error");
+        if (next_type(parser) == KeyVar) {
+            scan_next_token(parser); /* skip 'var' if any */
+        }
+        if (match_id(parser, name) != NULL) {
+            check_class_attr(parser, c, name);
+            be_class_member_bind(parser->vm, c, name, bfalse);
+            class_static_assignment_expr(parser, e, name);
+
+            while (match_skip(parser, OptComma)) { /* ',' */
+                if (match_id(parser, name) != NULL) {
+                    check_class_attr(parser, c, name);
+                    be_class_member_bind(parser->vm, c, name, bfalse);
+                    class_static_assignment_expr(parser, e, name);
+                } else {
+                    parser_error(parser, "class static error");
+                }
+            }
+        } else {
+            parser_error(parser, "class static error");
+        }
     }
 }
 
@@ -1686,7 +1693,7 @@ static void statement(bparser *parser)
     case OptSemic: scan_next_token(parser); break; /* empty statement */
     default: expr_stmt(parser); break;
     }
-    be_assert(parser->finfo->freereg == be_list_count(parser->finfo->local));
+    be_assert(parser->finfo->freereg >= be_list_count(parser->finfo->local));
 }
 
 static void stmtlist(bparser *parser)

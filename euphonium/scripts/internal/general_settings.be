@@ -23,7 +23,7 @@ class GeneralSettingsPlugin : Plugin
     def set_hostname()
         if core.platform() == "esp32"
             var hn = util.to_hostname(self.config_value('deviceName'))
-            print("setting hostname to ", hn)
+            log_info("setting hostname to ", hn)
             wifi.set_hostname(hn)
         end
     end
@@ -31,7 +31,7 @@ class GeneralSettingsPlugin : Plugin
     def set_mdns()
         if core.platform() == "esp32"
             var hn = util.to_hostname(self.config_value('deviceName'))
-            print("setting mdns name to ", hn)
+            log_info("setting mdns name to ", hn)
             _register_mdns(hn)
         end
     end
