@@ -83,6 +83,11 @@ void CSpotPlugin::runTask() {
         mercuryManager->startTask();
         auto audioSink = std::make_shared<FakeAudioSink>(this->audioBuffer,
                                                          this->luaEventBus);
+
+        while (!mercuryManager->isRunning) {
+            BELL_SLEEP_MS(10);
+        }
+
         spircController = std::make_shared<SpircController>(
             mercuryManager, authBlob->username, audioSink);
 
