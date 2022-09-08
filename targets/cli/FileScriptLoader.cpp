@@ -1,6 +1,12 @@
 #include <FileScriptLoader.h>
+#include <sys/stat.h>
 
 FileScriptLoader::FileScriptLoader() {
+    struct stat st;
+    if (stat("../../../euphonium/scripts/configuration", &st) != 0 || !S_ISDIR(st.st_mode))
+    {
+        mkdir("../../../euphonium/scripts/configuration", 0755);
+    }
 }
 
 void FileScriptLoader::loadScript(std::string scriptName, std::shared_ptr<berry::VmState> berry) {
