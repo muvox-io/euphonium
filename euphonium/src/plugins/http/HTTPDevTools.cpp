@@ -60,26 +60,13 @@ void HTTPDevTools::registerHandlers(std::shared_ptr<bell::HTTPServer> server) {
         mainServer->respond(response);
     };
 
-    EuphoniumLogger *logger =
-        static_cast<EuphoniumLogger *>(bell::bellGlobalLogger.get());
-    auto requestLogsHandler = [&logger](bell::HTTPRequest &request) {
-        std::string res;
-        for (auto &log : logger->logCache) {
-            res += log;
-        }
-        bell::HTTPResponse response = {
-            .connectionFd = request.connection,
-            .status = 200,
-            .body = res,
-            .contentType = "application/json",
-        };
-        mainServer->respond(response);
-    };
+    // mainServer->registerHandler(bell::RequestType::GET, "/devtools/file",
+    //                             directoriesHandler);
+    // mainServer->registerHandler(bell::RequestType::GET, "/logs",
+    //                             requestLogsHandler);
+    // mainServer->registerHandler(bell::RequestType::POST, "/file/*)",
+    //                             uploadFileHandler);
 
-    mainServer->registerHandler(bell::RequestType::GET, "/devtools/file",
-                                directoriesHandler);
-    mainServer->registerHandler(bell::RequestType::GET, "/logs",
-                                requestLogsHandler);
-    mainServer->registerHandler(bell::RequestType::POST, "/file/*)",
+    mainServer->registerHandler(bell::RequestType::POST, "/packages/upload)",
                                 uploadFileHandler);
 }

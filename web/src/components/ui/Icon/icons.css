@@ -23,66 +23,105 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-moon:before {
-  content: "\e912";
-}
-.icon-edit:before {
-  content: "\e911";
-}
-.icon-search:before {
-  content: "\e900";
-}
-.icon-close:before {
-  content: "\e901";
-}
-.icon-pause:before {
-  content: "\e902";
-}
-.icon-play:before {
-  content: "\e903";
+.icon-home:before {
+  content: "\e91b";
 }
 .icon-volume-up:before {
-  content: "\e904";
+  content: "\e900";
 }
 .icon-volume-off:before {
-  content: "\e905";
+  content: "\e901";
 }
 .icon-volume-down:before {
+  content: "\e902";
+}
+.icon-stop:before {
+  content: "\e903";
+}
+.icon-extension:before {
+  content: "\e91f";
+}
+.icon-arrow-right:before {
+  content: "\e91e";
+}
+.icon-radio:before {
+  content: "\e91d";
+}
+.icon-arrow-down:before {
+  content: "\e91c";
+}
+.icon-arrow-left:before {
+  content: "\e91a";
+}
+.icon-equalizer:before {
+  content: "\e919";
+}
+.icon-rss_feed:before {
+  content: "\e910";
+}
+.icon-share:before {
+  content: "\e917";
+}
+.icon-edit:before {
+  content: "\e918";
+}
+.icon-search:before {
+  content: "\e904";
+}
+.icon-hide:before {
+  content: "\e905";
+}
+.icon-show:before {
   content: "\e906";
 }
-.icon-home:before {
+.icon-visibility:before {
+  content: "\e906";
+}
+.icon-lock:before {
   content: "\e907";
 }
-.icon-info:before {
+.icon-pause:before {
   content: "\e908";
 }
-.icon-music:before {
+.icon-close:before {
   content: "\e909";
 }
-.icon-playlist:before {
+.icon-bluetooth:before {
   content: "\e90a";
 }
 .icon-dac_settings:before {
   content: "\e90b";
 }
-.icon-settings:before {
+.icon-power:before {
   content: "\e90c";
 }
-.icon-equalizer:before {
+.icon-settings:before {
   content: "\e90d";
 }
-.icon-speaker_group:before {
+.icon-music:before {
   content: "\e90e";
 }
-.icon-speaker:before {
+.icon-music_off:before {
   content: "\e90f";
 }
-.icon-radio:before {
-  content: "\e910";
+.icon-music_note:before {
+  content: "\e914";
+}
+.icon-queue:before {
+  content: "\e911";
+}
+.icon-library_music:before {
+  content: "\e912";
+}
+.icon-speaker_group:before {
+  content: "\e913";
+}
+.icon-speaker:before {
+  content: "\e915";
+}
+.icon-moon:before {
+  content: "\e916";
 }
 .icon-sun:before {
   content: "\e9d4";
-}
-.icon-rss:before {
-  content: "\ea9b";
 }

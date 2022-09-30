@@ -12,9 +12,10 @@ import Icon from "../ui/Icon";
 const PluginIconMap = {
   dashboard: "home",
   webradio: "radio",
-  plugin: "playlist",
+  plugin: "queue",
   general: "settings",
   hardware: "dac_settings",
+  package_manager: "extension",
 } as { [key: string]: string };
 
 const SideBarItem = ({ displayName = "", name = "", type = "" }) => {
@@ -25,7 +26,7 @@ const SideBarItem = ({ displayName = "", name = "", type = "" }) => {
       <Match path={hrefUrl}>
         {({ matches, path, url }: any) => (
           <div
-            class={`text-m flex flex-row items-center ${
+            class={`text-m flex flex-row items-center mt-1 mb-1 ${
               matches ? "text-app-accent" : "text-app-text-secondary "
             }`}
           >
@@ -84,7 +85,11 @@ export default ({ version = "", theme = "", onThemeChange = () => {} }) => {
         cacheKey="sidebar"
       >
         {(pluginsFromAPI: PluginEntry[]) => {
-          let plugins = [...pluginsFromAPI];
+          let plugins = [...pluginsFromAPI, {
+            name: "package_manager",
+            displayName: "Package manager",
+            type: PluginEntryType.App,
+          }];
           return (
             <>
               <SideBarItem displayName="Dashboard" name="home"></SideBarItem>
@@ -116,5 +121,5 @@ export default ({ version = "", theme = "", onThemeChange = () => {} }) => {
         <Icon name="moon" />
       </div>
     </div>
-  );
+  ); 
 };

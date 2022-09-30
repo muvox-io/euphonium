@@ -1,5 +1,6 @@
 import Router, { Route } from "preact-router";
 import { EuphoniumInfo } from "../../api/euphonium/system/models";
+import PackageManager from "../../apps/PackageManager";
 import RadioBrowser from "../../apps/webradio/RadioBrowser";
 import useIsMobile from "../../utils/isMobile.hook";
 import ConfiguratorCard from "../ConfiguratorCard";
@@ -34,6 +35,10 @@ export default function NormalComponent({ info }: { info: EuphoniumInfo }) {
           <Route
             path="/web/plugin/:plugin"
             component={ErrorBoundaryWrapper(ConfiguratorCard)}
+          />
+          <Route
+            path="/web/apps/package_manager"
+            component={ErrorBoundaryWrapper(PackageManager)}
           />
           <Route path="/web" component={ErrorBoundaryWrapper(SplashScreen)} />
 
