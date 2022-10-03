@@ -3,6 +3,7 @@
 
 #include "ScriptLoader.h"
 #include <iostream>
+#include "PlatformConstants.h"
 #include <fstream>
 #include <thread>
 #include "Module.h"

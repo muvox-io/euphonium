@@ -13,6 +13,9 @@
 #include "EuphoniumLog.h"
 #include "dirent.h"
 #include "plugins/persistor/ConfigPersistor.h"
+#include "PlatformConstants.h"
+#include <iostream>
+#include <fstream>
 
 class HTTPDevTools {
     public:

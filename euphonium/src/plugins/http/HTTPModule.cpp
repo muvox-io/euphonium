@@ -2,9 +2,8 @@
 #include "BellLogger.h"
 #include "EuphoniumLog.h"
 #include "HTTPEvents.h"
-#include "cJSON.h"
 #include "MDNSService.h"
-
+#include "cJSON.h"
 
 void listFiles(const std::string &path,
                std::function<void(const std::string &)> cb) {
@@ -69,9 +68,10 @@ void HTTPModule::respond(int connectionFd, int status, std::string body,
 
 void HTTPModule::registerHandler(std::string routeUrl, std::string requestType,
                                  int handlerId) {
-    auto handler = [handlerId, this](bell::HTTPRequest &request) {
-        request.handlerId = handlerId;
-        auto event = std::make_unique<HandleRouteEvent>(request);
+    auto handler = [handlerId,
+                    this](std::unique_ptr<bell::HTTPRequest> request) {
+        request->handlerId = handlerId;
+        auto event = std::make_unique<HandleRouteEvent>(std::move(request));
         EUPH_LOG(info, "http", "Posting the event");
         this->luaEventBus->postEvent(std::move(event));
     };
@@ -91,78 +91,89 @@ void HTTPModule::runTask() {
     EuphoniumLogger *logger =
         static_cast<EuphoniumLogger *>(bell::bellGlobalLogger.get());
 
-    auto assetHandler = [this](bell::HTTPRequest &request) {
-        auto fileName = request.urlParams.at("asset");
+    auto assetHandler = [this](std::unique_ptr<bell::HTTPRequest> request) {
+        auto fileName = request->urlParams.at("asset");
         std::string fullFilePath = "assets/" + fileName;
-        mainPersistor->serveFile(request.connection, fullFilePath);
+        mainPersistor->serveFile(request->connection, fullFilePath);
     };
-    auto directoriesHandler = [this](bell::HTTPRequest &request) {
-        std::string result = "[";
-        std::string prefix = "../../../euphonium/scripts/";
+    auto directoriesHandler =
+        [this](std::unique_ptr<bell::HTTPRequest> request) {
+            std::string result = "[";
+            std::string prefix = "../../../euphonium/scripts/";
 #ifdef ESP_PLATFORM
-        prefix = "/spiffs/";
+            prefix = "/spiffs/";
 #endif
-        listFiles(prefix, [&result, prefix](const std::string &file) {
-            BELL_LOG(info, "http", "%s", file.c_str());
-            std::string path = file;
-            if (path.find(prefix) != std::string::npos) {
-                path.erase(0, prefix.size() - 1);
-            }
+            listFiles(prefix, [&result, prefix](const std::string &file) {
+                BELL_LOG(info, "http", "%s", file.c_str());
+                std::string path = file;
+                if (path.find(prefix) != std::string::npos) {
+                    path.erase(0, prefix.size() - 1);
+                }
 
-            result += "\"" + path + "\",";
-        });
+                result += "\"" + path + "\",";
+            });
 
-        result.pop_back();
-        result += "]";
-        bell::HTTPResponse response = {
-            .connectionFd = request.connection,
-            .status = 200,
-            .body = result,
-            .contentType = "application/json",
+            result.pop_back();
+            result += "]";
+            bell::HTTPResponse response = {
+                .connectionFd = request->connection,
+                .status = 200,
+                .body = result,
+                .contentType = "application/json",
+            };
+            mainServer->respond(response);
         };
-        mainServer->respond(response);
-    };
-    auto uploadFileHandler = [this](bell::HTTPRequest &request) {
+    auto uploadFileHandler = [this](
+                                 std::unique_ptr<bell::HTTPRequest> request) {
         BELL_LOG(info, "http", "Received file update of len %d",
-                 request.body.size());
-        BELL_LOG(info, "http", "File name: %s",
-                 request.url.substr(15, request.url.size()).c_str());
-        mainPersistor->persist(request.url.substr(15, request.url.size()),
-                               request.body);
-        bell::HTTPResponse response = {
-            .connectionFd = request.connection,
-            .status = 200,
-            .body = "{ \"status\": \"ok\"}",
-            .contentType = "application/json",
-        };
-        mainServer->respond(response);
-    };
-    auto requestLogsHandler = [&logger](bell::HTTPRequest &request) {
-        std::string res;
-        for (auto &log : logger->logCache) {
-            res += log;
+                 request->responseReader->getTotalSize());
+        std::ofstream tmpPackage(SCRIPTS_PREFIX_PATH + "tmp/pkg.tar.gz",
+                                 std::ios::out | std::ios::binary);
+        auto readBytes = 0;
+        auto readBuffer = std::vector<uint8_t>(128);
+        while (readBytes < request->responseReader->getTotalSize()) {
+            auto read = request->responseReader->read((char *)readBuffer.data(),
+                                                      readBuffer.size());
+            tmpPackage.write((char *)readBuffer.data(), read);
+            readBytes += read;
         }
+        tmpPackage.close();
+
         bell::HTTPResponse response = {
-            .connectionFd = request.connection,
+            .connectionFd = request->connection,
             .status = 200,
-            .body = res,
+            .body = "{ \"status\": \"success\"}",
             .contentType = "application/json",
         };
         mainServer->respond(response);
     };
+    auto requestLogsHandler =
+        [&logger](std::unique_ptr<bell::HTTPRequest> request) {
+            std::string res;
+            for (auto &log : logger->logCache) {
+                res += log;
+            }
+            bell::HTTPResponse response = {
+                .connectionFd = request->connection,
+                .status = 200,
+                .body = res,
+                .contentType = "application/json",
+            };
+            mainServer->respond(response);
+        };
 
-    auto indexHandler = [this](bell::HTTPRequest &request) {
+    auto indexHandler = [this](std::unique_ptr<bell::HTTPRequest> request) {
         std::string fileName = "index.html";
-        if (request.url.find("/devtools/file") != std::string::npos) {
-            fileName = request.url.substr(request.url.find("/devtools") + 15,
-                                          request.url.size());
+        if (request->url.find("/devtools/file") != std::string::npos) {
+            fileName = request->url.substr(request->url.find("/devtools") + 15,
+                                           request->url.size());
         }
-        mainPersistor->serveFile(request.connection, fileName);
+        mainPersistor->serveFile(request->connection, fileName);
     };
 
-    auto restartHandler = [this](bell::HTTPRequest &request) {
+    auto restartHandler = [this](std::unique_ptr<bell::HTTPRequest> request) {
         bell::HTTPResponse response = {
-            .connectionFd = request.connection,
+            .connectionFd = request->connection,
             .status = 200,
             .body = "{ \"status\": \"ok\"}",
             .contentType = "application/json",
@@ -173,8 +184,9 @@ void HTTPModule::runTask() {
 #endif
     };
 
-    auto renameFileHandler = [this](bell::HTTPRequest &request) {
-        auto body = request.body;
+    auto renameFileHandler = [this](
+                                 std::unique_ptr<bell::HTTPRequest> request) {
+        auto body = request->body;
         // parse body with cjson
         cJSON *root = cJSON_Parse(body.c_str());
         if (!root) {
@@ -194,7 +206,7 @@ void HTTPModule::runTask() {
                     std::string(prefix + newName).c_str());
 
         bell::HTTPResponse response = {
-            .connectionFd = request.connection,
+            .connectionFd = request->connection,
             .status = 200,
             .body = "{ \"status\": \"ok\"}",
             .contentType = "application/json",
@@ -203,8 +215,8 @@ void HTTPModule::runTask() {
     };
 
     // redirect all requests to /web
-    auto rootHandler = [this](bell::HTTPRequest &request) {
-        mainServer->redirectTo("/web", request.connection);
+    auto rootHandler = [this](std::unique_ptr<bell::HTTPRequest> request) {
+        mainServer->redirectTo("/web", request->connection);
     };
 
     // mainServer->registerHandler(bell::RequestType::GET, "/assets/:asset",
@@ -219,12 +231,12 @@ void HTTPModule::runTask() {
     mainServer->registerHandler(bell::RequestType::GET, "/devtools/logs",
                                 requestLogsHandler);
     mainServer->registerHandler(bell::RequestType::GET, "/", rootHandler);
-    mainServer->registerHandler(bell::RequestType::POST, "/devtools/file/*)",
+    mainServer->registerHandler(bell::RequestType::POST, "/packages/upload",
                                 uploadFileHandler);
     mainServer->registerHandler(bell::RequestType::POST,
                                 "/devtools/rename-file", renameFileHandler);
-    mainServer->registerHandler(bell::RequestType::POST,
-                                "/system/restart", restartHandler);
+    mainServer->registerHandler(bell::RequestType::POST, "/system/restart",
+                                restartHandler);
     mainServer->listen();
 }
 

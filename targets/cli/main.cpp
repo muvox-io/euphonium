@@ -3,6 +3,9 @@
 #include "PortAudioAudioOutput.h"
 #include <EuphoniumLog.h>
 #include <optional>
+#include "PlatformConstants.h"
+
+const std::string SCRIPTS_PREFIX_PATH = "../../../euphonium/scripts/";
 
 int main(int argc, char *argv[]) {
     initializeEuphoniumLogger();

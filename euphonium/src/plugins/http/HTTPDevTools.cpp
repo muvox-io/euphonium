@@ -18,43 +18,55 @@ void listFiles(const std::string &path,
 
 void HTTPDevTools::registerHandlers(std::shared_ptr<bell::HTTPServer> server) {
 
+    //     auto directoriesHandler = [](bell::HTTPRequest &request) {
+    //         std::string result = "[";
+    //         std::string prefix = "../../../euphonium/scripts/";
+    // #ifdef ESP_PLATFORM
+    //         prefix = "/spiffs/";
+    // #endif
+    //         listFiles(prefix, [&result, prefix](const std::string &file) {
+    //             BELL_LOG(info, "http", "%s", file.c_str());
+    //             std::string path = file;
+    //             if (path.find(prefix) != std::string::npos) {
+    //                 path.erase(0, prefix.size() - 1);
+    //             }
 
-    auto directoriesHandler = [](bell::HTTPRequest &request) {
-        std::string result = "[";
-        std::string prefix = "../../../euphonium/scripts/";
-#ifdef ESP_PLATFORM
-        prefix = "/spiffs/";
-#endif
-        listFiles(prefix, [&result, prefix](const std::string &file) {
-            BELL_LOG(info, "http", "%s", file.c_str());
-            std::string path = file;
-            if (path.find(prefix) != std::string::npos) {
-                path.erase(0, prefix.size() - 1);
-            }
+    //             result += "\"" + path + "\",";
+    //         });
 
-            result += "\"" + path + "\",";
-        });
+    //         result.pop_back();
+    //         result += "]";
+    //         bell::HTTPResponse response = {
+    //             .connectionFd = request.connection,
+    //             .status = 200,
+    //             .body = result,
+    //             .contentType = "application/json",
+    //         };
+    //         mainServer->respond(response);
+    //     };
+    auto uploadFileHandler = [](std::unique_ptr<bell::HTTPRequest> request) {
+        // open file SCRIPTS_DIR/tmp/pkg.tar.gz
+        // write request->body to file
+        // close file
+        // Save the file
 
-        result.pop_back();
-        result += "]";
-        bell::HTTPResponse response = {
-            .connectionFd = request.connection,
-            .status = 200,
-            .body = result,
-            .contentType = "application/json",
-        };
-        mainServer->respond(response);
-    };
-    auto uploadFileHandler = [](bell::HTTPRequest &request) {
         BELL_LOG(info, "http", "Received file update of len %d",
-                 request.body.size());
-        BELL_LOG(info, "http", "File name: %s", request.url.c_str());
-        mainPersistor->persist(request.url.substr(6, request.url.size()),
-                               request.body);
+                 request->responseReader->getTotalSize());
+        std::ofstream tmpPackage(SCRIPTS_PREFIX_PATH + "tmp/pkg.tar.gz",
+                                std::ios::out | std::ios::binary);
+        auto readBytes = 0;
+        auto readBuffer = std::vector<uint8_t>(128);
+        while (readBytes < request->responseReader->getTotalSize()) {
+            auto read = request->responseReader->read((char*) readBuffer.data(), readBuffer.size());
+            tmpPackage.write((char *)readBuffer.data(), read);
+            readBytes += read;
+        }
+        tmpPackage.close();
+
         bell::HTTPResponse response = {
-            .connectionFd = request.connection,
+            .connectionFd = request->connection,
             .status = 200,
-            .body = "{ \"status\": \"ok\"}",
+            .body = "{ \"status\": \"success\"}",
             .contentType = "application/json",
         };
         mainServer->respond(response);
@@ -67,6 +79,6 @@ void HTTPDevTools::registerHandlers(std::shared_ptr<bell::HTTPServer> server) {
     // mainServer->registerHandler(bell::RequestType::POST, "/file/*)",
     //                             uploadFileHandler);
 
-    mainServer->registerHandler(bell::RequestType::POST, "/packages/upload)",
-                                uploadFileHandler);
+    mainServer->registerHandler(bell::RequestType::POST, "/packages/upload",
+                                uploadFileHandler, false);
 }

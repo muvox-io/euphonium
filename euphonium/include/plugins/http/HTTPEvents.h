@@ -8,20 +8,20 @@
 
 class HandleRouteEvent: public Event {
     public:
-    bell::HTTPRequest request;
-    HandleRouteEvent(const bell::HTTPRequest& request) {
-        this->request = request;
+    std::unique_ptr<bell::HTTPRequest> request;
+    HandleRouteEvent(std::unique_ptr<bell::HTTPRequest> request) {
+        this->request = std::move(request);
         this->subType = "handleRouteEvent";
         this->eventType = EventType::LUA_MAIN_EVENT;
     };
 
     berry::map toBerry() {
         berry::map result;
-        result["body"]  = this->request.body;
-        result["connection"] = this->request.connection;
-        result["handlerId"] = this->request.handlerId;
-        result["queryParams"] = berry::to_map(this->request.queryParams);
-        result["urlParams"] = berry::to_map(this->request.urlParams);
+        result["body"]  = this->request->body;
+        result["connection"] = this->request->connection;
+        result["handlerId"] = this->request->handlerId;
+        result["queryParams"] = berry::to_map(this->request->queryParams);
+        result["urlParams"] = berry::to_map(this->request->urlParams);
         return result;
     }
 };
