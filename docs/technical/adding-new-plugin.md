@@ -352,8 +352,20 @@ touch my-plugin.h
 popd
 ```
 
+Next, you'll need to tell the build system about the source files for your new
+plugin by adding to the list of glob patterns (e.g.
+`"src/plugins/my-plugin/*.cpp"` or `"src/plugins/my-plugin/*.c"`)
+[here](https://github.com/feelfreelinux/euphonium/blob/master/euphonium/CMakeLists.txt#L15)
+in the same `CMakeLists.txt` file.
+
+You also need to add your include directory near the bottom of `euphonium/CMakeLists.txt` like so:
+
+```cpp
+include_directories("include/plugins/my-plugin")
+```
+
 Finally, you'll need to add include your plugin's header file to
-`euphonium/include/Core.cpp` and add your plugin to the [list of registered
+`euphonium/include/Core.cpp`, and add your plugin to the [list of registered
 plugins](https://github.com/feelfreelinux/euphonium/blob/master/euphonium/src/Core.cpp#L42-L46)
 in `euphonium/src/Core.cpp`
 
