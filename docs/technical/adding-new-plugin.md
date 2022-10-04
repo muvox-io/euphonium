@@ -1,31 +1,31 @@
 # Extending Euphonium
 
-## Euphonium Architecure
+## Euphonium Architecture
 
 There are essentially 3 layers of the Euphonium application which are:
 
 - The Web UI written in React / Javascript
-- The Applicaiton layer writtin in [Berry Scripting language](https://github.com/berry-lang/berry).
-- The Infrastructure layer, writtin in C/C++
+- The Application layer written in [Berry Scripting language](https://github.com/berry-lang/berry).
+- The Infrastructure layer, written in C/C++
 
 Plugins can integrate into each layer, and communicate between each layer.
 Having a firm understanding of how these layers communicate will help you
-undersetand what plugin's can do and what code you need to write when creating
+understand what plugin's can do and what code you need to write when creating
 a new plugin.
 
 ### Web plugins in brief
 
-Plugins can expose functionality the users in the Web Applicaion via the
+Plugins can expose functionality the users in the Web Application via the
 `make_form()` method of the application layer plugin. Forms in the web app have
-two distinct funtions: (1) exposing the currnet plugin state to the user, and
-(2) recieving inputs such as updated settings from users. The Web app is
-extended by createing an application layer plugin and creating a form using it's
+two distinct functions: (1) exposing the current plugin state to the user, and
+(2) receiving inputs such as updated settings from users. The Web app is
+extended by creating an application layer plugin and creating a form using it's
 `make_form()` method.
 
 ### Applicaiton Layer plugins in brief
 
-Application layer plugins are writtin in [Berry Scripting
-language](https://github.com/berry-lang/berry) and inhereit from the [Plugin
+Application layer plugins are written in [Berry Scripting
+language](https://github.com/berry-lang/berry) and inherit from the [Plugin
 Class](https://github.com/feelfreelinux/euphonium/blob/master/euphonium/scripts/internal/plugin.be)
 
 Plugin scripts are used to define a new plugin class, instantiate the plugin and
@@ -34,7 +34,7 @@ register it with Euphonium like so:
 ```berry
 class MyPlugin : Plugin
     def init()
-        # Defind constants like the plugin name
+        # Define constants like the plugin name
     end
 
     def make_form(cts,state)
@@ -43,7 +43,7 @@ class MyPlugin : Plugin
 
     def on_event(event, data)
        # Handle events, such as plugin initialization, updates to the plugin
-       # state (in reponse to user interaction with the Web app), and
+       # state (in response to user interaction with the Web app), and
        # events propagated from infrastructure layer (including your own custom
        # events defined in an infrastructure layer plugin)
     end
@@ -62,7 +62,7 @@ C++ plugins inherit from the
 [Module](https://github.com/feelfreelinux/euphonium/blob/master/euphonium/include/Module.h)
 and [bell::Task](https://github.com/feelfreelinux/bell/blob/master/include/Task.h#L17) classes.
 
-For the pruposes creating plugins, [`bell::Task`](https://github.com/feelfreelinux/bell/blob/master/include/Task.h) has the interface:
+For the purposes creating plugins, [`bell::Task`](https://github.com/feelfreelinux/bell/blob/master/include/Task.h) has the interface:
 
 ```c++
 class Task {
@@ -88,7 +88,7 @@ public:
     ModuleStatus status = ModuleStatus::SHUTDOWN;
 
     // A shared pointer to the berry runtime (vm) which can be used to expose
-    // data and funcitons as globals variables
+    // data and functions as to the berry runtime
     std::shared_ptr<berry::VmState> berry;
 
     // A shared pointer to the luaEventBus where events can be posted to the
@@ -129,14 +129,15 @@ plugin->luaEventBus = this->luaEventBus;
 plugin->setupBindings();
 ```
 
-The `berry` and `luaEventsBus` are used to communicate with the application layer, as illustrated below.
+The `berry` and `luaEventsBus` are used to communicate with the application
+layer, as illustrated below.
 
-## Communication between appliation layers
+## Communication between Application Layers
 
-### Communication from Web Forms to Aplication layer plugins
+### Communication from Web Forms to Application Layer Plugins
 
-The web forms in the settings section of the app communicate to the applicaiton
-layer via HTTP requests made to the `/plugins/:name` enpoint. When a `POST`
+The web forms in the settings section of the app communicate to the application
+layer via HTTP requests made to the `/plugins/:name` endpoint. When a `POST`
 request is made to this endpoint, the request body is used to update the
 plugin's state, and the plugin is notified that it's stat has been updated with
 a call to it's `on_event()` method like so:
@@ -146,14 +147,14 @@ plugin.on_event(EVENT_CONFIG_UPDATED, plugin.state)
 ```
 
 Note that even though the new plugin stat is supplied as the second argument to
-this method call, the plugin's state has alread been replaced before the method
-is called, so this invokation is merely an opportunity to respond to the
-state change; the method does not need to upate it's own state in order for the
+this method call, the plugin's state has already been replaced before the method
+is called, so this invocation is merely an opportunity to respond to the
+state change; the method does not need to update it's own state in order for the
 state to be updated in this case.
 
-### Aplication layer plugin HTTP APIs
+### Application Layer Plugin HTTP APIs
 
-Applicaiton layer plugins may expose API endpoints by registering a
+Application layer plugins may expose API endpoints by registering a
 callback with the [http plugin](https://feelfreelinux.github.io/euphonium/plugins/scripting-language/#http).
 
 ## Examples
@@ -230,11 +231,11 @@ end)
 
 Communication within the Infrastructure and to the Application layer can be
 achieved by posting messages to an infrastructure layer event bus. Messages
-posted to the infrasturcture layer event bus are propogated to both
-infrastructure and applicaion layer event subscribers.
+posted to the infrastructure layer event bus are propagated to both
+infrastructure and application layer event subscribers.
 
 When infrastructure plugins are registered, a reference to the `mainEventBus` is
-bound to the plugin's `luaEventBus` propety. Modules can therefor post events
+bound to the plugin's `luaEventBus` property. Modules can therefor post events
 to the event bus using
 
 ```cpp
@@ -242,7 +243,9 @@ this->luaEventBus->postEvent(std::move(event));
 ```
 
 Infrastructure layer plugins can subscribe to the event bus by registering a
-listerner which implements the EventSubscriber interface. Plugins which implement an appropriate `handleEvent()` method can therefore register themselves as subscribers using:
+listener which implements the EventSubscriber interface. Plugins which implement
+an appropriate `handleEvent()` method can therefore register themselves as
+subscribers using:
 
 ```cpp
 auto subscriber = dynamic_cast<EventSubscriber *>(this);
@@ -250,10 +253,10 @@ luaEventBus->addListener(EventType::LUA_MAIN_EVENT, *subscriber);
 ```
 
 Notably the Euphonium Core registers itself as a subscriber, and uses that
-subscription to propogate events to the `handle_event` global in the application
-layer which then propogate those events to registered event handlers and plugins.
+subscription to propagate events to the `handle_event` global in the application
+layer which then propagate those events to registered event handlers and plugins.
 
-Application layer plugins recieve these event notifications with a call to their
+Application layer plugins receive these event notifications with a call to their
 `plugin.on_event()` method, like so:.
 
 ```berry
@@ -266,7 +269,7 @@ class MyPlugin : Plugin
 end
 ```
 
-Alternatively, application layer plugins can recieve events by registering a
+Alternatively, application layer plugins can receive events by registering a
 callback manually with the euphonium core using:
 
 ```berry
@@ -277,15 +280,15 @@ end)
 
 ## Exposing C++ Objects in the Berry language
 
-While events can be propogated from the infrastructure layer to the appliation
+While events can be propagated from the infrastructure layer to the application
 layer, (as of this writing) the same mechanism cannot be used to communicate
-from the appliation layer to the infrastructure layer. In order for the the
-infrastructure layer to recieve events from the applicaiton layer,
+from the application layer to the infrastructure layer. In order for the the
+infrastructure layer to receive events from the application layer,
 infrastructure plugins can bind functions, methods, and values into berry
 runtime.
 
 This is accomplished using the convenience methods of the `berry` reference
-that is attached to each infrastructre plugin, such as:
+that is attached to each infrastructure plugin, such as:
 
 ```cpp
 // bind the MQTTPlugin::publish method to mqqt.pugin function in the berry runtime
@@ -298,14 +301,6 @@ berry->export_function("digital_write", &gpioDigitalWrite, "gpio");
 berry->export_function("sleep_ms", &sleepMS);
 ```
 
-From C++, objects may be exposed in the Berry scripting language runtime using the [berry language helpers]
-
-For example, the `WebRatdioPlugin.cpp` exposes [two cpp
-functions???](https://github.com/feelfreelinux/euphonium/blob/master/euphonium/src/plugins/webradio/WebRadioPlugin.cpp#L14-L18)
-using the `berry->export_this` helper provided by
-
-Core::loadPlugins is responsible for loading plugins -- look here for details on the setupBindings() method
-
 # Installing Plugins
 
 ## Installing Application layer plugins
@@ -313,9 +308,9 @@ Core::loadPlugins is responsible for loading plugins -- look here for details on
 The Berry scripts that define the application layer plugins are stored in the `euphonium/scripts/plugin` directory.
 
 **Pro Tip:** Start by creating a blank file (`my-plugin.be`) for your plugin,
-then compile, flash, and run the Euphonium applicaiton. This will create a new
+then compile, flash, and run the Euphonium application. This will create a new
 empty file in the that you can edit using the Web IDE. The Web IDE is a web
-applicaion that you can run from your local machine, connect to your ESP32, edit
+application that you can run from your local machine, connect to your ESP32, edit
 your new plugin and debug your code in real time. When the plugin is working
 the way you like it, copy your code out of the web IDE and into your plugin's
 `.be` file.
@@ -367,7 +362,7 @@ in `euphonium/src/Core.cpp`
 If your plugin is going to rely on existing libraries, then you'll need to load
 the into the repo (preferably as sub-modules), and tell the build system about
 the additional libraries. For example, if you want to add a display using the
-aweseom `u8g2` library, you could add the required libraries as git submodules
+awesome `u8g2` library, you could add the required libraries as git submodules
 like so:
 
 ```sh
