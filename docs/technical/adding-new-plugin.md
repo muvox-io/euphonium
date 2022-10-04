@@ -22,7 +22,7 @@ two distinct functions: (1) exposing the current plugin state to the user, and
 extended by creating an application layer plugin and creating a form using it's
 `make_form()` method.
 
-### Applicaiton Layer plugins in brief
+### Application Layer plugins in brief
 
 Application layer plugins are written in [Berry Scripting
 language](https://github.com/berry-lang/berry) and inherit from the [Plugin
@@ -62,7 +62,9 @@ C++ plugins inherit from the
 [Module](https://github.com/feelfreelinux/euphonium/blob/master/euphonium/include/Module.h)
 and [bell::Task](https://github.com/feelfreelinux/bell/blob/master/include/Task.h#L17) classes.
 
-For the purposes creating plugins, [`bell::Task`](https://github.com/feelfreelinux/bell/blob/master/include/Task.h) has the interface:
+For the purposes creating plugins,
+[`bell::Task`](https://github.com/feelfreelinux/bell/blob/master/include/Task.h)
+has the interface:
 
 ```c++
 class Task {
@@ -74,7 +76,9 @@ protected:
 }
 ```
 
-and the [`Module`](https://github.com/feelfreelinux/euphonium/blob/master/euphonium/include/Module.h) class has this interface:
+and the
+[`Module`](https://github.com/feelfreelinux/euphonium/blob/master/euphonium/include/Module.h)
+class has this interface:
 
 ```cpp
 class Module {
@@ -305,7 +309,8 @@ berry->export_function("sleep_ms", &sleepMS);
 
 ## Installing Application layer plugins
 
-The Berry scripts that define the application layer plugins are stored in the `euphonium/scripts/plugin` directory.
+The Berry scripts that define the application layer plugins are stored in the
+`euphonium/scripts/plugin` directory.
 
 **Pro Tip:** Start by creating a blank file (`my-plugin.be`) for your plugin,
 then compile, flash, and run the Euphonium application. This will create a new
@@ -326,7 +331,8 @@ yarn install
 yarn start
 ```
 
-then Navigate to `http://localhost:3000` (if the window doesn't open on it's own) to use the Web IDE
+then Navigate to `http://localhost:3000` (if the window doesn't open on it's
+own) to use the Web IDE
 
 ## Installing Infrastructure layer (C/C++) plugins
 
@@ -358,7 +364,8 @@ plugin by adding to the list of glob patterns (e.g.
 [here](https://github.com/feelfreelinux/euphonium/blob/master/euphonium/CMakeLists.txt#L15)
 in the same `CMakeLists.txt` file.
 
-You also need to add your include directory near the bottom of `euphonium/CMakeLists.txt` like so:
+You also need to add your include directory near the bottom of
+`euphonium/CMakeLists.txt` like so:
 
 ```cpp
 include_directories("include/plugins/my-plugin")
@@ -371,11 +378,11 @@ in `euphonium/src/Core.cpp`
 
 ### Using libraries
 
-If your plugin is going to rely on existing libraries, then you'll need to load
-the into the repo (preferably as sub-modules), and tell the build system about
-the additional libraries. For example, if you want to add a display using the
-awesome `u8g2` library, you could add the required libraries as git submodules
-like so:
+If your plugin is going to rely on existing external C/C++ libraries, then
+you'll need to load them into the repo (preferably as sub-modules), and tell the
+build system about the additional libraries. For example, if you want to add a
+display using the awesome `u8g2` library, you could add the required libraries
+as git submodules like so:
 
 ```sh
 git submodule add ../../olikraus/u8g2 euphonium/u8g2
