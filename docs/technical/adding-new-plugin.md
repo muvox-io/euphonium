@@ -2,18 +2,19 @@
 
 ## Euphonium Architecture
 
-There are essentially 3 layers of the Euphonium application which are:
+There are essentially 4 layers of the Euphonium application which are:
 
 - The Web UI written in React / Javascript
-- The Application layer written in [Berry Scripting language](https://github.com/berry-lang/berry).
-- The Infrastructure layer, written in C/C++
+- The "Application layer" written in [Berry Scripting language](https://github.com/berry-lang/berry).
+- A platform agnostic "Feature layer", written in C/C++
+- A platform Specific "Driver layer", written in C/C++
 
 Plugins can integrate into each layer, and communicate between each layer.
 Having a firm understanding of how these layers communicate will help you
 understand what plugin's can do and what code you need to write when creating
 a new plugin.
 
-### Web plugins in brief
+### Web Plugins in Brief
 
 Plugins can expose functionality the users in the Web Application via the
 `make_form()` method of the application layer plugin. Forms in the web app have
@@ -22,14 +23,17 @@ two distinct functions: (1) exposing the current plugin state to the user, and
 extended by creating an application layer plugin and creating a form using it's
 `make_form()` method.
 
-### Application Layer plugins in brief
+Additionally the Web app is a React (Vite) app located in the `web/` directory
+that you can modify to your heart's content.
+
+### Application Layer Plugins in Brief
 
 Application layer plugins are written in [Berry Scripting
 language](https://github.com/berry-lang/berry) and inherit from the [Plugin
 Class](https://github.com/feelfreelinux/euphonium/blob/master/euphonium/scripts/internal/plugin.be)
 
-Plugin scripts are used to define a new plugin class, instantiate the plugin and
-register it with Euphonium like so:
+Plugin scripts located in the `euphonium/scripts/plugins` and are used to define a
+new plugin class, instantiate the plugin and register it with Euphonium like so:
 
 ```berry
 class MyPlugin : Plugin
@@ -56,9 +60,13 @@ my_plugin = MyPlugin()
 euphonium.register_plugin(my_plugin)
 ```
 
-### Infrastructure (C++) plugins in brief
+### Feature Layer Plugins in Brief
 
-C++ plugins inherit from the
+Feature plugin interfaces are defined in the
+`euphonium/include/plugins/[pluginName]` directories and the methods are defined
+(out of line) in the `euphonium/src/plugins/[pluginName]` directories.
+
+Feature plugins inherit from the
 [Module](https://github.com/feelfreelinux/euphonium/blob/master/euphonium/include/Module.h)
 and [bell::Task](https://github.com/feelfreelinux/bell/blob/master/include/Task.h#L17) classes.
 
@@ -122,12 +130,12 @@ public:
 };
 ```
 
-When C++ Modules are loaded, they are provided with a reference to the `berry`
-and `luaEventBus`, and then their `setupBindings()` method is called with the
-following:
+When Featuer plugins are loaded, they are provided with a reference to the
+`berry` and `luaEventBus`, and then their `setupBindings()` method is called
+with the following:
 
 ```cpp
-// core.cpp
+// euphonium/src/Core.cpp
 plugin->berry = this->berry;
 plugin->luaEventBus = this->luaEventBus;
 plugin->setupBindings();
@@ -136,9 +144,17 @@ plugin->setupBindings();
 The `berry` and `luaEventsBus` are used to communicate with the application
 layer, as illustrated below.
 
-## Communication between Application Layers
+### Driver Layer Plugins in Brief
 
-### Communication from Web Forms to Application Layer Plugins
+Driver layer plugins (drivers, really) implement platform specific features and
+are located in the platform specific `target/[platform]` directories. For
+example, the I2C driver for the ESP32 is contained in the
+`target/esp32/app/main/driver` directory. Drivers are used to expose platform
+specific features (e.g. I2C) to the application layer.
+
+# Communication between Euphonium Layers
+
+## Communication from Web Forms to Application Layer Plugins
 
 The web forms in the settings section of the app communicate to the application
 layer via HTTP requests made to the `/plugins/:name` endpoint. When a `POST`
@@ -156,14 +172,14 @@ is called, so this invocation is merely an opportunity to respond to the
 state change; the method does not need to update it's own state in order for the
 state to be updated in this case.
 
-### Application Layer Plugin HTTP APIs
+## Application Layer Plugin HTTP APIs
 
 Application layer plugins may expose API endpoints by registering a
 callback with the [http plugin](https://feelfreelinux.github.io/euphonium/plugins/scripting-language/#http).
 
-## Examples
+# Examples
 
-### Application layer plugin Example
+## Application Layer Plugin Example
 
 This plugin toggles a pin LOW or HIGH in response to http `POST` requests made
 at a custom endpoint. Users can select the output pin on the in the web ap
@@ -231,14 +247,14 @@ http.handle("POST","/toggle-pin",def
 end)
 ```
 
-### The Event Bus
+## The Event Bus
 
-Communication within the Infrastructure and to the Application layer can be
-achieved by posting messages to an infrastructure layer event bus. Messages
-posted to the infrastructure layer event bus are propagated to both
-infrastructure and application layer event subscribers.
+Communication within the Feature and to the Application layer can be
+achieved by posting messages to an Feature layer event bus. Messages
+posted to the Feature layer event bus are propagated to both
+Feature and application layer event subscribers.
 
-When infrastructure plugins are registered, a reference to the `mainEventBus` is
+When Feature plugins are registered, a reference to the `mainEventBus` is
 bound to the plugin's `luaEventBus` property. Modules can therefor post events
 to the event bus using
 
@@ -246,7 +262,7 @@ to the event bus using
 this->luaEventBus->postEvent(std::move(event));
 ```
 
-Infrastructure layer plugins can subscribe to the event bus by registering a
+Feature layer plugins can subscribe to the event bus by registering a
 listener which implements the EventSubscriber interface. Plugins which implement
 an appropriate `handleEvent()` method can therefore register themselves as
 subscribers using:
@@ -284,15 +300,15 @@ end)
 
 ## Exposing C++ Objects in the Berry language
 
-While events can be propagated from the infrastructure layer to the application
+While events can be propagated from the feature layer to the application
 layer, (as of this writing) the same mechanism cannot be used to communicate
-from the application layer to the infrastructure layer. In order for the the
-infrastructure layer to receive events from the application layer,
-infrastructure plugins can bind functions, methods, and values into berry
+from the application layer to the feature layer. In order for the the
+feature layer to receive events from the application layer,
+feature plugins can bind functions, methods, and values into berry
 runtime.
 
 This is accomplished using the convenience methods of the `berry` reference
-that is attached to each infrastructure plugin, such as:
+that is attached to each feature plugin, such as:
 
 ```cpp
 // bind the MQTTPlugin::publish method to mqqt.pugin function in the berry runtime
@@ -334,27 +350,27 @@ yarn start
 then Navigate to `http://localhost:3000` (if the window doesn't open on it's
 own) to use the Web IDE
 
-## Installing Infrastructure layer (C/C++) plugins
+## Installing Feature layer (C/C++) plugins
 
 ### Installing the `.cpp` and `.h` files:
 
 Your plugin will need `.h` and `.cpp` files, which you can create with:
 
-```
+```sh
 pushd euphonium/src/plugins
-mkdir my-plugin
-cd my-plugin
-touch my-plugin.cpp
+mkdir newFeature
+cd newFeature
+touch newFeaturePlugin.cpp
 popd
 ```
 
 and:
 
-```
+```sh
 pushd euphonium/include/plugins
-mkdir my-plugin
-cd my-plugin
-touch my-plugin.h
+mkdir newFeature
+cd newFeature
+touch newFeaturePlugin.h
 popd
 ```
 
@@ -376,24 +392,60 @@ Finally, you'll need to add include your plugin's header file to
 plugins](https://github.com/feelfreelinux/euphonium/blob/master/euphonium/src/Core.cpp#L42-L46)
 in `euphonium/src/Core.cpp`
 
-### Using libraries
+## Using libraries with Feature Plugins
 
 If your plugin is going to rely on existing external C/C++ libraries, then
 you'll need to load them into the repo (preferably as sub-modules), and tell the
-build system about the additional libraries. For example, if you want to add a
-display using the awesome `u8g2` library, you could add the required libraries
-as git submodules like so:
+build system about the additional libraries. For example, if you want to library
+from `github.com/some/great-library`, then you'll want to clone in into `euphonium/`
+with:
 
 ```sh
-git submodule add ../../olikraus/u8g2 euphonium/u8g2
-git submodule add ../../mkfrey/u8g2-hal-esp-idf euphonium/u8g2-hal-esp-idf
+git submodule add ../../some/great-library euphonium/great-library
 ```
 
-and let the cmake build system know about your new dependencies
-by adding these lines near the top of the `/euphonium/CMakeList.txt` file just
-below the other calls to `add_subdirectory(...)`:
+and then update `euphonium/CMakeLists.txt` with your dependency. Probably
+something like
 
 ```cmake
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/u8g2 ${CMAKE_CURRENT_BINARY_DIR}/u8g2)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/u8g2-hal-esp-idf ${CMAKE_CURRENT_BINARY_DIR}/u8g2-hal-esp-idf)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/bell ${CMAKE_CURRENT_BINARY_DIR}/bell)
 ```
+
+as well as adding your library to this lists in `target_link_libraries()` and
+`target_include_directories()`. A note of caution: Libraries that are aware of
+or depend on the esp-idf features are likely to [flummox the build process](https://github.com/feelfreelinux/euphonium/issues/58)
+if they are included in the euphonium core (`euphonium/`)
+
+# Installing Platform Specific Drivers
+
+Platform specific drivers, will depend on the platform. New feature drivers for
+the ESP32, for example, can be installed with:
+
+```
+pushd targets/esp32/app/main/driver
+mkdir feature
+cd feature
+touch featureDriver.cpp
+touch featureDriver.h
+popd
+```
+
+Driver functionality should be exposed to the Application layer in the usual way
+with the Berry language vm with the export helpers
+(`berry->export_something()`), which the ESP32 platform exposes to the drivers
+registers
+[here](https://github.com/feelfreelinux/euphonium/blob/master/targets/esp32/app/main/driver/ESP32Platform.cpp#L125-L141)
+
+## Using ESP-IDF Libraries with (Drivers)
+
+When writing drivers for the ESP32, the ESP-IDF will automatically include
+projects in the `targets/esp32/app/components` directory. For example, if you
+want to add a display using the awesome `u8g2` library, you could add the
+required libraries as git submodules like so:
+
+```sh
+git submodule add ../../olikraus/u8g2 targets/esp32/app/components/u8g2
+git submodule add ../../mkfrey/u8g2-hal-esp-idf targets/esp32/app/components/u8g2-hal-esp-idf
+```
+
+and like that, your new components can be consumed in your driver files.
