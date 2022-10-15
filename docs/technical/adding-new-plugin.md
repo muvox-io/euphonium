@@ -43,9 +43,7 @@ class MyPlugin : Plugin
 
     def on_event(event, data)
        # Handle events, such as plugin initialization, updates to the plugin
-       # state (in response to user interaction with the Web app), and
-       # events propagated from infrastructure layer (including your own custom
-       # events defined in an infrastructure layer plugin)
+       # state (in response to user interaction with the Web app)
     end
 end
 
@@ -55,6 +53,14 @@ my_plugin = MyPlugin()
 # Register your plugin with the euphonium application
 euphonium.register_plugin(my_plugin)
 ```
+
+As of this writing, these are the events handled by the plugin's `on_event()` method:
+
+- EVENT_CONFIG_UPDATED
+- EVENT_VOLUME_UPDATED
+- EVENT_SYSTEM_INIT
+- EVENT_SET_PAUSE
+- EVENT_PLUGIN_INIT
 
 ### Infrastructure (C++) plugins in brief
 
@@ -260,27 +266,16 @@ Notably the Euphonium Core registers itself as a subscriber, and uses that
 subscription to propagate events to the `handle_event` global in the application
 layer which then propagate those events to registered event handlers and plugins.
 
-Application layer plugins receive these event notifications with a call to their
-`plugin.on_event()` method, like so:.
-
-```berry
-class MyPlugin : Plugin
-    def on_event(event, data)
-        if event == 'wifiStateChanged'
-            # Do something when the wifi state changes...
-        end
-    end
-end
-```
-
-Alternatively, application layer plugins can receive events by registering a
-callback manually with the euphonium core using:
+Application layer plugins can receive events by registering a callback manually
+with the euphonium core using:
 
 ```berry
 euphonium.register_handler('wifiStateChanged', def (event)
     # Do something when the wifi state changes...
 end)
 ```
+
+**Note that** only one handler register may be registered to a given event.
 
 ## Exposing C++ Objects in the Berry language
 
