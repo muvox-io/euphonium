@@ -136,7 +136,7 @@ public:
 };
 ```
 
-When Featuer plugins are loaded, they are provided with a reference to the
+When Feature plugins are loaded, they are provided with a reference to the
 `berry` and `luaEventBus`, and then their `setupBindings()` method is called
 with the following:
 
@@ -293,6 +293,39 @@ end)
 
 **Note that** only one handler register may be registered to a given event.
 
+## Asynchronous tasks
+
+Application may need to do tasks periodically, such as update a display, call
+out to a web server, etc. As of this writing, these types of tasks cannot be
+accomplished in the application layer as berry language is synchronous, and code like this will block the application indefinitely :
+
+```berry
+# Do *not* to this:
+while 1
+    do_something()
+    sleep_ms(1000)
+end
+```
+
+Instead you'll need to create either a feature or driver plugin which inherits
+from `bell::Task` and runs your asynchronous tasks in a FreeRTOS task, like so:
+
+```cpp
+MyAwesomePlugin::MyAwesomePlugin() : bell::Task("awesome", 6 * 1024, 0, 1) {
+    name = "awesome";
+    // create the FreeRTOS Task to run the `runTask()` method
+    this->startTask();
+}
+
+void MyAwesomePlugin::runTask() {
+    while (true) // or any FreeRTOS idiom like `for(auto item: someQueue)`
+    {
+        do_something()
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
+```
+
 ## Exposing C++ Objects in the Berry language
 
 While events can be propagated from the feature layer to the application
@@ -306,7 +339,7 @@ This is accomplished using the convenience methods of the `berry` reference
 that is attached to each feature plugin, such as:
 
 ```cpp
-// bind the MQTTPlugin::publish method to mqqt.pugin function in the berry runtime
+// bind the MQTTPlugin::publish method to mqqt.plugin function in the berry runtime
 berry->export_this("publish", this, &MQTTPlugin::publish, "mqtt");
 
 // bind the gpioDigitalWrite function to gpio.digital_write function in the berry runtime
@@ -425,11 +458,16 @@ touch featureDriver.h
 popd
 ```
 
-Driver functionality should be exposed to the Application layer in the usual way
-with the Berry language vm with the export helpers
-(`berry->export_something()`), which the ESP32 platform exposes to the drivers
-registers
-[here](https://github.com/feelfreelinux/euphonium/blob/master/targets/esp32/app/main/driver/ESP32Platform.cpp#L125-L141)
+Driver functionality should be exposed to the Application layer in the usual
+ways:
+
+- Exporting C/C++ functions into the Berry language vm with the export helpers
+  (`berry->export_something()`), which the ESP32 platform exposes to the drivers
+  registers
+  [here](https://github.com/feelfreelinux/euphonium/blob/master/targets/esp32/app/main/driver/ESP32Platform.cpp#L125-L141)
+
+- create a plugin which inherits from `bell::Task` and [register it as a plugin
+  in main.cpp](https://github.com/feelfreelinux/euphonium/blob/e562fea1a8eb659e9cba97820036f6208b2aec34/targets/esp32/app/main/main.cpp#L50), which is how the Bluetooth Plugin is registered in the ESP32 target.
 
 ## Using ESP-IDF Libraries with (Drivers)
 
