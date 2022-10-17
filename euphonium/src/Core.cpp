@@ -112,7 +112,7 @@ void Core::emptyBuffers() { audioBuffer->clearBuffer(); }
 
 void Core::loadScript(std::string file) { loader->loadScript(file, berry); }
 
-void Core::handleEvent(std::unique_ptr<Event> event) {
+void Core::handleEvent(std::unique_ptr<Event> &event) {
     EUPH_LOG(debug, "core", "Got event");
     // Load function
     berry->get_global("handle_event");

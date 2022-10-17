@@ -49,7 +49,7 @@ public:
     void runTask();
     void emptyBuffers();
     void loadScript(std::string file);
-    void handleEvent(std::unique_ptr<Event> event);
+    void handleEvent(std::unique_ptr<Event> &event);
     void setupBindings();
     std::string getPlatform();
     std::string getVersion();
