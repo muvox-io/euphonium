@@ -1,0 +1,29 @@
+{
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "build"],
+  "compileOnSave": true,
+  "compilerOptions": {
+    "target": "es5", // Compatible with older browsers
+    "module": "commonjs", // Compatible with both Node.js and browser
+    "moduleResolution": "node", // Tell tsc to look in node_modules for modules
+    "sourceMap": false, // Creates *.js.map files
+    "inlineSourceMap": true,
+    "strict": true, // Strict types, eg. prohibits `var x=0; x=null`
+    "alwaysStrict": true, // Enable JavaScript's "use strict" mode
+    "types": ["node"],
+    "outDir": "build",
+    "sourceRoot": "./src",
+    "noImplicitAny": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "typeRoots": ["./node_modules/@types"],
+    "jsx": "react"
+  },
+  "typedocOptions": {
+    "mode": "modules",
+    "out": "docs/build",
+    "categorizeByGroup": true,
+    "theme": "docs/themeoverride",
+    "excludeNotExported": false
+  }
+}

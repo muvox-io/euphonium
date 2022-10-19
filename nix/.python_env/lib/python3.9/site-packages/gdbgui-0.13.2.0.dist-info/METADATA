@@ -1,0 +1,63 @@
+Metadata-Version: 2.1
+Name: gdbgui
+Version: 0.13.2.0
+Summary: Browser-based frontend to gdb. Debug C, C++, Go, or Rust.
+Home-page: https://github.com/cs01/gdbgui
+Author: Chad Smith
+Author-email: grassfedcode@gmail.com
+License: License :: GNU GPLv3
+Keywords: gdb,debug,c,c++,go,rust,python,machine-interface,parse,frontend,flask,browser,gui
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Description-Content-Type: text/markdown
+Requires-Dist: Flask (<1.0,>=0.12.2)
+Requires-Dist: Flask-Compress (<2.0,>=1.4.0)
+Requires-Dist: Flask-SocketIO (<3.0,>=2.9)
+Requires-Dist: gevent (<2.0,>=1.2.2)
+Requires-Dist: pygdbmi (<1.0,>=0.9.0.0)
+Requires-Dist: Pygments (<3.0,>=2.2.0)
+Provides-Extra: dev
+Requires-Dist: flake8 (==3.5.0) ; extra == 'dev'
+Requires-Dist: mkdocs ; extra == 'dev'
+Requires-Dist: mkdocs-material ; extra == 'dev'
+Requires-Dist: collective.checkdocs (==0.2) ; extra == 'dev'
+Requires-Dist: PyInstaller (==3.3.1) ; extra == 'dev'
+Requires-Dist: check-manifest (==0.39) ; extra == 'dev'
+Requires-Dist: black ; (python_version >= "3.6") and extra == 'dev'
+
+<p align="center">
+<a href="http://gdbgui.com"><img src="https://github.com/cs01/gdbgui/raw/master/images/gdbgui_banner.png"></a>
+</p>
+
+<h3 align="center">
+A modern, browser-based frontend to gdb (gnu debugger)
+</h3>
+
+<p align="center">
+<a href="https://travis-ci.org/cs01/gdbgui">
+<img src="https://travis-ci.org/cs01/gdbgui.svg?branch=master" alt="image" /></a>
+
+<a href="https://pypi.python.org/pypi/gdbgui/">
+<img src="https://img.shields.io/badge/pypi-0.13.2.0-blue.svg" alt="image" />
+</a>
+
+<img src="https://pepy.tech/badge/gdbgui" alt="image" />
+
+</p>
+
+---
+
+**Documentation**: https://gdbgui.com
+
+**Source Code**: https://github.com/cs01/gdbgui/
+
+

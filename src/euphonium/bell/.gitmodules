@@ -1,0 +1,17 @@
+[submodule "tremor"]
+	path = tremor
+	url = https://gitlab.xiph.org/xiph/tremor.git
+	branch = lowmem
+[submodule "cJSON"]
+	path = cJSON
+	url = https://github.com/DaveGamble/cJSON
+[submodule "nanopb"]
+	path = nanopb
+	url = https://github.com/nanopb/nanopb
+[submodule "opus"]
+	path = opus
+	url = https://github.com/xiph/opus
+
+[submodule "alac"]
+	path = alac
+	url = https://github.com/philippe44/alac

@@ -1,0 +1,2 @@
+#!/bin/sh
+node $EUPH_BUILD_CLI/src/cli.js $@

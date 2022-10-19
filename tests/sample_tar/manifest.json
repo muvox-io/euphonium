@@ -1,9 +1,0 @@
-{
-    "name": "Test package",
-    "author": "feelfreelinux",
-    "version": "1.0",
-    "core_req": ">=0.1.0",
-    "description": "Test package",
-    "upstream_url": "",
-    "upstream_manifest_url": ""
-}

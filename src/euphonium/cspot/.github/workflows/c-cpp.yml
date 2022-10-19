@@ -1,0 +1,57 @@
+name: C/C++ CI
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    strategy:
+        matrix:
+          os: [macos-latest, ubuntu-latest]
+        fail-fast: false
+    runs-on:  ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        
+    - name: Install Protoc
+      uses: arduino/setup-protoc@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }} # https://github.com/arduino/setup-protoc/issues/6
+        
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v1.4
+      with:
+        cmake-version: '3.18.x'
+
+    - name: Install avachi libraries (mDNS) and asound
+      run: sudo apt-get install libavahi-compat-libdnssd-dev libasound2-dev
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      
+    - name: Install openssl on macos
+      run: |
+        brew upgrade openssl@1.1
+        brew link --force openssl@1.1
+        brew install portaudio
+        brew link --force portaudio
+        export PKG_CONFIG_PATH="/usr/local/Cellar/portaudio/19.6.0/lib/pkgconfig"
+        export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/openssl@1.1/lib/pkgconfig"
+        pkg-config --modversion openssl
+        pkg-config --modversion portaudio-2.0
+        echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH" >> $GITHUB_ENV
+      if: ${{ matrix.os == 'macos-latest' }}
+      
+    - name: Install python dependencies
+      run: python3 -m pip install --upgrade pip setuptools wheel
+      
+    - name: Install grpcio-tools
+      run: sudo pip3 install grpcio-tools
+      
+    - name: List files in cspot directory
+      run: echo "cspot/ files:" && ls cspot && echo "cspot/bell files:" && ls cspot/bell/cJSON
+      
+    - name: cmake
+      run: cd targets/cli && mkdir -p build && cd build && cmake ..
+      
+    - name: make
+      run: cd  targets/cli/build && make

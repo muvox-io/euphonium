@@ -1,0 +1,3 @@
+[console_scripts]
+gdbgui = gdbgui.backend:main
+

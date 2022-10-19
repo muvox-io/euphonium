@@ -1,9 +1,13 @@
-[submodule "euphonium/cspot"]
-	path = euphonium/cspot
+[submodule "src/euphonium/cspot"]
+	path = src/euphonium/cspot
 	url = https://github.com/feelfreelinux/cspot
-[submodule "euphonium/bell"]
-	path = euphonium/bell
+[submodule "src/euphonium/bell"]
+	path = src/euphonium/bell
 	url = https://github.com/feelfreelinux/bell
-[submodule "targets/esp32/app/components/esp_littlefs"]
-	path = targets/esp32/app/components/esp_littlefs
+[submodule "src/targets/esp32/app/components/esp_littlefs"]
+	path = src/targets/esp32/app/components/esp_littlefs
 	url = https://github.com/joltwallet/esp_littlefs.git
+[submodule "nix/esp-idf/sdk"]
+	path = nix/esp-idf/sdk
+	url = git@github.com:espressif/esp-idf.git
+	branch = release/v4.4

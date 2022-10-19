@@ -1,7 +1,8 @@
 .DS_Store
 *.d
 .idea
-.cache
+.cache/
+fs-defaults/
 .cache/
 authBlob.json
 cmake-build-debug
