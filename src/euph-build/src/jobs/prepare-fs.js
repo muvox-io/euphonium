@@ -1,6 +1,8 @@
 import { asyncExec } from "../utils/async-exec.js";
 
 export const prepareFS = async ({ incrementStep, config }) => {
+    await asyncExec("mkdir", ["-p", config.outputDir]);
+    await asyncExec("mkdir", ["-p", 'fs-defaults']);
     await asyncExec("rm", ['-rf', 'fs-tmp'], { cwd: config.outputDir });
     
     // Copy base fs
