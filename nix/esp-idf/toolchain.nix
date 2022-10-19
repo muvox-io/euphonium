@@ -13,13 +13,13 @@ let
     "x86_64-windows" = "win64";
   };
   platformHash = {
-    "linux-amd64" = "161wxgfhln82788717m0wv9acvvp1mbh39i9m3fbn9hqqkp62873";
-    "linux-arm64" = "04py5c277d563vf04934xcdjbyq6rcdwaz3fh31c6fzvmbfckghz";
+    "linux-amd64" = "0drd0pid0b5dc8j1ypbr78qqflp3sdq0z8q4wm0in0f21424xwcf";
+    "linux-arm64" = "1dw9l485wl64q4dhhpy1mzcdqzkin907hr7q85m78b7m5sn1glp7";
     "linux-armel" = "12qgd7v6yhvcp9vrrv0knys1lcl40jmc1kn6gsqhvz4n8khjdfvg";
     "linux-armhf" = "04hv96gaarwhqa8n36pjx3mz1mqi27kxa6npmz3jljmhlidqhpdh";
     "linux-i686" = "1jvf58p96w7kd573dhh1qv8hzl0bmidq6ai1c4h7l80qn82y1y2x";
-    "macos" = "0rkj8jgx8l0bvqqf1j1r4q5w6ccnwlb2ypaizl6j47kj0ch9y0m3";
-    "macos-arm64" = "sUGJdy1wqWgTiV//dzHQ8v7AyCXPwC4ALW2RoMxLax0";
+    "macos" = "1i2x1nsvk35v63kn74vczm6bgcgr0jhwlz4zk163ljh2vagi1bqr";
+    "macos-arm64" = "07bb9g6a14bd5l02xh6g4p4c1zpjs0qpgzszi49niabh5mvqjhdi";
   };
   platform = platforms.${stdenv.system};
   toolchainHash = platformHash.${platform};
