@@ -31,7 +31,7 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "https://github.com/espressif/crosstool-NG/releases/download/esp-${version}/xtensa-esp32-elf-gcc8_4_0-esp-${version}-${platform}.tar.gz";
-    hash = toolchainHash;
+    sha256 = toolchainHash;
   };
 
   buildInputs = [ makeWrapper ];
