@@ -1,74 +1,13 @@
-name: ESP IDF
-
-on: [push, pull_request]
-
+name: Build euphonium
+on:
+  pull_request:
+  push:
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v18
       with:
-        submodules: recursive
-      
-    - name: Cache build
-      id: cache-build
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.npms
-        key: ${{ runner.os }}-esp32-app-build
-
-    - name: Build the firmware
-      run: |
-        cd web
-        npm install
-        npm run build
-        cd ..
-        mkdir -p targets/esp32/app/spiffs
-        cp -r web/dist/. targets/esp32/app/spiffs/
-        echo ${{github.ref_name}} > targets/esp32/app/spiffs/scripts-version
-        echo ${{github.ref_name}} > euphonium/scripts/scripts-version
-        docker run --rm -v $PWD:/project --env EUPH_VER=${{github.ref_name}} --env IDF_CCACHE_ENABLE=0 -w /project espressif/idf:release-v4.4 /bin/bash -c "python3 -m pip install --upgrade pip setuptools wheel && \
-          pip3 install grpcio-tools && cd targets/esp32 && export EUPH_VER="${{github.ref_name}}" && sh generate_full_build.sh"
-        ls -la targets/esp32/build
-        cat euphonium/scripts/scripts-version
-    
-    - name: Archive production artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: Firmware
-        path: |
-          targets/esp32/*.tar.gz
-          targets/esp32/ota_checksum.txt
-          targets/esp32/scripts.tar
-          targets/esp32/scripts_checksum.txt
-          targets/esp32/ota.bin
-          
-    - name: Check file existence
-      id: check_files
-      uses: andstor/file-existence-action@v1
-      with:
-        files: |
-          targets/esp32/build/euphonium-esp32.bin,
-          targets/esp32/euphonium-${{github.ref_name}}.tar.gz, 
-          targets/esp32/ota_checksum.txt, 
-          targets/esp32/scripts.tar, 
-          targets/esp32/scripts_checksum.txt, 
-          targets/esp32/ota.bin
-        allow_failure: true
-        
-    - name: File exists
-      if: steps.check_files.outputs.files_exists == 'true'
-      # Only runs if all of the files exists
-      run: echo All files exists!
-        
-    - name: Release
-      uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
-      with:
-        files: |
-          targets/esp32/euphonium-${{github.ref_name}}.tar.gz
-          targets/esp32/ota_checksum.txt
-          targets/esp32/scripts.tar
-          targets/esp32/scripts_checksum.txt
-          targets/esp32/ota.bin
+        nix_path: nixpkgs=channel:nixos-22.05
+    - run: nix-shell nix/shell.nix --run 'euph-build esp32 build'

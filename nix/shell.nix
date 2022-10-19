@@ -21,6 +21,7 @@ pkgs.mkShell {
       # Native dependencies
       portaudio
       mbedtls
+      protobuf
 
       # esp-idf specific
       (pkgs.callPackage ./esp-idf/toolchain.nix {})
