@@ -6,6 +6,7 @@ fs-defaults/
 .cache/
 authBlob.json
 cmake-build-debug
+.python-env/
 scripts-version
 wifi.config.json
 build/
