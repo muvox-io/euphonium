@@ -1,0 +1,1236 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation (Wiki) for Euphonium">
+      
+      
+      
+        <link rel="canonical" href="https://euphonium.github.io/docs/technical/adding-new-plugin/">
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.4.1">
+    
+    
+      
+        <title>Writing your own plugin - Euphonium</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.69437709.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Barlow:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Barlow";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="euphonium" data-md-color-primary="" data-md-color-accent="indigo">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#extending-euphonium" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Euphonium" class="md-header__button md-logo" aria-label="Euphonium" data-md-component="logo">
+      
+  <img src="../../images/euph.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Euphonium
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Writing your own plugin
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="euphonium" data-md-color-primary="" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/feelfreelinux/euphonium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    feelfreelinux/euphonium
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link md-tabs__link--active">
+        Home
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Euphonium" class="md-nav__button md-logo" aria-label="Euphonium" data-md-component="logo">
+      
+  <img src="../../images/euph.svg" alt="logo">
+
+    </a>
+    Euphonium
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/feelfreelinux/euphonium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    feelfreelinux/euphonium
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1" type="checkbox" id="__nav_1" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_1">
+          Home
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Home" data-md-level="1">
+        <label class="md-nav__title" for="__nav_1">
+          <span class="md-nav__icon md-icon"></span>
+          Home
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Euphonium documentation
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../status/" class="md-nav__link">
+        Status
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plugins/" class="md-nav__link">
+        Plugins
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1_5" type="checkbox" id="__nav_1_5" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_1_5">
+          Technical documentation
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Technical documentation" data-md-level="2">
+        <label class="md-nav__title" for="__nav_1_5">
+          <span class="md-nav__icon md-icon"></span>
+          Technical documentation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        Architecture
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dev-environment/" class="md-nav__link">
+        Setting up development environment
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adding-new-dac/" class="md-nav__link">
+        Adding support to new DAC
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Writing your own plugin
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Writing your own plugin
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#euphonium-architecture" class="md-nav__link">
+    Euphonium Architecture
+  </a>
+  
+    <nav class="md-nav" aria-label="Euphonium Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#web-plugins-in-brief" class="md-nav__link">
+    Web Plugins in Brief
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#application-layer-plugins-in-brief" class="md-nav__link">
+    Application Layer Plugins in Brief
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#feature-layer-plugins-in-brief" class="md-nav__link">
+    Feature Layer Plugins in Brief
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#driver-layer-plugins-in-brief" class="md-nav__link">
+    Driver Layer Plugins in Brief
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1_6" type="checkbox" id="__nav_1_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_1_6">
+          API Documentation
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="API Documentation" data-md-level="2">
+        <label class="md-nav__title" for="__nav_1_6">
+          <span class="md-nav__icon md-icon"></span>
+          API Documentation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plugins/scripting-language/" class="md-nav__link">
+        Scripting Language
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1_6_2" type="checkbox" id="__nav_1_6_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_1_6_2">
+          HTTP API
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="HTTP API" data-md-level="3">
+        <label class="md-nav__title" for="__nav_1_6_2">
+          <span class="md-nav__icon md-icon"></span>
+          HTTP API
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../http/" class="md-nav__link">
+        Euphonium REST API
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../http/main/" class="md-nav__link">
+        Core
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../http/devtools/" class="md-nav__link">
+        Plugin - DevTools
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../http/webradio/" class="md-nav__link">
+        Plugin - WebRadio
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../http/ota/" class="md-nav__link">
+        Plugin - OTA
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plugins/cpp.md" class="md-nav__link">
+        C++ Documentation
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        Hardware
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#euphonium-architecture" class="md-nav__link">
+    Euphonium Architecture
+  </a>
+  
+    <nav class="md-nav" aria-label="Euphonium Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#web-plugins-in-brief" class="md-nav__link">
+    Web Plugins in Brief
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#application-layer-plugins-in-brief" class="md-nav__link">
+    Application Layer Plugins in Brief
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#feature-layer-plugins-in-brief" class="md-nav__link">
+    Feature Layer Plugins in Brief
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#driver-layer-plugins-in-brief" class="md-nav__link">
+    Driver Layer Plugins in Brief
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+  <a href="https://github.com/feelfreelinux/docs/blob/master/docs/technical/adding-new-plugin.md" title="Edit this page" class="md-content__button md-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+
+<h1 id="extending-euphonium">Extending Euphonium<a class="headerlink" href="#extending-euphonium" title="Permanent link">~</a></h1>
+<h2 id="euphonium-architecture">Euphonium Architecture<a class="headerlink" href="#euphonium-architecture" title="Permanent link">~</a></h2>
+<p>There are essentially 4 layers of the Euphonium application which are:</p>
+<ul>
+<li>The Web UI written in React / Javascript</li>
+<li>The "Application layer" written in <a href="https://github.com/berry-lang/berry">Berry Scripting language</a>.</li>
+<li>A platform agnostic "Feature layer", written in C/C++</li>
+<li>A platform Specific "Driver layer", written in C/C++</li>
+</ul>
+<p>Plugins can integrate into each layer, and communicate between each layer.
+Having a firm understanding of how these layers communicate will help you
+understand what plugin's can do and what code you need to write when creating
+a new plugin.</p>
+<h3 id="web-plugins-in-brief">Web Plugins in Brief<a class="headerlink" href="#web-plugins-in-brief" title="Permanent link">~</a></h3>
+<p>Plugins can expose functionality the users in the Web Application via the
+<code>make_form()</code> method of the application layer plugin. Forms in the web app have
+two distinct functions: (1) exposing the current plugin state to the user, and
+(2) receiving inputs such as updated settings from users. The Web app is
+extended by creating an application layer plugin and creating a form using it's
+<code>make_form()</code> method.</p>
+<p>Additionally the Web app is a React (Vite) app located in the <code>web/</code> directory
+that you can modify to your heart's content.</p>
+<h3 id="application-layer-plugins-in-brief">Application Layer Plugins in Brief<a class="headerlink" href="#application-layer-plugins-in-brief" title="Permanent link">~</a></h3>
+<p>Application layer plugins are written in <a href="https://github.com/berry-lang/berry">Berry Scripting
+language</a> and inherit from the <a href="https://github.com/feelfreelinux/euphonium/blob/master/euphonium/scripts/internal/plugin.be">Plugin
+Class</a></p>
+<p>Plugin scripts located in the <code>euphonium/scripts/plugins</code> and are used to define a
+new plugin class, instantiate the plugin and register it with Euphonium like so:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">MyPlugin</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">Plugin</span><span class="w"></span>
+<span class="w">    </span><span class="kd">def</span><span class="w"> </span><span class="nf">init</span><span class="p">()</span><span class="w"></span>
+<span class="w">        </span><span class="c1"># Define constants like the plugin name</span><span class="w"></span>
+<span class="w">    </span><span class="k">end</span><span class="w"></span>
+
+<span class="w">    </span><span class="kd">def</span><span class="w"> </span><span class="nf">make_form</span><span class="p">(</span><span class="n">cts</span><span class="p">,</span><span class="n">state</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="c1"># Create the form that allows users to set plugin settings in the Web UI</span><span class="w"></span>
+<span class="w">    </span><span class="k">end</span><span class="w"></span>
+
+<span class="w">    </span><span class="kd">def</span><span class="w"> </span><span class="nf">on_event</span><span class="p">(</span><span class="n">event</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">)</span><span class="w"></span>
+<span class="w">       </span><span class="c1"># Handle events, such as plugin initialization, updates to the plugin</span><span class="w"></span>
+<span class="w">       </span><span class="c1"># state (in response to user interaction with the Web app)</span><span class="w"></span>
+<span class="w">    </span><span class="k">end</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+
+<span class="c1"># Instantiate your plugin</span><span class="w"></span>
+<span class="n">my_plugin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">MyPlugin</span><span class="p">()</span><span class="w"></span>
+
+<span class="c1"># Register your plugin with the euphonium application</span><span class="w"></span>
+<span class="n">euphonium</span><span class="p">.</span><span class="nf">register_plugin</span><span class="p">(</span><span class="n">my_plugin</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<p>As of this writing, these are the events handled by the plugin's <code>on_event()</code> method:</p>
+<ul>
+<li>EVENT_CONFIG_UPDATED</li>
+<li>EVENT_VOLUME_UPDATED</li>
+<li>EVENT_SYSTEM_INIT</li>
+<li>EVENT_SET_PAUSE</li>
+<li>EVENT_PLUGIN_INIT</li>
+</ul>
+<h3 id="feature-layer-plugins-in-brief">Feature Layer Plugins in Brief<a class="headerlink" href="#feature-layer-plugins-in-brief" title="Permanent link">~</a></h3>
+<p>Feature plugin interfaces are defined in the
+<code>euphonium/include/plugins/[pluginName]</code> directories and the methods are defined
+(out of line) in the <code>euphonium/src/plugins/[pluginName]</code> directories.</p>
+<p>Feature plugins inherit from the
+<a href="https://github.com/feelfreelinux/euphonium/blob/master/euphonium/include/Module.h">Module</a>
+and <a href="https://github.com/feelfreelinux/bell/blob/master/include/Task.h#L17">bell::Task</a> classes.</p>
+<p>For the purposes creating plugins,
+<a href="https://github.com/feelfreelinux/bell/blob/master/include/Task.h"><code>bell::Task</code></a>
+has the interface:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Task</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="k">public</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">taskName</span><span class="p">;</span><span class="w"></span>
+<span class="k">protected</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Override this to start your plugin task</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">runTask</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>and the
+<a href="https://github.com/feelfreelinux/euphonium/blob/master/euphonium/include/Module.h"><code>Module</code></a>
+class has this interface:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Module</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="k">public</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">Module</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="c1">// constructor</span>
+
+<span class="w">    </span><span class="c1">// Module name:</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">name</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Module Status:</span>
+<span class="w">    </span><span class="n">ModuleStatus</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ModuleStatus</span><span class="o">::</span><span class="n">SHUTDOWN</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// A shared pointer to the berry runtime (vm) which can be used to expose</span>
+<span class="w">    </span><span class="c1">// data and functions as to the berry runtime</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">berry</span><span class="o">::</span><span class="n">VmState</span><span class="o">&gt;</span><span class="w"> </span><span class="n">berry</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// A shared pointer to the luaEventBus where events can be posted to the</span>
+<span class="w">    </span><span class="c1">// application from the plugin</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">EventBus</span><span class="o">&gt;</span><span class="w"> </span><span class="n">luaEventBus</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// The audioBuffer</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">MainAudioBuffer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">audioBuffer</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// configuration managed by the</span>
+<span class="w">    </span><span class="n">berry</span><span class="o">::</span><span class="n">map</span><span class="w"> </span><span class="n">config</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// PLUGIN LIFE CYCLE METHODS:</span>
+
+<span class="w">    </span><span class="c1">// ??</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">loadScript</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">ScriptLoader</span><span class="o">&gt;</span><span class="w"> </span><span class="n">scriptLoader</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Called by the Core application when the Berry runtime is ready to have</span>
+<span class="w">    </span><span class="c1">// data and functions exported</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setupBindings</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// ??</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">startAudioThread</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Called by the Core application at shut down</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre></div>
+<p>When Feature plugins are loaded, they are provided with a reference to the
+<code>berry</code> and <code>luaEventBus</code>, and then their <code>setupBindings()</code> method is called
+with the following:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// euphonium/src/Core.cpp</span>
+<span class="n">plugin</span><span class="o">-&gt;</span><span class="n">berry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">berry</span><span class="p">;</span><span class="w"></span>
+<span class="n">plugin</span><span class="o">-&gt;</span><span class="n">luaEventBus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">luaEventBus</span><span class="p">;</span><span class="w"></span>
+<span class="n">plugin</span><span class="o">-&gt;</span><span class="n">setupBindings</span><span class="p">();</span><span class="w"></span>
+</code></pre></div>
+<p>The <code>berry</code> and <code>luaEventsBus</code> are used to communicate with the application
+layer, as illustrated below.</p>
+<h3 id="driver-layer-plugins-in-brief">Driver Layer Plugins in Brief<a class="headerlink" href="#driver-layer-plugins-in-brief" title="Permanent link">~</a></h3>
+<p>Driver layer plugins (drivers, really) implement platform specific features and
+are located in the platform specific <code>target/[platform]</code> directories. For
+example, the I2C driver for the ESP32 is contained in the
+<code>target/esp32/app/main/driver</code> directory. Drivers are used to expose platform
+specific features (e.g. I2C) to the application layer.</p>
+<h1 id="communication-between-euphonium-layers">Communication between Euphonium Layers<a class="headerlink" href="#communication-between-euphonium-layers" title="Permanent link">~</a></h1>
+<h2 id="communication-from-web-forms-to-application-layer-plugins">Communication from Web Forms to Application Layer Plugins<a class="headerlink" href="#communication-from-web-forms-to-application-layer-plugins" title="Permanent link">~</a></h2>
+<p>The web forms in the settings section of the app communicate to the application
+layer via HTTP requests made to the <code>/plugins/:name</code> endpoint. When a <code>POST</code>
+request is made to this endpoint, the request body is used to update the
+plugin's state, and the plugin is notified that it's stat has been updated with
+a call to it's <code>on_event()</code> method like so:</p>
+<div class="highlight"><pre><span></span><code><span class="n">plugin</span><span class="p">.</span><span class="nf">on_event</span><span class="p">(</span><span class="n">EVENT_CONFIG_UPDATED</span><span class="p">,</span><span class="w"> </span><span class="n">plugin</span><span class="p">.</span><span class="na">state</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<p>Note that even though the new plugin stat is supplied as the second argument to
+this method call, the plugin's state has already been replaced before the method
+is called, so this invocation is merely an opportunity to respond to the
+state change; the method does not need to update it's own state in order for the
+state to be updated in this case.</p>
+<h2 id="application-layer-plugin-http-apis">Application Layer Plugin HTTP APIs<a class="headerlink" href="#application-layer-plugin-http-apis" title="Permanent link">~</a></h2>
+<p>Application layer plugins may expose API endpoints by registering a
+callback with the <a href="https://feelfreelinux.github.io/euphonium/plugins/scripting-language/#http">http plugin</a>.</p>
+<h1 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">~</a></h1>
+<h2 id="application-layer-plugin-example">Application Layer Plugin Example<a class="headerlink" href="#application-layer-plugin-example" title="Permanent link">~</a></h2>
+<p>This plugin toggles a pin LOW or HIGH in response to http <code>POST</code> requests made
+at a custom endpoint. Users can select the output pin on the in the web ap
+under the "LED Driver" settings.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">LED_Driver</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">Plugin</span><span class="w"></span>
+<span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="n">pin</span><span class="w"></span>
+
+<span class="w">    </span><span class="kd">def</span><span class="w"> </span><span class="nf">init</span><span class="p">()</span><span class="w"></span>
+<span class="w">        </span><span class="kr">self</span><span class="p">.</span><span class="nf">apply_default_values</span><span class="p">()</span><span class="w"></span>
+<span class="w">        </span><span class="kr">self</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;led_driver&quot;</span><span class="w"></span>
+<span class="w">        </span><span class="kr">self</span><span class="p">.</span><span class="na">theme_color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;#d2c464&quot;</span><span class="w"></span>
+<span class="w">        </span><span class="kr">self</span><span class="p">.</span><span class="na">display_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;LED Driver&quot;</span><span class="w"></span>
+<span class="w">        </span><span class="kr">self</span><span class="p">.</span><span class="nb">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;plugin&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="k">end</span><span class="w"></span>
+
+<span class="w">    </span><span class="kd">def</span><span class="w"> </span><span class="nf">make_form</span><span class="p">(</span><span class="n">cts</span><span class="p">,</span><span class="n">state</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="c1"># Create the form that allows users select the output pin for the LED</span><span class="w"></span>
+<span class="w">        </span><span class="n">ctx</span><span class="p">.</span><span class="nf">create_group</span><span class="p">(</span><span class="s1">&#39;led-driver&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s1">&#39;label&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;General&#39;</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
+<span class="w">        </span><span class="n">ctx</span><span class="p">.</span><span class="nf">number_field</span><span class="p">(</span><span class="s1">&#39;pin&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="s1">&#39;label&#39;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Output Pin&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="s1">&#39;default&#39;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="s1">&#39;group&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;led-driver&#39;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">})</span><span class="w"></span>
+<span class="w">    </span><span class="k">end</span><span class="w"></span>
+
+<span class="w">    </span><span class="kd">def</span><span class="w"> </span><span class="nf">on_event</span><span class="p">(</span><span class="n">event</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">event</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">EVENT_CONFIG_UPDATED</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="n">data</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="s1">&#39;pin&#39;</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;pin&#39;</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">&#39;0&#39;</span><span class="w"></span>
+<span class="w">                </span><span class="n">gpio</span><span class="p">.</span><span class="nf">pin_mode</span><span class="p">(</span><span class="kr">self</span><span class="p">.</span><span class="na">state</span><span class="p">[</span><span class="s1">&#39;pin&#39;</span><span class="p">],</span><span class="w"> </span><span class="n">gpio</span><span class="p">.</span><span class="na">INPUT_PULLUP</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">end</span><span class="w"></span>
+<span class="w">        </span><span class="k">end</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">event</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">EVENT_PLUGIN_INIT</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="kr">self</span><span class="p">.</span><span class="na">state</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="s1">&#39;pin&#39;</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="kr">self</span><span class="p">.</span><span class="na">state</span><span class="p">[</span><span class="s1">&#39;pin&#39;</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">&#39;0&#39;</span><span class="w"></span>
+<span class="w">                </span><span class="n">gpio</span><span class="p">.</span><span class="nf">pin_mode</span><span class="p">(</span><span class="kr">self</span><span class="p">.</span><span class="na">state</span><span class="p">[</span><span class="s1">&#39;pin&#39;</span><span class="p">],</span><span class="w"> </span><span class="n">gpio</span><span class="p">.</span><span class="na">INPUT_PULLUP</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">end</span><span class="w"></span>
+<span class="w">        </span><span class="k">end</span><span class="w"></span>
+<span class="w">    </span><span class="k">end</span><span class="w"></span>
+
+<span class="w">    </span><span class="kd">def</span><span class="w"> </span><span class="nf">set_pin</span><span class="p">(</span><span class="n">pin_state</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="c1"># custom method to be called by the HTTP callback</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="kr">self</span><span class="p">.</span><span class="na">state</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="s1">&#39;pin&#39;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="kr">self</span><span class="p">.</span><span class="na">state</span><span class="p">.</span><span class="na">pin</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">&#39;0&#39;</span><span class="w"></span>
+<span class="w">            </span><span class="c1"># Output pin has not been set</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"></span>
+<span class="w">        </span><span class="k">end</span><span class="w"></span>
+<span class="w">        </span><span class="n">gpio</span><span class="p">.</span><span class="nf">digital_write</span><span class="p">(</span><span class="kr">self</span><span class="p">.</span><span class="na">pin</span><span class="p">,</span><span class="n">pin_state</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">end</span><span class="w"></span>
+
+<span class="k">end</span><span class="w"></span>
+
+<span class="c1"># Instantiate the application layer plugin</span><span class="w"></span>
+<span class="n">led_driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">LED_Driver</span><span class="p">()</span><span class="w"></span>
+
+<span class="c1"># Register the application layer plugin with the euphonium application</span><span class="w"></span>
+<span class="n">euphonium</span><span class="p">.</span><span class="nf">register_plugin</span><span class="p">(</span><span class="nf">CSpotPlugin</span><span class="p">())</span><span class="w"></span>
+
+<span class="c1"># Register the http endpoint</span><span class="w"></span>
+<span class="n">http</span><span class="p">.</span><span class="nf">handle</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span><span class="s2">&quot;/toggle-pin&quot;</span><span class="p">,</span><span class="kd">def</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">request</span><span class="p">.</span><span class="nf">json_body</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">&#39;true&#39;</span><span class="w"></span>
+<span class="w">        </span><span class="n">led_driver</span><span class="p">.</span><span class="nf">set_pin</span><span class="p">(</span><span class="n">gpio</span><span class="p">.</span><span class="na">HIGH</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"></span>
+<span class="w">        </span><span class="n">led_driver</span><span class="p">.</span><span class="nf">set_pin</span><span class="p">(</span><span class="n">gpio</span><span class="p">.</span><span class="na">LOW</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">end</span><span class="w"></span>
+<span class="k">end</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<h2 id="the-event-bus">The Event Bus<a class="headerlink" href="#the-event-bus" title="Permanent link">~</a></h2>
+<p>Communication within the Feature and to the Application layer can be
+achieved by posting messages to an Feature layer event bus. Messages
+posted to the Feature layer event bus are propagated to both
+Feature and application layer event subscribers.</p>
+<p>When Feature plugins are registered, a reference to the <code>mainEventBus</code> is
+bound to the plugin's <code>luaEventBus</code> property. Modules can therefor post events
+to the event bus using</p>
+<div class="highlight"><pre><span></span><code><span class="k">this</span><span class="o">-&gt;</span><span class="n">luaEventBus</span><span class="o">-&gt;</span><span class="n">postEvent</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">event</span><span class="p">));</span><span class="w"></span>
+</code></pre></div>
+<p>Feature layer plugins can subscribe to the event bus by registering a
+listener which implements the EventSubscriber interface. Plugins which implement
+an appropriate <code>handleEvent()</code> method can therefore register themselves as
+subscribers using:</p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">subscriber</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">dynamic_cast</span><span class="o">&lt;</span><span class="n">EventSubscriber</span><span class="w"> </span><span class="o">*&gt;</span><span class="p">(</span><span class="k">this</span><span class="p">);</span><span class="w"></span>
+<span class="n">luaEventBus</span><span class="o">-&gt;</span><span class="n">addListener</span><span class="p">(</span><span class="n">EventType</span><span class="o">::</span><span class="n">LUA_MAIN_EVENT</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">subscriber</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<p>Notably the Euphonium Core registers itself as a subscriber, and uses that
+subscription to propagate events to the <code>handle_event</code> global in the application
+layer which then propagate those events to registered event handlers and plugins.</p>
+<p>Application layer plugins can receive events by registering a callback manually
+with the euphonium core using:</p>
+<div class="highlight"><pre><span></span><code><span class="n">euphonium</span><span class="p">.</span><span class="nf">register_handler</span><span class="p">(</span><span class="s1">&#39;wifiStateChanged&#39;</span><span class="p">,</span><span class="w"> </span><span class="kd">def</span><span class="w"> </span><span class="p">(</span><span class="n">event</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># Do something when the wifi state changes...</span><span class="w"></span>
+<span class="k">end</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<p><strong>Note that</strong> only one handler register may be registered to a given event.</p>
+<h2 id="asynchronous-tasks">Asynchronous tasks<a class="headerlink" href="#asynchronous-tasks" title="Permanent link">~</a></h2>
+<p>Application may need to do tasks periodically, such as update a display, call
+out to a web server, etc. As of this writing, these types of tasks cannot be
+accomplished in the application layer as berry language is synchronous, and code like this will block the application indefinitely :</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Do *not* to this:</span><span class="w"></span>
+<span class="k">while</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">    </span><span class="nf">do_something</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="nf">sleep_ms</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+</code></pre></div>
+<p>Instead you'll need to create either a feature or driver plugin which inherits
+from <code>bell::Task</code> and runs your asynchronous tasks in a FreeRTOS task, like so:</p>
+<div class="highlight"><pre><span></span><code><span class="n">MyAwesomePlugin</span><span class="o">::</span><span class="n">MyAwesomePlugin</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">bell</span><span class="o">::</span><span class="n">Task</span><span class="p">(</span><span class="s">&quot;awesome&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;awesome&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// create the FreeRTOS Task to run the `runTask()` method</span>
+<span class="w">    </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">startTask</span><span class="p">();</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="n">MyAwesomePlugin</span><span class="o">::</span><span class="n">runTask</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="nb">true</span><span class="p">)</span><span class="w"> </span><span class="c1">// or any FreeRTOS idiom like `for(auto item: someQueue)`</span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">do_something</span><span class="p">()</span><span class="w"></span>
+<span class="w">        </span><span class="n">vTaskDelay</span><span class="p">(</span><span class="mi">1000</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">portTICK_PERIOD_MS</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<h2 id="exposing-c-objects-in-the-berry-language">Exposing C++ Objects in the Berry language<a class="headerlink" href="#exposing-c-objects-in-the-berry-language" title="Permanent link">~</a></h2>
+<p>While events can be propagated from the feature layer to the application
+layer, (as of this writing) the same mechanism cannot be used to communicate
+from the application layer to the feature layer. In order for the the
+feature layer to receive events from the application layer,
+feature plugins can bind functions, methods, and values into berry
+runtime.</p>
+<p>This is accomplished using the convenience methods of the <code>berry</code> reference
+that is attached to each feature plugin, such as:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// bind the MQTTPlugin::publish method to mqqt.plugin function in the berry runtime</span>
+<span class="n">berry</span><span class="o">-&gt;</span><span class="n">export_this</span><span class="p">(</span><span class="s">&quot;publish&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">MQTTPlugin</span><span class="o">::</span><span class="n">publish</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mqtt&quot;</span><span class="p">);</span><span class="w"></span>
+
+<span class="c1">// bind the gpioDigitalWrite function to gpio.digital_write function in the berry runtime</span>
+<span class="n">berry</span><span class="o">-&gt;</span><span class="n">export_function</span><span class="p">(</span><span class="s">&quot;digital_write&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">gpioDigitalWrite</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;gpio&quot;</span><span class="p">);</span><span class="w"></span>
+
+<span class="c1">// bind the sleepMS function to sleep_ms global function in the berry runtime</span>
+<span class="n">berry</span><span class="o">-&gt;</span><span class="n">export_function</span><span class="p">(</span><span class="s">&quot;sleep_ms&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sleepMS</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<h1 id="installing-plugins">Installing Plugins<a class="headerlink" href="#installing-plugins" title="Permanent link">~</a></h1>
+<h2 id="installing-application-layer-plugins">Installing Application layer plugins<a class="headerlink" href="#installing-application-layer-plugins" title="Permanent link">~</a></h2>
+<p>The Berry scripts that define the application layer plugins are stored in the
+<code>euphonium/scripts/plugin</code> directory.</p>
+<p><strong>Pro Tip:</strong> Start by creating a blank file (<code>my-plugin.be</code>) for your plugin,
+then compile, flash, and run the Euphonium application. This will create a new
+empty file in the that you can edit using the Web IDE. The Web IDE is a web
+application that you can run from your local machine, connect to your ESP32, edit
+your new plugin and debug your code in real time. When the plugin is working
+the way you like it, copy your code out of the web IDE and into your plugin's
+<code>.be</code> file.</p>
+<p>You can start the Web IDE by navigating to the <code>/web-ide</code> in the repo, with
+these commands:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># install the dependencies (only required once)</span>
+yarn install
+
+<span class="c1"># Run the Web IDE application</span>
+yarn start
+</code></pre></div>
+<p>then Navigate to <code>http://localhost:3000</code> (if the window doesn't open on it's
+own) to use the Web IDE</p>
+<h2 id="installing-feature-layer-cc-plugins">Installing Feature layer (C/C++) plugins<a class="headerlink" href="#installing-feature-layer-cc-plugins" title="Permanent link">~</a></h2>
+<h3 id="installing-the-cpp-and-h-files">Installing the <code>.cpp</code> and <code>.h</code> files:<a class="headerlink" href="#installing-the-cpp-and-h-files" title="Permanent link">~</a></h3>
+<p>Your plugin will need <code>.h</code> and <code>.cpp</code> files, which you can create with:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">pushd</span> euphonium/src/plugins
+mkdir newFeature
+<span class="nb">cd</span> newFeature
+touch newFeaturePlugin.cpp
+<span class="nb">popd</span>
+</code></pre></div>
+<p>and:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">pushd</span> euphonium/include/plugins
+mkdir newFeature
+<span class="nb">cd</span> newFeature
+touch newFeaturePlugin.h
+<span class="nb">popd</span>
+</code></pre></div>
+<p>Next, you'll need to tell the build system about the source files for your new
+plugin by adding to the list of glob patterns (e.g.
+<code>"src/plugins/my-plugin/*.cpp"</code> or <code>"src/plugins/my-plugin/*.c"</code>)
+<a href="https://github.com/feelfreelinux/euphonium/blob/master/euphonium/CMakeLists.txt#L15">here</a>
+in the same <code>CMakeLists.txt</code> file.</p>
+<p>You also need to add your include directory near the bottom of
+<code>euphonium/CMakeLists.txt</code> like so:</p>
+<div class="highlight"><pre><span></span><code><span class="n">include_directories</span><span class="p">(</span><span class="s">&quot;include/plugins/my-plugin&quot;</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<p>Finally, you'll need to add include your plugin's header file to
+<code>euphonium/include/Core.cpp</code>, and add your plugin to the <a href="https://github.com/feelfreelinux/euphonium/blob/master/euphonium/src/Core.cpp#L42-L46">list of registered
+plugins</a>
+in <code>euphonium/src/Core.cpp</code></p>
+<h2 id="using-libraries-with-feature-plugins">Using libraries with Feature Plugins<a class="headerlink" href="#using-libraries-with-feature-plugins" title="Permanent link">~</a></h2>
+<p>If your plugin is going to rely on existing external C/C++ libraries, then
+you'll need to load them into the repo (preferably as sub-modules), and tell the
+build system about the additional libraries. For example, if you want to library
+from <code>github.com/some/great-library</code>, then you'll want to clone in into <code>euphonium/</code>
+with:</p>
+<div class="highlight"><pre><span></span><code>git submodule add ../../some/great-library euphonium/great-library
+</code></pre></div>
+<p>and then update <code>euphonium/CMakeLists.txt</code> with your dependency. Probably
+something like</p>
+<div class="highlight"><pre><span></span><code><span class="nb">add_subdirectory</span><span class="p">(</span><span class="o">${</span><span class="nv">CMAKE_CURRENT_SOURCE_DIR</span><span class="o">}</span><span class="s">/bell</span><span class="w"> </span><span class="o">${</span><span class="nv">CMAKE_CURRENT_BINARY_DIR</span><span class="o">}</span><span class="s">/bell</span><span class="p">)</span>
+</code></pre></div>
+<p>as well as adding your library to this lists in <code>target_link_libraries()</code> and
+<code>target_include_directories()</code>. A note of caution: Libraries that are aware of
+or depend on the esp-idf features are likely to <a href="https://github.com/feelfreelinux/euphonium/issues/58">flummox the build process</a>
+if they are included in the euphonium core (<code>euphonium/</code>)</p>
+<h1 id="installing-platform-specific-drivers">Installing Platform Specific Drivers<a class="headerlink" href="#installing-platform-specific-drivers" title="Permanent link">~</a></h1>
+<p>Platform specific drivers, will depend on the platform. New feature drivers for
+the ESP32, for example, can be installed with:</p>
+<div class="highlight"><pre><span></span><code>pushd targets/esp32/app/main/driver
+mkdir feature
+cd feature
+touch featureDriver.cpp
+touch featureDriver.h
+popd
+</code></pre></div>
+<p>Driver functionality should be exposed to the Application layer in the usual
+ways:</p>
+<ul>
+<li>
+<p>Exporting C/C++ functions into the Berry language vm with the export helpers
+  (<code>berry-&gt;export_something()</code>), which the ESP32 platform exposes to the drivers
+  registers
+  <a href="https://github.com/feelfreelinux/euphonium/blob/master/targets/esp32/app/main/driver/ESP32Platform.cpp#L125-L141">here</a></p>
+</li>
+<li>
+<p>create a plugin which inherits from <code>bell::Task</code> and <a href="https://github.com/feelfreelinux/euphonium/blob/e562fea1a8eb659e9cba97820036f6208b2aec34/targets/esp32/app/main/main.cpp#L50">register it as a plugin
+  in main.cpp</a>, which is how the Bluetooth Plugin is registered in the ESP32 target.</p>
+</li>
+</ul>
+<h2 id="using-esp-idf-libraries-with-drivers">Using ESP-IDF Libraries with (Drivers)<a class="headerlink" href="#using-esp-idf-libraries-with-drivers" title="Permanent link">~</a></h2>
+<p>When writing drivers for the ESP32, the ESP-IDF will automatically include
+projects in the <code>targets/esp32/app/components</code> directory. For example, if you
+want to add a display using the awesome <code>u8g2</code> library, you could add the
+required libraries as git submodules like so:</p>
+<div class="highlight"><pre><span></span><code>git submodule add ../../olikraus/u8g2 targets/esp32/app/components/u8g2
+git submodule add ../../mkfrey/u8g2-hal-esp-idf targets/esp32/app/components/u8g2-hal-esp-idf
+</code></pre></div>
+<p>and like that, your new components can be consumed in your driver files.</p>
+
+
+
+
+              
+            </article>
+            
+          </div>
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../adding-new-dac/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Adding support to new DAC" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Adding support to new DAC
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../../plugins/scripting-language/" class="md-footer__link md-footer__link--next" aria-label="Next: Scripting Language" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Scripting Language
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.instant", "navigation.top", "navigation.tracking"], "search": "../../assets/javascripts/workers/search.ecf98df9.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.9c69f0bc.min.js"></script>
+      
+    
+  </body>
+</html>

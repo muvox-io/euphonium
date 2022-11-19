@@ -1,0 +1,1479 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation (Wiki) for Euphonium">
+      
+      
+      
+        <link rel="canonical" href="https://euphonium.github.io/docs/http/main/">
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.4.1">
+    
+    
+      
+        <title>Core - Euphonium</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.69437709.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Barlow:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Barlow";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="euphonium" data-md-color-primary="" data-md-color-accent="indigo">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#euphonium-rest-api" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Euphonium" class="md-header__button md-logo" aria-label="Euphonium" data-md-component="logo">
+      
+  <img src="../../images/euph.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Euphonium
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Core
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="euphonium" data-md-color-primary="" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/feelfreelinux/euphonium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    feelfreelinux/euphonium
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link md-tabs__link--active">
+        Home
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Euphonium" class="md-nav__button md-logo" aria-label="Euphonium" data-md-component="logo">
+      
+  <img src="../../images/euph.svg" alt="logo">
+
+    </a>
+    Euphonium
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/feelfreelinux/euphonium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    feelfreelinux/euphonium
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1" type="checkbox" id="__nav_1" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_1">
+          Home
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Home" data-md-level="1">
+        <label class="md-nav__title" for="__nav_1">
+          <span class="md-nav__icon md-icon"></span>
+          Home
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Euphonium documentation
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../status/" class="md-nav__link">
+        Status
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plugins/" class="md-nav__link">
+        Plugins
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1_5" type="checkbox" id="__nav_1_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_1_5">
+          Technical documentation
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Technical documentation" data-md-level="2">
+        <label class="md-nav__title" for="__nav_1_5">
+          <span class="md-nav__icon md-icon"></span>
+          Technical documentation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../technical/architecture/" class="md-nav__link">
+        Architecture
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../technical/dev-environment/" class="md-nav__link">
+        Setting up development environment
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../technical/adding-new-dac/" class="md-nav__link">
+        Adding support to new DAC
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../technical/adding-new-plugin/" class="md-nav__link">
+        Writing your own plugin
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1_6" type="checkbox" id="__nav_1_6" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_1_6">
+          API Documentation
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="API Documentation" data-md-level="2">
+        <label class="md-nav__title" for="__nav_1_6">
+          <span class="md-nav__icon md-icon"></span>
+          API Documentation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plugins/scripting-language/" class="md-nav__link">
+        Scripting Language
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1_6_2" type="checkbox" id="__nav_1_6_2" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_1_6_2">
+          HTTP API
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="HTTP API" data-md-level="3">
+        <label class="md-nav__title" for="__nav_1_6_2">
+          <span class="md-nav__icon md-icon"></span>
+          HTTP API
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        Euphonium REST API
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Core
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Core
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#events" class="md-nav__link">
+    Events
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugins" class="md-nav__link">
+    Plugins
+  </a>
+  
+    <nav class="md-nav" aria-label="Plugins">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-plugins" class="md-nav__link">
+    GET /plugins
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-pluginspluginname" class="md-nav__link">
+    GET /plugins/:pluginName
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-pluginspluginname" class="md-nav__link">
+    POST /plugins/:pluginName
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playback" class="md-nav__link">
+    Playback
+  </a>
+  
+    <nav class="md-nav" aria-label="Playback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-playback" class="md-nav__link">
+    GET /playback
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-playbackvolume" class="md-nav__link">
+    POST /playback/volume
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-playbackeq" class="md-nav__link">
+    POST /playback/eq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-playbackstatus" class="md-nav__link">
+    POST /playback/status
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system" class="md-nav__link">
+    System
+  </a>
+  
+    <nav class="md-nav" aria-label="System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-system" class="md-nav__link">
+    GET /system
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-systemreboot" class="md-nav__link">
+    POST /system/reboot
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wifi" class="md-nav__link">
+    WiFi
+  </a>
+  
+    <nav class="md-nav" aria-label="WiFi">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-wifi" class="md-nav__link">
+    GET /wifi
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-wificonnect" class="md-nav__link">
+    POST /wifi/connect
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-wifiscan_start" class="md-nav__link">
+    POST /wifi/scan_start
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devtools/" class="md-nav__link">
+        Plugin - DevTools
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../webradio/" class="md-nav__link">
+        Plugin - WebRadio
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ota/" class="md-nav__link">
+        Plugin - OTA
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plugins/cpp.md" class="md-nav__link">
+        C++ Documentation
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        Hardware
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#events" class="md-nav__link">
+    Events
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugins" class="md-nav__link">
+    Plugins
+  </a>
+  
+    <nav class="md-nav" aria-label="Plugins">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-plugins" class="md-nav__link">
+    GET /plugins
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-pluginspluginname" class="md-nav__link">
+    GET /plugins/:pluginName
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-pluginspluginname" class="md-nav__link">
+    POST /plugins/:pluginName
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playback" class="md-nav__link">
+    Playback
+  </a>
+  
+    <nav class="md-nav" aria-label="Playback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-playback" class="md-nav__link">
+    GET /playback
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-playbackvolume" class="md-nav__link">
+    POST /playback/volume
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-playbackeq" class="md-nav__link">
+    POST /playback/eq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-playbackstatus" class="md-nav__link">
+    POST /playback/status
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system" class="md-nav__link">
+    System
+  </a>
+  
+    <nav class="md-nav" aria-label="System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-system" class="md-nav__link">
+    GET /system
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-systemreboot" class="md-nav__link">
+    POST /system/reboot
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wifi" class="md-nav__link">
+    WiFi
+  </a>
+  
+    <nav class="md-nav" aria-label="WiFi">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-wifi" class="md-nav__link">
+    GET /wifi
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-wificonnect" class="md-nav__link">
+    POST /wifi/connect
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-wifiscan_start" class="md-nav__link">
+    POST /wifi/scan_start
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+  <a href="https://github.com/feelfreelinux/docs/blob/master/docs/http/main.md" title="Edit this page" class="md-content__button md-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+
+<h1 id="euphonium-rest-api">Euphonium REST API<a class="headerlink" href="#euphonium-rest-api" title="Permanent link">~</a></h1>
+<p>Every instance of the player exposes a HTTP API, internally used by the web-ui and the web-ide. This API is accessible under the default port.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This API is not stable yet, and may change in the future. In particular, authentication is not implemented at this moment.</p>
+</div>
+<h2 id="events">Events<a class="headerlink" href="#events" title="Permanent link">~</a></h2>
+<p>Euphonium's HTTP server exposes a endpoint for receiving live events. The events are sent as JSON objects. This is implemented as a long-lived connection to the <code>/events</code> endpoint. This is used for real time updates in the web ide.</p>
+<hr />
+<h2 id="plugins">Plugins<a class="headerlink" href="#plugins" title="Permanent link">~</a></h2>
+<p>Manages internal plugins.</p>
+<hr />
+<h3 id="get-plugins"><code>GET</code> <code>/plugins</code><a class="headerlink" href="#get-plugins" title="Permanent link">~</a></h3>
+<p>Returns list of currently active plugins.</p>
+<h4 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">~</a></h4>
+<p>This endpoint does not have parameters</p>
+<h4 id="responses">Responses<a class="headerlink" href="#responses" title="Permanent link">~</a></h4>
+<details class="example">
+<summary>Returns list of plugins</summary>
+<p>Response type <code>application/json</code>
+<div class="highlight"><pre><span></span><code><span class="p">[</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;plugin&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cspot&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Spotify (cspot)&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;plugin&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;webradio&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;WebRadio&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;app&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;webradio&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;WebRadio&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="p">]</span><span class="w"></span>
+</code></pre></div></p>
+</details>
+<hr />
+<h3 id="get-pluginspluginname"><code>GET</code> <code>/plugins/:pluginName</code><a class="headerlink" href="#get-pluginspluginname" title="Permanent link">~</a></h3>
+<p>Returns configuration schema with current values for given plugin.</p>
+<h4 id="parameters_1">Parameters<a class="headerlink" href="#parameters_1" title="Permanent link">~</a></h4>
+<table>
+<thead>
+<tr>
+<th align="left">Parameter</th>
+<th>type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>pluginName</code></td>
+<td>path</td>
+<td><code>string</code><br/>Name of the plugin to retrieve configuration of.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="responses_1">Responses<a class="headerlink" href="#responses_1" title="Permanent link">~</a></h4>
+<details class="example">
+<summary>Returns plugin configuration</summary>
+<p>Response type <code>application/json</code>. Example of spotify.
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;configSchema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;audioBitrate&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;160&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;tooltip&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Audio bitrate&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;stringList&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;defaultValue&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;160&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;listValues&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s2">&quot;96&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;160&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;320&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"></span>
+<span class="w">        </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;receiverName&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;tooltip&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Speaker&#39;s name&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Euphonium (cspot)&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;defaultValue&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Euphonium (cspot)&quot;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;themeColor&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#1DB954&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Spotify (cspot)&quot;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div></p>
+</details>
+<h3 id="post-pluginspluginname"><code>POST</code> <code>/plugins/:pluginName</code><a class="headerlink" href="#post-pluginspluginname" title="Permanent link">~</a></h3>
+<p>Updates configuration of given plugin schema. This configuration is persisted between reboots.</p>
+<h4 id="parameters_2">Parameters<a class="headerlink" href="#parameters_2" title="Permanent link">~</a></h4>
+<table>
+<thead>
+<tr>
+<th align="left">Parameter</th>
+<th>type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>pluginName</code></td>
+<td>path</td>
+<td><code>string</code><br/>Name of the plugin to retrieve configuration of.</td>
+</tr>
+<tr>
+<td align="left"><code>body</code></td>
+<td>body</td>
+<td><code>PluginConfig</code><br/>Content described below.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="requests">Requests<a class="headerlink" href="#requests" title="Permanent link">~</a></h4>
+<details class="example">
+<summary>Change spotify configuration</summary>
+<p>Response type <code>application/json</code>.
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;audioBitrate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;320&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;receiverName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Living room\&#39;s speaker&quot;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div></p>
+</details>
+<h4 id="responses_2">Responses<a class="headerlink" href="#responses_2" title="Permanent link">~</a></h4>
+<details class="example">
+<summary>Returns plugin configuration</summary>
+<p>Request type <code>application/json</code>. Example of spotify.
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;configSchema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;audioBitrate&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;320&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;tooltip&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Audio bitrate&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;stringList&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;defaultValue&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;160&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;listValues&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s2">&quot;96&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;160&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;320&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"></span>
+<span class="w">        </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;receiverName&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;tooltip&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Speaker&#39;s name&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Living room\&#39;s speaker&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;defaultValue&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Euphonium (cspot)&quot;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;themeColor&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#1DB954&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Spotify (cspot)&quot;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div></p>
+</details>
+<h2 id="playback">Playback<a class="headerlink" href="#playback" title="Permanent link">~</a></h2>
+<p>Manages the playback state of the system.</p>
+<hr />
+<h3 id="get-playback"><code>GET</code> <code>/playback</code><a class="headerlink" href="#get-playback" title="Permanent link">~</a></h3>
+<p>Returns complete current state of playback, containing current track, current position, current volume and current eq settings.</p>
+<h4 id="parameters_3">Parameters<a class="headerlink" href="#parameters_3" title="Permanent link">~</a></h4>
+<p>This endpoint does not have parameters</p>
+<h4 id="responses_3">Responses<a class="headerlink" href="#responses_3" title="Permanent link">~</a></h4>
+<details class="example">
+<summary>Returns current playback state</summary>
+<p>Response type <code>application/json</code>. Example of spotify.
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;song&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;icon&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://i.scdn.co/image/kocz.jpg&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;songName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Never Gonna Give You Up&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;albumName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Never Gonna Give You Up&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;sourceName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cspot&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;artistName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Rick Astley&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;paused&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;volume&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">50</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;eq&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;low&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;mid&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-0.5</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;high&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div></p>
+</details>
+<h3 id="post-playbackvolume"><code>POST</code> <code>/playback/volume</code><a class="headerlink" href="#post-playbackvolume" title="Permanent link">~</a></h3>
+<p>Updates playback current volume.</p>
+<h4 id="parameters_4">Parameters<a class="headerlink" href="#parameters_4" title="Permanent link">~</a></h4>
+<table>
+<thead>
+<tr>
+<th align="left">Parameter</th>
+<th>type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>body</code></td>
+<td>body</td>
+<td><code>Volume</code><br/>Content described below.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="requests_1">Requests<a class="headerlink" href="#requests_1" title="Permanent link">~</a></h4>
+<details class="example">
+<summary>Change volume</summary>
+<p>Request type <code>application/json</code>. Volume is an integer betwen 0 and 100.
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;volume&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div></p>
+</details>
+<h4 id="responses_4">Responses<a class="headerlink" href="#responses_4" title="Permanent link">~</a></h4>
+<details class="example">
+<summary>Returns current playback state</summary>
+<p>Response type <code>application/json</code>. Example of spotify.
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;song&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;icon&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://i.scdn.co/image/kocz.jpg&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;songName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Never Gonna Give You Up&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;albumName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Never Gonna Give You Up&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;sourceName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cspot&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;artistName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Rick Astley&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;paused&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;volume&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;eq&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;low&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;mid&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-0.5</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;high&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div></p>
+</details>
+<h3 id="post-playbackeq"><code>POST</code> <code>/playback/eq</code><a class="headerlink" href="#post-playbackeq" title="Permanent link">~</a></h3>
+<p>Updates playback current equalizer settings.</p>
+<h4 id="parameters_5">Parameters<a class="headerlink" href="#parameters_5" title="Permanent link">~</a></h4>
+<table>
+<thead>
+<tr>
+<th align="left">Parameter</th>
+<th>type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>body</code></td>
+<td>body</td>
+<td><code>Eq</code><br/>Content described below.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="requests_2">Requests<a class="headerlink" href="#requests_2" title="Permanent link">~</a></h4>
+<details class="example">
+<summary>Change equalizer settings</summary>
+<p>Request type <code>application/json</code>. Equalizer settings are an object with keys <code>low</code>, <code>mid</code> and <code>high</code>. One value on the scale corresponds to 3 dB.
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;low&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.25</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;mid&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;high&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div></p>
+</details>
+<h4 id="responses_5">Responses<a class="headerlink" href="#responses_5" title="Permanent link">~</a></h4>
+<details class="example">
+<summary>Returns current playback state</summary>
+<p>Response type <code>application/json</code>. Example of spotify.
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;song&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;icon&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://i.scdn.co/image/kocz.jpg&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;songName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Never Gonna Give You Up&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;albumName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Never Gonna Give You Up&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;sourceName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cspot&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;artistName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Rick Astley&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;paused&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;volume&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;eq&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;low&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.25</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;mid&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;high&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div></p>
+</details>
+<h3 id="post-playbackstatus"><code>POST</code> <code>/playback/status</code><a class="headerlink" href="#post-playbackstatus" title="Permanent link">~</a></h3>
+<p>Updates playback current playback status.</p>
+<h4 id="parameters_6">Parameters<a class="headerlink" href="#parameters_6" title="Permanent link">~</a></h4>
+<table>
+<thead>
+<tr>
+<th align="left">Parameter</th>
+<th>type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>body</code></td>
+<td>body</td>
+<td><code>Playback</code><br/>Content described below.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="requests_3">Requests<a class="headerlink" href="#requests_3" title="Permanent link">~</a></h4>
+<details class="example">
+<summary>Change playback settings</summary>
+<p>Request type <code>application/json</code>. Status is either 'playing' or 'paused'
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;playing&quot;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div></p>
+</details>
+<h4 id="responses_6">Responses<a class="headerlink" href="#responses_6" title="Permanent link">~</a></h4>
+<details class="example">
+<summary>Returns current playback state</summary>
+<p>Response type <code>application/json</code>. Example of spotify.
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;song&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;icon&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://i.scdn.co/image/kocz.jpg&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;songName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Never Gonna Give You Up&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;albumName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Never Gonna Give You Up&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;sourceName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cspot&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;artistName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Rick Astley&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;playing&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;volume&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;eq&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;low&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.25</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;mid&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;high&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div></p>
+</details>
+<h2 id="system">System<a class="headerlink" href="#system" title="Permanent link">~</a></h2>
+<p>Manages the state of the system.</p>
+<hr />
+<h3 id="get-system"><code>GET</code> <code>/system</code><a class="headerlink" href="#get-system" title="Permanent link">~</a></h3>
+<p>Returns information about current system state.</p>
+<h4 id="parameters_7">Parameters<a class="headerlink" href="#parameters_7" title="Permanent link">~</a></h4>
+<p>This endpoint does not have parameters</p>
+<h4 id="responses_7">Responses<a class="headerlink" href="#responses_7" title="Permanent link">~</a></h4>
+<details class="example">
+<summary>Returns current system state</summary>
+<p>Response type <code>application/json</code>.
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;networkState&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;online&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.0.14&quot;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div></p>
+</details>
+<h3 id="post-systemreboot"><code>POST</code> <code>/system/reboot</code><a class="headerlink" href="#post-systemreboot" title="Permanent link">~</a></h3>
+<p>Returns information about current system state.</p>
+<h4 id="parameters_8">Parameters<a class="headerlink" href="#parameters_8" title="Permanent link">~</a></h4>
+<p>Calling this endpoint will reboot the system.</p>
+<h4 id="responses_8">Responses<a class="headerlink" href="#responses_8" title="Permanent link">~</a></h4>
+<details class="example">
+<summary>Returns current system state</summary>
+<p>Response type <code>application/json</code>.
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.0.14&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;networkState&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rebooting&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div></p>
+</details>
+<h2 id="wifi">WiFi<a class="headerlink" href="#wifi" title="Permanent link">~</a></h2>
+<p>Manages state of the WiFi connection</p>
+<hr />
+<h3 id="get-wifi"><code>GET</code> <code>/wifi</code><a class="headerlink" href="#get-wifi" title="Permanent link">~</a></h3>
+<p>Returns current WiFi state.</p>
+<h4 id="parameters_9">Parameters<a class="headerlink" href="#parameters_9" title="Permanent link">~</a></h4>
+<p>This endpoint does not have parameters</p>
+<h4 id="responses_9">Responses<a class="headerlink" href="#responses_9" title="Permanent link">~</a></h4>
+<details class="example">
+<summary>Returns current WiFi state</summary>
+<p>Response type <code>application/json</code>. Example of connected to AP.
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;state&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;connected&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;ipAddress&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;192.168.254.103&quot;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div></p>
+</details>
+<h3 id="post-wificonnect"><code>POST</code> <code>/wifi/connect</code><a class="headerlink" href="#post-wificonnect" title="Permanent link">~</a></h3>
+<p>Connects to WiFi network.</p>
+<h4 id="parameters_10">Parameters<a class="headerlink" href="#parameters_10" title="Permanent link">~</a></h4>
+<table>
+<thead>
+<tr>
+<th align="left">Parameter</th>
+<th>type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>body</code></td>
+<td>body</td>
+<td><code>WiFiSettings</code><br/>Content described below.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="requests_4">Requests<a class="headerlink" href="#requests_4" title="Permanent link">~</a></h4>
+<details class="example">
+<summary>WiFi network parameters</summary>
+<p>Request type <code>application/json</code>.
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;ssid&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;RandomNetwork&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Test123&quot;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div></p>
+</details>
+<h4 id="responses_10">Responses<a class="headerlink" href="#responses_10" title="Permanent link">~</a></h4>
+<details class="example">
+<summary>Returns current WiFi state</summary>
+<p>Response type <code>application/json</code>. Example of connected to AP.
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;state&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;connecting&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div></p>
+</details>
+<h3 id="post-wifiscan_start"><code>POST</code> <code>/wifi/scan_start</code><a class="headerlink" href="#post-wifiscan_start" title="Permanent link">~</a></h3>
+<p>Starts WiFi network scan.</p>
+<h4 id="parameters_11">Parameters<a class="headerlink" href="#parameters_11" title="Permanent link">~</a></h4>
+<p>This endpoint does not have parameters</p>
+<h4 id="responses_11">Responses<a class="headerlink" href="#responses_11" title="Permanent link">~</a></h4>
+<details class="example">
+<summary>Returns current WiFi state</summary>
+<p>Response type <code>application/json</code>. Example of connected to AP.
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;state&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;scanning&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div></p>
+</details>
+
+
+
+
+              
+            </article>
+            
+          </div>
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../" class="md-footer__link md-footer__link--prev" aria-label="Previous: Euphonium REST API" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Euphonium REST API
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../devtools/" class="md-footer__link md-footer__link--next" aria-label="Next: Plugin - DevTools" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Plugin - DevTools
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.instant", "navigation.top", "navigation.tracking"], "search": "../../assets/javascripts/workers/search.ecf98df9.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.9c69f0bc.min.js"></script>
+      
+    
+  </body>
+</html>

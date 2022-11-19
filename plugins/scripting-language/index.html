@@ -1,0 +1,2158 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation (Wiki) for Euphonium">
+      
+      
+      
+        <link rel="canonical" href="https://euphonium.github.io/docs/plugins/scripting-language/">
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.4.1">
+    
+    
+      
+        <title>Scripting Language - Euphonium</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.69437709.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Barlow:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Barlow";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="euphonium" data-md-color-primary="" data-md-color-accent="indigo">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#scripting-language-api" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Euphonium" class="md-header__button md-logo" aria-label="Euphonium" data-md-component="logo">
+      
+  <img src="../../images/euph.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Euphonium
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Scripting Language
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="euphonium" data-md-color-primary="" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/feelfreelinux/euphonium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    feelfreelinux/euphonium
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link md-tabs__link--active">
+        Home
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Euphonium" class="md-nav__button md-logo" aria-label="Euphonium" data-md-component="logo">
+      
+  <img src="../../images/euph.svg" alt="logo">
+
+    </a>
+    Euphonium
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/feelfreelinux/euphonium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    feelfreelinux/euphonium
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1" type="checkbox" id="__nav_1" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_1">
+          Home
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Home" data-md-level="1">
+        <label class="md-nav__title" for="__nav_1">
+          <span class="md-nav__icon md-icon"></span>
+          Home
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Euphonium documentation
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../status/" class="md-nav__link">
+        Status
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        Plugins
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1_5" type="checkbox" id="__nav_1_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_1_5">
+          Technical documentation
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Technical documentation" data-md-level="2">
+        <label class="md-nav__title" for="__nav_1_5">
+          <span class="md-nav__icon md-icon"></span>
+          Technical documentation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../technical/architecture/" class="md-nav__link">
+        Architecture
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../technical/dev-environment/" class="md-nav__link">
+        Setting up development environment
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../technical/adding-new-dac/" class="md-nav__link">
+        Adding support to new DAC
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../technical/adding-new-plugin/" class="md-nav__link">
+        Writing your own plugin
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1_6" type="checkbox" id="__nav_1_6" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_1_6">
+          API Documentation
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="API Documentation" data-md-level="2">
+        <label class="md-nav__title" for="__nav_1_6">
+          <span class="md-nav__icon md-icon"></span>
+          API Documentation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Scripting Language
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Scripting Language
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#globals" class="md-nav__link">
+    globals
+  </a>
+  
+    <nav class="md-nav" aria-label="globals">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core" class="md-nav__link">
+    core
+  </a>
+  
+    <nav class="md-nav" aria-label="core">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_1" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#formcontext" class="md-nav__link">
+    FormContext
+  </a>
+  
+    <nav class="md-nav" aria-label="FormContext">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#class-methods" class="md-nav__link">
+    Class methods
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interface-fieldconfig" class="md-nav__link">
+    Interface FieldConfig
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#http" class="md-nav__link">
+    http
+  </a>
+  
+    <nav class="md-nav" aria-label="http">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_2" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#object-httprequest" class="md-nav__link">
+    Object HTTPRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playback" class="md-nav__link">
+    playback
+  </a>
+  
+    <nav class="md-nav" aria-label="playback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_3" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#euphonium" class="md-nav__link">
+    euphonium
+  </a>
+  
+    <nav class="md-nav" aria-label="euphonium">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_4" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#input" class="md-nav__link">
+    input
+  </a>
+  
+    <nav class="md-nav" aria-label="input">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_5" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hooks" class="md-nav__link">
+    hooks
+  </a>
+  
+    <nav class="md-nav" aria-label="hooks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_6" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enum-hooksbootstage" class="md-nav__link">
+    enum hooks.BOOTSTAGE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_1" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#i2s" class="md-nav__link">
+    i2s
+  </a>
+  
+    <nav class="md-nav" aria-label="i2s">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_7" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#object-i2sconfig" class="md-nav__link">
+    Object I2SConfig
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_2" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#i2c" class="md-nav__link">
+    i2c
+  </a>
+  
+    <nav class="md-nav" aria-label="i2c">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_8" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_3" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpio" class="md-nav__link">
+    gpio
+  </a>
+  
+    <nav class="md-nav" aria-label="gpio">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_9" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enum-inputevent_type" class="md-nav__link">
+    enum input.EVENT_TYPE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_4" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_5" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#led_strip" class="md-nav__link">
+    led_strip
+  </a>
+  
+    <nav class="md-nav" aria-label="led_strip">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#class-ledstrip" class="md-nav__link">
+    Class LEDStrip
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enum-led_stripled_type" class="md-nav__link">
+    enum led_strip.LED_TYPE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_6" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wifi" class="md-nav__link">
+    wifi
+  </a>
+  
+    <nav class="md-nav" aria-label="wifi">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_10" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1_6_2" type="checkbox" id="__nav_1_6_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_1_6_2">
+          HTTP API
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="HTTP API" data-md-level="3">
+        <label class="md-nav__title" for="__nav_1_6_2">
+          <span class="md-nav__icon md-icon"></span>
+          HTTP API
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../http/" class="md-nav__link">
+        Euphonium REST API
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../http/main/" class="md-nav__link">
+        Core
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../http/devtools/" class="md-nav__link">
+        Plugin - DevTools
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../http/webradio/" class="md-nav__link">
+        Plugin - WebRadio
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../http/ota/" class="md-nav__link">
+        Plugin - OTA
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cpp.md" class="md-nav__link">
+        C++ Documentation
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        Hardware
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#globals" class="md-nav__link">
+    globals
+  </a>
+  
+    <nav class="md-nav" aria-label="globals">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core" class="md-nav__link">
+    core
+  </a>
+  
+    <nav class="md-nav" aria-label="core">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_1" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#formcontext" class="md-nav__link">
+    FormContext
+  </a>
+  
+    <nav class="md-nav" aria-label="FormContext">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#class-methods" class="md-nav__link">
+    Class methods
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interface-fieldconfig" class="md-nav__link">
+    Interface FieldConfig
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#http" class="md-nav__link">
+    http
+  </a>
+  
+    <nav class="md-nav" aria-label="http">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_2" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#object-httprequest" class="md-nav__link">
+    Object HTTPRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playback" class="md-nav__link">
+    playback
+  </a>
+  
+    <nav class="md-nav" aria-label="playback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_3" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#euphonium" class="md-nav__link">
+    euphonium
+  </a>
+  
+    <nav class="md-nav" aria-label="euphonium">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_4" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#input" class="md-nav__link">
+    input
+  </a>
+  
+    <nav class="md-nav" aria-label="input">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_5" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hooks" class="md-nav__link">
+    hooks
+  </a>
+  
+    <nav class="md-nav" aria-label="hooks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_6" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enum-hooksbootstage" class="md-nav__link">
+    enum hooks.BOOTSTAGE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_1" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#i2s" class="md-nav__link">
+    i2s
+  </a>
+  
+    <nav class="md-nav" aria-label="i2s">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_7" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#object-i2sconfig" class="md-nav__link">
+    Object I2SConfig
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_2" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#i2c" class="md-nav__link">
+    i2c
+  </a>
+  
+    <nav class="md-nav" aria-label="i2c">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_8" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_3" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpio" class="md-nav__link">
+    gpio
+  </a>
+  
+    <nav class="md-nav" aria-label="gpio">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_9" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enum-inputevent_type" class="md-nav__link">
+    enum input.EVENT_TYPE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_4" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_5" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#led_strip" class="md-nav__link">
+    led_strip
+  </a>
+  
+    <nav class="md-nav" aria-label="led_strip">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#class-ledstrip" class="md-nav__link">
+    Class LEDStrip
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enum-led_stripled_type" class="md-nav__link">
+    enum led_strip.LED_TYPE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_6" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wifi" class="md-nav__link">
+    wifi
+  </a>
+  
+    <nav class="md-nav" aria-label="wifi">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_10" class="md-nav__link">
+    Commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+  <a href="https://github.com/feelfreelinux/docs/blob/master/docs/plugins/scripting-language.md" title="Edit this page" class="md-content__button md-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+
+<h1 id="scripting-language-api">Scripting language API<a class="headerlink" href="#scripting-language-api" title="Permanent link">~</a></h1>
+<p>Euphonium contains a berry-lang scripting language that can be used to tweak the system for your needs. The following page documents the internal API used in all scripts. Feel free to check <code>euphonium/scripts</code> to see how this is used internally.</p>
+<h2 id="globals"><code>globals</code><a class="headerlink" href="#globals" title="Permanent link">~</a></h2>
+<p>Global utilities</p>
+<h3 id="commands">Commands<a class="headerlink" href="#commands" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Command</th>
+<th>Signature</th>
+<th>Supported platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>sleep_ms</code></td>
+<td><code>(milliseconds: int) -&gt; void</code>. <br/>Pauses execution for given amount of milliseconds.</td>
+<td>All</td>
+</tr>
+</tbody>
+</table>
+<h2 id="core"><code>core</code><a class="headerlink" href="#core" title="Permanent link">~</a></h2>
+<p>Manages euphonium's core functionality, mostly shared utils. </p>
+<p><strong>Implemented by <code>Core.cpp</code></strong></p>
+<h3 id="commands_1">Commands<a class="headerlink" href="#commands_1" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Command</th>
+<th>Signature</th>
+<th>Supported platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>core.start_plugin</code></td>
+<td><code>(pluginName: string, pluginConfig: map) -&gt; void</code><br/>Starts given plugin's audio thread with following configuration.</td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>core.platform</code></td>
+<td><code>() -&gt; string</code>.<br/>Returns platform on which euphonium is currently running. Result being either <code>esp32</code> or <code>desktop</code></td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>core.version</code></td>
+<td><code>() -&gt; string</code>.<br/>Returns current version of the system. Example result: <code>0.0.14</code></td>
+<td>All</td>
+</tr>
+</tbody>
+</table>
+<h2 id="formcontext"><code>FormContext</code><a class="headerlink" href="#formcontext" title="Permanent link">~</a></h2>
+<p>Class used in plugins that handles UI creation and interaction in the web-ui.</p>
+<p><strong>Implemented by <code>form_ctx.be</code></strong></p>
+<h3 id="class-methods">Class methods<a class="headerlink" href="#class-methods" title="Permanent link">~</a></h3>
+<p>All of the following methods are available on the <code>FormContext</code> class instance.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Command</th>
+<th>Signature</th>
+<th>Supported platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>text_field</code></td>
+<td><code>(key: string, config: FieldConfig) -&gt; void</code><br/>Adds a text field to the configuration. See <code>FieldConfig</code> below for parameters.</td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>select_field</code></td>
+<td><code>(key: string, config: FieldConfig) -&gt; void</code><br/>Adds a option select / picker field to the configuration. See <code>FieldConfig</code> below for parameters.</td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>checkbox_field</code></td>
+<td><code>(key: string, config: FieldConfig) -&gt; void</code><br/>Adds a checkbox to the configuration. See <code>FieldConfig</code> below for parameters.</td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>create_group</code></td>
+<td><code>(key: string, config: [key: string, label: string]) -&gt; void</code><br/>Adds a new config group to the configuration.</td>
+<td>All</td>
+</tr>
+</tbody>
+</table>
+<h3 id="interface-fieldconfig">Interface <code>FieldConfig</code><a class="headerlink" href="#interface-fieldconfig" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th>Signature</th>
+<th>Field type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>label</code></td>
+<td><code>string</code><br/>Configuration field's label visible over the control in the interface.</td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>hint</code></td>
+<td><code>string</code><br/>Used as a hint in the text field.</td>
+<td><code>text_field</code></td>
+</tr>
+<tr>
+<td align="left"><code>default</code></td>
+<td><code>string</code><br/>Field's default value.</td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>values</code></td>
+<td><code>list</code><br/>All of select field's available values.</td>
+<td><code>select_field</code></td>
+</tr>
+<tr>
+<td align="left"><code>group</code></td>
+<td><code>string</code><br/>Group that a given field belongs to, previously registered with <code>create_group</code></td>
+<td>All</td>
+</tr>
+</tbody>
+</table>
+<h2 id="http"><code>http</code><a class="headerlink" href="#http" title="Permanent link">~</a></h2>
+<p>Allows for registering endpoints on the internal HTTP server.</p>
+<p><strong>Implemented by <code>http.be</code> and <code>HTTPModule.cpp</code></strong></p>
+<h3 id="commands_2">Commands<a class="headerlink" href="#commands_2" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Command</th>
+<th>Signature</th>
+<th>Supported platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>http.handle</code></td>
+<td><code>(method: string, path: string, response_handler: [(request) -&gt; void]) -&gt; void</code><br/>Register a new HTTP endpoint under given <code>path</code>. Response handler is a method that takes <code>HTTPRequest</code> as a parameter. See examples below for usage.</td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>http.emit_event</code></td>
+<td><code>(type: string, body: map) -&gt; void</code>.<br/>Broadcasts a server-side event to all connected devices. <code>body</code> will be serialized into json string.</td>
+<td>All</td>
+</tr>
+</tbody>
+</table>
+<h3 id="object-httprequest">Object <code>HTTPRequest</code><a class="headerlink" href="#object-httprequest" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Command</th>
+<th>Signature</th>
+<th>Supported platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>write_json</code></td>
+<td><code>(body: map, status: int) -&gt; void</code>.<br/>Writes a response json to given connection. Body is passed as a map of data to be serialized into json. Status is the HTTP status code of the response.</td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>write_text</code></td>
+<td><code>(body: string, status: int) -&gt; void</code>.<br/>Writes the response as <code>text/plain</code>.</td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>json_body</code></td>
+<td><code>() -&gt; map</code><br/>Parses given request's body string into json and returns it as map</td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>query_params</code></td>
+<td><code>() -&gt; map</code><br/>Returns map of parsed query parameters of the given request.</td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>url_params</code></td>
+<td><code>() -&gt; map</code><br/>Returns map of parsed url parameters of the given request.</td>
+<td>All</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example">Example<a class="headerlink" href="#example" title="Permanent link">~</a></h3>
+<div class="admonition example">
+<p class="admonition-title">HTTP server usage</p>
+<p>Handle simple GET and return "Hello, world!"</p>
+<p><div class="highlight"><pre><span></span><code><span class="n">http</span><span class="o">.</span><span class="n">handle</span><span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;/hello_world&#39;</span><span class="p">,</span> <span class="k">def</span> <span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">&quot;Hello world!&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+<span class="n">end</span><span class="p">)</span>
+</code></pre></div>
+Handle POST with json body, return a json response</p>
+<div class="highlight"><pre><span></span><code><span class="n">http</span><span class="o">.</span><span class="n">handle</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s1">&#39;/create_cat&#39;</span><span class="p">,</span> <span class="k">def</span> <span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">json_body</span><span class="p">()</span> <span class="o">==</span> <span class="n">nil</span>
+        <span class="n">http</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">&quot;No body&quot;</span><span class="p">,</span> <span class="n">request</span><span class="p">[</span><span class="s1">&#39;connection&#39;</span><span class="p">],</span> <span class="mi">400</span><span class="p">)</span>
+    <span class="k">else</span>
+       <span class="c1"># Parse json body</span>
+       <span class="n">var</span> <span class="n">parsed_body</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">json_body</span><span class="p">()</span>
+
+       <span class="c1"># Create response</span>
+       <span class="n">var</span> <span class="n">response</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">parsed_body</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="mi">3</span> <span class="p">}</span>
+       <span class="n">request</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+    <span class="n">end</span>
+<span class="n">end</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<h2 id="playback"><code>playback</code><a class="headerlink" href="#playback" title="Permanent link">~</a></h2>
+<p>Manages playback state of the system.</p>
+<h3 id="commands_3">Commands<a class="headerlink" href="#commands_3" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Command</th>
+<th>Signature</th>
+<th>Supported platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>playback.set_eq</code></td>
+<td><code>(low: int, mid: int, high: int) -&gt; void</code>.<br/>If <code>EqualizerProcessor</code> is enabled, this changes the eq's settings. 1 point on the scale means 3 db. Defaults to 0, 0, 0 (no eq).</td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>playback.set_pause</code></td>
+<td><code>(paused: boolean) -&gt; void</code>.<br/>Pauses the playback state. This also triggers a pause event.</td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>playback.empty_buffers</code></td>
+<td><code>() -&gt; void</code>.<br/>Empties internal audio buffers of the system. Call this during playback changes / stop pause.</td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>playback.soft_volume</code></td>
+<td><code>(volume: int) -&gt; void</code><br/>Changes the system's software volume. Volume is between <code>0</code> and <code>100</code>.</td>
+<td>All</td>
+</tr>
+</tbody>
+</table>
+<h2 id="euphonium"><code>euphonium</code><a class="headerlink" href="#euphonium" title="Permanent link">~</a></h2>
+<p>Global euphonium instance object. Handles main events, and keeps a state of plugin registry.</p>
+<h3 id="commands_4">Commands<a class="headerlink" href="#commands_4" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Command</th>
+<th>Signature</th>
+<th>Supported platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>euphonium.register_plugin</code></td>
+<td><code>(plugin: Plugin) -&gt; void</code><br/>Registers a new euphonium plugin. <code>plugin</code> is a instance of plugin to register in the system.</td>
+<td>All</td>
+</tr>
+</tbody>
+</table>
+<h2 id="input"><code>input</code><a class="headerlink" href="#input" title="Permanent link">~</a></h2>
+<p><em>ESP32 specific</em></p>
+<p>Allows registration of callbacks for input events. Useful for adding buttons, encoders and such.</p>
+<h3 id="commands_5">Commands<a class="headerlink" href="#commands_5" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Command</th>
+<th>Signature</th>
+<th>Supported platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="hooks"><code>hooks</code><a class="headerlink" href="#hooks" title="Permanent link">~</a></h2>
+<p>Hooks allow to run different instructions during certain boot stages. Used for example to pull up an IO during boot.</p>
+<h3 id="commands_6">Commands<a class="headerlink" href="#commands_6" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Command</th>
+<th>Signature</th>
+<th>Supported platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>hooks.add_handler</code></td>
+<td><code>(bootstage: int, handler: [() -&gt; void]) -&gt; void</code><br/>Register a new hook. Different <code>bootstage</code> values described below.</td>
+<td>All</td>
+</tr>
+</tbody>
+</table>
+<h3 id="enum-hooksbootstage">enum <code>hooks.BOOTSTAGE</code><a class="headerlink" href="#enum-hooksbootstage" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Command</th>
+<th>Description</th>
+<th>Supported platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>hooks.ON_INIT</code></td>
+<td>Called earliest during boot, after scripting VM init.</td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>hooks.POST_SYSTEM</code></td>
+<td>Called after all core logic has been initialized, before plugins startup.</td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>hooks.POST_PLUGIN</code></td>
+<td>Called after all plugins have been initialized</td>
+<td>All</td>
+</tr>
+<tr>
+<td align="left"><code>hooks.AP_INIT</code></td>
+<td>Called after AP network has been initialized.</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>hooks.WIFI_INIT</code></td>
+<td>Called after WiFi has been initialized.</td>
+<td>esp32</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example_1">Example<a class="headerlink" href="#example_1" title="Permanent link">~</a></h3>
+<div class="admonition example">
+<p class="admonition-title">Sample hook that runs after boot</p>
+<p>Define I2S configuration, output 256 x MCLK clock on GPIO0.
+<div class="highlight"><pre><span></span><code><span class="n">hooks</span><span class="o">.</span><span class="n">add_handler</span><span class="p">(</span><span class="n">hooks</span><span class="o">.</span><span class="n">ON_INIT</span><span class="p">,</span> <span class="k">def</span> <span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;On boot called!&quot;</span><span class="p">)</span>
+<span class="n">end</span><span class="p">)</span>
+</code></pre></div></p>
+</div>
+<h2 id="i2s"><code>i2s</code><a class="headerlink" href="#i2s" title="Permanent link">~</a></h2>
+<p>Controls I2S bus. Mainly used for DAC support.</p>
+<p><strong>Implemented by <code>I2SDriver.cpp</code></strong></p>
+<h3 id="commands_7">Commands<a class="headerlink" href="#commands_7" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Command</th>
+<th>Signature</th>
+<th>Supported platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>i2s.install</code></td>
+<td><code>(configuration: I2SConfig) -&gt; void</code><br/>Installs I2S driver. See below for description of I2SConfig structure.</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>i2s.delete</code></td>
+<td><code>() -&gt; void</code>.<br/>Uninstalls the current I2S driver.</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>i2s.set_expand</code></td>
+<td><code>(src: int, dst: int) -&gt; void</code>.<br/>Enables expand from <code>src</code> bits to <code>dst</code> bits in driver write. Useful for 32bit DAC support.</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>i2s.disable_expand</code></td>
+<td><code>() -&gt; void</code>.<br/>Disables bits expand.</td>
+<td>esp32</td>
+</tr>
+</tbody>
+</table>
+<h3 id="object-i2sconfig">Object <code>I2SConfig</code><a class="headerlink" href="#object-i2sconfig" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>sample_rate</code></td>
+<td><code>int</code><br/>Defines sample rate for the incoming data signal. <em>WARNING - Sample rate is only initial, will be further changed in case od dynamic sample rate</em></td>
+</tr>
+<tr>
+<td align="left"><code>bits_per_sample</code></td>
+<td><code>int</code><br/>Bits per sample for incoming data.</td>
+</tr>
+<tr>
+<td align="left"><code>comm_format</code></td>
+<td>one of <code>I2S_CHANNEL_FMT_RIGHT_LEFT</code>, <code>I2S_CHANNEL_FMT_ALL_RIGHT</code>, <code>I2S_CHANNEL_FMT_ALL_LEFT</code> or <code>I2S_CHANNEL_FMT_ONLY_RIGHT</code></td>
+</tr>
+<tr>
+<td align="left"><code>channel_format</code></td>
+<td>one of <code>I2S_COMM_FORMAT_I2S</code>, <code>I2S_COMM_FORMAT_MSB</code>, <code>I2S_COMM_FORMAT_PCM_SHORT</code> or <code>I2S_COMM_FORMAT_PCM_LONG</code></td>
+</tr>
+<tr>
+<td align="left"><code>mclk</code></td>
+<td><code>int</code> <br/>if defined and larger than 0, outputs given <code>mclk</code> on GPIO0.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example_2">Example<a class="headerlink" href="#example_2" title="Permanent link">~</a></h3>
+<div class="admonition example">
+<p class="admonition-title">Sample driver configuration</p>
+<p>Define I2S configuration, output 256 x MCLK clock on GPIO0.
+<div class="highlight"><pre><span></span><code><span class="n">var</span> <span class="n">config</span> <span class="o">=</span> <span class="n">I2SConfig</span><span class="p">()</span>
+<span class="n">config</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">=</span> <span class="mi">44100</span>
+<span class="n">config</span><span class="o">.</span><span class="n">bits_per_sample</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">config</span><span class="o">.</span><span class="n">comm_format</span> <span class="o">=</span> <span class="n">I2S_CHANNEL_FMT_RIGHT_LEFT</span>
+<span class="n">config</span><span class="o">.</span><span class="n">channel_format</span> <span class="o">=</span> <span class="n">I2S_COMM_FORMAT_I2S</span>
+<span class="n">config</span><span class="o">.</span><span class="n">mclk</span> <span class="o">=</span> <span class="mi">256</span> <span class="o">*</span> <span class="mi">44100</span>
+
+<span class="n">i2s</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</code></pre></div></p>
+</div>
+<h2 id="i2c"><code>i2c</code><a class="headerlink" href="#i2c" title="Permanent link">~</a></h2>
+<p>Controls I2C bus on supported platforms. Mainly used in different drivers.</p>
+<p><strong>Implemented by <code>I2CDriver.cpp</code></strong></p>
+<h3 id="commands_8">Commands<a class="headerlink" href="#commands_8" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Command</th>
+<th>Signature</th>
+<th>Supported platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>i2c.install</code></td>
+<td><code>(sda: int, scl: int) -&gt; void</code><br/>Installs I2C driver under given pins.</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>i2c.detect</code></td>
+<td><code>(addr:int) -&gt; bool</code>.<br/>Tries to detect device under given addr. Returns true if device found.</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>i2c.read_bytes</code></td>
+<td><code>(addr:int, reg:int, size:int) -&gt; int or nil</code>.<br/>Read a value of 1..4 bytes from address addr and register reg. Returns nil if no response.</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>i2c.write_bytes</code></td>
+<td><code>(addr:int, reg:int, val:bytes) -&gt; nil</code><br/>Writes the val bytes sequence as bytes() to address addr register reg.</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>i2c.read</code></td>
+<td><code>(addr:int, reg:int, size:int) -&gt; int or nil</code>.<br/>Reads a singular bytes from a given register.</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>i2c.write</code></td>
+<td><code>(addr:int, reg:int, val:int) -&gt; nil</code><br/>Writes a singular byte to a given register.</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>i2c.write_raw</code></td>
+<td><code>(addr:int, val:bytes) -&gt; nil</code><br/>Write a raw sequence of bytes to the given device.</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>i2c.read_raw</code></td>
+<td><code>(addr:int, val:bytes, size: int) -&gt; int or nil</code><br/>Writes the val sequence of bytes on the i2c line, and then reads <code>size</code> bytes.</td>
+<td>esp32</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example_3">Example<a class="headerlink" href="#example_3" title="Permanent link">~</a></h3>
+<div class="admonition example">
+<p class="admonition-title">Write few bytes to I2C device</p>
+<p>Configure I2C on 21 and 23 pins, then perform two writes.
+<div class="highlight"><pre><span></span><code><span class="n">i2c</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="mi">23</span><span class="p">)</span>
+
+<span class="n">var</span> <span class="n">deviceAddr</span> <span class="o">=</span> <span class="mh">0x10</span>
+
+<span class="c1"># Write 0x01 to register 0x00</span>
+<span class="n">i2c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">deviceAddr</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">)</span>
+
+<span class="c1"># Write byte sequence to register 0x01</span>
+<span class="n">i2c</span><span class="o">.</span><span class="n">write_bytes</span><span class="p">(</span><span class="n">deviceAddr</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;1a01&#39;</span><span class="p">))</span>
+</code></pre></div></p>
+</div>
+<h2 id="gpio"><code>gpio</code><a class="headerlink" href="#gpio" title="Permanent link">~</a></h2>
+<p>Controls GPIO pins on supported platforms. Mainly used in different drivers.</p>
+<p><strong>Implemented by <code>GPIODriver.cpp</code></strong></p>
+<h3 id="commands_9">Commands<a class="headerlink" href="#commands_9" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Command</th>
+<th>Signature</th>
+<th>Supported platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>gpio.digital_write</code></td>
+<td><code>(gpio: int, state: int) -&gt; void</code><br/>Sets GPIO to LOW/HIGH. Needs physical pin number</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>gpio.digital_read</code></td>
+<td><code>(gpio: int) -&gt; int</code><br/>Returns digital state of given physical GPIO. Either <code>gpio.LOW</code> or <code>gpio.HIGH</code></td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>gpio.pin_mode</code></td>
+<td><code>(gpio: int, mode: int) -&gt; int</code><br/>Changes the GPIO mode. Only use if if you know what you're doing, by default Euphonium handles GPIO mode itself. Mode can have the following values: gpio.INPUT, gpio.OUTPUT, gpio.PULLUP, gpio.INPUT_PULLUP, gpio.PULLDOWN</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>gpio.analog_read</code></td>
+<td><code>(gpio: int) -&gt; real</code>.<br/>Returns the voltage on a given pin in mV. <strong>Only used with DAC pins.</strong></td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>gpio.register_button</code></td>
+<td><code>(gpio: int, event_type: gpio.EVENT_TYPE,  handler: [() -&gt; void], config: map([high_state: bool])) -&gt; void</code><br/>Registers a new handler called after interaction with a given button on provided <code>gpio</code>. Supports press, double press, and long press.</td>
+<td>esp32</td>
+</tr>
+</tbody>
+</table>
+<h3 id="enum-inputevent_type">enum <code>input.EVENT_TYPE</code><a class="headerlink" href="#enum-inputevent_type" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Command</th>
+<th>Description</th>
+<th>Supported platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>gpio.PRESS</code></td>
+<td>Called on single press of a button.</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>gpio.DOUBLE_PRESS</code></td>
+<td>Called on double press of a button.</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>gpio.LONG_PRESS</code></td>
+<td>Called on long press of a button.</td>
+<td>esp32</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example_4">Example<a class="headerlink" href="#example_4" title="Permanent link">~</a></h3>
+<div class="admonition example">
+<p class="admonition-title">GPIO Driver usage</p>
+<p>Sets GPIO 21 as output, writes its state to HIGH.
+<div class="highlight"><pre><span></span><code><span class="n">gpio</span><span class="o">.</span><span class="n">pin_mode</span><span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="n">gpio</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">)</span>
+<span class="n">gpio</span><span class="o">.</span><span class="n">digital_write</span><span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="n">gpio</span><span class="o">.</span><span class="n">HIGH</span><span class="p">)</span>
+</code></pre></div></p>
+</div>
+<h3 id="example_5">Example<a class="headerlink" href="#example_5" title="Permanent link">~</a></h3>
+<div class="admonition example">
+<p class="admonition-title">Example button that changes volume when pressed</p>
+<p>Register a button on gpio 5, and call a function from <code>playback</code> when pressed.
+<div class="highlight"><pre><span></span><code><span class="n">gpio</span><span class="o">.</span><span class="n">register_button</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">PRESS</span><span class="p">,</span> <span class="k">def</span> <span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Volume up called!&quot;</span><span class="p">)</span>
+    <span class="n">playback</span><span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="n">playback</span><span class="o">.</span><span class="n">volume</span> <span class="o">+</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">end</span><span class="p">,</span> <span class="p">{</span> <span class="s1">&#39;high_state&#39;</span><span class="p">:</span> <span class="n">true</span> <span class="p">})</span>
+</code></pre></div></p>
+</div>
+<h2 id="led_strip"><code>led_strip</code><a class="headerlink" href="#led_strip" title="Permanent link">~</a></h2>
+<p>Allows for control of addressable LEDs like the WS28xx and SK6812. Underneath it uses esp32's RMT driver, to drive up to 8 separate strip instances.</p>
+<p><strong>Implemented by <code>LEDDriver.cpp</code></strong></p>
+<h3 id="class-ledstrip">Class <code>LEDStrip</code><a class="headerlink" href="#class-ledstrip" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th>Signature</th>
+<th>Supported platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>init / constructor</code></td>
+<td><code>(type: LED_TYPE, pin: int, len: int, channel: RMT_CHANNEL, brightness: int?)</code><br/><code>LEDStrip</code> constructor. Allows control of a singular strip, with a driver <code>type</code>, connected under a GPIO <code>pin</code>. <code>channel</code> is the RMT channel to use. If <code>brightness</code> is provided, the entire LED chain will be dimmed accordingly.</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>show</code></td>
+<td><code>() -&gt; void</code><br/> Called on existing instance. Will update the LED strip with previously assigned color values</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>set_item</code></td>
+<td><code>(index, item: [r: number, g: number, b: number]) -&gt; void</code><br/>This implements the API for setting color of individual LEDs via a standard color assign. See example below for usage. <code>r</code>, <code>g</code> and <code>b</code> range from 0 to 255.</td>
+<td>esp32</td>
+</tr>
+</tbody>
+</table>
+<h3 id="enum-led_stripled_type">enum <code>led_strip.LED_TYPE</code><a class="headerlink" href="#enum-led_stripled_type" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>LED_WS2812</code></td>
+<td>Indicates WS2812 LED type.</td>
+</tr>
+<tr>
+<td align="left"><code>LED_WS2812B</code></td>
+<td>Indicates WS2812B LED type.</td>
+</tr>
+<tr>
+<td align="left"><code>LED_SK6812</code></td>
+<td>Indicates SK6812 LED type.</td>
+</tr>
+<tr>
+<td align="left"><code>LED_WS2813</code></td>
+<td>Indicates WS2813 LED type.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example_6">Example<a class="headerlink" href="#example_6" title="Permanent link">~</a></h3>
+<div class="admonition example">
+<p class="admonition-title">LED Driver usage</p>
+<p>Registers a new LED strip under pin 21, consisting of 12 WS2812 leds, at lower brightness. Then turns the first LED red, the second one green.
+<div class="highlight"><pre><span></span><code><span class="n">volume_strip</span> <span class="o">=</span> <span class="n">LEDStrip</span><span class="p">(</span><span class="n">LED_WS2812</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">RMT_CHANNEL_0</span><span class="p">,</span> <span class="mi">150</span><span class="p">)</span>
+
+<span class="c1"># change the first LED to red and second one to green.</span>
+<span class="n">volume_strip</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="c1"># red in RGB format</span>
+<span class="n">volume_strip</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="c1"># green in RGB format</span>
+
+<span class="c1"># display the changes on the strip</span>
+<span class="n">volume_strip</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></p>
+</div>
+<h2 id="wifi"><code>wifi</code><a class="headerlink" href="#wifi" title="Permanent link">~</a></h2>
+<p>Controls internal state of the platform's WiFi. Used internally by <code>wifi.be</code>.</p>
+<p><strong>Implemented by <code>WiFiDriver.cpp</code></strong></p>
+<h3 id="commands_10">Commands<a class="headerlink" href="#commands_10" title="Permanent link">~</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Command</th>
+<th>Signature</th>
+<th>Supported platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>wifi.init_stack</code></td>
+<td><code>() -&gt; void</code><br/>Initializes the WiFi stack</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>wifi.connect</code></td>
+<td><code>(ssid: string, password: string, fromAP: bool) -&gt; void</code><br/>Attempts WiFi connection. <code>fromAP</code> should be set according to the current WiFi mode.</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>wifi.start_ap</code></td>
+<td><code>(ssid: string, password: string) -&gt; void</code><br/>Starts an access point with given credentials.</td>
+<td>esp32</td>
+</tr>
+<tr>
+<td align="left"><code>wifi.start_scan</code></td>
+<td><code>() -&gt; boid</code>.<br/>Starts scanning of WiFi networks.</td>
+<td>esp32</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+              
+            </article>
+            
+          </div>
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../../technical/adding-new-plugin/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Writing your own plugin" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Writing your own plugin
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../../http/" class="md-footer__link md-footer__link--next" aria-label="Next: Euphonium REST API" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Euphonium REST API
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.instant", "navigation.top", "navigation.tracking"], "search": "../../assets/javascripts/workers/search.ecf98df9.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.9c69f0bc.min.js"></script>
+      
+    
+  </body>
+</html>
