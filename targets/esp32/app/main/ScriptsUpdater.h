@@ -27,7 +27,7 @@ public:
     size_t readFileSize();
     void readTarHeaders();
     void update();
-    void handleEvent(std::unique_ptr<Event> event);
+    void handleEvent(std::unique_ptr<Event> &event);
 };
 
 #endif

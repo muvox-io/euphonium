@@ -134,7 +134,7 @@ void ScriptsUpdater::readTarHeaders() {
     }
 }
 
-void ScriptsUpdater::handleEvent(std::unique_ptr<Event> event) {
+void ScriptsUpdater::handleEvent(std::unique_ptr<Event> &event) {
     BELL_LOG(info, "scripts_updater", "handleEvent");
     if (event->subType == "wifiStateChanged") {
         auto eventData = event->toBerry();

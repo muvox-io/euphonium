@@ -12,7 +12,7 @@ bool EventBus::update()
     while (!eventQueue.empty())
     {
         gotUpdate = true;
-        std::unique_ptr localPtr(std::move(eventQueue.front()));
+        std::unique_ptr<Event> localPtr(std::move(eventQueue.front()));
         eventQueue.pop();
         auto type = localPtr->eventType;
         auto it = registeredListeners.find(type);
@@ -20,7 +20,7 @@ bool EventBus::update()
         {
             for (auto &&subscriber : (*it).second)
             {
-                subscriber.get().handleEvent(std::move(localPtr));
+                subscriber.get().handleEvent(localPtr);
             }
         }
     }

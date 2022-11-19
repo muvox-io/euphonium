@@ -26,7 +26,7 @@ class Event {
 
 class EventSubscriber {
 public:
-    virtual void handleEvent(std::unique_ptr<Event> event) = 0;
+    virtual void handleEvent(std::unique_ptr<Event> &event) = 0;
 };
 
 class EventBus {
