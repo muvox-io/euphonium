@@ -62,17 +62,19 @@ If you are on macOS then we can do this with `brew`:
 brew install OpenSSL PortAudio
 ```
 
-If you are on Ubuntu/Debian you can install with:
+#### Needed libs on Linux
+If you are on Ubuntu/Debian you can install this with:
 ```
 sudo apt install libmbedtls-dev protobuf-compiler openssl libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0
 ```
 
-#### Needed libs on Linux
-When building on linux you will also need the follwoing dependency: `libavahi-compat-libdnssd-dev`.
+When building on linux you will likely also need the follwoing dependency: `libavahi-compat-libdnssd-dev`.
 This can be installed by
 ```
 sudo apt-get install libavahi-compat-libdnssd-dev
 ```
+
+both can be installed with a package manager.
 
 #### ESP32-Specific dependencies
 
@@ -116,6 +118,16 @@ For a desktop run, please run the following commands
 
 This will output a binary `euphoniumcli` which can be later executed to run the platform. The web-ui will be available on port `80` by default.
 If you have trouble using port 80 (on Linux for example), use `cmake .. -D HTTP_SERVER_PORT=8080` to change the web-ui port.
+
+#### Hint for Linux Mint
+In order for the CLI build to work on Linux Mint I had to add a little extra CLI arg to the `cmake` command, as it doesn't know how to find the correct library it would seem.
+Maybe this could be added directly into the `cmake` setup?
+
+To fully compile the `cli` on Linux Mint execute the following
+```
+cmake -DCMAKE_CXX_STANDARD_LIBRARIES="-lX11 -ldl" ..
+make
+```
 
 ### Building and installing the project - ESP32
 
