@@ -5,6 +5,7 @@
 
 #include "BellUtils.h"
 
+#include "HTTPDispatcher.h"
 #include "StorageAccessor.h"
 #include "EuphContext.h"
 #include "EuphLogger.h"
@@ -16,6 +17,7 @@ class Core {
   std::string TAG = "core";
 
   std::shared_ptr<euph::Context> ctx;
+  std::shared_ptr<euph::HTTPDispatcher> http;
 
  public:
   Core();
