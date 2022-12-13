@@ -4,4 +4,5 @@
         "-background-index",
         "-compile-commands-dir=debug"
     ],
+    "cmake.sourceDirectory": "${workspaceFolder}/src/targets/cli",
 }

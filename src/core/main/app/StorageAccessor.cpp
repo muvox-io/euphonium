@@ -2,8 +2,6 @@
 
 using namespace euph;
 
-StorageAccessor::StorageAccessor() {
-}
+StorageAccessor::StorageAccessor() {}
 
-StorageAccessor::~StorageAccessor() {
-}
+StorageAccessor::~StorageAccessor() {}

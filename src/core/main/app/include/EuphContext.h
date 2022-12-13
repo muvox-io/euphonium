@@ -13,7 +13,7 @@
  * - storage -> Instance of the StorageAccessor, thats should be used to access the filesystem
 */
 namespace euph {
-    struct Context {
-        std::shared_ptr<euph::StorageAccessor> storage;
-    };
-} // namespace euph
+struct Context {
+  std::shared_ptr<euph::StorageAccessor> storage;
+};
+}  // namespace euph

@@ -3,15 +3,19 @@
 #include <memory>
 #include <string>
 
+#include "EuphContext.h"
 #include "EuphLogger.h"
 
 namespace euph {
 class Core {
-  private:
-    std::string TAG = "core";
+ private:
+  // TAG for logging
+  std::string TAG = "core";
 
-  public:
-    Core();
-    ~Core();
+  std::shared_ptr<euph::Context> ctx;
+
+ public:
+  Core();
+  ~Core();
 };
-} // namespace euph
+}  // namespace euph
