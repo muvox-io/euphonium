@@ -1,0 +1,7 @@
+{
+  "name": "system",
+  "version": "0.1.0",
+  "description": "Minimal set of internal scripts for the system",
+  "author": "euphonium",
+  "init_hook": "system"
+}
