@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 
-#include "BellLogger.h"
+#include "EuphLogger.h"
 
 namespace euph {
 class Core {

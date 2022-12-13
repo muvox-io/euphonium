@@ -1,6 +1,7 @@
 nix/.python_env
 node_modules/
 .DS_Store
+euph-old
 *.d
 .idea
 .cache/

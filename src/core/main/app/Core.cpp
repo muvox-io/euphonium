@@ -3,8 +3,7 @@
 using namespace euph;
 
 Core::Core() {
-    bell::setDefaultLogger();
-    BELL_LOG(info, TAG, "Core created");
+    EUPH_LOG(info, TAG, "Core created");
 }
 
 Core::~Core() {

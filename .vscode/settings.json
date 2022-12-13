@@ -95,6 +95,9 @@
         "be_func.h": "c",
         "be_decoder.h": "c",
         "be_object.h": "c",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "csignal": "cpp",
+        "coroutine": "cpp",
+        "future": "cpp"
     }
 }

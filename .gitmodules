@@ -8,4 +8,5 @@
 	url = git@github.com:espressif/esp-idf
 [submodule "src/core/external/bell"]
 	path = src/core/external/bell
+	branch = develop
 	url = https://github.com/feelfreelinux/bell
