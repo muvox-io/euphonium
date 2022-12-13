@@ -3,6 +3,9 @@
 #include <memory>
 #include <string>
 
+#include "BellUtils.h"
+
+#include "StorageAccessor.h"
 #include "EuphContext.h"
 #include "EuphLogger.h"
 

@@ -5,4 +5,5 @@
         "-compile-commands-dir=debug"
     ],
     "cmake.sourceDirectory": "${workspaceFolder}/src/targets/cli",
+    "editor.tabSize": 2
 }

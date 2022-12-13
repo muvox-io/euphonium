@@ -28,6 +28,7 @@
               [
                 # Build depds
                 clang
+                clangd
                 cmake
                 ninja
                 git
