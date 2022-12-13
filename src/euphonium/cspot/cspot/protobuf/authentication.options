@@ -1,5 +1,0 @@
-LoginCredentials.username max_size:30, fixed_length:false
-LoginCredentials.auth_data max_size:512, fixed_length:false
-SystemInfo.system_information_string max_size:16, fixed_length:false
-SystemInfo.device_id max_size:50, fixed_length:false
-ClientResponseEncrypted.version_string max_size:32, fixed_length:false

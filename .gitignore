@@ -1,3 +1,5 @@
+nix/.python_env
+node_modules/
 .DS_Store
 *.d
 .idea
@@ -22,6 +24,4 @@ targets/esp32/scripts.tar
 targets/esp32/recovery/dependencies.lock
 targets/esp32/app/dependencies.lock
 targets/esp32/app/spiffs/*
-web/package-lock.json
-web/yarn.lock
 py/

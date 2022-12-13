@@ -1,9 +1,0 @@
-build/
-sdkconfig
-sdkconfig.old
-
-example/build/
-example/sdkconfig
-example/sdkconfig.old
-
-*.DS_Store
