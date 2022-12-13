@@ -6,3 +6,6 @@
 	path = nix/esp-idf
 	branch = release/v4.4
 	url = git@github.com:espressif/esp-idf
+[submodule "src/core/external/bell"]
+	path = src/core/external/bell
+	url = https://github.com/feelfreelinux/bell
