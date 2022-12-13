@@ -1,6 +1,5 @@
 #include "StorageAccessor.h"
-#include <mutex>
-#include "BellLogger.h"
+
 
 using namespace euph;
 
@@ -98,43 +97,55 @@ void StorageAccessor::runTask() {
 
       // check if file exists
       if (file.is_open()) {
-        // read file
-        if (this->currentOperation.format == OperationFormat::TEXT) {
-          // reserve fileSize bytes in the string
-          this->currentOperation.dataText = std::string(fileSize, ' ');
-          file.read(&currentOperation.dataText[0], fileSize);
-          this->currentOperation.status = OperationStatus::SUCCESS;
+        switch (this->currentOperation.format) {
+          // Handle reads to string
+          case OperationFormat::TEXT: {
+            this->currentOperation.dataText = std::string(fileSize, ' ');
+            file.read(&currentOperation.dataText[0], fileSize);
+            this->currentOperation.status = OperationStatus::SUCCESS;
+            break;
+          }
 
-          EUPH_LOG(info, TASK, "Read file: %s", this->currentOperation.path);
-        } else if (this->currentOperation.format == OperationFormat::BINARY) {
-          // reserve fileSize bytes in the string
-          this->currentOperation.dataBinary = std::vector<uint8_t>(fileSize);
-          file.read((char*)&currentOperation.dataBinary[0], fileSize);
-          this->currentOperation.status = OperationStatus::SUCCESS;
-        } else if (this->currentOperation.format == OperationFormat::HTTP) {
-          this->currentOperation.status = OperationStatus::SUCCESS;
+          // Handle reads to binary
+          case OperationFormat::BINARY: {
+            this->currentOperation.dataBinary = std::vector<uint8_t>(fileSize);
+            file.read((char*)&currentOperation.dataBinary[0], fileSize);
+            this->currentOperation.status = OperationStatus::SUCCESS;
+            break;
+          }
 
-          // reserve fileSize bytes in the string
-          mgBytesLeft = fileSize;
-          while (mgBytesLeft > 0) {
-            size_t toRead =
-                mgBytesLeft > HTTP_CHUNK_SIZE ? HTTP_CHUNK_SIZE : mgBytesLeft;
+          // Handle reads to socket
+          case OperationFormat::HTTP: {
+            this->currentOperation.status = OperationStatus::SUCCESS;
+            mgBytesLeft = fileSize;
 
-            // read file
-            file.read((char*)mgBuffer.data() + (fileSize - mgBytesLeft),
-                      toRead);
-            size_t readBytes = file.gcount();
+            // Write the requested file to the socket, chunk by chunk
+            while (mgBytesLeft > 0) {
+              size_t toRead =
+                  mgBytesLeft > HTTP_CHUNK_SIZE ? HTTP_CHUNK_SIZE : mgBytesLeft;
 
-            size_t writtenBytes = mg_write(this->currentOperation.dataCon,
-                                           mgBuffer.data(), readBytes);
-            if (writtenBytes < 0) {
-              mgBytesLeft = 0;
-              this->currentOperation.status = OperationStatus::FAILURE;
-            } else {
-              mgBytesLeft -= writtenBytes;
+              // read file to temporary buffer
+              file.read((char*)mgBuffer.data() + (fileSize - mgBytesLeft),
+                        toRead);
+
+              // write to socket
+              size_t writtenBytes = mg_write(this->currentOperation.dataCon,
+                                             mgBuffer.data(), file.gcount());
+              if (writtenBytes < 0) {
+                // Error writing to socket
+                mgBytesLeft = 0;
+                this->currentOperation.status = OperationStatus::FAILURE;
+              } else {
+                // Update bytes left
+                mgBytesLeft -= writtenBytes;
+              }
             }
+            break;
           }
         }
+      } else {
+        // File does not exist
+        this->currentOperation.status = OperationStatus::FAILURE;
       }
     }
     this->responseSemaphore->give();

@@ -1,12 +1,12 @@
 #pragma once
 
 #include <fstream>
+#include <istream>
 #include <memory>
-#include <string>
 #include <mutex>
+#include <string>
 #include <string_view>
 #include <vector>
-#include <istream>
 
 // For mg_connection
 #include "BellTask.h"
@@ -78,16 +78,13 @@ class StorageAccessor : public bell::Task {
 
  private:
   const size_t HTTP_CHUNK_SIZE = 1024;
-  
+
   // Current operation
   Operation currentOperation;
 
   // Semaphores used to synchronize the task
   std::unique_ptr<bell::WrappedSemaphore> requestSemaphore;
   std::unique_ptr<bell::WrappedSemaphore> responseSemaphore;
-
-  // Mutex used to synchronize the task
-  std::mutex operationLock;
 
   void runTask() override;
 };
