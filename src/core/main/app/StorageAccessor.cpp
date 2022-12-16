@@ -1,5 +1,5 @@
 #include "StorageAccessor.h"
-
+#include <vector>
 
 using namespace euph;
 
@@ -58,6 +58,23 @@ std::vector<uint8_t> StorageAccessor::readFileBinary(std::string_view path) {
   } else {
     throw "Failed to read file";
   }
+}
+
+std::vector<std::string> StorageAccessor::listFiles(std::string_view path) {
+  std::vector<std::string> files;
+  DIR* dir;
+  struct dirent* ent;
+  if ((dir = opendir(path.data())) != NULL) {
+    /* print all the files and directories within directory */
+    while ((ent = readdir(dir)) != NULL) {
+      files.push_back(ent->d_name);
+    }
+    closedir(dir);
+  } else {
+    /* could not open directory */
+    throw "Could not open directory";
+  }
+  return files;
 }
 
 void StorageAccessor::readFileToSocket(std::string_view path,

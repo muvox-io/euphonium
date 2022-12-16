@@ -7,6 +7,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <dirent.h>
 
 // For mg_connection
 #include "BellTask.h"
@@ -75,6 +76,17 @@ class StorageAccessor : public bell::Task {
    * @param conn Pointer to the socket
    */
   void readFileToSocket(std::string_view path, struct mg_connection* conn);
+
+  /**
+   * @brief Returns a list of files in a directory
+   *
+   * While StorageAccessor is not explicitly meant to be used for FS abstraction,
+   * it is still useful to have a function that returns a list of files in a directory.
+   * 
+   * @param path Path to the directory
+   * @return std::vector<std::string> list of files
+   */
+  std::vector<std::string> listFiles(std::string_view path);
 
  private:
   const size_t HTTP_CHUNK_SIZE = 1024;

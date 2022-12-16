@@ -10,10 +10,22 @@
 #include <tuple>
 #include <type_traits>
 #include <vector>
-#include "EuphLogger.h"
-#include "be_debug.h"
-#include "be_vm.h"
+
 #include "berry.h"
+extern "C" {
+#include <be_debug.h>
+#include <be_exec.h>
+#include <be_gc.h>
+#include <be_string.h>
+#include <be_strlib.h>
+#include <be_vector.h>
+#include <be_vm.h>
+}
+
+#include "BellUtils.h"
+#include "EuphLogger.h"
+
+#undef str
 
 namespace berry {
 typedef std::map<std::string, std::any> map;
@@ -107,7 +119,9 @@ class VmState {
 
   bvm* raw_ptr() { return vm; }
 
-  bool execute_string(const std::string& string);
+  std::pair<int, std::string> debug_get_lineinfo();
+
+  bool execute_string(const std::string& string, const std::string& tag);
 
   void lambda(std::function<int(VmState&)>* function, const std::string& name,
               const std::string& module = "");

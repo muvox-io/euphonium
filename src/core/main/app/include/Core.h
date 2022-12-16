@@ -5,7 +5,9 @@
 
 #include "BellUtils.h"
 
+#include "CoreBindings.h"
 #include "HTTPDispatcher.h"
+#include "PackageLoader.h"
 #include "StorageAccessor.h"
 #include "EuphContext.h"
 #include "EuphLogger.h"
@@ -18,6 +20,9 @@ class Core {
 
   std::shared_ptr<euph::Context> ctx;
   std::shared_ptr<euph::HTTPDispatcher> http;
+  std::shared_ptr<euph::PackageLoader> pkgLoader;
+  
+  std::unique_ptr<euph::CoreBindings> bindings;
 
  public:
   Core();

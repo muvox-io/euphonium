@@ -30,5 +30,8 @@ struct Context {
     ctx->vm = std::make_shared<berry::VmState>();
     return ctx;
   }
+
+  // Path to the root of the filesystem
+  std::string rootPath = "../src/core/fs";
 };
 }  // namespace euph
