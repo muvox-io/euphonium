@@ -1,7 +1,11 @@
 #pragma once
 
 #include <memory>
+#include <fmt/core.h>
+
+#include "BellUtils.h"
 #include "EuphContext.h"
+#include "EuphLogger.h"
 
 namespace euph {
 

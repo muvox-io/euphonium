@@ -1,7 +1,4 @@
 #include "CoreBindings.h"
-#include "BellUtils.h"
-#include "EuphLogger.h"
-#include "fmt/core.h"
 
 using namespace euph;
 
@@ -12,7 +9,7 @@ CoreBindings::CoreBindings(std::shared_ptr<euph::Context> ctx) {
 CoreBindings::~CoreBindings() {}
 
 void CoreBindings::setupBindings() {
-  EUPH_LOG(info, TAG, "Setting up core bindings");
+  EUPH_LOG(debug, TAG, "Setting up core bindings");
 
   ctx->vm->export_this("sleep_ms", this, &CoreBindings::_sleepMS, "core");
   ctx->vm->export_this("get_version", this, &CoreBindings::_getVersion, "core");
@@ -37,7 +34,7 @@ void CoreBindings::_loadScript(std::string pkg, std::string path) {
   std::string scriptPath =
       fmt::format("{}/pkgs/{}/{}", ctx->rootPath, pkg, path);
 
-  EUPH_LOG(info, TAG, "Loading script: %s", scriptPath.c_str());
+  EUPH_LOG(debug, TAG, "Loading script [%s]", scriptPath.c_str());
 
   try {
     std::string scriptBody = this->ctx->storage->readFile(scriptPath);

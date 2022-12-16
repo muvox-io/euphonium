@@ -4,9 +4,10 @@
 #include <unordered_map>
 
 #include "BellHTTPServer.h"
+#include "BerryBind.h"
+#include "EventBus.h"
 #include "WrappedSemaphore.h"
 #include "civetweb.h"
-
 #include "EuphContext.h"
 
 namespace euph {
@@ -35,6 +36,30 @@ class HTTPDispatcher {
  public:
   HTTPDispatcher(std::shared_ptr<euph::Context> ctx);
   ~HTTPDispatcher();
+
+  // HTTP methods supported by the dispatcher
+  enum Method : uint8_t { GET = 0, POST = 1 };
+
+  // Event used to notify the scripting layer of a new HTTP request
+  class VmEvent : public Event {
+   private:
+    int handlerId;
+    int connId;
+
+   public:
+    VmEvent(int handlerId, int connId) {
+      this->eventType = EventType::VM_MAIN_EVENT;
+      this->subType = "http_request";
+    }
+    ~VmEvent(){};
+
+    berry::map toBerry() override {
+      berry::map m;
+      m["handler_id"] = this->handlerId;
+      m["conn_id"] = this->connId;
+      return m;
+    }
+  };
 
   // Initializes the dispatcher
   void initialize();

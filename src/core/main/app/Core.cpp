@@ -1,7 +1,4 @@
 #include "Core.h"
-#include <memory>
-#include "BellUtils.h"
-#include "CoreBindings.h"
 
 using namespace euph;
 
@@ -17,11 +14,40 @@ Core::Core() {
 
   // setup bindings
   this->bindings->setupBindings();
+  this->http->setupBindings();
 
   this->pkgLoader->loadWithHook("system");
 
+  this->handleEventLoop();
+}
+
+void Core::handleEventLoop() {
+  // Subscribe self to the event bus
+  auto subscriber = dynamic_cast<EventSubscriber*>(this);
+  ctx->eventBus->addListener(EventType::VM_MAIN_EVENT, *subscriber);
+
   while (true) {
-    BELL_SLEEP_MS(500);
+    ctx->eventBus->eventSemaphore->wait();
+    ctx->eventBus->update();
+  }
+}
+
+void Core::handleEvent(std::unique_ptr<Event>& event) {
+  EUPH_LOG(debug, TAG, "Got event");
+  // Load function
+  ctx->vm->get_global("handle_event");
+
+  // Arg 1
+  ctx->vm->string(event->subType);
+
+  // Arg 2
+  ctx->vm->map(event->toBerry());
+
+  ctx->vm->pcall(2);
+
+  if (be_top(ctx->vm->raw_ptr()) > 0) {
+    BELL_LOG(error, TAG, "Berry stack invalid, possible memory leak (%d > 0 !)",
+             be_top(ctx->vm->raw_ptr()));
   }
 }
 

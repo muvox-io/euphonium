@@ -282,10 +282,7 @@ end
 
 euphonium = EuphoniumInstance()
 
-# Native closures
-def handle_event(event_type, event_data)
-    euphonium.handle_event(event_type, event_data)
-end
+
 
 def load_plugins()
     print("Load plugins called")

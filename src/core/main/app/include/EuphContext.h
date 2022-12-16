@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "EventBus.h"
 #include "StorageAccessor.h"
 #include "BerryBind.h"
 
@@ -13,11 +14,13 @@
  * - buffer -> Instance of CentralAudioBuffer
  * - storage -> Instance of the StorageAccessor, thats should be used to access the filesystem
  * - vm -> Instance of the VM, that should be used to run the scripts
+ * - eventBus -> Instance of the EventBus, that should be used to communicate between the different parts of the system
 */
 namespace euph {
 struct Context {
   std::shared_ptr<euph::StorageAccessor> storage;
   std::shared_ptr<berry::VmState> vm;
+  std::shared_ptr<euph::EventBus> eventBus;
 
   /**
    * @brief Creates a context with the default utilities
@@ -28,6 +31,7 @@ struct Context {
     auto ctx = std::make_shared<euph::Context>();
     ctx->storage = std::make_shared<euph::StorageAccessor>();
     ctx->vm = std::make_shared<berry::VmState>();
+    ctx->eventBus = std::make_shared<euph::EventBus>();
     return ctx;
   }
 
