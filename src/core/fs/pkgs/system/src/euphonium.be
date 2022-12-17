@@ -282,8 +282,6 @@ end
 
 euphonium = EuphoniumInstance()
 
-
-
 def load_plugins()
     print("Load plugins called")
     euphonium.load_configuration()
