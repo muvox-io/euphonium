@@ -18,8 +18,9 @@ add_definitions(-DHTTP_SERVER_PORT=${HTTP_SERVER_PORT})
 
 include_directories("main/app/include")
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
+find_package(fmt)
 
 add_library(euphonium STATIC ${SOURCES})
-target_link_libraries(euphonium PUBLIC bell berry ${EXTRA_REQ_LIBS})
+
+target_link_libraries(euphonium PUBLIC  fmt::fmt bell berry ${EXTRA_REQ_LIBS})
 target_include_directories(euphonium PUBLIC "main/app/include" "protos" bell ${EXTRA_REQ_LIBS} ${CMAKE_CURRENT_BINARY_DIR})

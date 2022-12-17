@@ -42,6 +42,7 @@
                 portaudio
                 mbedtls
                 protobuf
+                fmt
 
                 # esp-idf specific
                 (pkgs.callPackage ./nix/toolchain.nix { })
