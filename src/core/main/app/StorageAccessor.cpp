@@ -1,4 +1,5 @@
 #include "StorageAccessor.h"
+#include <stdexcept> 
 
 using namespace euph;
 
@@ -12,8 +13,8 @@ StorageAccessor::StorageAccessor()
       .format = OperationFormat::TEXT,
       .status = OperationStatus::SUCCESS,
       .path = nullptr,
-      .dataText = "",
       .dataBinary = {},
+      .dataText = "",
       .dataCon = nullptr,
   };
 
@@ -38,7 +39,7 @@ std::string StorageAccessor::readFile(std::string_view path) {
   if (this->currentOperation.status == OperationStatus::SUCCESS) {
     return this->currentOperation.dataText;
   } else {
-    throw "Failed to read file";
+    throw std::runtime_error("Failed to read file");
   }
 }
 
@@ -55,7 +56,7 @@ std::vector<uint8_t> StorageAccessor::readFileBinary(std::string_view path) {
   if (this->currentOperation.status == OperationStatus::SUCCESS) {
     return this->currentOperation.dataBinary;
   } else {
-    throw "Failed to read file";
+    throw std::runtime_error("Failed to read file");
   }
 }
 
@@ -71,7 +72,7 @@ std::vector<std::string> StorageAccessor::listFiles(std::string_view path) {
     closedir(dir);
   } else {
     /* could not open directory */
-    throw "Could not open directory";
+    throw std::runtime_error("Failed to read file " + std::string(path));
   }
   return files;
 }
@@ -89,7 +90,7 @@ void StorageAccessor::readFileToSocket(std::string_view path,
   this->responseSemaphore->wait();
 
   if (this->currentOperation.status == OperationStatus::FAILURE) {
-    throw "Failed to read file";
+    throw std::runtime_error("Failed to read file");
   }
 }
 
