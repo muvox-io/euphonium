@@ -1,0 +1,7 @@
+{
+  "name": "cspot",
+  "version": "0.1.0",
+  "description": "Spotify Connect support",
+  "author": "euphonium",
+  "init_hook": "plugin"
+}

@@ -1,5 +1,5 @@
 # HTTP Endpoints
-http.handle('GET', '/plugins', def (request)
+http.handle(HTTP_GET, '/plugins', def (request)
     var result = []
     for plugin : euphonium.plugins
         result.push({
@@ -20,11 +20,9 @@ http.handle('GET', '/plugins', def (request)
     request.write_json(result, 200)
 end)
 
-http.handle('GET', '/plugins/:name', def (request)
-  
-
+http.handle(HTTP_GET, '/plugins/:name', def (request)
     for plugin : euphonium.plugins
-        if plugin.name == request.url_params()['name']
+        if plugin.name == request.route_params()['name']
             var ctx = FormContext()
             plugin.make_form(ctx, plugin.state)
 
@@ -42,14 +40,14 @@ http.handle('GET', '/plugins/:name', def (request)
     }, 404)
 end)
 
-http.handle('POST', '/plugins/:name', def (request)
+http.handle(HTTP_POST, '/plugins/:name', def (request)
     var result = {
         'status': 'error'
     }
 
     var body = request.json_body()
 
-    var plugin = euphonium.get_plugin(request.url_params()['name'])
+    var plugin = euphonium.get_plugin(request.route_params()['name'])
     var isDraft = body['isPreview']
     var state = json.load(json.dump(plugin.state))
 
@@ -80,18 +78,18 @@ http.handle('POST', '/plugins/:name', def (request)
 end)
 
 
-http.handle('GET', '/system', def (request)
+http.handle(HTTP_GET, '/system', def (request)
     request.write_json({
         'version': core.version(),
         'networkState': euphonium.network_state
     }, 200)
 end)
 
-http.handle('GET', '/playback', def (request)
+http.handle(HTTP_GET, '/playback', def (request)
     request.write_json(euphonium.playback_state, 200)
 end)
 
-http.handle('POST', '/playback/volume', def (request)
+http.handle(HTTP_POST, '/playback/volume', def (request)
     var body = request.json_body()
     euphonium.apply_volume(int(body['volume']))
 
@@ -103,7 +101,7 @@ http.handle('POST', '/playback/volume', def (request)
     request.write_json(euphonium.playback_state, 200)
 end)
 
-http.handle('POST', '/playback/eq', def (request)
+http.handle(HTTP_POST, '/playback/eq', def (request)
     var body = request.json_body()
     playback.set_eq(real(body['low']), real(body['mid']), real(body['high']))
     euphonium.playback_state['eq'] = body
@@ -117,7 +115,7 @@ http.handle('POST', '/playback/eq', def (request)
     request.write_json(euphonium.playback_state, 200)
 end)
 
-http.handle('POST', '/playback/status', def (request)
+http.handle(HTTP_POST, '/playback/status', def (request)
     euphonium.playback_state['status'] = request.json_body()['status']
     plugin = euphonium.get_plugin(euphonium.current_source)
 

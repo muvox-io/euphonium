@@ -12,8 +12,8 @@ void CoreBindings::setupBindings() {
   EUPH_LOG(debug, TAG, "Setting up core bindings");
 
   ctx->vm->export_this("sleep_ms", this, &CoreBindings::_sleepMS, "core");
-  ctx->vm->export_this("get_version", this, &CoreBindings::_getVersion, "core");
-  ctx->vm->export_this("get_platform", this, &CoreBindings::_getPlatform,
+  ctx->vm->export_this("version", this, &CoreBindings::_getVersion, "core");
+  ctx->vm->export_this("platform", this, &CoreBindings::_getPlatform,
                        "core");
   ctx->vm->export_this("load", this, &CoreBindings::_loadScript, "core");
   ctx->vm->export_this("get_time_ms", this, &CoreBindings::_getTimeMs, "core");

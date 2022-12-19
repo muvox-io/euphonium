@@ -1,4 +1,5 @@
 #include "HTTPDispatcher.h"
+#include "BellHTTPServer.h"
 
 using namespace euph;
 
@@ -23,6 +24,7 @@ void HTTPDispatcher::setupBindings() {
                        &HTTPDispatcher::_readContentLength, "http");
   ctx->vm->export_this("_write_response", this, &HTTPDispatcher::_writeResponse,
                        "http");
+  ctx->vm->export_this("_read_route_params", this, &HTTPDispatcher::_readRouteParams, "http");
 }
 
 std::string HTTPDispatcher::_readBody(int connId) {
@@ -90,4 +92,17 @@ void HTTPDispatcher::_writeResponse(int connId, std::string body,
             "%s\r\nConnection: close\r\n\r\n",
             statusCode, contentType.c_str());
   mg_write(conn, body.c_str(), body.size());
+  this->responseSemaphore->give();
+}
+
+berry::map HTTPDispatcher::_readRouteParams(int connId) {
+  auto conn = this->bindConnections[connId];
+  auto params = bell::BellHTTPServer::extractParams(conn);
+
+  berry::map result;
+  for (auto &&param : params) {
+    result[param.first] = param.second;
+  }
+
+  return result;
 }

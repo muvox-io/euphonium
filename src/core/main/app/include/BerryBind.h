@@ -5,7 +5,7 @@
 #include <exception>
 #include <functional>
 #include <iostream>
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <tuple>
 #include <type_traits>
@@ -28,11 +28,11 @@ extern "C" {
 #undef str
 
 namespace berry {
-typedef std::map<std::string, std::any> map;
+typedef std::unordered_map<std::string, std::any> map;
 typedef std::vector<std::any> list;
 
 template <typename T>
-berry::map to_map(std::map<std::string, T> inputMap) {
+berry::map to_map(std::unordered_map<std::string, T> inputMap) {
   berry::map berryMap;
   for (auto& pair : inputMap) {
     berryMap[pair.first] = pair.second;
@@ -288,7 +288,7 @@ class VmState {
   }
 };
 
-typedef std::map<std::string, std::function<int(berry::VmState&)>*> moduleMap;
+typedef std::unordered_map<std::string, std::function<int(berry::VmState&)>*> moduleMap;
 
 extern berry::moduleMap moduleLambdas;
 

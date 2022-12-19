@@ -17,6 +17,7 @@ Core::Core() {
   this->http->setupBindings();
 
   this->pkgLoader->loadWithHook("system");
+  this->pkgLoader->loadWithHook("plugin");
 
   this->handleEventLoop();
 }

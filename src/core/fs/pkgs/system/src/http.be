@@ -11,8 +11,8 @@ class HTTPRequest
         return get_native('http', name)
     end
 
-    def url_params()
-        return {}
+    def route_params()
+        return self._read_route_params(self.conn_id)
     end
 
     def query_params()
@@ -43,6 +43,10 @@ class HTTP
 
     def init()
         self.handlers = []
+
+        events.register_native('http_request', def (event) 
+            self.handle_event(event)
+        end)
     end
 
     def handle_event(req_data)
@@ -53,7 +57,7 @@ class HTTP
     # handle request
     def handle(request_type, path, callback)
         self.handlers.push(callback)
-        self._register_handler(request_type, path, self.handlers.size() - 1)
+        self._register_handler(int(request_type), path, int(self.handlers.size() - 1))
     end
 
     # publish event
@@ -63,7 +67,3 @@ class HTTP
 end
 
 http = HTTP()
-
-http.handle(HTTP_GET, '/hello_world', def (req)
-    req.write_json({ 'status': 'hello_world' })
-end)

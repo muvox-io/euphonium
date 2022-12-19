@@ -50,6 +50,8 @@ class HTTPDispatcher {
     VmEvent(int handlerId, int connId) {
       this->eventType = EventType::VM_MAIN_EVENT;
       this->subType = "http_request";
+      this->handlerId = handlerId;
+      this->connId = connId;
     }
     ~VmEvent(){};
 
@@ -71,6 +73,7 @@ class HTTPDispatcher {
   void _registerHandler(int httpMethod, std::string path, int handlerId);
   void _writeResponse(int connId, std::string body, std::string contentType,
                       int statusCode);
+  berry::map _readRouteParams(int connId);
   std::string _readBody(int connId);
   size_t _readContentLength(int connId);
 };

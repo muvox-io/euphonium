@@ -13,43 +13,6 @@ class EuphoniumInstance
         self.last_volume = 0
         self.playback_state = {}
         self.plugins_initialized = false
-        self.event_handlers = {
-            'handleRouteEvent': def (request)
-                http.handle_event(request)
-            end,
-            'songChangedEvent': def (song)
-                self.update_song(song)
-            end,
-            'audioTakeoverEvent': def (req)
-                self.current_source = req['source']
-                self.send_notification("success", self.current_source, "Took over playback")
-            end,
-            'playbackError': def (req)
-                self.current_source = req['source']
-                self.send_notification("error", self.current_source, req["errorMessage"])
-            end,
-            'statusChangedEvent': def (req)
-                if req['isPaused']
-                    self.playback_state['status'] = 'paused'
-                else
-                    self.playback_state['status'] = 'playing'
-                end
-
-                self.update_playback()
-            end,
-            'youtubeEvent': def (ev)
-                self.get_plugin('youtube').on_event('youtube', ev)
-            end,
-            'volumeChangedEvent': def (req)
-                self.apply_volume(int(req['volume']))
-            end,
-            'handleConfigLoaded': def (config)
-                self.load_configuration_for(config)
-            end,
-            'hookEvent' : def (ev)
-                hooks.call(ev['hook'])
-            end
-        }
         self.plugins = []
         self.playback_state = {
             'song': {
@@ -129,11 +92,11 @@ class EuphoniumInstance
     # Initializes all plugins
     def init_required_plugins()
         self.network_state = 'online'
-        self.init_plugin('cspot')
-        self.init_plugin('webradio')
+        # self.init_plugin('cspot')
+        # self.init_plugin('webradio')
         #self.init_plugin('bluetooth')
-        self.broadcast_event(EVENT_PLUGIN_INIT, {})
-        self.init_http()
+        # self.broadcast_event(EVENT_PLUGIN_INIT, {})
+        # self.init_http()
     end
 
     def init_plugin(plugin_name)
