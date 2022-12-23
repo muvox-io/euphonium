@@ -1,0 +1,52 @@
+.button {
+  cursor: pointer;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  margin: 0.5rem 0;
+  color: var(--accent);
+  position: relative;
+  transition: 300ms;
+  @media screen and (max-width: 768px) {
+    padding: 1rem 3rem;
+  }
+
+  /* hack to add some opacity to the border */
+  &:before {
+    content: " ";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    opacity: 0.6;
+    border: 2px solid var(--accent);
+    background: transparent;
+  }
+  &:hover:enabled {
+    color: var(--text-primary);
+    background: var(--accent);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  &.primary {
+    background: var(--accent-dark);
+    color: var(--text-primary);
+
+    &:hover:enabled {
+      background: var(--accent);
+    }
+  }
+  &.borderless {
+    &:before {
+      border: none;
+    }
+    &:hover {
+      background: transparent;
+    }
+  }
+}

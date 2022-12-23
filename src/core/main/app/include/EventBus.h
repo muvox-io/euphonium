@@ -11,8 +11,7 @@
 #include <WrappedSemaphore.h>
 
 namespace euph {
-
-enum class EventType : uint32_t { VM_MAIN_EVENT, VM_ERROR_EVENT };
+enum class EventType : uint32_t { VM_MAIN_EVENT, VM_ERROR_EVENT, CONNECTIVITY_EVENT, WEBSOCKET_EVENT };
 
 class Event {
  public:

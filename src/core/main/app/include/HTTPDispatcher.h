@@ -31,7 +31,12 @@ class HTTPDispatcher {
   // Used to keep track of the next bind id
   uint32_t nextBindId = 0;
 
-  std::unique_ptr<bell::BellHTTPServer> server;
+  // List of connected websocket clients
+  std::vector<struct mg_connection*> websocketConnections;
+
+  std::mutex websocketConnectionsMutex;
+
+  std::shared_ptr<bell::BellHTTPServer> server;
 
  public:
   HTTPDispatcher(std::shared_ptr<euph::Context> ctx);
@@ -63,16 +68,41 @@ class HTTPDispatcher {
     }
   };
 
+  // Event used to notify the scripting layer of a new websocket message
+  class VmWebsocketEvent : public Event {
+   private:
+    std::string body;
+
+   public:
+    VmWebsocketEvent(const std::string& body) {
+      this->eventType = EventType::VM_MAIN_EVENT;
+      this->subType = "websocket";
+      this->body = body;
+    }
+    ~VmWebsocketEvent(){};
+
+    berry::map toBerry() override {
+      berry::map m;
+      m["body"] = this->body;
+      return m;
+    }
+  };
+
   // Initializes the dispatcher
   void initialize();
 
   // Registers berry bindings to the internal methods
   void setupBindings();
 
+  void broadcastWebsocket(const std::string& body);
+
+  std::shared_ptr<bell::BellHTTPServer> getServer();
+
   // Methods bind to the scripting API
   void _registerHandler(int httpMethod, std::string path, int handlerId);
   void _writeResponse(int connId, std::string body, std::string contentType,
                       int statusCode);
+  void _broadcastWebsocket(std::string body);
   berry::map _readRouteParams(int connId);
   std::string _readBody(int connId);
   size_t _readContentLength(int connId);

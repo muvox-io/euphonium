@@ -35,6 +35,14 @@ struct Context {
     return ctx;
   }
 
+  static std::shared_ptr<euph::Context> createWithBus(std::shared_ptr<euph::EventBus> bus) {
+    auto ctx = std::make_shared<euph::Context>();
+    ctx->storage = std::make_shared<euph::StorageAccessor>();
+    ctx->vm = std::make_shared<berry::VmState>();
+    ctx->eventBus = bus;
+    return ctx;
+  }
+
   // Path to the root of the filesystem
   std::string rootPath = "../src/core/fs";
 };

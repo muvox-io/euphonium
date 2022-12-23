@@ -1,18 +1,56 @@
 #include "HTTPDispatcher.h"
+#include <memory>
 #include "BellHTTPServer.h"
+#include "civetweb.h"
 
 using namespace euph;
 
 HTTPDispatcher::HTTPDispatcher(std::shared_ptr<euph::Context> ctx) {
   this->ctx = ctx;
   this->responseSemaphore = std::make_unique<bell::WrappedSemaphore>(0);
-  this->server = std::make_unique<bell::BellHTTPServer>(8080);
+  this->server = std::make_shared<bell::BellHTTPServer>(8080);
 }
 
 HTTPDispatcher::~HTTPDispatcher() {}
 
 void HTTPDispatcher::initialize() {
   EUPH_LOG(debug, TAG, "Registering HTTP handlers");
+
+  this->server->registerWS(
+      "/events",
+      [this](struct mg_connection* conn, char* data, size_t dataSize) {
+        // Convert the data to a string
+        std::string dataString(data, dataSize);
+
+        // Post the event to the event bus
+        auto event = std::make_unique<VmWebsocketEvent>(dataString);
+        this->ctx->eventBus->postEvent(std::move(event));
+      },
+      [this](struct mg_connection* conn, bell::BellHTTPServer::WSState state) {
+        switch (state) {
+          case bell::BellHTTPServer::WSState::READY: {
+            EUPH_LOG(debug, TAG, "Websocket connection open");
+            std::scoped_lock lock(this->websocketConnectionsMutex);
+            this->websocketConnections.push_back(conn);
+            break;
+          }
+          case bell::BellHTTPServer::WSState::CLOSED: {
+            EUPH_LOG(debug, TAG, "Websocket connection closed");
+            std::scoped_lock lock(this->websocketConnectionsMutex);
+            // remove the connection from the list
+            this->websocketConnections.erase(find(websocketConnections.begin(),
+                                                  websocketConnections.end(),
+                                                  conn));
+            break;
+          }
+          default:
+            break;
+        }
+      });
+}
+
+std::shared_ptr<bell::BellHTTPServer> HTTPDispatcher::getServer() {
+  return this->server;
 }
 
 void HTTPDispatcher::setupBindings() {
@@ -24,7 +62,10 @@ void HTTPDispatcher::setupBindings() {
                        &HTTPDispatcher::_readContentLength, "http");
   ctx->vm->export_this("_write_response", this, &HTTPDispatcher::_writeResponse,
                        "http");
-  ctx->vm->export_this("_read_route_params", this, &HTTPDispatcher::_readRouteParams, "http");
+  ctx->vm->export_this("_read_route_params", this,
+                       &HTTPDispatcher::_readRouteParams, "http");
+  ctx->vm->export_this("_broadcast_websocket", this,
+                       &HTTPDispatcher::_broadcastWebsocket, "http");
 }
 
 std::string HTTPDispatcher::_readBody(int connId) {
@@ -83,13 +124,26 @@ void HTTPDispatcher::_registerHandler(int httpMethod, std::string path,
   }
 }
 
+void HTTPDispatcher::broadcastWebsocket(const std::string& body) {
+  std::scoped_lock lock(this->websocketConnectionsMutex);
+
+  // for each in this->websocketConnections
+  for (auto&& conn : this->websocketConnections) {
+    mg_websocket_write(conn, MG_WEBSOCKET_OPCODE_TEXT, body.data(), body.size());
+  }
+}
+
+void HTTPDispatcher::_broadcastWebsocket(std::string body) {
+  this->broadcastWebsocket(body);
+}
+
 void HTTPDispatcher::_writeResponse(int connId, std::string body,
                                     std::string contentType, int statusCode) {
   auto conn = this->bindConnections[connId];
 
   mg_printf(conn,
             "HTTP/1.1 %d OK\r\nContent-Type: "
-            "%s\r\nConnection: close\r\n\r\n",
+            "%s\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n",
             statusCode, contentType.c_str());
   mg_write(conn, body.c_str(), body.size());
   this->responseSemaphore->give();
@@ -100,7 +154,7 @@ berry::map HTTPDispatcher::_readRouteParams(int connId) {
   auto params = bell::BellHTTPServer::extractParams(conn);
 
   berry::map result;
-  for (auto &&param : params) {
+  for (auto&& param : params) {
     result[param.first] = param.second;
   }
 
