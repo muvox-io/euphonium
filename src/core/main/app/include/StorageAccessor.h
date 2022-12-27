@@ -62,6 +62,14 @@ class StorageAccessor : public bell::Task {
   std::string readFile(std::string_view path);
 
   /**
+   * @brief Reads a file from the filesystem and returns it as a string
+   * 
+   * @param path Path to the file
+   * @param body String to write to the file
+   */
+  void writeFile(std::string_view path, std::string_view body);
+
+  /**
    * @brief Reads a file from the filesystem and returns it as a vector of bytes
    * 
    * @param path Path to the file

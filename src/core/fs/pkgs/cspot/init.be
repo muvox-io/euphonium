@@ -1,10 +1,13 @@
 class CSpotPlugin : Plugin
   def init()
       self.apply_default_values()
+
       self.name = "cspot"
       self.theme_color = "#1DB954"
       self.display_name = "Spotify (cspot)"
       self.type = "plugin"
+
+      self.fetch_config()
   end
 
   def make_form(ctx, state)

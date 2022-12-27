@@ -20,7 +20,9 @@ class CoreBindings {
   void _sleepMS(int ms);
   std::string _getVersion();
   std::string _getPlatform();
-  void _loadScript(std::string plg, std::string path);
+  void _loadScript(std::string pkg, std::string path);
+  std::string _loadConfig(std::string pkg);
+  bool _saveConfig(std::string pkg, std::string cfg);
   long _getTimeMs();
 
  private:

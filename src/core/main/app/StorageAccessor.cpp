@@ -43,6 +43,23 @@ std::string StorageAccessor::readFile(std::string_view path) {
   }
 }
 
+void StorageAccessor::writeFile(std::string_view path, std::string_view body) {
+  this->currentOperation = Operation{
+      .type = OperationType::WRITE,
+      .format = OperationFormat::TEXT,
+      .status = OperationStatus::PENDING,
+      .path = (char*)path.data(),
+      .dataText = std::string(body),
+  };
+
+  this->requestSemaphore->give();
+  this->responseSemaphore->wait();
+
+  if (this->currentOperation.status != OperationStatus::SUCCESS) {
+    throw std::runtime_error("Failed to write file");
+  }
+}
+
 std::vector<uint8_t> StorageAccessor::readFileBinary(std::string_view path) {
   this->currentOperation = Operation{
       .type = OperationType::READ,
@@ -160,6 +177,26 @@ void StorageAccessor::runTask() {
             break;
           }
         }
+      } else {
+        // File does not exist
+        this->currentOperation.status = OperationStatus::FAILURE;
+      }
+    }
+
+    if (this->currentOperation.type == OperationType::WRITE) {
+      std::ofstream file(this->currentOperation.path, std::ios::binary);
+
+      // if file doesnt exist, create it
+      if (!file.is_open()) {
+        file.open(this->currentOperation.path, std::ios::out);
+      }
+      
+
+      // check if file exists
+      if (file.is_open()) {
+        file.write(this->currentOperation.dataText.c_str(),
+                   this->currentOperation.dataText.size());
+        this->currentOperation.status = OperationStatus::SUCCESS;
       } else {
         // File does not exist
         this->currentOperation.status = OperationStatus::FAILURE;

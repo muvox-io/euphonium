@@ -58,7 +58,7 @@ http.handle(HTTP_POST, '/plugins/:name', def (request)
     var ctx = FormContext()
     plugin.make_form(ctx, state)
 
-    result = {
+    result = { 
         'displayName': plugin.display_name,
         'themeColor': plugin.theme_color,
         'configSchema': ctx.apply_state(state)
@@ -86,7 +86,7 @@ http.handle(HTTP_GET, '/system', def (request)
 end)
 
 http.handle(HTTP_GET, '/playback', def (request)
-    request.write_json(euphonium.playback_state, 200)
+    request.write_json({}, 200)
 end)
 
 http.handle(HTTP_POST, '/playback/volume', def (request)

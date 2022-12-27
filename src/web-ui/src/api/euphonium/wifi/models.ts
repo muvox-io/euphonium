@@ -3,7 +3,6 @@ export interface WiFiNetwork {
     open: boolean;
 }
 
-
 export interface WiFiEventBody {
     networks?: WiFiNetwork[];
     error?: boolean;

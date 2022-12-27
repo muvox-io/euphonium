@@ -20,7 +20,8 @@ class HTTPRequest
     end
 
     def json_body()
-        return {}
+        var json_body = self._read_body(self.conn_id)
+        return json.load(json_body)
     end
 
     def write_json(body, status)

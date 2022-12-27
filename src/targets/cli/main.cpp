@@ -67,7 +67,7 @@ class FakeConnectivity : public euph::Connectivity, public bell::Task {
   }
 
   void runTask() override {
-    BELL_SLEEP_MS(2000);
+    BELL_SLEEP_MS(100);
 
     data.state = euph::Connectivity::State::CONNECTED_NO_INTERNET;
     data.type = euph::Connectivity::ConnectivityType::WIFI_AP;

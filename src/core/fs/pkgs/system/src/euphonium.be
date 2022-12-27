@@ -1,37 +1,13 @@
 class EuphoniumInstance
-    var event_handlers
-    var internal_handlers
     var plugins
-    var playback_state
     var plugins_initialized
-    var network_state
-    var current_source
-    var last_volume
 
     # Setup initial values
     def init()
-        self.last_volume = 0
-        self.playback_state = {}
+        #self.last_volume = 0
+        #self.playback_state = {}
         self.plugins_initialized = false
         self.plugins = []
-        self.playback_state = {
-            'song': {
-                'songName': 'Queue empty',
-                'artistName': '--',
-                'sourceName': '--',
-                'icon': '',
-                'albumName': '--'
-            },
-            'eq': {
-                'low': 0,
-                'mid': 0,
-                'high': 0
-            },
-            'volume': 50,
-            'status': 'paused'
-        }
-        self.network_state = 'offline'
-        self.internal_handlers = {}
     end
 
     # Registers a new event handler
@@ -39,32 +15,18 @@ class EuphoniumInstance
         self.event_handlers[type] = handler
     end
 
-    def on_event(type, handler)
-        if (self.internal_handlers.find(type) == nil)
-            self.internal_handlers[type] = []
-        end
-        self.internal_handlers[type].push(handler)
-    end
-
-    # Pass event to given handler
-    def handle_event(eventType, eventData)
-        if (self.event_handlers[eventType] != nil)
-            self.event_handlers[eventType](eventData)
-        end
-    end
-
     def update_song(playback_info)
-        self.playback_state['song'] = playback_info
+        # self.playback_state['song'] = playback_info
 
-        if playback_info['sourceName'] != ''
-            self.playback_state['song']['sourceThemeColor'] = self.get_plugin(playback_info['sourceName']).theme_color
-        end
-        self.update_playback()
+        # if playback_info['sourceName'] != ''
+        #     self.playback_state['song']['sourceThemeColor'] = self.get_plugin(playback_info['sourceName']).theme_color
+        # end
+        # self.update_playback()
     end
 
     def set_status(playback_status)
-        self.playback_state['status'] = playback_status
-        self.update_playback()
+        # self.playback_state['status'] = playback_status
+        # self.update_playback()
     end
 
     def update_playback()
@@ -92,11 +54,6 @@ class EuphoniumInstance
     # Initializes all plugins
     def init_required_plugins()
         self.network_state = 'online'
-        # self.init_plugin('cspot')
-        # self.init_plugin('webradio')
-        #self.init_plugin('bluetooth')
-        # self.broadcast_event(EVENT_PLUGIN_INIT, {})
-        # self.init_http()
     end
 
     def init_plugin(plugin_name)
@@ -118,27 +75,19 @@ class EuphoniumInstance
         end
     end
 
-    # Starts the HTTP thread
-    def init_http()
-        core.start_plugin('http', {})
-    end
-
     # Adds plugin to plugin registry
     def register_plugin(plugin)
         self.plugins.push(plugin)
     end
 
     def persist_playback_state()
-        persistor.persist("configuration/playback.config.json", json.dump(self.playback_state))
+        # persistor.persist("configuration/playback.config.json", json.dump(self.playback_state))
     end
 
     def load_configuration()
-        # load playback config
-        persistor.load("configuration/playback.config.json")
-
-        for plugin : self.plugins
-            persistor.load("configuration/" + plugin.name + ".config.json")
-        end
+        # for plugin : self.plugins
+        #     persistor.load("configuration/" + plugin.name + ".config.json")
+        # end
     end
 
     # Returns plugin with given name
@@ -154,98 +103,93 @@ class EuphoniumInstance
 
     # broadcasts given event to all plugins
     def broadcast_event(event_type, event_data)
-        for plugin : self.plugins
-            plugin.on_event(event_type, event_data)
-        end
+        # for plugin : self.plugins
+        #     plugin.on_event(event_type, event_data)
+        # end
 
-        if (self.internal_handlers.find(event_type) != nil)
-            for handler : self.internal_handlers[event_type]
-                handler(event_data)
-            end
-        end
+        # if (self.internal_handlers.find(event_type) != nil)
+        #     for handler : self.internal_handlers[event_type]
+        #         handler(event_data)
+        #     end
+        # end
     end
 
     # sends an event to a particular plugin
     def send_plugin_event(plugin, event_type, event_data)
-        plugin = self.get_plugin(plugin)
-        plugin.on_event(event_type, event_data)
+        # plugin = self.get_plugin(plugin)
+        # plugin.on_event(event_type, event_data)
     end
 
     # loads configuration for given plugin
     def load_configuration_for(conf)
-        var str_index = string.find(conf['key'], ".config.json")
-        if (str_index > 0)
-            var plugin_name = string.split(conf['key'], str_index)[0]
-            plugin_name = string.split(plugin_name, string.find(plugin_name, "/") + 1)[1]
+        # var str_index = string.find(conf['key'], ".config.json")
+        # if (str_index > 0)
+        #     var plugin_name = string.split(conf['key'], str_index)[0]
+        #     plugin_name = string.split(plugin_name, string.find(plugin_name, "/") + 1)[1]
 
-            if plugin_name == "playback"
-                if conf['value'] != ''
-                    self.playback_state = json.load(conf['value'])
-                end
-            else 
-                plugin = self.get_plugin(plugin_name)
-                plugin.load_config(conf['value'])
-                plugin.configuration_loaded = true
-                self.load_plugins_when_ready()
-            end
-        end
+        #     if plugin_name == "playback"
+        #         if conf['value'] != ''
+        #             self.playback_state = json.load(conf['value'])
+        #         end
+        #     else 
+        #         plugin = self.get_plugin(plugin_name)
+        #         plugin.load_config(conf['value'])
+        #         plugin.configuration_loaded = true
+        #         self.load_plugins_when_ready()
+        #     end
+        # end
     end
 
     def load_plugins_when_ready()
-        if (!self.plugins_initialized)
-            for plugin : self.plugins
-                if (!plugin.configuration_loaded)
-                    return
-                end
-            end
+        # if (!self.plugins_initialized)
+        #     for plugin : self.plugins
+        #         if (!plugin.configuration_loaded)
+        #             return
+        #         end
+        #     end
 
-            self.plugins_initialized = true
+        #     self.plugins_initialized = true
 
-            for plugin : self.plugins
-                if plugin.type == 'init_handler'
-                    plugin.on_event(EVENT_SYSTEM_INIT, {})
-                end
-            end
+        #     for plugin : self.plugins
+        #         if plugin.type == 'init_handler'
+        #             plugin.on_event(EVENT_SYSTEM_INIT, {})
+        #         end
+        #     end
 
-            var pluginAudio = self.get_audio_output()
-            if (pluginAudio != nil)
-                pluginAudio.on_event(EVENT_CONFIG_UPDATED, {})
-                pluginAudio.init_audio()
-            end
+        #     var pluginAudio = self.get_audio_output()
+        #     if (pluginAudio != nil)
+        #         pluginAudio.on_event(EVENT_CONFIG_UPDATED, {})
+        #         pluginAudio.init_audio()
+        #     end
 
-            self.init_plugin('bluetooth')
-            if core.platform() == 'desktop'
-                self.init_required_plugins()
-            end
+        #     self.init_plugin('bluetooth')
+        #     if core.platform() == 'desktop'
+        #         self.init_required_plugins()
+        #     end
 
-            if self.playback_state != nil
-                self.apply_volume(self.playback_state['volume'])
-            end
-        end
+        #     if self.playback_state != nil
+        #         self.apply_volume(self.playback_state['volume'])
+        #     end
+        # end
     end
 
     def apply_volume(volume)
-        if self.last_volume != volume && volume >= 0 && volume <= 100
-            self.last_volume = volume
-            if core.platform() == 'desktop'
-                playback.set_soft_volume(volume)
-            else
-                var hardware_plugin = self.get_plugin('hardware')
-                if !hardware_plugin.has_hardware_volume()
-                    playback.set_soft_volume(volume)
-                end
-            end
+        # if self.last_volume != volume && volume >= 0 && volume <= 100
+        #     self.last_volume = volume
+        #     if core.platform() == 'desktop'
+        #         playback.set_soft_volume(volume)
+        #     else
+        #         var hardware_plugin = self.get_plugin('hardware')
+        #         if !hardware_plugin.has_hardware_volume()
+        #             playback.set_soft_volume(volume)
+        #         end
+        #     end
 
-            self.playback_state['volume'] = volume
-            self.update_playback()
-            self.broadcast_event(EVENT_VOLUME_UPDATED, volume)
-        end
+        #     self.playback_state['volume'] = volume
+        #     self.update_playback()
+        #     self.broadcast_event(EVENT_VOLUME_UPDATED, volume)
+        # end
     end
 end
 
 euphonium = EuphoniumInstance()
-
-def load_plugins()
-    print("Load plugins called")
-    euphonium.load_configuration()
-end

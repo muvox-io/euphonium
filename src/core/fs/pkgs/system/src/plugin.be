@@ -52,7 +52,12 @@ class Plugin
 
     # saves raw confugration into memory
     def persist_config()
-        persistor.persist("configuration/" + self.name + ".config.json", json.dump(self.state))
+        core.save_config(self.name, json.dump(self.state))
+    end
+
+    def fetch_config()
+        var config = core.load_config(self.name)
+        self.state = json.load(config)
     end
 
     def make_form(ctx, state)

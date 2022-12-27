@@ -15,6 +15,7 @@ bool EventBus::update()
         gotUpdate = true;
         std::unique_ptr<Event> localPtr(std::move(eventQueue.front()));
         eventQueue.pop();
+        if (!localPtr) continue;
         auto type = localPtr->eventType;
         auto it = registeredListeners.find(type);
         if (it != registeredListeners.end())
