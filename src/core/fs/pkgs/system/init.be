@@ -11,15 +11,15 @@ end
 core = Core()
 # --/
 
-# # Load essential modules
+# Load essential modules
 core.load("system", "src/bindings.be")
 core.load("system", "src/event_handler.be")
 core.load("system", "src/http.be")
-
 core.load("system", "src/hooks.be")
-
-
 core.load("system", "src/form_ctx.be")
 core.load("system", "src/plugin.be")
+
+# Load core classes, http apis
+core.load("system", "src/playback.be")
 core.load("system", "src/euphonium.be")
 core.load("system", "src/api.be")

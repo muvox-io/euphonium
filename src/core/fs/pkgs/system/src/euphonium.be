@@ -8,11 +8,15 @@ class EuphoniumInstance
         #self.playback_state = {}
         self.plugins_initialized = false
         self.plugins = []
+        
+        events.register_native("plugins_ready", def (data)
+            self.broadcast_event(EVENT_PLUGIN_INIT, {})
+        end)
     end
 
     # Registers a new event handler
     def register_handler(type, handler)
-        self.event_handlers[type] = handler
+        # self.event_handlers[type] = handler
     end
 
     def update_song(playback_info)
@@ -103,21 +107,15 @@ class EuphoniumInstance
 
     # broadcasts given event to all plugins
     def broadcast_event(event_type, event_data)
-        # for plugin : self.plugins
-        #     plugin.on_event(event_type, event_data)
-        # end
-
-        # if (self.internal_handlers.find(event_type) != nil)
-        #     for handler : self.internal_handlers[event_type]
-        #         handler(event_data)
-        #     end
-        # end
+        for plugin : self.plugins
+            plugin.on_event(event_type, event_data)
+        end
     end
 
     # sends an event to a particular plugin
     def send_plugin_event(plugin, event_type, event_data)
-        # plugin = self.get_plugin(plugin)
-        # plugin.on_event(event_type, event_data)
+        plugin = self.get_plugin(plugin)
+        plugin.on_event(event_type, event_data)
     end
 
     # loads configuration for given plugin

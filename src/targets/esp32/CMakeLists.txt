@@ -15,4 +15,4 @@ endif()
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(euphonium-esp32)
 
-littlefs_create_partition_image(storage spiffs)
+littlefs_create_partition_image(storage fs)

@@ -1,7 +1,4 @@
 #include "Core.h"
-#include "Connectivity.h"
-#include "EuphContext.h"
-#include "EventBus.h"
 
 using namespace euph;
 
@@ -11,6 +8,7 @@ Core::Core(std::shared_ptr<euph::Connectivity> connectivity) {
 
   // Set event bus for connectivity, so it can update network status
   this->connectivity->setEventBus(eventBus);
+
 
   // Start main event loop
   this->handleEventLoop();
@@ -28,9 +26,17 @@ void Core::initialize() {
   this->http = std::make_shared<euph::HTTPDispatcher>(this->ctx);
   this->pkgLoader = std::make_shared<euph::PackageLoader>(this->ctx);
   this->bindings = std::make_unique<euph::CoreBindings>(this->ctx);
+  this->audioTask = std::make_shared<euph::AudioTask>(this->ctx);
+
+  // Register sources
+  this->audioSources.push_back(std::make_unique<RadioPlugin>(ctx));
 
   this->http->initialize();
   this->pkgLoader->loadValidPackages();
+
+  for (auto& source : this->audioSources) {
+    source->initializeBindings();
+  }
 
   // Allow connectivity to register HTTP handlers
   this->connectivity->registerHandlers(this->http->getServer());
@@ -53,11 +59,15 @@ void Core::initialize() {
   // Load system packages
   this->pkgLoader->loadWithHook("system");
   this->pkgLoader->loadWithHook("plugin");
+
+  // Initialize plugins
+  auto event = std::make_unique<GenericVmEvent>("plugins_ready");
+  eventBus->postEvent(std::move(event));
 }
 
 void Core::handleEventLoop() {
   // Subscribe self to the event bus
-  auto subscriber = dynamic_cast<EventSubscriber*>(this);
+  auto subscriber = static_cast<EventSubscriber*>(this);
   eventBus->addListener(EventType::VM_MAIN_EVENT, *subscriber);
   eventBus->addListener(EventType::CONNECTIVITY_EVENT, *subscriber);
 
@@ -92,7 +102,7 @@ void Core::handleEvent(std::unique_ptr<Event>& event) {
     }
     case EventType::CONNECTIVITY_EVENT: {
       auto connectivityEvent =
-          dynamic_cast<Connectivity::ConnectivityEvent*>(event.get());
+          static_cast<Connectivity::ConnectivityEvent*>(event.get());
       auto connectivityData = connectivityEvent->data;
 
       switch (connectivityData.state) {

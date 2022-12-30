@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include "CentralAudioBuffer.h"
+
 #include "EventBus.h"
 #include "StorageAccessor.h"
 #include "BerryBind.h"
@@ -21,6 +23,7 @@ struct Context {
   std::shared_ptr<euph::StorageAccessor> storage;
   std::shared_ptr<berry::VmState> vm;
   std::shared_ptr<euph::EventBus> eventBus;
+  std::shared_ptr<bell::CentralAudioBuffer> audioBuffer;
 
   /**
    * @brief Creates a context with the default utilities
@@ -32,6 +35,7 @@ struct Context {
     ctx->storage = std::make_shared<euph::StorageAccessor>();
     ctx->vm = std::make_shared<berry::VmState>();
     ctx->eventBus = std::make_shared<euph::EventBus>();
+    ctx->audioBuffer = std::make_shared<bell::CentralAudioBuffer>(128);
     return ctx;
   }
 
@@ -39,6 +43,7 @@ struct Context {
     auto ctx = std::make_shared<euph::Context>();
     ctx->storage = std::make_shared<euph::StorageAccessor>();
     ctx->vm = std::make_shared<berry::VmState>();
+    ctx->audioBuffer = std::make_shared<bell::CentralAudioBuffer>(128);
     ctx->eventBus = bus;
     return ctx;
   }
