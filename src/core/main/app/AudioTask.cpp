@@ -7,7 +7,7 @@ AudioTask::AudioTask(std::shared_ptr<euph::Context> ctx): bell::Task("AudioTask"
   this->dsp = std::make_shared<bell::BellDSP>(ctx->audioBuffer);
 
   // Start Audio thread
-  startTask();
+  // startTask();
 }
 
 AudioTask::~AudioTask() {

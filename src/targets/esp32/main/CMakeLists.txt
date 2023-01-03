@@ -1,8 +1,9 @@
 # Find all source files with
-file(GLOB COMPONENT_SRCS "*.cpp")
+file(GLOB COMPONENT_SRCS "*.cpp" "app/*.cpp")
 
 set(COMPONENT_ADD_INCLUDEDIRS
     .
+    app/include
     )
 
 set(COMPONENT_REQUIRES

@@ -2,13 +2,9 @@
 
 using namespace euph;
 
-Core::Core(std::shared_ptr<euph::Connectivity> connectivity) {
-  this->eventBus = std::make_shared<euph::EventBus>();
+Core::Core(std::shared_ptr<euph::Connectivity> connectivity, std::shared_ptr<euph::EventBus> eventBus) {
+  this->eventBus = eventBus;
   this->connectivity = connectivity;
-
-  // Set event bus for connectivity, so it can update network status
-  this->connectivity->setEventBus(eventBus);
-
 
   // Start main event loop
   this->handleEventLoop();

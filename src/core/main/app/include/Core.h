@@ -39,7 +39,7 @@ class Core : public euph::EventSubscriber {
   std::vector<std::unique_ptr<euph::AudioSourcePlugin>> audioSources = {};
 
  public:
-  Core(std::shared_ptr<euph::Connectivity> connectivity);
+  Core(std::shared_ptr<euph::Connectivity> connectivity, std::shared_ptr<euph::EventBus> eventBus);
   ~Core();
 
   void initialize();

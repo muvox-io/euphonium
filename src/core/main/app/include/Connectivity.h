@@ -10,7 +10,7 @@
 
 namespace euph {
 class Connectivity {
-private:
+protected:
   std::shared_ptr<EventBus> eventBus;
 
 public:

@@ -7,7 +7,7 @@ using namespace euph;
 
 HTTPDispatcher::HTTPDispatcher(std::shared_ptr<euph::Context> ctx) {
   this->ctx = ctx;
-  this->responseSemaphore = std::make_unique<bell::WrappedSemaphore>(0);
+  this->responseSemaphore = std::make_unique<bell::WrappedSemaphore>(20);
   this->server = std::make_shared<bell::BellHTTPServer>(8080);
 }
 
