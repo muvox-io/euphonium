@@ -13,11 +13,12 @@ class FakeConnectivity : public euph::Connectivity, public bell::Task {
   std::unique_ptr<bell::WrappedSemaphore> eventSemaphore;
 
  public:
-  FakeConnectivity() : bell::Task("FakeConnectivity", 1024, 0, 0) {
+  FakeConnectivity(std::shared_ptr<euph::EventBus> eventBus) : bell::Task("FakeConnectivity", 1024, 0, 0) {
     this->data = {
       euph::Connectivity::State::DISCONNECTED,
       euph::Connectivity::ConnectivityType::DEFAULT};
     this->eventSemaphore = std::make_unique<bell::WrappedSemaphore>(5);
+    this->eventBus = eventBus;
 
     startTask();
   }
@@ -131,8 +132,13 @@ class FakeConnectivity : public euph::Connectivity, public bell::Task {
 
 int main() {
   initializeEuphoniumLogger();
-  auto connectivity = std::make_shared<FakeConnectivity>();
-  auto core = std::make_unique<euph::Core>(connectivity);
+  auto eventBus = std::make_shared<euph::EventBus>();
 
+  auto connectivity = std::make_shared<FakeConnectivity>(eventBus);
+  auto core = std::make_unique<euph::Core>(connectivity, eventBus);
+
+  while (true) {
+    BELL_SLEEP_MS(1000);
+  }
   return 0;
 }

@@ -86,7 +86,7 @@ http.handle(HTTP_GET, '/system', def (request)
 end)
 
 http.handle(HTTP_GET, '/playback', def (request)
-    request.write_json({}, 200)
+    request.write_json(playback_state.get_state(), 200)
 end)
 
 http.handle(HTTP_POST, '/playback/volume', def (request)

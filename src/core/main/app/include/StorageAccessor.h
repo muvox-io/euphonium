@@ -102,6 +102,8 @@ class StorageAccessor : public bell::Task {
   // Current operation
   Operation currentOperation;
 
+  bool strEndsWith(std::string const &fullString, std::string const &ending);
+
   // Semaphores used to synchronize the task
   std::unique_ptr<bell::WrappedSemaphore> requestSemaphore;
   std::unique_ptr<bell::WrappedSemaphore> responseSemaphore;

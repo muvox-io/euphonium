@@ -4,7 +4,7 @@
 
 using namespace euph;
 
-EuphoniumApp::EuphoniumApp() : bell::Task("app", 4 * 1024, 0, 0, false) {
+EuphoniumApp::EuphoniumApp() : bell::Task("app", 32 * 1024, 0, 0, false) {
   initializeEuphoniumLogger();
   initializeStorage();
 
@@ -14,7 +14,7 @@ EuphoniumApp::EuphoniumApp() : bell::Task("app", 4 * 1024, 0, 0, false) {
 void EuphoniumApp::initializeStorage() {
   // Initialize LittleFS Storage
   esp_vfs_littlefs_conf_t conf = {
-      .base_path = "/disk",
+      .base_path = "/fs",
       .partition_label = "storage",
       .format_if_mount_failed = true,
       .dont_mount = false,

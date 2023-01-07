@@ -1,4 +1,5 @@
 #include "ESP32Connectivity.h"
+#include "esp_wifi.h"
 
 using namespace euph;
 
@@ -10,7 +11,8 @@ static void wifiEventHandler(void* arg, esp_event_base_t event_base,
   self->handleEvent(event_base, event_id, event_data);
 }
 
-ESP32Connectivity::ESP32Connectivity(std::shared_ptr<euph::EventBus> eventBus) {
+ESP32Connectivity::ESP32Connectivity(std::shared_ptr<euph::EventBus> eventBus)
+    : bell::Task("Connectivity", 4 * 1024, 0, 0) {
   this->eventBus = eventBus;
 
   this->data = {
@@ -18,8 +20,13 @@ ESP32Connectivity::ESP32Connectivity(std::shared_ptr<euph::EventBus> eventBus) {
       Connectivity::ConnectivityType::DEFAULT,
   };
 
+  this->data.jsonBody = "{}";
+  this->dataUpdateSemaphore = std::make_unique<bell::WrappedSemaphore>(5);
+
   this->initializeWiFiStack();
   this->initConfiguration();
+
+  this->startTask();
 };
 
 void ESP32Connectivity::initConfiguration() {
@@ -48,8 +55,10 @@ void ESP32Connectivity::initConfiguration() {
 
 void ESP32Connectivity::initializeWiFiStack() {
   // set netif
-  esp_netif_t* sta_netif = esp_netif_create_default_wifi_sta();
-  assert(sta_netif);
+  esp_netif_t* staNetif = esp_netif_create_default_wifi_sta();
+  assert(staNetif);
+  esp_netif_t* apNetif = esp_netif_create_default_wifi_ap();
+  assert(apNetif);
 
   // initialize with default configuration
   wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
@@ -105,10 +114,136 @@ void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
     this->data.type = ConnectivityType::WIFI_AP;
 
     EUPH_LOG(debug, TAG, "Sending state update...");
+
     // Update
-    this->sendStateUpdate();
+    this->dataUpdateSemaphore->give();
+  } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_SCAN_DONE) {
+    // Scan finished
+    uint16_t number = DEFAULT_SCAN_LIST_SIZE;
+    uint16_t apCount = 0;
+    memset(scanInfo, 0, sizeof(scanInfo));
+
+    ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&number, scanInfo));
+    ESP_ERROR_CHECK(esp_wifi_scan_get_ap_num(&apCount));
+
+    jsonBody["networks"] = nlohmann::json::array();
+
+    for (int i = 0; (i < DEFAULT_SCAN_LIST_SIZE) && (i < apCount); i++) {
+      auto network = scanInfo[i];
+      EUPH_LOG(info, TAG, "Got network %s", (char*)scanInfo[i].ssid);
+      std::string networkSsid((char*)network.ssid);
+
+      // Add a JSON structure of the network to the list
+      jsonBody["networks"].push_back({
+          {"ssid", networkSsid},
+          {"rssi", network.rssi},
+          {"open", network.authmode == WIFI_AUTH_OPEN},
+      });
+    }
+
+    this->dataUpdateSemaphore->give();
+
+    this->isScanning = false;
+  } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
+    // Retrieve IP address
+    ip_event_got_ip_t* event = (ip_event_got_ip_t*)event_data;
+    char strIp[16];
+    esp_ip4addr_ntoa(&event->ip_info.ip, strIp, IP4ADDR_STRLEN_MAX);
+
+    EUPH_LOG(info, TAG, "Connected, ip addr %s", strIp);
+    this->data.ipAddr = strIp;
+    this->data.type = ConnectivityType::WIFI_STA;
+    this->data.state = Connectivity::State::CONNECTED;
+    this->jsonBody["error"] = false;
+
+    this->dataUpdateSemaphore->give();
+  } else if (event_base == WIFI_EVENT &&
+               event_id == WIFI_EVENT_STA_DISCONNECTED) {
+    if (this->data.state == Connectivity::State::CONNECTING) {
+      if (this->connectionAttempts < MAX_CONNECTION_ATTEMPTS) {
+        this->connectionAttempts++;
+
+        EUPH_LOG(error, TAG, "WiFi connection retry, attempt #%d", this->connectionAttempts);
+        esp_wifi_connect();
+      } else {
+        EUPH_LOG(error, TAG, "Connection failed, after %d attempts", this->connectionAttempts);
+        this->jsonBody["error"] = true;
+        this->dataUpdateSemaphore->give();
+      }
+    }
   }
 }
 
+void ESP32Connectivity::requestScan() {
+  if (isScanning) {
+    EUPH_LOG(debug, TAG, "Skipping scan, as one is already in progress");
+    return;
+  }
+
+  ESP_ERROR_CHECK(esp_wifi_scan_start(NULL, false));
+}
+
+void ESP32Connectivity::attemptConnect(const std::string& ssid,
+                                       const std::string passwd) {
+  if (this->isScanning) {
+    esp_wifi_scan_stop();
+    this->isScanning = false;
+  }
+
+  wifi_config_t staConfig = {};
+
+  esp_wifi_get_config(WIFI_IF_STA, &staConfig);
+
+  strcpy((char*)staConfig.sta.ssid, ssid.c_str());
+  strcpy((char*)staConfig.sta.password, passwd.c_str());
+
+  esp_wifi_set_config(WIFI_IF_STA, &staConfig);
+
+  this->data.state = euph::Connectivity::State::CONNECTING;
+  this->data.ssid = ssid;
+
+
+  esp_wifi_connect();
+}
+
 void ESP32Connectivity::registerHandlers(
-    std::shared_ptr<bell::BellHTTPServer> http) {}
+    std::shared_ptr<bell::BellHTTPServer> http) {
+  http->registerGet("/wifi/scan", [this, &http](struct mg_connection* conn) {
+    this->requestScan();
+
+    return http->makeJsonResponse("{ \"status\": \"ok\" }");
+  });
+
+  http->registerGet("/wifi/state", [this, &http](struct mg_connection* conn) {
+    this->sendStateUpdate();
+
+    return http->makeJsonResponse("{ \"status\": \"ok\" }");
+  });
+
+  http->registerPost(
+      "/wifi/connect", [this, &http](struct mg_connection* conn) {
+        auto connInfo = mg_get_request_info(conn);
+        std::vector<uint8_t> body(connInfo->content_length);
+        mg_read(conn, body.data(), connInfo->content_length);
+
+        auto bodyJson = nlohmann::json::parse(body.begin(), body.end());
+
+        if (bodyJson.find("ssid") == bodyJson.end() ||
+            bodyJson.find("password") == bodyJson.end()) {
+          return http->makeJsonResponse("{ \"status\": \"error\" }");
+        }
+
+        // Attempt connection to the AP
+        this->attemptConnect(bodyJson["ssid"], bodyJson["password"]);
+
+        return http->makeJsonResponse("{ \"status\": \"ok\" }");
+      });
+}
+
+void ESP32Connectivity::runTask() {
+  while (true) {
+    this->dataUpdateSemaphore->wait();
+    this->data.jsonBody = this->jsonBody.dump();
+    this->sendStateUpdate();
+  }
+}

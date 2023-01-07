@@ -1,6 +1,8 @@
 #include "HTTPDispatcher.h"
 #include <memory>
+#include <string_view>
 #include "BellHTTPServer.h"
+#include "BellUtils.h"
 #include "civetweb.h"
 
 using namespace euph;
@@ -15,6 +17,18 @@ HTTPDispatcher::~HTTPDispatcher() {}
 
 void HTTPDispatcher::initialize() {
   EUPH_LOG(debug, TAG, "Registering HTTP handlers");
+  std::mutex serveMutex;
+
+  this->server->registerGet("/web/**", [this](struct mg_connection* conn) {
+    std::scoped_lock lock(webAccessMutex);
+    this->serveWeb(conn);
+    return this->server->makeEmptyResponse();
+  });
+  this->server->registerGet("/web", [this](struct mg_connection* conn) {
+    std::scoped_lock lock(webAccessMutex);
+    this->serveWeb(conn);
+    return this->server->makeEmptyResponse();
+  });
 
   this->server->registerWS(
       "/events",
@@ -51,6 +65,25 @@ void HTTPDispatcher::initialize() {
 
 std::shared_ptr<bell::BellHTTPServer> HTTPDispatcher::getServer() {
   return this->server;
+}
+
+void HTTPDispatcher::serveWeb(struct mg_connection* conn) {
+  auto reqInfo = mg_get_request_info(conn);
+  std::string_view uri = std::string_view(reqInfo->local_uri);
+
+  std::string filePath = "index.html";
+
+  // Substract /web/
+  if (uri.size() > 5) {
+    filePath = uri.substr(5, uri.size());
+  }
+
+  EUPH_LOG(info, TAG, "Web access URI %s", filePath.c_str());
+
+  // Prefix of package in the fs
+  std::string webPrefix =
+      fmt::format("{}/pkgs/web/dist/{}", ctx->rootPath, filePath);
+  this->ctx->storage->readFileToSocket(webPrefix, conn);
 }
 
 void HTTPDispatcher::setupBindings() {
@@ -129,7 +162,8 @@ void HTTPDispatcher::broadcastWebsocket(const std::string& body) {
 
   // for each in this->websocketConnections
   for (auto&& conn : this->websocketConnections) {
-    mg_websocket_write(conn, MG_WEBSOCKET_OPCODE_TEXT, body.data(), body.size());
+    mg_websocket_write(conn, MG_WEBSOCKET_OPCODE_TEXT, body.data(),
+                       body.size());
   }
 }
 

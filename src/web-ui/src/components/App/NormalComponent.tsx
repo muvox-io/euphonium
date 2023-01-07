@@ -38,7 +38,7 @@ export default function NormalComponent({ info }: { info: EuphoniumInfo }) {
           <Route path="/web" component={ErrorBoundaryWrapper(SplashScreen)} />
 
           <Route
-            path="/web/apps/webradio"
+            path="/web/apps/radio"
             component={ErrorBoundaryWrapper(RadioBrowser)}
           />
           <Route

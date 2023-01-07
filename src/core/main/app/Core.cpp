@@ -28,7 +28,12 @@ void Core::initialize() {
   this->audioSources.push_back(std::make_unique<RadioPlugin>(ctx));
 
   this->http->initialize();
-  this->pkgLoader->loadValidPackages();
+
+  try {
+    this->pkgLoader->loadValidPackages();
+  } catch (...) {
+    EUPH_LOG(error, TAG, "Cannot access file system, make sure the device is flashed properly.");
+  }
 
   for (auto& source : this->audioSources) {
     source->initializeBindings();

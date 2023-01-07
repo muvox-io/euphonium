@@ -7,7 +7,7 @@ class PlaybackState
   var current_track
   var settings
 
-  def init
+  def init()
     self.current_track = self.create_default_track()
     self.settings = self.create_default_settings()
   end

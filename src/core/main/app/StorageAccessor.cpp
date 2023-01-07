@@ -1,5 +1,6 @@
 #include "StorageAccessor.h"
-#include <stdexcept> 
+#include <iostream>
+#include <stdexcept>
 
 using namespace euph;
 
@@ -111,6 +112,16 @@ void StorageAccessor::readFileToSocket(std::string_view path,
   }
 }
 
+bool StorageAccessor::strEndsWith(std::string const& fullString,
+                                  std::string const& ending) {
+  if (fullString.length() >= ending.length()) {
+    return (0 == fullString.compare(fullString.length() - ending.length(),
+                                    ending.length(), ending));
+  } else {
+    return false;
+  }
+}
+
 void StorageAccessor::runTask() {
   size_t fileSize = 0;
   size_t mgBytesLeft = 0;
@@ -122,12 +133,25 @@ void StorageAccessor::runTask() {
     this->currentOperation.status = OperationStatus::PENDING;
 
     if (this->currentOperation.type == OperationType::READ) {
-      std::ifstream file(this->currentOperation.path, std::ios::binary);
+      std::string filePath = this->currentOperation.path;
+      std::ifstream file(filePath, std::ios::binary);
 
       // read file size
       file.seekg(0, std::ios::end);
       fileSize = file.tellg();
       file.seekg(0, std::ios::beg);
+
+      // Make sure to try a gzipped version if file does not exist
+      if (!file.is_open()) {
+        filePath = filePath + ".gz";
+        file = std::ifstream(filePath, std::ios::binary);
+        EUPH_LOG(info, TASK, "File not found, trying to use gz alternative");
+
+        // read file size
+        file.seekg(0, std::ios::end);
+        fileSize = file.tellg();
+        file.seekg(0, std::ios::beg);
+      }
 
       // check if file exists
       if (file.is_open()) {
@@ -153,18 +177,45 @@ void StorageAccessor::runTask() {
             this->currentOperation.status = OperationStatus::SUCCESS;
             mgBytesLeft = fileSize;
 
+            std::string contentType = "text/plain";
+            std::string extraHeaders = "";
+
+            // Handle gzipped files
+            if (strEndsWith(filePath, ".gz")) {
+              extraHeaders = "Content-Encoding: gzip\r\n";
+              filePath = filePath.substr(0, filePath.size() - 3);
+            }
+
+            // Deduce content-type
+            if (strEndsWith(filePath, ".html")) {
+              contentType = "text/html";
+            } else if (strEndsWith(filePath, ".js")) {
+              contentType = "application/javascript";
+            } else if (strEndsWith(filePath, ".css")) {
+              contentType = "text/css";
+            }
+
+            mg_printf(this->currentOperation.dataCon,
+                      "HTTP/1.1 %d OK\r\nContent-Type: "
+                      "%s\r\n%sContent-Length: %d\r\nConnection: close\r\n\r\n",
+                      200, contentType.c_str(), extraHeaders.c_str(),
+                      (int)fileSize);
+
             // Write the requested file to the socket, chunk by chunk
             while (mgBytesLeft > 0) {
               size_t toRead =
                   mgBytesLeft > HTTP_CHUNK_SIZE ? HTTP_CHUNK_SIZE : mgBytesLeft;
 
               // read file to temporary buffer
-              file.read((char*)mgBuffer.data() + (fileSize - mgBytesLeft),
+              file.read((char*)mgBuffer.data(),
                         toRead);
+
+              size_t toReadBytes = file.gcount();
 
               // write to socket
               size_t writtenBytes = mg_write(this->currentOperation.dataCon,
-                                             mgBuffer.data(), file.gcount());
+                                             mgBuffer.data(), toReadBytes);
+
               if (writtenBytes < 0) {
                 // Error writing to socket
                 mgBytesLeft = 0;
@@ -190,7 +241,6 @@ void StorageAccessor::runTask() {
       if (!file.is_open()) {
         file.open(this->currentOperation.path, std::ios::out);
       }
-      
 
       // check if file exists
       if (file.is_open()) {

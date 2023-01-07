@@ -45,6 +45,10 @@ struct Context {
     ctx->vm = std::make_shared<berry::VmState>();
     ctx->audioBuffer = std::make_shared<bell::CentralAudioBuffer>(128);
     ctx->eventBus = bus;
+
+    #ifdef ESP_PLATFORM
+    ctx->rootPath = "/fs";
+    #endif
     return ctx;
   }
 

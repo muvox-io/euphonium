@@ -7,6 +7,7 @@ class RadioPlugin : Plugin
       self.theme_color = "#1DB954"
       self.display_name = "Web Radio"
       self.type = "plugin"
+      self.has_web_app = true
 
       self.fetch_config()
 

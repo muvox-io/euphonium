@@ -9,6 +9,7 @@
 #include "WrappedSemaphore.h"
 #include "civetweb.h"
 #include "EuphContext.h"
+#include "fmt/format.h"
 
 namespace euph {
 class HTTPDispatcher {
@@ -35,6 +36,8 @@ class HTTPDispatcher {
   std::vector<struct mg_connection*> websocketConnections;
 
   std::mutex websocketConnectionsMutex;
+
+  std::mutex webAccessMutex;
 
   std::shared_ptr<bell::BellHTTPServer> server;
 
@@ -94,7 +97,10 @@ class HTTPDispatcher {
   // Registers berry bindings to the internal methods
   void setupBindings();
 
+  void serveWeb(struct mg_connection* conn);
+
   void broadcastWebsocket(const std::string& body);
+
 
   std::shared_ptr<bell::BellHTTPServer> getServer();
 

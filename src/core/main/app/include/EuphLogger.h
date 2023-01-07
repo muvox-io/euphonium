@@ -25,7 +25,7 @@ class EuphoniumLogger : public bell::AbstractLogger {
   // static bool enableColors = true;
   void debug(std::string filename, int line, std::string submodule,
              const char* format, ...) {
-    std::lock_guard<std::mutex> guard(logMutex);
+    std::scoped_lock<std::mutex> guard(logMutex);
     std::stringstream log;
     log << "D [" << submodule << "] ";
     printf(colorRed);
@@ -48,7 +48,7 @@ class EuphoniumLogger : public bell::AbstractLogger {
 
   void error(std::string filename, int line, std::string submodule,
              const char* format, ...) {
-    std::lock_guard<std::mutex> guard(logMutex);
+    std::scoped_lock<std::mutex> guard(logMutex);
     std::stringstream log;
     printf(colorRed);
     log << "E [" << submodule << "] ";
@@ -71,7 +71,7 @@ class EuphoniumLogger : public bell::AbstractLogger {
 
   void info(std::string filename, int line, std::string submodule,
             const char* format, ...) {
-    std::lock_guard<std::mutex> guard(logMutex);
+    std::scoped_lock<std::mutex> guard(logMutex);
     std::stringstream log;
     printf(colorBlue);
     log << "I [" << submodule << "] ";

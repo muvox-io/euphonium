@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <mutex>
+#include <string>
 #include <string_view>
 
 #include "esp_event.h"
@@ -9,12 +9,16 @@
 #include "nvs.h"
 #include "nvs_flash.h"
 #include "nvs_handle.hpp"
+#include "nlohmann/json.hpp"
+
+#include "BellTask.h"
+#include "WrappedSemaphore.h"
 
 #include "Connectivity.h"
 #include "EuphLogger.h"
 
 namespace euph {
-class ESP32Connectivity : public Connectivity {
+class ESP32Connectivity : public Connectivity, public bell::Task {
  public:
   ESP32Connectivity(std::shared_ptr<euph::EventBus> eventBus);
   ~ESP32Connectivity(){};
@@ -22,16 +26,29 @@ class ESP32Connectivity : public Connectivity {
   void initConfiguration();
   void initializeWiFiStack();
 
+  void requestScan();
+  void attemptConnect(const std::string& ssid, const std::string passwd);
   void handleEvent(esp_event_base_t event_base, int32_t event_id,
                    void* event_data);
   void registerHandlers(std::shared_ptr<bell::BellHTTPServer> http) override;
-
   void initializeAP();
+
+  void runTask() override;
 
  private:
   std::string TAG = "ESP32Connectivity";
+
+  uint8_t DEFAULT_SCAN_LIST_SIZE = 10;
+  uint8_t MAX_CONNECTION_ATTEMPTS = 3;
+  wifi_ap_record_t scanInfo[10];
+
   std::string nvsWiFiKey = "wifi_settings";
   std::string ssid;
   std::string password;
+  nlohmann::json jsonBody = {};
+
+  int connectionAttempts = 0;
+  std::atomic<bool> isScanning = false;
+  std::unique_ptr<bell::WrappedSemaphore> dataUpdateSemaphore;
 };
 }  // namespace euph
