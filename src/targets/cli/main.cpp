@@ -5,6 +5,7 @@
 #include "Connectivity.h"
 #include "Core.h"
 #include "EuphLogger.h"
+#include "DesktopAudioOutput.h"
 #include "WrappedSemaphore.h"
 #include "civetweb.h"
 
@@ -134,8 +135,9 @@ int main() {
   initializeEuphoniumLogger();
   auto eventBus = std::make_shared<euph::EventBus>();
 
+  auto output = std::make_shared<euph::DesktopAudioOutput>();
   auto connectivity = std::make_shared<FakeConnectivity>(eventBus);
-  auto core = std::make_unique<euph::Core>(connectivity, eventBus);
+  auto core = std::make_unique<euph::Core>(connectivity, eventBus, output);
 
   while (true) {
     BELL_SLEEP_MS(1000);

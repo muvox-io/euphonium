@@ -1,0 +1,7 @@
+{
+  "name": "platform_desktop",
+  "version": "0.1.0",
+  "description": "Desktop platform support",
+  "author": "euphonium",
+  "init_hook": "platform_desktop"
+}

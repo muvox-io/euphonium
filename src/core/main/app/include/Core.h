@@ -8,6 +8,7 @@
 #include "DecoderGlobals.h"
 
 #include "CoreBindings.h"
+#include "EuphAudioOutput.h"
 #include "EuphContext.h"
 #include "EuphLogger.h"
 #include "EventBus.h"
@@ -35,12 +36,13 @@ class Core : public euph::EventSubscriber {
   std::shared_ptr<euph::HTTPDispatcher> http;
   std::shared_ptr<euph::PackageLoader> pkgLoader;
   std::shared_ptr<euph::AudioTask> audioTask;
+  std::shared_ptr<euph::AudioOutput> audioOutput;
 
   std::unique_ptr<euph::CoreBindings> bindings;
   std::vector<std::unique_ptr<euph::AudioSourcePlugin>> audioSources = {};
 
  public:
-  Core(std::shared_ptr<euph::Connectivity> connectivity, std::shared_ptr<euph::EventBus> eventBus);
+  Core(std::shared_ptr<euph::Connectivity> connectivity, std::shared_ptr<euph::EventBus> eventBus, std::shared_ptr<euph::AudioOutput> euphAudioOutput);
   ~Core();
 
   void initialize();

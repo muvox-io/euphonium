@@ -3,10 +3,12 @@
 
 using namespace euph;
 
-Core::Core(std::shared_ptr<euph::Connectivity> connectivity, std::shared_ptr<euph::EventBus> eventBus) {
+Core::Core(std::shared_ptr<euph::Connectivity> connectivity,
+           std::shared_ptr<euph::EventBus> eventBus, std::shared_ptr<euph::AudioOutput> euphAudioOutput) {
   bell::createDecoders();
   this->eventBus = eventBus;
   this->connectivity = connectivity;
+  this->audioOutput = euphAudioOutput;
 
   // Start main event loop
   this->handleEventLoop();
@@ -24,17 +26,20 @@ void Core::initialize() {
   this->http = std::make_shared<euph::HTTPDispatcher>(this->ctx);
   this->pkgLoader = std::make_shared<euph::PackageLoader>(this->ctx);
   this->bindings = std::make_unique<euph::CoreBindings>(this->ctx);
-  this->audioTask = std::make_shared<euph::AudioTask>(this->ctx);
+  this->audioTask = std::make_shared<euph::AudioTask>(this->ctx, this->audioOutput);
 
   // Register sources
   this->audioSources.push_back(std::make_unique<RadioPlugin>(ctx));
 
   this->http->initialize();
+  this->audioOutput->setupBindings(ctx);
 
   try {
     this->pkgLoader->loadValidPackages();
   } catch (...) {
-    EUPH_LOG(error, TAG, "Cannot access file system, make sure the device is flashed properly.");
+    EUPH_LOG(
+        error, TAG,
+        "Cannot access file system, make sure the device is flashed properly.");
   }
 
   for (auto& source : this->audioSources) {
@@ -52,16 +57,21 @@ void Core::initialize() {
   this->http->getServer()->registerGet(
       "/system/info", [this](struct mg_connection* conn) {
         nlohmann::json state = {
-          { "connectivity", this->connectivity->getData().toJson() },
-          { "version", "0.1.0" },
-          { "onboarding", false }
-        };
+            {"connectivity", this->connectivity->getData().toJson()},
+            {"version", "0.1.0"},
+            {"onboarding", false}};
         return this->http->getServer()->makeJsonResponse(state.dump());
       });
 
   // Load system packages
   this->pkgLoader->loadWithHook("system");
   this->pkgLoader->loadWithHook("plugin");
+
+#ifdef ESP_PLATFORM
+  this->pkgLoader->loadWithHook("platform_esp32");
+#else
+  this->pkgLoader->loadWithHook("platform_desktop");
+#endif
 
   // Initialize plugins
   auto event = std::make_unique<GenericVmEvent>("plugins_ready");
@@ -135,10 +145,8 @@ void Core::handleEvent(std::unique_ptr<Event>& event) {
       // Broadcast event to websocket
       if (this->http != nullptr) {
         auto connectivityDataJson = this->connectivity->getData().toJson();
-        nlohmann::json websocketEvent = {
-          { "type", "connectivity" },
-          { "data", connectivityDataJson }          
-        };
+        nlohmann::json websocketEvent = {{"type", "connectivity"},
+                                         {"data", connectivityDataJson}};
         this->http->broadcastWebsocket(websocketEvent.dump());
       }
       break;
