@@ -18,6 +18,7 @@ void CoreBindings::setupBindings() {
   ctx->vm->export_this("load_config", this, &CoreBindings::_loadConfig, "core");
   ctx->vm->export_this("save_config", this, &CoreBindings::_saveConfig, "core");
   ctx->vm->export_this("get_time_ms", this, &CoreBindings::_getTimeMs, "core");
+  ctx->vm->export_this("trigger_pause", this, &CoreBindings::_triggerPause, "core");
 }
 
 std::string CoreBindings::_getPlatform() {
@@ -29,6 +30,14 @@ std::string CoreBindings::_getPlatform() {
 
 std::string CoreBindings::_getVersion() {
   return "0.0.1";
+}
+
+void CoreBindings::_triggerPause(bool isPaused) {
+  if (isPaused) {
+    this->ctx->playbackController->pause();
+  } else {
+    this->ctx->playbackController->play();
+  }
 }
 
 void CoreBindings::_loadScript(std::string pkg, std::string path) {

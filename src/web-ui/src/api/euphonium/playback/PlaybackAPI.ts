@@ -18,7 +18,7 @@ export default class PlaybackAPI {
     });
   setPaused = (isPaused: boolean) =>
     this.apiAccessor.fetch<void>("POST", "/playback/status", {
-      status: isPaused ? "paused" : "playing",
+      state: isPaused ? "paused" : "playing",
     });
   playRadio = (
     stationName: string,

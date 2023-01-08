@@ -116,16 +116,8 @@ http.handle(HTTP_POST, '/playback/eq', def (request)
 end)
 
 http.handle(HTTP_POST, '/playback/status', def (request)
-    euphonium.playback_state['status'] = request.json_body()['status']
-    plugin = euphonium.get_plugin(euphonium.current_source)
+    var body = request.json_body()
+    playback_state.notify_state(body['state'])
 
-    if euphonium.playback_state['status'] == 'playing'
-        plugin.on_event(EVENT_SET_PAUSE, false)
-    else
-        plugin.on_event(EVENT_SET_PAUSE, true)
-    end
-
-    # reset buffers
-    playback.empty_buffers()
-    request.write_json(euphonium.playback_state, 200)
+    request.write_json(playback_state.get_state(), 200)
 end)

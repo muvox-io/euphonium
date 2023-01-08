@@ -18,8 +18,8 @@ const PlaybackDataContextProvider = ({ children }: any) => {
     fetchInitialPlaybackState();
   }, [playbackAPI]);
   useEffect(() => {
-    const playbackStateChanged = ({ data }: any) => {
-      setPlaybackState(JSON.parse(data));
+    const playbackStateChanged = (data: any) => {
+      setPlaybackState(data);
     };
     eventSource.on("playback", playbackStateChanged);
     return () =>

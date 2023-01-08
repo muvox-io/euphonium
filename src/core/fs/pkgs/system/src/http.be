@@ -63,7 +63,8 @@ class HTTP
 
     # publish event
     def emit_event(type, body)
-        self._broadcast_websocket(json.dump({ 'type': type, 'body': body }))
+        var json_body = json.dump({ 'type': type, 'data': body })
+        self._broadcast_websocket(json_body)
     end
 end
 

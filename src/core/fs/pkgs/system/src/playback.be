@@ -31,6 +31,15 @@ class PlaybackState
 
   def notify_state(state)
     self.settings['state'] = state
+
+    if state == STATE_PLAYING
+      core.trigger_pause(false)
+    end
+
+    if state == STATE_PAUSED
+      core.trigger_pause(true)
+    end
+
     self.update_remote()
   end
 

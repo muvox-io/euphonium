@@ -19,11 +19,27 @@
  * - eventBus -> Instance of the EventBus, that should be used to communicate between the different parts of the system
 */
 namespace euph {
+// Used to control the state of playback. @TODO: Extend with loading state, error state, and such
+struct PlaybackController {
+  std::atomic<bool> isPaused = false;
+  std::atomic<bool> requestPause = false;
+
+  void pause() {
+    this->requestPause = true;
+  }
+
+  void play() {
+    this->isPaused = false;
+  }
+};
+
 struct Context {
   std::shared_ptr<euph::StorageAccessor> storage;
   std::shared_ptr<berry::VmState> vm;
   std::shared_ptr<euph::EventBus> eventBus;
   std::shared_ptr<bell::CentralAudioBuffer> audioBuffer;
+  std::shared_ptr<euph::PlaybackController> playbackController;
+
 
   /**
    * @brief Creates a context with the default utilities
@@ -44,6 +60,7 @@ struct Context {
     ctx->storage = std::make_shared<euph::StorageAccessor>();
     ctx->vm = std::make_shared<berry::VmState>();
     ctx->audioBuffer = std::make_shared<bell::CentralAudioBuffer>(128);
+    ctx->playbackController = std::make_shared<euph::PlaybackController>();
     ctx->eventBus = bus;
 
     #ifdef ESP_PLATFORM
