@@ -1,6 +1,4 @@
 #include "EuphoniumApp.h"
-#include "EventBus.h"
-
 
 using namespace euph;
 
@@ -41,7 +39,7 @@ void EuphoniumApp::runTask() {
   auto eventBus = std::make_shared<euph::EventBus>();
   auto connectivity = std::make_shared<ESP32Connectivity>(eventBus);
 
-  auto core = std::make_unique<euph::Core>(connectivity, eventBus);
+  //auto core = std::make_unique<euph::Core>(connectivity, eventBus);
 
   while (true) {
     BELL_SLEEP_MS(100);

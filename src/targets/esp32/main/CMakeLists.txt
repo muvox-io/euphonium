@@ -1,9 +1,10 @@
 # Find all source files with
-file(GLOB COMPONENT_SRCS "*.cpp" "app/*.cpp")
+file(GLOB COMPONENT_SRCS "*.cpp" "app/*.cpp" "drivers/*.cpp")
 
 set(COMPONENT_ADD_INCLUDEDIRS
     .
     app/include
+    drivers/include
     )
 
 set(COMPONENT_REQUIRES

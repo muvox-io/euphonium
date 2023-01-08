@@ -10,6 +10,7 @@
 #include "Core.h"
 #include "ESP32Connectivity.h"
 #include "EuphLogger.h"
+#include "ESP32Platform.h"
 
 namespace euph {
 class EuphoniumApp : public bell::Task {
