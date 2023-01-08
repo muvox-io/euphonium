@@ -14,6 +14,10 @@ void RadioPlugin::runPlugin() {
 }
 
 void RadioPlugin::queryUrl(std::string url) {
+  this->isRunning = false;
+  std::scoped_lock lock(this->runningMutex);
+
+  this->isRunning = true;
   this->playbackURLQueue.push(url);
 }
 
@@ -39,7 +43,7 @@ void RadioPlugin::runTask() {
   auto hashFunc = std::hash<std::string>();
 
   EUPH_LOG(info, TASK, "Waiting for playback requests");
-
+  // Queue playback
   while (true) {
     playbackURLQueue.wpop(playbackUrl);
     EUPH_LOG(info, TASK, "Received URL %s", playbackUrl.c_str());
@@ -48,7 +52,6 @@ void RadioPlugin::runTask() {
     try {
       auto req = bell::HTTPStream::get(playbackUrl);
 
-      // Queue playback
       auto stream = std::make_unique<bell::EncodedAudioStream>();
       stream->openWithStream(std::move(req));
 
@@ -56,11 +59,23 @@ void RadioPlugin::runTask() {
       ctx->audioBuffer->lockAccess();
 
       uint32_t trackHash = hashFunc(playbackUrl);
+      size_t written, toWrite = 0;
 
       // Guard playback only while song is requested
       while (isRunning) {
         size_t readSize = stream->decodeFrame(dataTmp.data());
-        ctx->audioBuffer->writePCM(dataTmp.data(), dataTmp.size(), trackHash);
+        toWrite = readSize;
+
+        while (toWrite > 0) {
+          written = ctx->audioBuffer->writePCM(
+              dataTmp.data() + (readSize - toWrite), toWrite, trackHash);
+          toWrite -= written;
+
+          // Buffer full, wait
+          if (written == 0) {
+            BELL_SLEEP_MS(100);
+          }
+        }
       }
 
       ctx->audioBuffer->unlockAccess();

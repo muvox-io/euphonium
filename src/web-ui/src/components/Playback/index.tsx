@@ -27,6 +27,63 @@ export function debounce<T extends unknown[], U>(
   };
 }
 
+interface PlaybackStateProps {
+  playbackState?: PlaybackState;
+}
+
+const PlaybackImage = ({ playbackState }: PlaybackStateProps) => {
+  if (!playbackState?.track?.iconUrl) return (<></>)
+  return (<div><div class="absolute bg-gray-500 w-[80px] h-[80px] left-6 bottom-2 rounded-xl">
+    <img src={playbackState?.track?.iconUrl} class="rounded-xl"></img>
+
+  </div><div class="w-[90px]"></div></div>)
+
+}
+
+const PlaybackSong = ({ playbackState }: PlaybackStateProps) => {
+  const track = playbackState?.track;
+  if (!track?.name) {
+  return (<div class="text-white ml-4">
+    Queue empty
+  </div>);
+  }
+
+  return (<div class="text-white ml-4">{track?.name} <span class="text-app-text-secondary font-thin">via radio</span></div>)
+}
+
+const PlaybackVolume = ({ playbackState }: PlaybackStateProps) => {
+  const [volume, setVolume] = useState(0);
+  return (<>
+    <Icon name="volume-up" />
+    <input
+      class="w-[100px]"
+      type="range"
+      id="volume"
+      name="volume"
+      min="0"
+      max="100"
+    />
+    <div class="text-sm ml-3">{volume}%</div>
+  </>)
+
+}
+
+const PlaybackControls = ({ playbackState }: PlaybackStateProps) => {
+  const playbackAPI = useAPI(PlaybackAPI);
+  return (<div class="mr-2"><Icon
+    onClick={() => {
+      playbackAPI.setPaused(
+        playbackState?.settings?.state == PlaybackStatus.Playing
+      );
+    }}
+    name={
+      playbackState?.settings?.state == PlaybackStatus.Playing
+        ? "pause"
+        : "play"
+    }
+  /></div>)
+}
+
 const PlaybackBar = ({
   themeColor = "#fff",
 }: {
@@ -34,131 +91,35 @@ const PlaybackBar = ({
 }) => {
   const playbackAPI = useAPI(PlaybackAPI);
   const playbackState = usePlaybackState();
-  console.log(playbackState)
+
   const [eqOpen, setEqOpen] = useState<boolean>(false);
   const [mobileDialogOpen, setMobileDialogOpen] = useState<boolean>(false);
+  const [volume, updateVolume] = useState(0);
 
-  const volUpdatedInstant = (volume: number, persist: boolean) => {
-    playbackAPI.updateVolume(Math.round((volume / 15) * 100), persist);
+  const volUpdated = (volume: number, persist: boolean) => {
+    // playbackAPI.updateVolume(Math.round((volume / 15) * 100), persist);
+    updateVolume(volume);
   };
 
-  const volUpdated = debounce(
+  /*const volUpdated = debounce(
     (volume: number, persist: boolean = false) =>
       volUpdatedInstant(volume, persist),
     100
-  );
+  );*/
 
   const isMobile = useIsMobile();
 
   return (
-    <div
-      class="flex flex-col flex-grow bottom-0 fixed right-0 left-0 md:left-[220px]"
-      onClick={() => {
-        if (isMobile) {
-          setMobileDialogOpen(true);
-        }
-      }}
-    >
-      <div class="flex flex-row bg-app-secondary border border-app-border md:bg-app-primary h-13 mr-3 ml-3 rounded-t-xl items-center shadow-xl flex-grow">
-        <img
-          class="rounded-xl h-20 w-20 shadow-xl border border-app-border bg-white -mt-8 ml-2 mb-2"
-          src={
-            playbackState?.song?.icon ??
-            "https://www.veryicon.com/download/png/media/music-series/sound-wave-1-2?s=256"
-          }
-        ></img>
-        <div class="flex flex-col justify-center ml-4 w-full">
-          <div>{playbackState?.song?.songName}</div>
-          <div class="text-app-text-secondary text-xs">
-            {playbackState?.song?.artistName} • {playbackState?.song?.albumName} •
-            playback from {playbackState?.song?.sourceName}
-          </div>
-        </div>
-        <div class="md:hidden mx-3 rounded-full cursor-pointer flex items-center justify-center">
-          <Icon name="eq" />
-        </div>
-        {!isMobile ? (
-          <div class="mr-3 text-xl text-app-text-secondary ml-auto flex flex-row">
-            <div class="relative flex justify-center">
-              {eqOpen && playbackState?.eq ? (
-                <div class="absolute bottom-[50px] shadow-xl text-center rounded-xl w-[170px] p-4 z-30 bg-app-primary mb-1">
-                  equalizer
-                  <Equalizer eq={playbackState!!.eq} />
-                </div>
-              ) : null}
-              <Icon onClick={() => setEqOpen(!eqOpen)} name="equalizer" />
-            </div>
-            <Icon name="volume-up" />
-            <input
-              class="w-20"
-              type="range"
-              id="volume"
-              name="volume"
-              value={((playbackState?.volume || 0) / 100) * 15}
-              onInput={(e: any) => volUpdated(e.target.value)}
-              onBlur={(e: any) => volUpdated(e.target.value, true)}
-              min="0"
-              max="15"
-            />
-            <Icon
-              onClick={() => {
-                playbackAPI.setPaused(
-                  playbackState?.status == PlaybackStatus.Playing
-                );
-              }}
-              name={
-                playbackState?.status == PlaybackStatus.Playing
-                  ? "pause"
-                  : "play"
-              }
-            />
-          </div>
-        ) : null}
+    <div class="flex flex-col flex-grow bottom-0 fixed right-0 left-0 md:left-[220px] h-[50px]">
+      <div class="flex text-app-text-secondary flex-row bg-app-secondary border border-app-border md:bg-app-primary h-13 mr-3 ml-3 rounded-t-xl items-center shadow-xl flex-grow">
+        <PlaybackImage playbackState={playbackState} />
+        <PlaybackSong playbackState={playbackState} />
+        <div class="ml-auto"></div>
+        <PlaybackVolume playbackState={playbackState} />
+
+        <PlaybackControls playbackState={playbackState} />
       </div>
-      <div
-        class="mr-3 ml-3 h-1 w-auto text-xs"
-        style={{ backgroundColor: playbackState?.song?.sourceThemeColor }}
-      ></div>
-      {mobileDialogOpen == true ? (
-        <Modal header="Playback settings">
-          <div class="flex flex-col">
-            <div className="text-app-text-secondary text-lg mb-3">
-              equalizer
-            </div>
-            <div class="w-full flex justify-center pl-[35px] pt-2 pb-4 rounded-2xl bg-app-secondary">
-              <div className="text-center w-[170px]">
-                {playbackState?.eq ? (
-                  <Equalizer eq={playbackState?.eq} />
-                ) : null}
-              </div>
-            </div>
-            <div class="text-app-text-secondary text-lg mt-4">
-              volume setting
-            </div>
-            <input
-              className="w-20"
-              type="range"
-              id="volume"
-              name="volume"
-              class="w-[240px] mt-2 mb-2"
-              value={((playbackState?.volume || 0) / 100) * 15}
-              onInput={(e: any) => volUpdated(e.target.value)}
-              min="0"
-              max="15"
-            />
-            <button
-              class="text-app-text-secondary pt-2"
-              onClick={(e) => {
-                setMobileDialogOpen(false);
-                e.stopPropagation();
-              }}
-            >
-              Close
-            </button>
-          </div>
-        </Modal>
-      ) : null}
-    </div>
+    </div >
   );
 };
 

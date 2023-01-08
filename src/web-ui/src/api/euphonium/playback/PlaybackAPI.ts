@@ -2,7 +2,7 @@ import APIAccessor from "../../APIAccessor";
 import { EqSettings, PlaybackState } from "./models";
 
 export default class PlaybackAPI {
-  constructor(private apiAccessor: APIAccessor) {}
+  constructor(private apiAccessor: APIAccessor) { }
 
   updateEq = (settings: EqSettings, persist = false) =>
     this.apiAccessor.fetch<void>("POST", "/playback/eq", {
@@ -23,13 +23,11 @@ export default class PlaybackAPI {
   playRadio = (
     stationName: string,
     favicon: string,
-    stationUrl: string,
-    codec: string
+    stationUrl: string
   ) =>
-    this.apiAccessor.fetch<void>("POST", "/webradio", {
-      stationUrl,
-      codec,
-      stationName,
-      favicon,
+    this.apiAccessor.fetch<void>("POST", "/radio/play", {
+      url: stationUrl,
+      name: stationName,
+      iconUrl: favicon
     });
 }

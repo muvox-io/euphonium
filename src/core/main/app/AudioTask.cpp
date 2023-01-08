@@ -1,4 +1,5 @@
 #include "AudioTask.h"
+#include "PortAudioSink.h"
 
 using namespace euph;
 
@@ -6,8 +7,11 @@ AudioTask::AudioTask(std::shared_ptr<euph::Context> ctx): bell::Task("AudioTask"
   this->ctx = ctx;
   this->dsp = std::make_shared<bell::BellDSP>(ctx->audioBuffer);
 
+  this->audioSink = std::make_unique<PortAudioSink>();
+  this->audioSink->setParams(44100, 2, 16);
+
   // Start Audio thread
-  // startTask();
+  startTask();
 }
 
 AudioTask::~AudioTask() {
@@ -15,8 +19,16 @@ AudioTask::~AudioTask() {
 
 void AudioTask::runTask() {
   EUPH_LOG(info, TASK, "Audio thread running");
-  while (true) {
-    //this->ctx->audioBuffer->chunkReady->wait();
+  bell::CentralAudioBuffer::AudioChunk currentChunk = { .pcmSize = 0 };
 
+  while (true) {
+    // Wait until next chunk arrives
+    this->ctx->audioBuffer->chunkReady->wait();
+
+    currentChunk = this->ctx->audioBuffer->readChunk();
+
+    if (currentChunk.pcmSize > 0) {
+      this->audioSink->feedPCMFrames(currentChunk.pcmData, currentChunk.pcmSize);
+    }
   }
 }

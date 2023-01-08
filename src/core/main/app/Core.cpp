@@ -1,8 +1,10 @@
 #include "Core.h"
+#include "DecoderGlobals.h"
 
 using namespace euph;
 
 Core::Core(std::shared_ptr<euph::Connectivity> connectivity, std::shared_ptr<euph::EventBus> eventBus) {
+  bell::createDecoders();
   this->eventBus = eventBus;
   this->connectivity = connectivity;
 

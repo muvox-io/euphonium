@@ -29,8 +29,6 @@ class RadioPlugin : Plugin
 
   # prepares track metadata
   def handle_request_packet(request)
-    self._query_url(request)
-
     if (request.find('name') == nil)
       request['name'] = 'HTTP Stream'
     end
@@ -40,6 +38,8 @@ class RadioPlugin : Plugin
 
     playback_state.notify_playback(request)
     playback_state.notify_state(STATE_PLAYING)
+
+    self._query_url(request["url"])
   end
 
   def make_form(ctx, state)

@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 
 #include "BellUtils.h"
+#include "DecoderGlobals.h"
 
 #include "CoreBindings.h"
 #include "EuphContext.h"

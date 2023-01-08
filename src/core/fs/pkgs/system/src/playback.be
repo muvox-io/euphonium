@@ -26,15 +26,17 @@ class PlaybackState
 
   def notify_playback(track)
     self.current_track = track
+    self.update_remote()
   end
 
   def notify_state(state)
-    self.settings['state'] = STATE_EMPTY
+    self.settings['state'] = state
+    self.update_remote()
   end
 
   # Called in order to send current state to the websocket connection
   def update_remote()
-    http.emit_event('playbackState', self.get_state)
+    http.emit_event('playback', self.get_state())
   end
 
   def get_state()
