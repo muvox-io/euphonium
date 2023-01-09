@@ -1,0 +1,7 @@
+{
+  "name": "platform_esp32",
+  "version": "0.1.0",
+  "description": "ESP32 platform support",
+  "author": "euphonium",
+  "init_hook": "platform_esp32"
+}
