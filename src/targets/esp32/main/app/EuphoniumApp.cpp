@@ -38,8 +38,13 @@ void EuphoniumApp::initializeStorage() {
 void EuphoniumApp::runTask() {
   auto eventBus = std::make_shared<euph::EventBus>();
   auto connectivity = std::make_shared<ESP32Connectivity>(eventBus);
+  auto output = std::make_shared<euph::I2SAudioOutput>();
 
-  //auto core = std::make_unique<euph::Core>(connectivity, eventBus);
+  auto core = std::make_unique<euph::Core>(connectivity, eventBus, output);
+  core->exportPlatformBindings = [=] (std::shared_ptr<euph::Context> ctx) {
+    exportDrivers(ctx->vm);
+  };
+  core->handleEventLoop();
 
   while (true) {
     BELL_SLEEP_MS(100);

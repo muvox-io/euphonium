@@ -11,6 +11,7 @@
 #include "ESP32Connectivity.h"
 #include "EuphLogger.h"
 #include "ESP32Platform.h"
+#include "I2SAudioOutput.h"
 
 namespace euph {
 class EuphoniumApp : public bell::Task {

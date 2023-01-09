@@ -27,7 +27,7 @@ export function App() {
             {/* <Onboarding/> */}
             <APIFetcher api={SystemAPI} fetch={(api) => api.getSystemInfo()}>
               {(info: EuphoniumInfo) => {
-                if (info?.onboarding) {
+                if (info?.connectivity?.type == "WIFI_AP") {
                   return <Onboarding connectivity={info.connectivity}/>
                 }
 

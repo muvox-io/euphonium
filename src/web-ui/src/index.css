@@ -1,3 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face { 
+    font-family: 'OpenSans'; 
+    src: url('@/assets/OpenSans-Regular.woff2'); /* but this does */
+}
+
+.body {
+
+}

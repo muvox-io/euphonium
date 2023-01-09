@@ -7,7 +7,7 @@ namespace euph {
 class I2SAudioOutput : public euph::AudioOutput {
  public:
   I2SAudioOutput();
-  ~I2SAudioOutput(){};
+  ~I2SAudioOutput() {};
 
   void setupBindings(std::shared_ptr<euph::Context> ctx) override;
 

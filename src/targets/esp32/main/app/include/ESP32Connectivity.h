@@ -10,6 +10,7 @@
 #include "nvs_flash.h"
 #include "nvs_handle.hpp"
 #include "nlohmann/json.hpp"
+#include "fmt/format.h"
 
 #include "BellTask.h"
 #include "WrappedSemaphore.h"
@@ -26,12 +27,14 @@ class ESP32Connectivity : public Connectivity, public bell::Task {
   void initConfiguration();
   void initializeWiFiStack();
 
+  void persistConfig();
   void requestScan();
-  void attemptConnect(const std::string& ssid, const std::string passwd);
+  void attemptConnect(const std::string& ssid, const std::string& passwd);
   void handleEvent(esp_event_base_t event_base, int32_t event_id,
                    void* event_data);
   void registerHandlers(std::shared_ptr<bell::BellHTTPServer> http) override;
   void initializeAP();
+  void initializeSTA();
 
   void runTask() override;
 

@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import preact from '@preact/preset-vite'
 import viteCompression from 'vite-plugin-compression'
+import * as path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -8,12 +9,16 @@ export default defineConfig({
     deleteOriginFile: true,
     ext: '.gz'
   })],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+    }
+  },
   build: {
     rollupOptions: {
       output: {
         assetFileNames: (assetInfo) => {
           console.log(assetInfo);
-          let extType = assetInfo.name!!.split('.')[1];
           return `web/assets/[name]-[hash][extname]`;
         },
         chunkFileNames: 'web/assets/[name]-[hash].js',

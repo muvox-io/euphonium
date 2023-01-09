@@ -9,9 +9,6 @@ Core::Core(std::shared_ptr<euph::Connectivity> connectivity,
   this->eventBus = eventBus;
   this->connectivity = connectivity;
   this->audioOutput = euphAudioOutput;
-
-  // Start main event loop
-  this->handleEventLoop();
 }
 
 void Core::initialize() {
@@ -52,6 +49,10 @@ void Core::initialize() {
   // setup bindings
   this->bindings->setupBindings();
   this->http->setupBindings();
+
+  if (this->exportPlatformBindings != nullptr) {
+    this->exportPlatformBindings(this->ctx);
+  }
 
   // Register an 'system' endpoint in HTTPDispatcher
   this->http->getServer()->registerGet(

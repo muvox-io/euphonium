@@ -5,7 +5,7 @@
 using namespace euph;
 
 StorageAccessor::StorageAccessor()
-    : bell::Task("storage_accessor", 6 * 1025, 0, 0, false) {
+    : bell::Task("storage_accessor", 16 * 1024, 0, 0, false) {
   this->requestSemaphore = std::make_unique<bell::WrappedSemaphore>(100);
   this->responseSemaphore = std::make_unique<bell::WrappedSemaphore>(100);
 

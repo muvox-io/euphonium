@@ -46,10 +46,40 @@ void ESP32Connectivity::initConfiguration() {
 
     if (wifiConfigSize > 0) {
       EUPH_LOG(info, TAG, "Found existing WiFi configuration, connecting...");
+      std::string configStr(wifiConfigSize - 1, ' ');
+      handle->get_string(nvsWiFiKey.c_str(), configStr.data(), wifiConfigSize);
+
+      nlohmann::json wifiConfigObj = nlohmann::json::parse(configStr.c_str());
+
+      initializeSTA();
+      this->attemptConnect(wifiConfigObj["ssid"], wifiConfigObj["password"]);
     } else {
       EUPH_LOG(info, TAG, "WiFi configuration not found, starting AP...");
       initializeAP();
     }
+  }
+}
+
+void ESP32Connectivity::persistConfig() {
+
+  esp_err_t err;
+  std::unique_ptr<nvs::NVSHandle> handle =
+      nvs::open_nvs_handle("storage", NVS_READWRITE, &err);
+  if (err != ESP_OK) {
+    EUPH_LOG(error, TAG, "Error (%s) opening NVS handle!\n",
+             esp_err_to_name(err));
+  } else {
+    EUPH_LOG(info, TAG, "Reading WiFi configuration from NVS storage...");
+
+    size_t wifiConfigSize = 0;
+
+    nlohmann::json cfgBody = {};
+    // Using FMT as nlohmann::json likes to break stack limits on sys_evt task
+    cfgBody["ssid"] = this->ssid;
+    cfgBody["password"] = this->password;
+    std::string cfg = cfgBody.dump();
+
+    handle->set_string(nvsWiFiKey.c_str(), cfg.c_str());
   }
 }
 
@@ -69,6 +99,25 @@ void ESP32Connectivity::initializeWiFiStack() {
       WIFI_EVENT, ESP_EVENT_ANY_ID, &wifiEventHandler, this, NULL));
   ESP_ERROR_CHECK(esp_event_handler_instance_register(
       IP_EVENT, IP_EVENT_STA_GOT_IP, &wifiEventHandler, this, NULL));
+
+  ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+}
+
+void ESP32Connectivity::initializeSTA() {
+  // Setup configuration for STA mode
+  wifi_config_t staConfig = {};
+  memset(&staConfig, 0, sizeof(staConfig));
+
+  staConfig.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
+  staConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
+  staConfig.sta.threshold.rssi = -127;
+  staConfig.sta.threshold.authmode = WIFI_AUTH_OPEN;
+
+  esp_wifi_stop();
+  ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+  ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &staConfig));
+
+  ESP_ERROR_CHECK(esp_wifi_start());
 }
 
 void ESP32Connectivity::initializeAP() {
@@ -141,6 +190,8 @@ void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
       });
     }
 
+    this->jsonBody["scanning"] = false;
+
     this->dataUpdateSemaphore->give();
 
     this->isScanning = false;
@@ -157,17 +208,21 @@ void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
     this->jsonBody["error"] = false;
 
     this->dataUpdateSemaphore->give();
+    this->persistConfig();
   } else if (event_base == WIFI_EVENT &&
-               event_id == WIFI_EVENT_STA_DISCONNECTED) {
+             event_id == WIFI_EVENT_STA_DISCONNECTED) {
     if (this->data.state == Connectivity::State::CONNECTING) {
       if (this->connectionAttempts < MAX_CONNECTION_ATTEMPTS) {
         this->connectionAttempts++;
 
-        EUPH_LOG(error, TAG, "WiFi connection retry, attempt #%d", this->connectionAttempts);
+        EUPH_LOG(error, TAG, "WiFi connection retry, attempt #%d",
+                 this->connectionAttempts);
         esp_wifi_connect();
       } else {
-        EUPH_LOG(error, TAG, "Connection failed, after %d attempts", this->connectionAttempts);
+        EUPH_LOG(error, TAG, "Connection failed, after %d attempts",
+                 this->connectionAttempts);
         this->jsonBody["error"] = true;
+        this->data.state = Connectivity::State::CONNECTED_NO_INTERNET;
         this->dataUpdateSemaphore->give();
       }
     }
@@ -180,11 +235,15 @@ void ESP32Connectivity::requestScan() {
     return;
   }
 
+  this->isScanning = true;
+  this->jsonBody["scanning"] = true;
+  this->dataUpdateSemaphore->give();
+
   ESP_ERROR_CHECK(esp_wifi_scan_start(NULL, false));
 }
 
 void ESP32Connectivity::attemptConnect(const std::string& ssid,
-                                       const std::string passwd) {
+                                       const std::string& passwd) {
   if (this->isScanning) {
     esp_wifi_scan_stop();
     this->isScanning = false;
@@ -199,9 +258,12 @@ void ESP32Connectivity::attemptConnect(const std::string& ssid,
 
   esp_wifi_set_config(WIFI_IF_STA, &staConfig);
 
+  this->ssid = ssid;
+  this->password = passwd;
+
   this->data.state = euph::Connectivity::State::CONNECTING;
   this->data.ssid = ssid;
-
+  this->dataUpdateSemaphore->give();
 
   esp_wifi_connect();
 }

@@ -42,6 +42,7 @@ interface NetworkListParams {
 const NetworkList = ({ setConfigState, connectivity }: NetworkListParams) => {
   const hasNetworks = connectivity?.body?.networks?.length;
   const wifiAPI = useAPI(WiFiAPI);
+  const scanning = !!connectivity?.body?.scanning;
 
   const doScan = () => {
     wifiAPI.wifiScan();
@@ -67,7 +68,8 @@ const NetworkList = ({ setConfigState, connectivity }: NetworkListParams) => {
       {hasNetworks ? <><div class="mb-5"></div><Button
         onClick={doScan}
         class="text-xl h-[55px] w-full flex flex-row justify-center items-center">
-        Scan again
+                {scanning ? (<div class="dot-elastic"></div>) : 'Scan again'}
+
       </Button></> : null}
       {hasNetworks ? (<div class="mt-2 w-full text-center">Show remaining</div>) : null}
     </div>
@@ -97,8 +99,7 @@ const NetworkSelected = ({ setConfigState, network, connectivity }: NetworkSelec
       <NetworkItem name={network?.ssid} isOpen={network?.open} />
       {network?.open ? null : <>
         Network password
-
-        <Input type="password" class="mt-2 mb-2 text-2xl" height={55} onChange={setPassword} value={password}></Input></>}
+        <Input type="password" class="mt-1 mb-2 text-2xl" height={55} onChange={setPassword} value={password}></Input></>}
 
 
       <div class={`${connectivity?.body?.error ? "visible" : "invisible"} text-red-500 text-l mb-4`}>Connection failed, recheck credentials</div>

@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <functional>
 #include <nlohmann/json.hpp>
 
 #include "BellUtils.h"
@@ -48,5 +49,8 @@ class Core : public euph::EventSubscriber {
   void initialize();
   void handleEvent(std::unique_ptr<Event>& event) override;
   void handleEventLoop();
+
+  // Used in platform implementations to export platform-specific bindings to the vm
+  std::function<void(std::shared_ptr<euph::Context>)> exportPlatformBindings = nullptr;
 };
 }  // namespace euph
