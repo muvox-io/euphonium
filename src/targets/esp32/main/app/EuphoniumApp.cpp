@@ -2,7 +2,7 @@
 
 using namespace euph;
 
-EuphoniumApp::EuphoniumApp() : bell::Task("app", 32 * 1024, 0, 0, false) {
+EuphoniumApp::EuphoniumApp() : bell::Task("app", 16 * 1024, 0, 0, false) {
   initializeEuphoniumLogger();
   initializeStorage();
 

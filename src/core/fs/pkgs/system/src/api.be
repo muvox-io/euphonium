@@ -46,7 +46,8 @@ http.handle(HTTP_POST, '/plugins/:name', def (request)
     }
 
     var body = request.json_body()
-
+    print(request.route_params())
+    print(body)
     var plugin = euphonium.get_plugin(request.route_params()['name'])
     var isDraft = body['isPreview']
     var state = json.load(json.dump(plugin.state))

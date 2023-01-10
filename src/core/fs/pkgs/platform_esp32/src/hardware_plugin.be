@@ -6,11 +6,13 @@ class HardwarePlugin : Plugin
 
     def init()
         self.registered_drivers = []
-        self.apply_default_values()
-
         self.name = "hardware"
         self.display_name = "Hardware"
         self.type = "system"
+
+        self.fetch_config()
+        self.apply_default_values()
+
         self.selected_driver = nil
         self.is_audio_output = true
     end
@@ -24,7 +26,9 @@ class HardwarePlugin : Plugin
 
         ctx.create_group('boardGroup', { 'label': 'Board' })
         board_names = []
-
+        for board : ESP32_BOARDS
+            board_names.push(board["name"])
+        end
         ctx.select_field('board', {
             'label': "Select your board type",
             'default': "custom",
@@ -46,11 +50,20 @@ class HardwarePlugin : Plugin
             })
             if state.find("boardChanged") == "confirmed_" + state.find("board")
                 state["boardChanged"] = "cancelled_" + state.find("board")
+                for board : ESP32_BOARDS
+                    if board["name"] == state.find("board")
+                        # copy the state defined for the board
+                        for key : board["state"].keys()
+                            state.setitem(key, board["state"][key])
+                        end
+                        break
+                    end
+                end
             end
         end
 
         ctx.create_group('driver', { 'label': 'DAC Driver' })
-       
+    
 
         ctx.select_field('dac', {
             'label': "Select DAC chip driver",

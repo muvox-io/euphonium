@@ -104,8 +104,7 @@ void HTTPDispatcher::setupBindings() {
 std::string HTTPDispatcher::_readBody(int connId) {
   auto conn = this->bindConnections[connId];
   const struct mg_request_info* reqInfo = mg_get_request_info(conn);
-  std::string body;
-  body.reserve(reqInfo->content_length);
+  std::string body(reqInfo->content_length, ' ');
 
   mg_read(conn, body.data(), reqInfo->content_length);
   return body;

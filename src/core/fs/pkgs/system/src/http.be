@@ -21,6 +21,7 @@ class HTTPRequest
 
     def json_body()
         var json_body = self._read_body(self.conn_id)
+        print(json_body)
         return json.load(json_body)
     end
 
