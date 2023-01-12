@@ -4,7 +4,8 @@
 using namespace euph;
 
 Core::Core(std::shared_ptr<euph::Connectivity> connectivity,
-           std::shared_ptr<euph::EventBus> eventBus, std::shared_ptr<euph::AudioOutput> euphAudioOutput) {
+           std::shared_ptr<euph::EventBus> eventBus,
+           std::shared_ptr<euph::AudioOutput> euphAudioOutput) {
   bell::createDecoders();
   this->eventBus = eventBus;
   this->connectivity = connectivity;
@@ -23,7 +24,8 @@ void Core::initialize() {
   this->http = std::make_shared<euph::HTTPDispatcher>(this->ctx);
   this->pkgLoader = std::make_shared<euph::PackageLoader>(this->ctx);
   this->bindings = std::make_unique<euph::CoreBindings>(this->ctx);
-  this->audioTask = std::make_shared<euph::AudioTask>(this->ctx, this->audioOutput);
+  this->audioTask =
+      std::make_shared<euph::AudioTask>(this->ctx, this->audioOutput);
 
   // Register sources
   this->audioSources.push_back(std::make_unique<RadioPlugin>(ctx));

@@ -39,6 +39,7 @@ void EuphoniumApp::runTask() {
   auto eventBus = std::make_shared<euph::EventBus>();
   auto connectivity = std::make_shared<ESP32Connectivity>(eventBus);
   auto output = std::make_shared<euph::I2SAudioOutput>();
+  auto statusTask = std::make_shared<euph::StatusLED>(eventBus);
 
   auto core = std::make_unique<euph::Core>(connectivity, eventBus, output);
   core->exportPlatformBindings = [=] (std::shared_ptr<euph::Context> ctx) {
