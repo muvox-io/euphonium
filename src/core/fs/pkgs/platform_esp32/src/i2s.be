@@ -49,15 +49,15 @@ class I2SWrapper
     end
 
     def expand(from, to)
-        # _i2s.expand(from, to)
+        _i2s.set_expand(from, to)
     end
 
     def disable_expand()
-        # _i2s.disable_expand()
+        _i2s.set_expand(16, 16)
     end
 
     def set_readable(readable)
-        # _i2s.set_readable(readable)
+        _i2s.set_readable(readable)
     end
 end
 

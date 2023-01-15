@@ -28,7 +28,7 @@ class MA12070P : DACDriver
         i2s.set_pins(self.get_i2s_pins())
 
         # Ensures we expand from 16 to 32 bit, to match MA12070P Clock system.
-        # i2s.expand(16, 32)
+        i2s.expand(16, 32)
 
         # Start I2C Driver
         i2c.install(self.get_gpio('sda'), self.get_gpio('scl'))
@@ -55,6 +55,7 @@ class MA12070P : DACDriver
 
         # Unmute Amplifier 
         gpio.digital_write(self.get_gpio('mutePin'), gpio.HIGH)
+        self.set_volume(40)
     end
 
     def unload_i2s()

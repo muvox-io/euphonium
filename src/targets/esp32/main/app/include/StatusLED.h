@@ -7,7 +7,6 @@
 #include <driver/gpio.h>
 #include <driver/ledc.h>
 
-#include "BellTask.h"
 #include "WrappedSemaphore.h"
 
 #include "Connectivity.h"

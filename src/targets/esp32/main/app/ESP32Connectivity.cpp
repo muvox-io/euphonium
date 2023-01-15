@@ -43,7 +43,6 @@ void ESP32Connectivity::initConfiguration() {
     size_t wifiConfigSize = 0;
     handle->get_item_size(nvs::ItemType::SZ, nvsWiFiKey.c_str(),
                           wifiConfigSize);
-
     if (wifiConfigSize > 0) {
       EUPH_LOG(info, TAG, "Found existing WiFi configuration, connecting...");
       std::string configStr(wifiConfigSize - 1, ' ');
@@ -61,7 +60,6 @@ void ESP32Connectivity::initConfiguration() {
 }
 
 void ESP32Connectivity::persistConfig() {
-
   esp_err_t err;
   std::unique_ptr<nvs::NVSHandle> handle =
       nvs::open_nvs_handle("storage", NVS_READWRITE, &err);
@@ -87,6 +85,7 @@ void ESP32Connectivity::initializeWiFiStack() {
   // set netif
   esp_netif_t* staNetif = esp_netif_create_default_wifi_sta();
   assert(staNetif);
+
   esp_netif_t* apNetif = esp_netif_create_default_wifi_ap();
   assert(apNetif);
 
@@ -104,6 +103,7 @@ void ESP32Connectivity::initializeWiFiStack() {
 }
 
 void ESP32Connectivity::initializeSTA() {
+  isApMode = false;
   // Setup configuration for STA mode
   wifi_config_t staConfig = {};
   memset(&staConfig, 0, sizeof(staConfig));
@@ -121,6 +121,7 @@ void ESP32Connectivity::initializeSTA() {
 }
 
 void ESP32Connectivity::initializeAP() {
+  isApMode = true;
   // Setup configuration for AP mode
   wifi_config_t apConfig = {};
   memset(&apConfig, 0, sizeof(apConfig));
@@ -153,6 +154,7 @@ void ESP32Connectivity::initializeAP() {
   ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &staConfig));
 
   ESP_ERROR_CHECK(esp_wifi_start());
+  std::cout << "Starting ap mode" << std::endl;
 }
 
 void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
@@ -224,6 +226,10 @@ void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
         this->jsonBody["error"] = true;
         this->data.state = Connectivity::State::CONNECTED_NO_INTERNET;
         this->dataUpdateSemaphore->give();
+
+        if (!isApMode) {
+          this->initializeAP();
+        }
       }
     }
   }

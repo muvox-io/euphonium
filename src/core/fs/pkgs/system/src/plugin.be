@@ -26,6 +26,7 @@ class Plugin
         self.state = {}
         var ctx = FormContext()
         self.make_form(ctx, self.state)
+
         for field : ctx.fields
             if (field.find('default') != nil)
                 self.state[field['key']] = field['default']

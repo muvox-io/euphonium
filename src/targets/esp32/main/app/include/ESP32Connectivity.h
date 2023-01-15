@@ -52,6 +52,7 @@ class ESP32Connectivity : public Connectivity, public bell::Task {
 
   int connectionAttempts = 0;
   std::atomic<bool> isScanning = false;
+  bool isApMode = false;
   std::unique_ptr<bell::WrappedSemaphore> dataUpdateSemaphore;
 };
 }  // namespace euph

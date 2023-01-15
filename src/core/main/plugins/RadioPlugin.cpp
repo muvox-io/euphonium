@@ -3,7 +3,7 @@
 using namespace euph;
 
 RadioPlugin::RadioPlugin(std::shared_ptr<euph::Context> ctx)
-    : bell::Task("radio", 4 * 1024, 0, 1) {
+    : bell::Task("radio", 32 * 1024, 0, 1) {
   this->ctx = ctx;
 }
 

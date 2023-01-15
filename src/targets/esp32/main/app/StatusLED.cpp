@@ -104,8 +104,5 @@ void StatusLED::runTask() {
       BELL_SLEEP_MS(fadeTime);
       breathingInverted = !breathingInverted;
     }
-    /*ESP_ERROR_CHECK( ledc_set_fade_with_time(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, fade_inverted ? 0 : (1<<12), 1000) );
-    ESP_ERROR_CHECK( ledc_fade_start(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, LEDC_FADE_WAIT_DONE) );
-    fade_inverted = !fade_inverted;*/
   }
 }

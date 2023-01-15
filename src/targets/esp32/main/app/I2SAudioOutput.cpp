@@ -8,10 +8,23 @@ void I2SAudioOutput::setupBindings(std::shared_ptr<euph::Context> ctx) {
   ctx->vm->export_this("set_pins", this, &I2SAudioOutput::_setPins, "i2s");
   ctx->vm->export_this("uninstall", this, &I2SAudioOutput::_uninstall, "i2s");
   ctx->vm->export_this("install", this, &I2SAudioOutput::_install, "i2s");
+  ctx->vm->export_this("set_readable", this, &I2SAudioOutput::_setReadable,
+                       "i2s");
+  ctx->vm->export_this("set_expand", this, &I2SAudioOutput::_setExpand, "i2s");
 }
 
 bool I2SAudioOutput::supportsHardwareVolume() {
   return true;
+}
+
+void I2SAudioOutput::_setExpand(int from, int to) {
+  expandFrom = from;
+  expandTo = to;
+}
+
+void I2SAudioOutput::_setReadable(bool isReadable) {
+  this->isReadable = isReadable;
+  std::scoped_lock lock(this->readingMutex);
 }
 
 void I2SAudioOutput::configure(uint32_t sampleRate, uint8_t channels,
@@ -19,7 +32,25 @@ void I2SAudioOutput::configure(uint32_t sampleRate, uint8_t channels,
 
 void I2SAudioOutput::setVolume(uint8_t volume) {}
 
-void I2SAudioOutput::feedPCM(uint8_t* pcm, size_t size) {}
+void I2SAudioOutput::feedPCM(uint8_t* pcm, size_t size) {
+  size_t written = 0;
+
+  while (written < size) {
+    if (isReadable) {
+      std::scoped_lock lock(readingMutex);
+      if (expandTo != 16) {
+        i2s_write_expand((i2s_port_t)0, pcm + written, size - written,
+                         expandFrom, expandTo, &bytesWritten, portMAX_DELAY);
+      } else {
+        i2s_write((i2s_port_t)0, pcm + written, size - written, &bytesWritten,
+                  portMAX_DELAY);
+      }
+      written += bytesWritten;
+    } else {
+      BELL_SLEEP_MS(10);
+    }
+  }
+}
 
 void I2SAudioOutput::_install(int sampleRate, int bitsPerSample,
                               int channelFormatInt, int commFormat, int mclk) {

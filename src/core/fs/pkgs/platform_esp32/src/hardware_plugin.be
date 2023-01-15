@@ -15,6 +15,11 @@ class HardwarePlugin : Plugin
 
         self.selected_driver = nil
         self.is_audio_output = true
+
+        print(self.state)
+        if self.state.find('dac') != nil
+            self.select_driver(self.state['dac'])
+        end
     end
 
     def make_form(ctx, state)
@@ -88,9 +93,6 @@ class HardwarePlugin : Plugin
                 break
             end
         end
-        
-
-     
     end
 
     # register driver implementation
@@ -125,7 +127,7 @@ class HardwarePlugin : Plugin
     end
 
     def on_event(event, data)
-        if event == EVENT_CONFIG_UPDATED
+        if event == EVENT_CONFIG_UPDATED || event == EVENT_PLUGIN_INIT
             self.select_driver(self.state['dac'])
         end
 
