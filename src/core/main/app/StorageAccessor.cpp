@@ -246,6 +246,7 @@ void StorageAccessor::runTask() {
       if (file.is_open()) {
         file.write(this->currentOperation.dataText.c_str(),
                    this->currentOperation.dataText.size());
+
         this->currentOperation.status = OperationStatus::SUCCESS;
       } else {
         // File does not exist

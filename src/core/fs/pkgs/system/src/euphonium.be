@@ -5,7 +5,6 @@ class EuphoniumInstance
     # Setup initial values
     def init()
         #self.last_volume = 0
-        #self.playback_state = {}
         self.plugins_initialized = false
         self.plugins = []
         
@@ -34,7 +33,7 @@ class EuphoniumInstance
     end
 
     def update_playback()
-        http.emit_event("playback", self.playback_state)
+        # http.emit_event("playback", self.playback_state)
     end
 
     def send_notification(type, from, text, submessage)
@@ -74,7 +73,7 @@ class EuphoniumInstance
                 end
             end
 
-            raw_state['volume'] = self.playback_state['volume'];
+            # raw_state['volume'] = self.playback_state['volume'];
             core.start_plugin(plugin_name, raw_state)
         end
     end
@@ -172,21 +171,12 @@ class EuphoniumInstance
     end
 
     def apply_volume(volume)
-        # if self.last_volume != volume && volume >= 0 && volume <= 100
-        #     self.last_volume = volume
-        #     if core.platform() == 'desktop'
-        #         playback.set_soft_volume(volume)
-        #     else
-        #         var hardware_plugin = self.get_plugin('hardware')
-        #         if !hardware_plugin.has_hardware_volume()
-        #             playback.set_soft_volume(volume)
-        #         end
-        #     end
+      if volume >= 0 && volume <= 100
+        var hardware_plugin = self.get_plugin('hardware')
 
-        #     self.playback_state['volume'] = volume
-        #     self.update_playback()
-        #     self.broadcast_event(EVENT_VOLUME_UPDATED, volume)
-        # end
+        playback_state.update_volume(volume)
+        self.broadcast_event(EVENT_VOLUME_UPDATED, volume)
+      end
     end
 end
 

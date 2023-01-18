@@ -2,11 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number'] {
+    -webkit-appearance: none;
+    -moz-appearance: textfield !important;
+  }
+}
+
 @font-face { 
     font-family: 'OpenSans'; 
-    src: url('@/assets/OpenSans-Regular.woff2'); /* but this does */
+    src: url("assets/OpenSans-Regular.woff2");
 }
 
 .body {
-
+  font-family: 'OpenSans';
 }

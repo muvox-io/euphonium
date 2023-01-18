@@ -53,12 +53,17 @@ class Plugin
 
     # saves raw confugration into memory
     def persist_config()
+        print("Persist called")
+        print(json.dump(self.state))
         core.save_config(self.name, json.dump(self.state))
     end
 
     def fetch_config()
         var config = core.load_config(self.name)
-        self.state = json.load(config)
+        var loaded_state = json.load(config)
+        for key : loaded_state.keys()
+          self.state[key] = loaded_state[key]
+        end
     end
 
     def make_form(ctx, state)

@@ -29,6 +29,11 @@ class PlaybackState
     self.update_remote()
   end
 
+  def update_volume(volume)
+    self.settings['volume'] = volume
+    # self.update_remote()
+  end
+
   def notify_state(state)
     self.settings['state'] = state
 

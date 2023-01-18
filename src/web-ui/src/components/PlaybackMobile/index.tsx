@@ -20,7 +20,7 @@ export default function () {
     <Card title="Playback" subtitle="Currently playing">
       <div class="flex flex-col items-center">
         <img
-          src={playbackState?.song?.icon}
+          src={playbackState?.track?.iconUrl}
           class="bg-white w-[250px] h-[250px] rounded-xl border border-app-border"
         />
         <div>Danny</div>

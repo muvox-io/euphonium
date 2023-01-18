@@ -13,19 +13,6 @@ import Equalizer from "../Equalizer";
 import Modal from "../Modal";
 import Icon from "../ui/Icon";
 
-export function debounce<T extends unknown[], U>(
-  callback: (...args: T) => PromiseLike<U> | U,
-  wait: number
-) {
-  let timer: number;
-
-  return (...args: T): Promise<U> => {
-    clearTimeout(timer);
-    return new Promise((resolve) => {
-      timer = setTimeout(() => resolve(callback(...args)), wait);
-    });
-  };
-}
 
 interface PlaybackStateProps {
   playbackState?: PlaybackState;
@@ -52,7 +39,19 @@ const PlaybackSong = ({ playbackState }: PlaybackStateProps) => {
 }
 
 const PlaybackVolume = ({ playbackState }: PlaybackStateProps) => {
-  const [volume, setVolume] = useState(0);
+  const playbackAPI = useAPI(PlaybackAPI);
+  const [localVolume, setLocalVolume] = useState(0);
+
+  if (playbackState?.settings?.volume && playbackState?.settings?.volume != localVolume) {
+    setLocalVolume(playbackState?.settings?.volume);
+  }
+
+  const updateVolume = (volume: number) => {
+    playbackAPI.updateVolumeThrottled(volume);
+    setLocalVolume(volume);
+    playbackState!.settings.volume = volume;
+  }
+
   return (<>
     <Icon name="volume-up" />
     <input
@@ -62,8 +61,10 @@ const PlaybackVolume = ({ playbackState }: PlaybackStateProps) => {
       name="volume"
       min="0"
       max="100"
+      onInput={({ target }: any) => updateVolume(target?.value)}
+      value={playbackState?.settings?.volume}
     />
-    <div class="text-sm ml-3">{volume}%</div>
+    <div class="text-sm ml-3">{localVolume}%</div>
   </>)
 
 }
@@ -89,25 +90,12 @@ const PlaybackBar = ({
 }: {
   themeColor?: string;
 }) => {
-  const playbackAPI = useAPI(PlaybackAPI);
   const playbackState = usePlaybackState();
 
-  const [eqOpen, setEqOpen] = useState<boolean>(false);
-  const [mobileDialogOpen, setMobileDialogOpen] = useState<boolean>(false);
-  const [volume, updateVolume] = useState(0);
 
   const volUpdated = (volume: number, persist: boolean) => {
     // playbackAPI.updateVolume(Math.round((volume / 15) * 100), persist);
-    updateVolume(volume);
   };
-
-  /*const volUpdated = debounce(
-    (volume: number, persist: boolean = false) =>
-      volUpdatedInstant(volume, persist),
-    100
-  );*/
-
-  const isMobile = useIsMobile();
 
   return (
     <div class="flex flex-col flex-grow bottom-0 fixed right-0 left-0 md:left-[220px] h-[50px]">

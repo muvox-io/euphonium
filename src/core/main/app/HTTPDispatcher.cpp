@@ -10,7 +10,14 @@ using namespace euph;
 HTTPDispatcher::HTTPDispatcher(std::shared_ptr<euph::Context> ctx) {
   this->ctx = ctx;
   this->responseSemaphore = std::make_unique<bell::WrappedSemaphore>(20);
-  this->server = std::make_shared<bell::BellHTTPServer>(8080);
+  int port = 8080;
+
+  // TODO: Handle it properly
+  #ifdef ESP_PLATFORM
+    port = 80;
+  #endif
+
+  this->server = std::make_shared<bell::BellHTTPServer>(port);
 }
 
 HTTPDispatcher::~HTTPDispatcher() {}
@@ -24,7 +31,14 @@ void HTTPDispatcher::initialize() {
     this->serveWeb(conn);
     return this->server->makeEmptyResponse();
   });
-  this->server->registerGet("/web", [this](struct mg_connection* conn) {
+
+  this->server->registerGet("/assets/**", [this](struct mg_connection* conn) {
+    std::scoped_lock lock(webAccessMutex);
+    this->serveWeb(conn);
+    return this->server->makeEmptyResponse();
+  });
+
+  this->server->registerGet("/", [this](struct mg_connection* conn) {
     std::scoped_lock lock(webAccessMutex);
     this->serveWeb(conn);
     return this->server->makeEmptyResponse();
@@ -73,9 +87,9 @@ void HTTPDispatcher::serveWeb(struct mg_connection* conn) {
 
   std::string filePath = "index.html";
 
-  // Substract /web/
-  if (uri.size() > 5) {
-    filePath = uri.substr(5, uri.size());
+  // Substract / from assets path
+  if (uri.find("/assets/") != std::string::npos) {
+    filePath = uri.substr(1, uri.size());
   }
 
   EUPH_LOG(info, TAG, "Web access URI %s", filePath.c_str());

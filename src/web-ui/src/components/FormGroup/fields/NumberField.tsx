@@ -11,6 +11,7 @@ export default function NumberField({
     <Input
       type="number"
       tooltip={field.label}
+      width={90}
       value={value}
       onChange={(str) => onChange(str)}
       onBlur={onChangeFinished}

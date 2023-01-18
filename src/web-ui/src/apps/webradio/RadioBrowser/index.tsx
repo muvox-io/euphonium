@@ -34,7 +34,7 @@ const Radio = ({
         <div class="mt-[9px] ml-[5px]">
           <Icon
             onClick={() =>
-              playbackAPI.playRadio(name, favicon, url_resolved, codec)
+              playbackAPI.playRadio(name, favicon, url_resolved)
             }
             name="play"
           />

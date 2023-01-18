@@ -10,16 +10,11 @@ class HardwarePlugin : Plugin
         self.display_name = "Hardware"
         self.type = "system"
 
-        self.fetch_config()
         self.apply_default_values()
+        self.fetch_config()
 
         self.selected_driver = nil
         self.is_audio_output = true
-
-        print(self.state)
-        if self.state.find('dac') != nil
-            self.select_driver(self.state['dac'])
-        end
     end
 
     def make_form(ctx, state)
@@ -79,8 +74,6 @@ class HardwarePlugin : Plugin
         })
         for driver : self.registered_drivers
             if driver.name == state['dac']
-                print("Found driver", driver)
-                print("driver.make_config_form", driver.make_config_form)
                 if driver.datasheet_link != nil && driver.datasheet_link != ""
                     ctx.link_button('datasheet', {
                         'label': "Datasheet",
@@ -128,7 +121,9 @@ class HardwarePlugin : Plugin
 
     def on_event(event, data)
         if event == EVENT_CONFIG_UPDATED || event == EVENT_PLUGIN_INIT
-            self.select_driver(self.state['dac'])
+            if self.state.find('dac') != nil
+              self.select_driver(self.state['dac'])
+            end
         end
 
         if event == EVENT_VOLUME_UPDATED
