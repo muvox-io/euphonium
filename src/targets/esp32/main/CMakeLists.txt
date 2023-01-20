@@ -9,9 +9,14 @@ set(COMPONENT_ADD_INCLUDEDIRS
 
 set(COMPONENT_REQUIRES
     nvs_flash
-    esp_littlefs
     bt
+    driver
+    vfs
+    esp_netif
+    lwip
+    esp_timer
+    esp_wifi
     core)
-
 register_component()
+
 component_compile_options(-std=gnu++17 -Wformat-truncation -Wrestrict -Wswitch)

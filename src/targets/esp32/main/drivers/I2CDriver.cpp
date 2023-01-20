@@ -28,7 +28,7 @@ void i2cMasterWriteToDevice(int portNum, uint8_t deviceAddr, berry::list writeBu
         writeBufMapped.push_back(std::any_cast<int>(value));
     }
 
-    auto res = i2c_master_write_to_device(portNum, deviceAddr, writeBufMapped.data(), writeBuf.size(), 1000 / portTICK_RATE_MS);
+    auto res = i2c_master_write_to_device(portNum, deviceAddr, writeBufMapped.data(), writeBuf.size(), 1000 / portTICK_PERIOD_MS);
 
     if (res != ESP_OK) {
         BELL_LOG(info, "i2c", "Write failed!");
@@ -37,7 +37,7 @@ void i2cMasterWriteToDevice(int portNum, uint8_t deviceAddr, berry::list writeBu
 
 berry::list i2cMasterReadFromDevice(int portNum, uint8_t deviceAddr, int readSize) {
     auto result = std::vector<uint8_t>(readSize);
-    auto res = i2c_master_read_from_device(portNum, deviceAddr, result.data(), readSize, 1000 / portTICK_RATE_MS);
+    auto res = i2c_master_read_from_device(portNum, deviceAddr, result.data(), readSize, 1000 / portTICK_PERIOD_MS);
     if (res != ESP_OK) {
         BELL_LOG(info, "i2c", "Read failed!");
     }
@@ -57,7 +57,7 @@ berry::list i2cMasterWriteReadDevice(int portNum, uint8_t deviceAddr, berry::lis
     }
 
     auto result = std::vector<uint8_t>(readSize);
-    auto res = i2c_master_write_read_device(portNum, deviceAddr, writeBufMapped.data(), writeBufMapped.size(), result.data(), readSize, 1000 / portTICK_RATE_MS);
+    auto res = i2c_master_write_read_device(portNum, deviceAddr, writeBufMapped.data(), writeBufMapped.size(), result.data(), readSize, 1000 / portTICK_PERIOD_MS);
     if (res != ESP_OK) {
         BELL_LOG(info, "i2c", "Read / Write failed!");
     }
@@ -74,7 +74,7 @@ bool i2cDetect(int address) {
     i2c_master_start(cmd);
     i2c_master_write_byte(cmd, (address << 1) | WRITE_BIT, ACK_CHECK_EN);
     i2c_master_stop(cmd);
-    esp_err_t ret = i2c_master_cmd_begin(i2c_port, cmd, 50 / portTICK_RATE_MS);
+    esp_err_t ret = i2c_master_cmd_begin(i2c_port, cmd, 50 / portTICK_PERIOD_MS);
     i2c_cmd_link_delete(cmd);
     return ret == ESP_OK;
 }

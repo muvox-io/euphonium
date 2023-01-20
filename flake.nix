@@ -59,23 +59,24 @@
               ''
                 export IDF_PATH=$(pwd)/nix/esp-idf
                 export PATH=$IDF_PATH/tools:$PATH
-                export IDF_PYTHON_ENV_PATH=$(pwd)/nix/.python_env
+                export IDF_TOOLS_PATH=$(pwd)/nix/.espressif
+                export IDF_PYTHON_ENV_PATH=$IDF_TOOLS_PATH/python_env/idf5.0_py3.9_env
                 export EUPH_BUILD_CLI=$(pwd)/src/euph-build
                 export PATH=$EUPH_BUILD_CLI/bin:$PATH
 
                 if [ ! -e $IDF_PYTHON_ENV_PATH ]; then
+                  mkdir -p $IDF_TOOLS_PATH
+                  touch $IDF_TOOLS_PATH/espidf.constraints.v5.0.txt
                   python -m venv $IDF_PYTHON_ENV_PATH
                   . $IDF_PYTHON_ENV_PATH/bin/activate
-
-                  pip install -r $IDF_PATH/requirements.txt
+                  pip install -r $IDF_PATH/tools/requirements/requirements.core.txt
                   pip install -r $(pwd)/src/requirements.txt
                   pip install -r $(pwd)/docs/requirements.txt
-
                   yarn --cwd $EUPH_BUILD_CLI
                 else
                 . $IDF_PYTHON_ENV_PATH/bin/activate
                 fi
-                
+
                 echo 'Euphonium dev environment is now active'
                 echo 'Access the dev-tool, by calling `euph-build --help`'
               '';

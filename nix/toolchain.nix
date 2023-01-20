@@ -19,7 +19,7 @@ let
     "linux-armhf" = "04hv96gaarwhqa8n36pjx3mz1mqi27kxa6npmz3jljmhlidqhpdh";
     "linux-i686" = "1jvf58p96w7kd573dhh1qv8hzl0bmidq6ai1c4h7l80qn82y1y2x";
     "macos" = "1i2x1nsvk35v63kn74vczm6bgcgr0jhwlz4zk163ljh2vagi1bqr";
-    "macos-arm64" = "07bb9g6a14bd5l02xh6g4p4c1zpjs0qpgzszi49niabh5mvqjhdi";
+    "macos-arm64" = "0fvw5b9myjj1z298q2j51in9j94qnrhdk1addi4zs1skvjq4jwi9";
   };
   platform = platforms.${stdenv.system};
   toolchainHash = platformHash.${platform};
@@ -27,10 +27,10 @@ in
 
 stdenv.mkDerivation rec {
   pname = "esp32-toolchain";
-  version = "2021r2-patch5";
+  version = "2022r1";
 
   src = fetchurl {
-    url = "https://github.com/espressif/crosstool-NG/releases/download/esp-${version}/xtensa-esp32-elf-gcc8_4_0-esp-${version}-${platform}.tar.gz";
+    url = "https://github.com/espressif/crosstool-NG/releases/download/esp-${version}/xtensa-esp32-elf-gcc11_2_0-esp-${version}-${platform}.tar.xz";
     sha256 = toolchainHash;
   };
 

@@ -12,3 +12,4 @@ add_library(berry STATIC ${SOURCES})
 target_link_libraries(berry PRIVATE)
 
 target_include_directories(berry PUBLIC "src" "generate" "default" ${CMAKE_CURRENT_BINARY_DIR})
+add_definitions(-Wno-error=format -Wno-format -Wno-char-subscripts)

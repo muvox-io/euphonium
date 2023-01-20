@@ -1,4 +1,6 @@
 nix/.python_env
+nix/.espressif
+src/targets/esp32/managed_components
 dist/
 node_modules/
 .DS_Store

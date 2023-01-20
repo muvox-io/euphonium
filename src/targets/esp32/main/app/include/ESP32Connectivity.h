@@ -11,6 +11,7 @@
 #include "nvs_handle.hpp"
 #include "nlohmann/json.hpp"
 #include "fmt/format.h"
+#include <lwip/ip4_addr.h>
 
 #include "BellTask.h"
 #include "WrappedSemaphore.h"
