@@ -203,11 +203,27 @@
  * are not required.
  * The default is to use the functions in the standard library.
  **/
+#ifdef ESP_PLATFORM
+#include <esp_heap_caps.h>
+
+void* psram_malloc(size_t size);
+void* psram_realloc(void *ptr, size_t size);
+
+#define BE_EXPLICIT_ABORT               abort
+#define BE_EXPLICIT_EXIT                exit
+#define BE_EXPLICIT_MALLOC              psram_malloc
+#define BE_EXPLICIT_FREE                free
+#define BE_EXPLICIT_REALLOC             psram_realloc
+
+#else
+
 #define BE_EXPLICIT_ABORT               abort
 #define BE_EXPLICIT_EXIT                exit
 #define BE_EXPLICIT_MALLOC              malloc
 #define BE_EXPLICIT_FREE                free
 #define BE_EXPLICIT_REALLOC             realloc
+
+#endif
 
 /* Macro: be_assert
  * Berry debug assertion. Only enabled when BE_DEBUG is active.

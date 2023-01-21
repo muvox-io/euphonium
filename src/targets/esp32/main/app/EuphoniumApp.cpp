@@ -2,7 +2,7 @@
 
 using namespace euph;
 
-EuphoniumApp::EuphoniumApp() : bell::Task("app", 16 * 1024, 0, 0, false) {
+EuphoniumApp::EuphoniumApp() : bell::Task("app", 12 * 1024, 0, 0, false) {
   initializeEuphoniumLogger();
   initializeStorage();
 
@@ -40,9 +40,12 @@ void EuphoniumApp::runTask() {
   auto connectivity = std::make_shared<ESP32Connectivity>(eventBus);
   auto output = std::make_shared<euph::I2SAudioOutput>();
   auto statusTask = std::make_shared<euph::StatusLED>(eventBus);
+  auto memoryMonitor = std::make_shared<euph::MemoryMonitorTask>();
 
   auto core = std::make_unique<euph::Core>(connectivity, eventBus, output);
-  core->exportPlatformBindings = [=] (std::shared_ptr<euph::Context> ctx) {
+
+  core->exportPlatformBindings = [&core] (std::shared_ptr<euph::Context> ctx) {
+    core->registerAudioSource(std::make_unique<BluetoothSinkPlugin>(ctx));
     exportDrivers(ctx->vm);
   };
   core->handleEventLoop();

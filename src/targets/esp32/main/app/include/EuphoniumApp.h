@@ -11,6 +11,8 @@
 #include "ESP32Connectivity.h"
 #include "EuphLogger.h"
 #include "ESP32Platform.h"
+#include "BluetoothSinkPlugin.h"
+#include "MemoryMonitorTask.h"
 #include "StatusLED.h"
 #include "I2SAudioOutput.h"
 

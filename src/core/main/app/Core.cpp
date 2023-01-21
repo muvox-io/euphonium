@@ -28,7 +28,7 @@ void Core::initialize() {
       std::make_shared<euph::AudioTask>(this->ctx, this->audioOutput);
 
   // Register sources
-  this->audioSources.push_back(std::make_unique<RadioPlugin>(ctx));
+  this->registerAudioSource(std::make_unique<RadioPlugin>(ctx));
 
   this->http->initialize();
   this->audioOutput->setupBindings(ctx);
@@ -41,10 +41,6 @@ void Core::initialize() {
         "Cannot access file system, make sure the device is flashed properly.");
   }
 
-  for (auto& source : this->audioSources) {
-    source->initializeBindings();
-  }
-
   // Allow connectivity to register HTTP handlers
   this->connectivity->registerHandlers(this->http->getServer());
 
@@ -54,6 +50,10 @@ void Core::initialize() {
 
   if (this->exportPlatformBindings != nullptr) {
     this->exportPlatformBindings(this->ctx);
+  }
+
+  for (auto& source : this->audioSources) {
+    source->initializeBindings();
   }
 
   // Register an 'system' endpoint in HTTPDispatcher
@@ -91,6 +91,10 @@ void Core::handleEventLoop() {
     eventBus->eventSemaphore->wait();
     eventBus->update();
   }
+}
+
+void Core::registerAudioSource(std::unique_ptr<euph::AudioSourcePlugin> source) {
+  this->audioSources.push_back(std::move(source));
 }
 
 void Core::handleEvent(std::unique_ptr<Event>& event) {

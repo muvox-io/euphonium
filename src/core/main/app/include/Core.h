@@ -49,6 +49,7 @@ class Core : public euph::EventSubscriber {
   void initialize();
   void handleEvent(std::unique_ptr<Event>& event) override;
   void handleEventLoop();
+  void registerAudioSource(std::unique_ptr<euph::AudioSourcePlugin> source);
 
   // Used in platform implementations to export platform-specific bindings to the vm
   std::function<void(std::shared_ptr<euph::Context>)> exportPlatformBindings = nullptr;

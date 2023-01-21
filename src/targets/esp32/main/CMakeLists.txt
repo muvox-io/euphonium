@@ -1,10 +1,11 @@
 # Find all source files with
-file(GLOB COMPONENT_SRCS "*.cpp" "app/*.cpp" "drivers/*.cpp")
+file(GLOB COMPONENT_SRCS "*.cpp" "app/*.cpp" "drivers/*.cpp" "bluetooth_sink/*.cpp" "bluetooth_sink/*.c")
 
 set(COMPONENT_ADD_INCLUDEDIRS
     .
     app/include
     drivers/include
+    bluetooth_sink/include
     )
 
 set(COMPONENT_REQUIRES
@@ -19,4 +20,4 @@ set(COMPONENT_REQUIRES
     core)
 register_component()
 
-component_compile_options(-std=gnu++17 -Wformat-truncation -Wrestrict -Wswitch)
+component_compile_options(-std=gnu++17 -Wno-format -Wformat-truncation -Wrestrict -Wswitch -fdiagnostics-color=always)

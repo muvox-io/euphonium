@@ -11,9 +11,22 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef ESP_PLATFORM
+#include <esp_heap_caps.h>
+
 /* this file contains configuration for the file system. */
 
 /* standard input and output */
+
+void* psram_malloc(size_t size) {
+  return heap_caps_malloc(size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+}
+
+void* psram_realloc(void *ptr, size_t size) {
+  return heap_caps_realloc(ptr, size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+}
+
+#endif
 
 BERRY_API void be_writebuffer(const char *buffer, size_t length)
 {
