@@ -16,32 +16,31 @@ void PackageLoader::loadValidPackages() {
 
     std::string manifestPath = fmt::format("{}/{}/manifest.json", path, file);
 
-    // check if the manifest exists
-    std::ifstream manifestFile(manifestPath);
+    try {
+      std::string manifestContent = ctx->storage->readFile(manifestPath);
 
-    if (!manifestFile.good()) {
+      nlohmann::json manifest = nlohmann::json::parse(manifestContent);
+
+      // ensure that the manifest has all the required fields
+      if (!manifest.contains("name") || !manifest.contains("version") ||
+          !manifest.contains("description") || !manifest.contains("author") ||
+          !manifest.contains("init_hook")) {
+        EUPH_LOG(info, TAG, "Invalid manifest for package: %s", file.c_str());
+        continue;
+      }
+
+      PackageInfo info;
+      info.name = manifest["name"];
+      info.version = manifest["version"];
+      info.description = manifest["description"];
+      info.author = manifest["author"];
+      info.initHook = manifest["init_hook"];
+
+      this->packages.push_back(info);
+      EUPH_LOG(info, TAG, "Registered package: %s", info.name.c_str());
+    } catch (...) {
       continue;
     }
-
-    nlohmann::json manifest = nlohmann::json::parse(manifestFile);
-
-    // ensure that the manifest has all the required fields
-    if (!manifest.contains("name") || !manifest.contains("version") ||
-        !manifest.contains("description") || !manifest.contains("author") ||
-        !manifest.contains("init_hook")) {
-      EUPH_LOG(info, TAG, "Invalid manifest for package: %s", file.c_str());
-      continue;
-    }
-
-    PackageInfo info;
-    info.name = manifest["name"];
-    info.version = manifest["version"];
-    info.description = manifest["description"];
-    info.author = manifest["author"];
-    info.initHook = manifest["init_hook"];
-
-    this->packages.push_back(info);
-    EUPH_LOG(info, TAG, "Registered package: %s", info.name.c_str());
   }
 }
 
@@ -50,7 +49,8 @@ void PackageLoader::loadWithHook(const std::string& hook) {
   for (auto pkg : this->packages) {
     if (pkg.initHook == hook) {
       EUPH_LOG(info, TAG, "Loading package: %s", pkg.name.c_str());
-      std::string initPath = fmt::format("{}/pkgs/{}/init.be", ctx->rootPath, pkg.name);
+      std::string initPath =
+          fmt::format("{}/pkgs/{}/init.be", ctx->rootPath, pkg.name);
       std::string initCode = ctx->storage->readFile(initPath);
 
       ctx->vm->execute_string(initCode, pkg.name);

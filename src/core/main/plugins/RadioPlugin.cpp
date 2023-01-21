@@ -55,8 +55,8 @@ void RadioPlugin::runTask() {
       auto stream = std::make_unique<bell::EncodedAudioStream>();
       stream->openWithStream(std::move(req));
 
-      // Lock access to the central audio buffer.
-      ctx->audioBuffer->lockAccess();
+      this->ctx->playbackController->lockPlayback("radio");
+
 
       uint32_t trackHash = hashFunc(playbackUrl);
       size_t written, toWrite = 0;
@@ -79,6 +79,8 @@ void RadioPlugin::runTask() {
       }
 
       ctx->audioBuffer->unlockAccess();
+
+      this->ctx->playbackController->unlockPlayback();
       EUPH_LOG(info, TASK, "Playback finished, buffer unlocked");
     } catch (...) {
       EUPH_LOG(info, TASK, "Cannot play requested url");

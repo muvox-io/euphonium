@@ -21,7 +21,7 @@ export interface PlaybackTrack {
   artist: string;
   iconUrl: string;
   source: string;
-  name: string;
+  title: string;
   trackURI: string;
 }
 

@@ -29,13 +29,13 @@ const PlaybackImage = ({ playbackState }: PlaybackStateProps) => {
 
 const PlaybackSong = ({ playbackState }: PlaybackStateProps) => {
   const track = playbackState?.track;
-  if (!track?.name) {
+  if (!track?.title) {
     return (<div class="text-white ml-4">
       Queue empty
     </div>);
   }
 
-  return (<div class="text-white ml-4">{track?.name} <span class="text-app-text-secondary font-thin">via radio</span></div>)
+  return (<div class="text-white ml-4">{track?.title} <span class="text-app-text-secondary font-thin">via radio</span></div>)
 }
 
 const PlaybackVolume = ({ playbackState }: PlaybackStateProps) => {

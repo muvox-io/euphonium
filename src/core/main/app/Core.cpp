@@ -33,6 +33,17 @@ void Core::initialize() {
   this->http->initialize();
   this->audioOutput->setupBindings(ctx);
 
+  // For handling source switching
+  this->ctx->playbackController->playbackLockedHandler =
+      [this](const std::string& source) {
+        for (auto& audioSource : this->audioSources) {
+          // Signal every audio source, except for the origin to shutdown playback
+          if (audioSource->getName() != source) {
+            audioSource->shutdownAudio();
+          }
+        }
+      };
+
   try {
     this->pkgLoader->loadValidPackages();
   } catch (...) {
@@ -71,6 +82,7 @@ void Core::initialize() {
   this->pkgLoader->loadWithHook("plugin");
 
 #ifdef ESP_PLATFORM
+  this->pkgLoader->loadWithHook("plugin_esp32");
   this->pkgLoader->loadWithHook("platform_esp32");
 #else
   this->pkgLoader->loadWithHook("platform_desktop");
@@ -93,7 +105,8 @@ void Core::handleEventLoop() {
   }
 }
 
-void Core::registerAudioSource(std::unique_ptr<euph::AudioSourcePlugin> source) {
+void Core::registerAudioSource(
+    std::unique_ptr<euph::AudioSourcePlugin> source) {
   this->audioSources.push_back(std::move(source));
 }
 

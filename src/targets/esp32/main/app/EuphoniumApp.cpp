@@ -2,9 +2,22 @@
 
 using namespace euph;
 
-EuphoniumApp::EuphoniumApp() : bell::Task("app", 12 * 1024, 0, 0, false) {
+EuphoniumApp::EuphoniumApp() : bell::Task("app", 16 * 1024, 0, 0) {
   initializeEuphoniumLogger();
   initializeStorage();
+
+  this->eventBus = std::make_shared<euph::EventBus>();
+  this->connectivity = std::make_shared<ESP32Connectivity>(eventBus);
+  this->audioOutput = std::make_shared<euph::I2SAudioOutput>();
+  this->statusTask = std::make_shared<euph::StatusLED>(eventBus);
+  this->memoryMonitor = std::make_shared<euph::MemoryMonitorTask>();
+
+  this->core = std::make_unique<euph::Core>(connectivity, eventBus, audioOutput);
+
+  this->core->exportPlatformBindings = [this] (std::shared_ptr<euph::Context> ctx) {
+    this->core->registerAudioSource(std::make_unique<BluetoothSinkPlugin>(ctx));
+    exportDrivers(ctx->vm);
+  };
 
   startTask();
 }
@@ -36,18 +49,6 @@ void EuphoniumApp::initializeStorage() {
 }
 
 void EuphoniumApp::runTask() {
-  auto eventBus = std::make_shared<euph::EventBus>();
-  auto connectivity = std::make_shared<ESP32Connectivity>(eventBus);
-  auto output = std::make_shared<euph::I2SAudioOutput>();
-  auto statusTask = std::make_shared<euph::StatusLED>(eventBus);
-  auto memoryMonitor = std::make_shared<euph::MemoryMonitorTask>();
-
-  auto core = std::make_unique<euph::Core>(connectivity, eventBus, output);
-
-  core->exportPlatformBindings = [&core] (std::shared_ptr<euph::Context> ctx) {
-    core->registerAudioSource(std::make_unique<BluetoothSinkPlugin>(ctx));
-    exportDrivers(ctx->vm);
-  };
   core->handleEventLoop();
 
   while (true) {

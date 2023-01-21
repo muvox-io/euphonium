@@ -23,6 +23,9 @@ namespace euph {
 struct PlaybackController {
   std::atomic<bool> isPaused = false;
   std::atomic<bool> requestPause = false;
+  std::mutex playbackAccessMutex;
+
+  std::function<void(const std::string&)> playbackLockedHandler;
 
   void pause() {
     this->requestPause = true;
@@ -30,6 +33,18 @@ struct PlaybackController {
 
   void play() {
     this->isPaused = false;
+  }
+
+  void lockPlayback(const std::string& source) {
+    if (playbackLockedHandler != NULL) {
+      playbackLockedHandler(source);
+    }
+
+    playbackAccessMutex.lock();
+  }
+
+  void unlockPlayback() {
+    playbackAccessMutex.unlock();
   }
 };
 

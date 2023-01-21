@@ -29,8 +29,8 @@ class RadioPlugin : Plugin
 
   # prepares track metadata
   def handle_request_packet(request)
-    if (request.find('name') == nil)
-      request['name'] = 'HTTP Stream'
+    if (request.find('title') == nil)
+      request['title'] = 'HTTP Stream'
     end
 
     request['trackURI'] = 'http:' + request["url"]

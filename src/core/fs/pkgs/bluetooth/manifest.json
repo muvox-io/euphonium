@@ -1,0 +1,7 @@
+{
+  "name": "bluetooth",
+  "version": "0.1.0",
+  "description": "Bluetooth support on ESP32",
+  "author": "euphonium",
+  "init_hook": "plugin_esp32"
+}

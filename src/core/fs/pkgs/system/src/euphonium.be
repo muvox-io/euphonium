@@ -11,6 +11,13 @@ class EuphoniumInstance
         events.register_native("plugins_ready", def (data)
             self.broadcast_event(EVENT_PLUGIN_INIT, {})
         end)
+
+        events.register_native("volume", def (data)
+          if data["source"] == "remote"
+            self.apply_volume(int(data["value"]))
+            playback_state.update_remote()
+          end
+        end)
     end
 
     # Registers a new event handler

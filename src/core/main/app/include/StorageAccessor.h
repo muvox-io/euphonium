@@ -26,7 +26,7 @@ namespace euph {
 class StorageAccessor : public bell::Task {
  public:
   // Indicates the type of the operation
-  enum class OperationType { READ, WRITE };
+  enum class OperationType { READ, WRITE, LIST_DIRS };
 
   // Indicates the format of the data
   enum class OperationFormat {
@@ -47,6 +47,7 @@ class StorageAccessor : public bell::Task {
 
     std::vector<uint8_t> dataBinary;
     std::string dataText;
+    std::vector<std::string> dataPaths;
     struct mg_connection* dataCon;
   };
 

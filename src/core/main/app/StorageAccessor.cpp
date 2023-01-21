@@ -79,20 +79,20 @@ std::vector<uint8_t> StorageAccessor::readFileBinary(std::string_view path) {
 }
 
 std::vector<std::string> StorageAccessor::listFiles(std::string_view path) {
-  std::vector<std::string> files;
-  DIR* dir;
-  struct dirent* ent;
-  if ((dir = opendir(path.data())) != NULL) {
-    /* print all the files and directories within directory */
-    while ((ent = readdir(dir)) != NULL) {
-      files.push_back(ent->d_name);
-    }
-    closedir(dir);
+  this->currentOperation = Operation{
+      .type = OperationType::LIST_DIRS,
+      .format = OperationFormat::BINARY,
+      .path = (char*)path.data(),
+  };
+
+  this->requestSemaphore->give();
+  this->responseSemaphore->wait();
+
+  if (this->currentOperation.status == OperationStatus::SUCCESS) {
+    return this->currentOperation.dataPaths;
   } else {
-    /* could not open directory */
-    throw std::runtime_error("Failed to read file " + std::string(path));
+    throw std::runtime_error("Failed to list dirs");
   }
-  return files;
 }
 
 void StorageAccessor::readFileToSocket(std::string_view path,
@@ -207,8 +207,7 @@ void StorageAccessor::runTask() {
                   mgBytesLeft > HTTP_CHUNK_SIZE ? HTTP_CHUNK_SIZE : mgBytesLeft;
 
               // read file to temporary buffer
-              file.read((char*)mgBuffer.data(),
-                        toRead);
+              file.read((char*)mgBuffer.data(), toRead);
 
               size_t toReadBytes = file.gcount();
 
@@ -253,6 +252,27 @@ void StorageAccessor::runTask() {
         this->currentOperation.status = OperationStatus::FAILURE;
       }
     }
+
+    if (this->currentOperation.type == OperationType::LIST_DIRS) {
+      this->currentOperation.dataPaths = std::vector<std::string>();
+
+      std::ofstream file(this->currentOperation.path, std::ios::binary);
+      DIR* dir;
+      struct dirent* ent;
+      if ((dir = opendir(this->currentOperation.path)) != NULL) {
+        /* print all the files and directories within directory */
+        while ((ent = readdir(dir)) != NULL) {
+          this->currentOperation.dataPaths.push_back(ent->d_name);
+        }
+        closedir(dir);
+
+        this->currentOperation.status = OperationStatus::SUCCESS;
+      } else {
+
+        this->currentOperation.status = OperationStatus::FAILURE;
+      }
+    }
+
     this->responseSemaphore->give();
   }
 }

@@ -139,6 +139,8 @@ int main() {
   auto connectivity = std::make_shared<FakeConnectivity>(eventBus);
   auto core = std::make_unique<euph::Core>(connectivity, eventBus, output);
 
+  core->handleEventLoop();
+
   while (true) {
     BELL_SLEEP_MS(1000);
   }

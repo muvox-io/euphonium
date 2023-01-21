@@ -26,5 +26,12 @@ class EuphoniumApp : public bell::Task {
 
  private:
   void initializeStorage();
+  std::shared_ptr<euph::ESP32Connectivity> connectivity;
+  std::shared_ptr<euph::EventBus> eventBus;
+  std::shared_ptr<euph::I2SAudioOutput> audioOutput;
+  std::shared_ptr<euph::StatusLED> statusTask;
+  std::shared_ptr<euph::MemoryMonitorTask> memoryMonitor;
+
+  std::unique_ptr<euph::Core> core;
 };
 }  // namespace euph
