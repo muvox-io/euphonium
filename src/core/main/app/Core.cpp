@@ -87,10 +87,18 @@ void Core::initialize() {
 #else
   this->pkgLoader->loadWithHook("platform_desktop");
 #endif
+  initializePlugins();
+}
 
-  // Initialize plugins
-  auto event = std::make_unique<GenericVmEvent>("plugins_ready");
-  eventBus->postEvent(std::move(event));
+void Core::initializePlugins() {
+  // Only initialize plugins when connected completely
+  if (connectivity->data.state == Connectivity::State::CONNECTED &&
+      !pluginsInitialized) {
+    // Initialize plugins
+    auto event = std::make_unique<GenericVmEvent>("plugins_ready");
+    eventBus->postEvent(std::move(event));
+    pluginsInitialized = true;
+  }
 }
 
 void Core::handleEventLoop() {
@@ -141,6 +149,7 @@ void Core::handleEvent(std::unique_ptr<Event>& event) {
       switch (connectivityData.state) {
         case euph::Connectivity::State::CONNECTED: {
           this->initialize();
+          this->initializePlugins();
           EUPH_LOG(info, TAG, "Connected to %s", connectivityData.ssid.c_str());
           break;
         }

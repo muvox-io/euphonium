@@ -121,6 +121,8 @@ void ESP32Connectivity::initializeSTA() {
 }
 
 void ESP32Connectivity::initializeAP() {
+  this->jsonBody["error"] = false;
+
   isApMode = true;
   // Setup configuration for AP mode
   wifi_config_t apConfig = {};
@@ -204,6 +206,7 @@ void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
     esp_ip4addr_ntoa(&event->ip_info.ip, strIp, IP4ADDR_STRLEN_MAX);
 
     EUPH_LOG(info, TAG, "Connected, ip addr %s", strIp);
+
     this->data.ipAddr = strIp;
     this->data.type = ConnectivityType::WIFI_STA;
     this->data.state = Connectivity::State::CONNECTED;
@@ -211,6 +214,16 @@ void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
 
     this->dataUpdateSemaphore->give();
     this->persistConfig();
+
+    // Disable AP mode after successful connection
+    if (isApMode) {
+      // Give the server a bit to respond
+      BELL_SLEEP_MS(2000);
+
+      // Go back to STA mode
+      ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+      isApMode = false;
+    }
   } else if (event_base == WIFI_EVENT &&
              event_id == WIFI_EVENT_STA_DISCONNECTED) {
     if (this->data.state == Connectivity::State::CONNECTING) {
