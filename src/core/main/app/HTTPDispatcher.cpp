@@ -12,10 +12,10 @@ HTTPDispatcher::HTTPDispatcher(std::shared_ptr<euph::Context> ctx) {
   this->responseSemaphore = std::make_unique<bell::WrappedSemaphore>(20);
   int port = 8080;
 
-  // TODO: Handle it properly
-  #ifdef ESP_PLATFORM
-    port = 80;
-  #endif
+// TODO: Handle it properly
+#ifdef ESP_PLATFORM
+  port = 80;
+#endif
 
   this->server = std::make_shared<bell::BellHTTPServer>(port);
 }
@@ -25,6 +25,16 @@ HTTPDispatcher::~HTTPDispatcher() {}
 void HTTPDispatcher::initialize() {
   EUPH_LOG(debug, TAG, "Registering HTTP handlers");
   std::mutex serveMutex;
+
+  // Handle captive portal redirect
+  this->server->registerNotFound([this](struct mg_connection* conn) {
+    mg_printf(conn,
+              "HTTP/1.1 302 Temporary Redirect\r\nContent-Type: text/html"
+              "\r\nLocation: /\r\nAccess-Control-Allow-Origin: "
+              "*\r\nConnection: close\r\n\r\n"
+              "Redirect to the captive portal");
+    return this->server->makeEmptyResponse();
+  });
 
   this->server->registerGet("/web/**", [this](struct mg_connection* conn) {
     std::scoped_lock lock(webAccessMutex);

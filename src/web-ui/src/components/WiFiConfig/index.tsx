@@ -9,7 +9,7 @@ import Icon from '../ui/Icon';
 import Input from '../ui/NewInput';
 
 const FloatingCard = ({ children, header, className }: any) => {
-  return (<div class="bg-app-primary text-3xl text-app-text-primary pr-8 pt-8 pb-6 pl-8 rounded-[40px] m-auto flex flex-col">
+  return (<div class="bg-app-primary w-full lg:w-auto h-full lg:h-auto text-3xl text-app-text-primary pr-8 pt-8 pb-6 pl-8 lg:rounded-[40px] m-auto flex flex-col">
     {header}
     {children}
   </div>)
@@ -53,7 +53,7 @@ const NetworkList = ({ setConfigState, connectivity }: NetworkListParams) => {
   }
 
   return (<FloatingCard header="Configure WiFi">
-    <div class="text-[16px] text-app-text-secondary mt-3 mb-2 w-[500px] leading-6 flex flex-col">
+    <div class="text-[16px] text-app-text-secondary mt-3 mb-2 w-full lg:w-[500px] leading-6 flex flex-col">
       {hasNetworks ? "Available networks" : null}
 
       {hasNetworks ? connectivity?.body?.networks?.map((network: any) => {
@@ -94,12 +94,12 @@ const NetworkSelected = ({ setConfigState, network, connectivity }: NetworkSelec
   const connecting = connectivity?.state == 'CONNECTING';
 
   return (<FloatingCard header="Configure WiFi">
-    <div class="text-[16px] text-app-text-secondary mt-3 mb-2 w-[500px] leading-6">
+    <div class="text-[16px] text-app-text-secondary mt-3 mb-2 w-auto lg:w-[500px] leading-6">
       Selected network
       <NetworkItem name={network?.ssid} isOpen={network?.open} />
       {network?.open ? null : <>
         Network password
-        <Input type="password" class="mt-1 mb-2 text-2xl" height={55} onChange={setPassword} value={password}></Input></>}
+        <Input type="password" class="-mt-2 mb-2 text-2xl" height={55} onChange={setPassword} value={password}></Input></>}
 
 
       <div class={`${connectivity?.body?.error ? "visible" : "invisible"} text-red-500 text-l mb-4`}>Connection failed, recheck credentials</div>
@@ -122,7 +122,7 @@ interface NetworkConnectedParams {
 
 const NetworkConnected = ({ connectivity }: NetworkConnectedParams) => {
   return (<FloatingCard header="Configure WiFi">
-    <div class="text-[16px] text-app-text-secondary mt-3 mb-2 w-[500px] leading-6">
+    <div class="text-[16px] text-app-text-secondary mt-3 mb-2 w-auto lg:w-[500px] leading-6">
       Network connected successfully
       <div class="flex flex-row items-center text-lg pr-2 pl-6 h-[55px] text-app-text-primary rounded-2xl mt-2 mb-2 bg-app-secondary">
         {connectivity?.ip}

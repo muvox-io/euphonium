@@ -14,6 +14,7 @@ static void wifiEventHandler(void* arg, esp_event_base_t event_base,
 ESP32Connectivity::ESP32Connectivity(std::shared_ptr<euph::EventBus> eventBus)
     : bell::Task("Connectivity", 4 * 1024, 0, 0) {
   this->eventBus = eventBus;
+  this->captivePortalDNS = std::make_unique<euph::CaptivePortalTask>();
 
   this->data = {
       Connectivity::State::DISCONNECTED,
@@ -51,7 +52,7 @@ void ESP32Connectivity::initConfiguration() {
       nlohmann::json wifiConfigObj = nlohmann::json::parse(configStr.c_str());
 
       initializeSTA();
-      this->attemptConnect(wifiConfigObj["ssid"], wifiConfigObj["password"]);
+      this->attemptConnect("bonk", wifiConfigObj["password"]);
     } else {
       EUPH_LOG(info, TAG, "WiFi configuration not found, starting AP...");
       initializeAP();
@@ -170,6 +171,8 @@ void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
 
     // Update
     this->dataUpdateSemaphore->give();
+
+    this->captivePortalDNS->startTask();
   } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_SCAN_DONE) {
     // Scan finished
     uint16_t number = DEFAULT_SCAN_LIST_SIZE;

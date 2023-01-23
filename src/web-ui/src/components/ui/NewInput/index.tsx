@@ -34,7 +34,7 @@ export default ({
         placeholder={placeholder}
         className={`${
           icon ? "pl-10" : ""
-        } bg-app-secondary w-full p-3 rounded-xl min-w-[420px] self-stretch lg:self-auto lg:ml-auto`}
+        } bg-app-secondary w-full p-3 rounded-xl lg:min-w-[420px] self-stretch lg:self-auto lg:ml-auto`}
         value={value}
         type={type}
         style={{ height: `${height}px` }}

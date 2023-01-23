@@ -6,6 +6,11 @@
   color: var(--accent);
   position: relative;
   transition: 300ms;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
   @media screen and (max-width: 768px) {
     padding: 1rem 3rem;
   }

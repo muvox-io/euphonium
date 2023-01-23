@@ -15,6 +15,7 @@
 
 #include "BellTask.h"
 #include "WrappedSemaphore.h"
+#include "CaptivePortalTask.h"
 
 #include "Connectivity.h"
 #include "EuphLogger.h"
@@ -55,5 +56,6 @@ class ESP32Connectivity : public Connectivity, public bell::Task {
   std::atomic<bool> isScanning = false;
   bool isApMode = false;
   std::unique_ptr<bell::WrappedSemaphore> dataUpdateSemaphore;
+  std::unique_ptr<euph::CaptivePortalTask> captivePortalDNS;
 };
 }  // namespace euph

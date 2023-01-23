@@ -4,7 +4,7 @@ import Button from '../ui/Button';
 import WiFiConfigurator from '../WiFiConfig';
 
 const FloatingCard = ({ children, header, className }: any) => {
-  return (<div class="bg-app-primary text-3xl text-app-text-primary pr-8 pt-8 pb-6 pl-8 rounded-[40px] m-auto flex flex-col">
+  return (<div class="bg-app-primary h-screen lg:h-auto text-3xl text-app-text-primary pr-8 pt-8 pb-6 pl-8 lg:rounded-[40px] m-auto flex flex-col">
     {header}
     {children}
   </div>)
@@ -12,7 +12,7 @@ const FloatingCard = ({ children, header, className }: any) => {
 
 const OnboardingHello = ({ setOnboardingState }: any) => {
   return (<FloatingCard header="Hello!">
-    <div class="text-[16px] text-app-text-secondary mt-4 mb-20 w-[500px] leading-6">
+    <div class="text-[16px] text-app-text-secondary mt-4 mb-20 lg:w-[500px] leading-6">
       Thanks for trying out Euphonium. This wizard will guide you
       through the initial setup of your device.
       <br /><br />
