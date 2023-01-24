@@ -3,7 +3,7 @@
 using namespace euph;
 
 MemoryMonitorTask::MemoryMonitorTask()
-    : bell::Task("MemoryMonitor", 1024 * 2, 0, 1) {
+    : bell::Task("MemoryMonitor", 1024 * 4, 0, 1) {
   startTask();
 }
 

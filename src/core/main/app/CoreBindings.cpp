@@ -16,6 +16,7 @@ void CoreBindings::setupBindings() {
   ctx->vm->export_this("platform", this, &CoreBindings::_getPlatform, "core");
   ctx->vm->export_this("load", this, &CoreBindings::_loadScript, "core");
   ctx->vm->export_this("load_config", this, &CoreBindings::_loadConfig, "core");
+  ctx->vm->export_this("confirm_onboarding", this, &CoreBindings::_confirmOnboarding, "core");
   ctx->vm->export_this("save_config", this, &CoreBindings::_saveConfig, "core");
   ctx->vm->export_this("get_time_ms", this, &CoreBindings::_getTimeMs, "core");
   ctx->vm->export_this("trigger_pause", this, &CoreBindings::_triggerPause, "core");
@@ -85,6 +86,10 @@ bool CoreBindings::_saveConfig(std::string pkg, std::string cfg) {
   }
 
   return false;
+}
+
+void CoreBindings::_confirmOnboarding() {
+  this->ctx->storage->writeFile(".configured", "");
 }
 
 

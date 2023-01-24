@@ -23,6 +23,7 @@ class CoreBindings {
   void _loadScript(std::string pkg, std::string path);
   std::string _loadConfig(std::string pkg);
   bool _saveConfig(std::string pkg, std::string cfg);
+  void _confirmOnboarding();
   void _triggerPause(bool isPaused);
   long _getTimeMs();
 

@@ -16,7 +16,7 @@ class FakeConnectivity : public euph::Connectivity, public bell::Task {
  public:
   FakeConnectivity(std::shared_ptr<euph::EventBus> eventBus) : bell::Task("FakeConnectivity", 1024, 0, 0) {
     this->data = {
-      euph::Connectivity::State::DISCONNECTED,
+      euph::Connectivity::State::CONNECTED,
       euph::Connectivity::ConnectivityType::DEFAULT};
     this->eventSemaphore = std::make_unique<bell::WrappedSemaphore>(5);
     this->eventBus = eventBus;
@@ -71,10 +71,11 @@ class FakeConnectivity : public euph::Connectivity, public bell::Task {
   void runTask() override {
     BELL_SLEEP_MS(100);
 
-    data.state = euph::Connectivity::State::CONNECTED_NO_INTERNET;
-    data.type = euph::Connectivity::ConnectivityType::WIFI_AP;
+    data.state = euph::Connectivity::State::CONNECTED;
+    data.type = euph::Connectivity::ConnectivityType::WIFI_STA;
 
     this->sendStateUpdate();
+    return;
 
     while (true) {
       this->eventSemaphore->wait();

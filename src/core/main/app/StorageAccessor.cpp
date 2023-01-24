@@ -235,6 +235,7 @@ void StorageAccessor::runTask() {
 
     if (this->currentOperation.type == OperationType::WRITE) {
       std::ofstream file(this->currentOperation.path, std::ios::binary);
+      std::cout << this->currentOperation.path << std::endl;
 
       // if file doesnt exist, create it
       if (!file.is_open()) {

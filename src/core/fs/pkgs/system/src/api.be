@@ -111,6 +111,17 @@ http.handle(HTTP_POST, '/playback/eq', def (request)
     request.write_json(euphonium.playback_state, 200)
 end)
 
+
+http.handle(HTTP_POST, '/playback/dsp', def (request)
+    var body = request.json_body()
+
+    if body.find("transforms") != nil
+      playback.configure_dsp(json.dump(body))
+    end
+
+    request.write_json(playback_state.get_state(), 200)
+end)
+
 http.handle(HTTP_POST, '/playback/status', def (request)
     var body = request.json_body()
     playback_state.notify_state(body['state'])

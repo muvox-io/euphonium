@@ -52,7 +52,7 @@ void ESP32Connectivity::initConfiguration() {
       nlohmann::json wifiConfigObj = nlohmann::json::parse(configStr.c_str());
 
       initializeSTA();
-      this->attemptConnect("bonk", wifiConfigObj["password"]);
+      this->attemptConnect(wifiConfigObj["ssid"], wifiConfigObj["password"]);
     } else {
       EUPH_LOG(info, TAG, "WiFi configuration not found, starting AP...");
       initializeAP();

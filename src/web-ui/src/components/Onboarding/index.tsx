@@ -25,6 +25,23 @@ const OnboardingHello = ({ setOnboardingState }: any) => {
   </FloatingCard>)
 };
 
+const OnboardingHardwareDetected = ({ setOnboardingState }: any) => {
+  return (<FloatingCard header="Detected official hardware">
+    <div class="bg-app-secondary rounded-xl lg:w-[450px] flex flex-col justify-center items-center mt-5 mb-5">
+      <img class="w-[220px] mt-12 align-center" src="https://raw.githubusercontent.com/muvox-io/euphonium/f9676280584a502628a40afb9dca9f1a92297c36/docs/assets/boards/icon-muvox.svg"/>
+      <div class="mt-5">μVox amplifier</div>
+      <div class="text-xl text-app-text-secondary mb-6">revision 0.9</div>
+      
+    </div>
+
+    <Button onClick={() => {
+      setOnboardingState('WIFI')
+    }} class="primary text-xl h-[50px]">Confirm</Button>
+  </FloatingCard>)
+};
+
+
+
 interface OnboardingParams {
   connectivity: Connectivity
 }
@@ -33,6 +50,6 @@ export default ({connectivity}: OnboardingParams) => {
   const [onboardingState, setOnboardingState] = useState<'HELLO' | 'WIFI'>('HELLO');
 
   return <div class="flex justify-center h-screen">{
-    connectivity.state != "CONNECTED" ? (onboardingState == 'HELLO' ? <OnboardingHello setOnboardingState={setOnboardingState}/> : <WiFiConfigurator/>) : null
+    connectivity.state != "CONNECTED" ? (onboardingState == 'HELLO' ? <OnboardingHello setOnboardingState={setOnboardingState}/> : <WiFiConfigurator/>) : (<OnboardingHardwareDetected setOnboardingState={setOnboardingState}/>)
   }</div>
 };

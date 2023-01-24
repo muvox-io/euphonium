@@ -73,7 +73,8 @@ void Core::initialize() {
         nlohmann::json state = {
             {"connectivity", this->connectivity->getData().toJson()},
             {"version", "0.1.0"},
-            {"onboarding", false}};
+            {"onboarding", false},
+        };
         return this->http->getServer()->makeJsonResponse(state.dump());
       });
 

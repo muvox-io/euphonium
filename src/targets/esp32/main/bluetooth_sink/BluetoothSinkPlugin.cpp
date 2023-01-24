@@ -3,7 +3,7 @@
 using namespace euph;
 
 BluetoothSinkPlugin::BluetoothSinkPlugin(std::shared_ptr<euph::Context> ctx)
-    : bell::Task("bt_sink", 4 * 1024, 0, 1) {
+    : bell::Task("bt_sink", 4 * 1024, 1, 0) {
   this->ctx = ctx;
   this->a2dpDriver = std::make_unique<euph::A2DPDriver>();
 
@@ -34,10 +34,14 @@ BluetoothSinkPlugin::BluetoothSinkPlugin(std::shared_ptr<euph::Context> ctx)
     switch (event.type) {
       case A2DPDriver::EventType::VOLUME: {
         uint8_t volume = std::get<uint8_t>(event.data);
-        // Prepare audio event
-        auto event = std::make_unique<euph::AudioVolumeEvent>(
-            volume, AudioVolumeEvent::REMOTE);
-        this->ctx->eventBus->postEvent(std::move(event));
+        // Ensure no repeated events
+        if (volume != this->lastVolume) {
+          this->lastVolume = volume;
+          // Prepare audio event
+          auto event = std::make_unique<euph::AudioVolumeEvent>(
+              volume, AudioVolumeEvent::REMOTE);
+          this->ctx->eventBus->postEvent(std::move(event));
+        }
         break;
       }
       case A2DPDriver::EventType::PLAYBACK_STATE: {
@@ -54,7 +58,8 @@ BluetoothSinkPlugin::BluetoothSinkPlugin(std::shared_ptr<euph::Context> ctx)
         break;
       }
       case A2DPDriver::EventType::PLAYBACK_METADATA: {
-        A2DPDriver::PlaybackMetadata metadata = std::get<A2DPDriver::PlaybackMetadata>(event.data);
+        A2DPDriver::PlaybackMetadata metadata =
+            std::get<A2DPDriver::PlaybackMetadata>(event.data);
 
         // Prepare metadata event
         auto event = std::make_unique<MetadataEvent>(metadata);

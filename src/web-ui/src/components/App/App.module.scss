@@ -5,7 +5,6 @@
     padding: 0px;
     width: 100vw;
     min-height: 100vh;
-    background: var(--secondary-color);
 
     &__mainContent {
         flex-grow: 1;
@@ -14,11 +13,17 @@
     }
 }
 
+.mainWrapperWaves {
+    background: url(../../assets/waves-bg.svg);
+    background-size: auto 100%;
+}
+
+.mainWrapperStatic {
+    background: var(--secondary-color);
+}
+
 body {
     width: 100vw;
     height: 100vh;
-    background: url(@/assets/waves-bg.svg);
     font-family: "OpenSans";
-    background-size: auto 100%;
-
 }

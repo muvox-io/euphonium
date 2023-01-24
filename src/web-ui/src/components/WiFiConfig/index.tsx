@@ -99,7 +99,7 @@ const NetworkSelected = ({ setConfigState, network, connectivity }: NetworkSelec
       <NetworkItem name={network?.ssid} isOpen={network?.open} />
       {network?.open ? null : <>
         Network password
-        <Input type="password" class="-mt-2 mb-2 text-2xl" height={55} onChange={setPassword} value={password}></Input></>}
+        <Input type="password" class="-mt-2 lg:mt-2 mb-2 text-2xl" height={55} onChange={setPassword} value={password}></Input></>}
 
 
       <div class={`${connectivity?.body?.error ? "visible" : "invisible"} text-red-500 text-l mb-4`}>Connection failed, recheck credentials</div>

@@ -61,6 +61,7 @@ class BluetoothSinkPlugin : public AudioSourcePlugin, public bell::Task {
 
   std::atomic<bool> isRunning = false;
   std::atomic<bool> canPlay = false;
+  int lastVolume = 0;
   std::mutex runningMutex;
 };
 

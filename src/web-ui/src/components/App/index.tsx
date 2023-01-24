@@ -19,24 +19,26 @@ export function App() {
   updateTheme();
   return (
     <>
-      <div className={css.mainWrapper}>
-        <ConnectionLostModal></ConnectionLostModal>
-        <PlaybackDataContextProvider>
-          <div class="h-screen w-screen">
-            <Notifications />
-            {/* <Onboarding/> */}
-            <APIFetcher api={SystemAPI} fetch={(api) => api.getSystemInfo()}>
-              {(info: EuphoniumInfo) => {
-                if (info?.connectivity?.type == "WIFI_AP") {
-                  return <Onboarding connectivity={info.connectivity}/>
-                }
-
-                return <NormalComponent info={info}/>
-              }}
-            </APIFetcher>
-          </div>
-        </PlaybackDataContextProvider>
-      </div>
+      <APIFetcher api={SystemAPI} fetch={(api) => api.getSystemInfo()}>
+        {(info: EuphoniumInfo) => {
+          const onboarding = info?.connectivity?.state != "CONNECTED" || info?.onboarding;
+          return (
+            <div className={`${css.mainWrapper} ${onboarding ? css.mainWrapperWaves : css.mainWrapperStatic}`}>
+              <ConnectionLostModal></ConnectionLostModal>
+              <PlaybackDataContextProvider>
+                <div class="h-screen w-screen">
+                  <Notifications />
+                  {/* <Onboarding/> */}
+                  {onboarding ?
+                    (<Onboarding connectivity={info.connectivity} />)
+                    : (<NormalComponent info={info} />)
+                  }
+                </div>
+              </PlaybackDataContextProvider>
+            </div>
+          );
+        }}
+      </APIFetcher>
     </>
   );
 }
