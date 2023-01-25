@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchurl, makeWrapper, pkgs }:
+{ stdenv, lib, fetchurl, fetchgit, makeWrapper, pkgs }:
 
 let
   esp-idf = (pkgs.callPackage ./esp-idf.nix { });
@@ -14,10 +14,7 @@ stdenv.mkDerivation rec {
   pname = "euphonium-target-esp32";
   version = "0.1.0";
 
-  src = fetchGit {
-    url = ../.;
-    submodules = true;
-  };
+  src = ../.;
 
   buildInputs = with pkgs;
     [
@@ -57,13 +54,18 @@ stdenv.mkDerivation rec {
     export IDF_PYTHON_ENV_PATH=$IDF_TOOLS_PATH/python_env/idf5.0_py3.9_env
     . $IDF_PYTHON_ENV_PATH/bin/activate
 
-    cd core/external
-    ls -al
-
+    cd src/targets/esp32
+    idf.py build
   '';
 
   installPhase = ''
-    cp -r . $out
+    cd build
+
+    mkdir -p $out $out/bootloader $out/partition_table
+    cp storage.bin $out/storage.bin
+    cp euphonium-esp32.bin $out/euphonium-esp32.bin
+    cp bootloader/bootloader.bin $out/bootloader/bootloader.bin
+    cp partition_table/partition-table.bin $out/partition_table/partition-table.bin
   '';
 
   dontConfigure = true;

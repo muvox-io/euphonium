@@ -14,6 +14,7 @@
           inherit system;
         };
         target-esp32 = (pkgs.callPackage ./nix/target-esp32.nix { });
+        esp-idf = (pkgs.callPackage ./nix/esp-idf.nix { });
         darwinPackages =
           if pkgs.stdenv.isDarwin then [
             pkgs.darwin.apple_sdk.frameworks.CoreServices
@@ -50,7 +51,7 @@
 
                 # esp-idf specific
                 ncurses5
-                target-esp32
+                esp-idf
 
                 # Python, mostly for esp-idf
                 (python3.withPackages (p: with p; [ pip virtualenv ]))
@@ -61,9 +62,9 @@
               ] ++ darwinPackages;
 
             shellHook = ''
-              export ESP32=${target-esp32}
-              export IDF_PATH=${target-esp32}/sdk
-              export IDF_TOOLS_PATH=${target-esp32}/.espressif
+              export HOME=$TMP
+              export IDF_PATH=${esp-idf}/sdk
+              export IDF_TOOLS_PATH=${esp-idf}/.espressif
               export PATH=$IDF_PATH/tools:$PATH
 
               export IDF_PYTHON_ENV_PATH=$IDF_TOOLS_PATH/python_env/idf5.0_py3.9_env
