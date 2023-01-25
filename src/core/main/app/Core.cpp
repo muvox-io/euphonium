@@ -7,6 +7,7 @@ Core::Core(std::shared_ptr<euph::Connectivity> connectivity,
            std::shared_ptr<euph::EventBus> eventBus,
            std::shared_ptr<euph::AudioOutput> euphAudioOutput) {
   bell::createDecoders();
+
   this->eventBus = eventBus;
   this->connectivity = connectivity;
   this->audioOutput = euphAudioOutput;
