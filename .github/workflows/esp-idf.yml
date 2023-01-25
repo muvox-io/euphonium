@@ -12,4 +12,5 @@ jobs:
     - uses: cachix/install-nix-action@v18
       with:
         nix_path: nixpkgs=channel:nixos-22.05
+        extra_nix_config: "sandbox=false"
     - run: nix build '.?submodules=1#target-esp32' 
