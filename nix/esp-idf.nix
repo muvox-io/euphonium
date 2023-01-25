@@ -13,7 +13,7 @@ let
     "x86_64-windows" = "win64";
   };
   platformHash = {
-    "linux-amd64" = "0drd0pid0b5dc8j1ypbr78qqflp3sdq0z8q4wm0in0f21424xwcf";
+    "linux-amd64" = "0c6z97x9lq5q5x181473zc27kf80i2vgs6kxxf7x2xc2w43q93b9";
     "linux-arm64" = "1dw9l485wl64q4dhhpy1mzcdqzkin907hr7q85m78b7m5sn1glp7";
     "linux-armel" = "12qgd7v6yhvcp9vrrv0knys1lcl40jmc1kn6gsqhvz4n8khjdfvg";
     "linux-armhf" = "04hv96gaarwhqa8n36pjx3mz1mqi27kxa6npmz3jljmhlidqhpdh";
