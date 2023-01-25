@@ -13,15 +13,19 @@
         pkgs-unstable = import nixpkgs-unstable {
           inherit system;
         };
-        darwinPackages = if pkgs.stdenv.isDarwin then [
-          pkgs.darwin.apple_sdk.frameworks.CoreServices
-          pkgs.darwin.apple_sdk.frameworks.ApplicationServices
-          pkgs.darwin.apple_sdk.frameworks.Security
-        ] else
-          [
+        target-esp32 = (pkgs.callPackage ./nix/target-esp32.nix { });
+        darwinPackages =
+          if pkgs.stdenv.isDarwin then [
+            pkgs.darwin.apple_sdk.frameworks.CoreServices
+            pkgs.darwin.apple_sdk.frameworks.ApplicationServices
+            pkgs.darwin.apple_sdk.frameworks.Security
+          ] else
+            [
 
-          ];
-      in {
+            ];
+      in
+      {
+        packages.target-esp32 = target-esp32;
         devShells = {
           default = pkgs.mkShell {
             buildInputs = with pkgs;
@@ -45,8 +49,8 @@
                 fmt
 
                 # esp-idf specific
-                (pkgs.callPackage ./nix/toolchain.nix { })
                 ncurses5
+                target-esp32
 
                 # Python, mostly for esp-idf
                 (python3.withPackages (p: with p; [ pip virtualenv ]))
@@ -55,32 +59,18 @@
                 nodejs
                 yarn
               ] ++ darwinPackages;
-            shellHook =
-              ''
-                export IDF_PATH=$(pwd)/nix/esp-idf
-                export PATH=$IDF_PATH/tools:$PATH
-                export IDF_TOOLS_PATH=$(pwd)/nix/.espressif
-                export IDF_PYTHON_ENV_PATH=$IDF_TOOLS_PATH/python_env/idf5.0_py3.9_env
-                export EUPH_BUILD_CLI=$(pwd)/src/euph-build
-                export PATH=$EUPH_BUILD_CLI/bin:$PATH
 
-                if [ ! -e $IDF_PYTHON_ENV_PATH ]; then
-                  mkdir -p $IDF_TOOLS_PATH
-                  touch $IDF_TOOLS_PATH/espidf.constraints.v5.0.txt
-                  python -m venv $IDF_PYTHON_ENV_PATH
-                  . $IDF_PYTHON_ENV_PATH/bin/activate
-                  pip install -r $IDF_PATH/tools/requirements/requirements.core.txt
-                  pip install -r $(pwd)/src/requirements.txt
-                  pip install -r $(pwd)/docs/requirements.txt
-                  yarn --cwd $EUPH_BUILD_CLI
-                else
-                . $IDF_PYTHON_ENV_PATH/bin/activate
-                fi
+            shellHook = ''
+              export ESP32=${target-esp32}
+              export IDF_PATH=${target-esp32}/sdk
+              export IDF_TOOLS_PATH=${target-esp32}/.espressif
+              export PATH=$IDF_PATH/tools:$PATH
 
-                echo 'Euphonium dev environment is now active'
-                echo 'Access the dev-tool, by calling `euph-build --help`'
-              '';
+              export IDF_PYTHON_ENV_PATH=$IDF_TOOLS_PATH/python_env/idf5.0_py3.9_env
+              . $IDF_PYTHON_ENV_PATH/bin/activate
+            '';
           };
         };
+
       });
 }

@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchurl, makeWrapper, buildFHSUserEnv }:
+{ stdenv, lib, fetchurl, makeWrapper }:
 
 let
   platforms = {
