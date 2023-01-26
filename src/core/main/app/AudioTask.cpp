@@ -118,7 +118,6 @@ void AudioTask::runTask() {
 
         this->audioOutput->feedPCM(currentChunk.pcmData, dataSize);
       } else {
-        EUPH_LOG(info, TASK, "No audio?");
         BELL_SLEEP_MS(100);
       }
     } else {

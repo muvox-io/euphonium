@@ -308,6 +308,9 @@ template <>
 int VmState::ret<uint8_t>(const uint8_t r);
 
 template <>
+int VmState::ret<uint64_t>(const uint64_t r);
+
+template <>
 int VmState::ret<berry::map>(const berry::map r);
 
 template <>
@@ -339,6 +342,9 @@ berry::map VmState::arg<berry::map>(const int i);
 
 template <>
 uint8_t VmState::arg<uint8_t>(const int i);
+
+template <>
+uint64_t VmState::arg<uint64_t>(const int i);
 
 template <>
 berry::list VmState::arg<berry::list>(const int i);

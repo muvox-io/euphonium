@@ -23,6 +23,7 @@ export interface PlaybackTrack {
   source: string;
   title: string;
   trackURI: string;
+  timestamp: number;
 }
 
 export interface PlaybackState {

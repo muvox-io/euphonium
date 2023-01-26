@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <chrono>
 #include <fmt/core.h>
 
 #include "BellUtils.h"
@@ -22,6 +23,7 @@ class CoreBindings {
   std::string _getPlatform();
   void _loadScript(std::string pkg, std::string path);
   std::string _loadConfig(std::string pkg);
+  uint64_t _getTimestamp();
   bool _saveConfig(std::string pkg, std::string cfg);
   void _confirmOnboarding();
   void _triggerPause(bool isPaused);

@@ -11,11 +11,6 @@
   }
 }
 
-@font-face { 
-    font-family: 'OpenSans'; 
-    src: url("assets/OpenSans-Regular.woff2");
-}
-
 .body {
-  font-family: 'OpenSans';
+  font-family: 'Helvetica', 'Verdana', 'Roboto', sans-serif;
 }

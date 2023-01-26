@@ -11,7 +11,7 @@ import Icon from "../ui/Icon";
 
 const PluginIconMap = {
   dashboard: "home",
-  webradio: "radio",
+  radio: "radio",
   plugin: "playlist",
   general: "settings",
   hardware: "dac_settings",
@@ -35,7 +35,7 @@ const SideBarItem = ({ displayName = "", name = "", type = "" }) => {
               />
             </span>
 
-            <span class="font-thin">{displayName}</span>
+            <span class="font-normal">{displayName}</span>
             {matches ? (
               <div class="w-1 h-[30px] bg-app-accent ml-auto -mr-4 rounded-l-lg"></div>
             ) : (
@@ -57,8 +57,8 @@ type CategoryProps = {
 
 const SideBarCategory = ({ plugins, filterType, header }: CategoryProps) => {
   return (
-    <div className="flex flex-col space-y-3">
-      <div className="mt-3 text-lg text-app-text-secondary md:text-sm font-semibold">
+    <div className="flex flex-col space-y-4">
+      <div className="mt-4 text-lg text-app-text-secondary md:text-sm font-normal">
         {header}
       </div>
 

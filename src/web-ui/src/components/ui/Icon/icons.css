@@ -1,5 +1,5 @@
 @font-face {
-  font-family: "euphonium";
+  font-family: "euph";
   src: url("../../../assets/icons.ttf");
   font-weight: normal;
   font-style: normal;
@@ -9,7 +9,7 @@
 [class^="icon-"],
 [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: "euphonium" !important;
+  font-family: "euph" !important;
   speak: never;
   font-style: normal;
   font-weight: normal;
@@ -23,66 +23,67 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-moon:before {
-  content: "\e912";
-}
-.icon-edit:before {
-  content: "\e911";
-}
-.icon-search:before {
+.icon-radio:before {
   content: "\e900";
 }
-.icon-close:before {
+.icon-add:before {
   content: "\e901";
 }
-.icon-pause:before {
+.icon-copy:before {
   content: "\e902";
 }
-.icon-play:before {
+.icon-speaker_group:before {
   content: "\e903";
 }
-.icon-volume-up:before {
+.icon-bluetooth:before {
   content: "\e904";
 }
-.icon-volume-off:before {
+.icon-playlist:before {
   content: "\e905";
 }
-.icon-volume-down:before {
+.icon-speaker:before {
   content: "\e906";
 }
-.icon-home:before {
+.icon-equalize1:before {
   content: "\e907";
 }
-.icon-info:before {
-  content: "\e908";
-}
-.icon-music:before {
-  content: "\e909";
-}
-.icon-playlist:before {
+.icon-pause:before {
   content: "\e90a";
 }
-.icon-dac_settings:before {
+.icon-close:before {
   content: "\e90b";
 }
-.icon-settings:before {
+.icon-edit:before {
   content: "\e90c";
 }
-.icon-equalizer:before {
+.icon-lock:before {
   content: "\e90d";
 }
-.icon-speaker_group:before {
+.icon-home:before {
   content: "\e90e";
 }
-.icon-speaker:before {
+.icon-play:before {
   content: "\e90f";
 }
-.icon-radio:before {
+.icon-moon:before {
   content: "\e910";
+}
+.icon-search:before {
+  content: "\e986";
+}
+.icon-settings_sliders:before {
+  content: "\e992";
+}
+.icon-settings:before {
+  content: "\e994";
 }
 .icon-sun:before {
   content: "\e9d4";
 }
-.icon-rss:before {
-  content: "\ea9b";
+.icon-volume:before {
+  content: "\ea27";
 }
+.icon-volume_mute:before {
+  content: "\ea2a";
+}
+

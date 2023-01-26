@@ -6,10 +6,12 @@ STATE_EMPTY = 'queue_empty'
 class PlaybackState
   var current_track
   var settings
+  var recently_played
 
   def init()
     self.current_track = self.create_default_track()
     self.settings = self.create_default_settings()
+    self.recently_played = []
   end
 
   # initializes the current_track object
@@ -20,12 +22,26 @@ class PlaybackState
       'iconUrl': '',
       'artist': '',
       'album': '',
-      'source': ''
+      'source': '',
+      'timestamp': 0
     }
+  end
+
+  def append_recently_played(track)
+    track['timestamp'] = core.get_timestamp()
+    if self.recently_played.size() > 10
+      self.recently_played.remove(-1)
+    end
+
+    self.recently_played.push(track)
   end
 
   def notify_playback(track)
     self.current_track = track
+    if self.current_track.find('hidden') == nil || !self.current_track.find('hidden')
+      self.append_recently_played(track)
+    end
+
     self.update_remote()
   end
 

@@ -20,6 +20,7 @@ void CoreBindings::setupBindings() {
   ctx->vm->export_this("save_config", this, &CoreBindings::_saveConfig, "core");
   ctx->vm->export_this("get_time_ms", this, &CoreBindings::_getTimeMs, "core");
   ctx->vm->export_this("trigger_pause", this, &CoreBindings::_triggerPause, "core");
+  ctx->vm->export_this("get_timestamp", this, &CoreBindings::_getTimestamp, "core");
 }
 
 std::string CoreBindings::_getPlatform() {
@@ -39,6 +40,11 @@ void CoreBindings::_triggerPause(bool isPaused) {
   } else {
     this->ctx->playbackController->play();
   }
+}
+
+uint64_t CoreBindings::_getTimestamp() {
+  using namespace std::chrono;
+  return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 }
 
 void CoreBindings::_loadScript(std::string pkg, std::string path) {

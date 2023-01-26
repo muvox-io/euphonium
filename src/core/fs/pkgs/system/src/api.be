@@ -90,6 +90,10 @@ http.handle(HTTP_GET, '/playback', def (request)
     request.write_json(playback_state.get_state(), 200)
 end)
 
+http.handle(HTTP_GET, '/playback/recent', def (request)
+    request.write_json(playback_state.recently_played, 200)
+end)
+
 http.handle(HTTP_POST, '/playback/volume', def (request)
     var body = request.json_body()
     euphonium.apply_volume(int(body['volume']))

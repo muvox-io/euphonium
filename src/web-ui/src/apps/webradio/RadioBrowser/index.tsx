@@ -27,7 +27,7 @@ const Radio = ({
         }
       />
       <div class="font-normal max-w-[80%] -mt-1 mb-2 truncate">{name}</div>
-      <div class="font-thin text-sm truncate text-gray-400">
+      <div class="font-regular text-sm truncate text-gray-400">
         {codec} Codec • {bitrate} kbps • {countrycode}
       </div>
       <div class="bg-green-600 active:bg-green-800 text-white w-10 h-10 rounded-full absolute flex -bottom-2 -right-2 cursor-pointer">
@@ -56,7 +56,7 @@ export default () => {
             placeholder={"Search radios"}
             className="pl-10 bg-app-primary h-[45px] p-3 rounded-xl min-w-full"
             onChange={(e: any) =>
-              getStationsByName(e.target.value).then(setRadios)
+              getStationsByName(e.target.value, 30, 0).then(setRadios)
             }
           ></input>
           <div class="text-app-text-secondary left-1 top-3 absolute">
@@ -72,7 +72,7 @@ export default () => {
           icon="search"
         /> */}
         {radios.length > 0 && (
-          <div class="grid md:grid-cols-2 grid-cols-1 xl:grid-cols-5 gap-8 mt-5">
+          <div class="grid md:grid-cols-2 grid-cols-1 xl:grid-cols-3 gap-8 mt-5">
             {radios.map((radio) => (
               <Radio {...radio}></Radio>
             ))}

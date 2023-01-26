@@ -388,6 +388,12 @@ int VmState::ret<bint>(const bint r) {
 }
 
 template <>
+int VmState::ret<uint64_t>(const uint64_t r) {
+  number(r);
+  be_return(vm);
+}
+
+template <>
 int VmState::ret<int>(const int r) {
   number(r);
   be_return(vm);
@@ -425,6 +431,11 @@ bint VmState::arg<bint>(const int i) {
 
 template <>
 uint8_t VmState::arg<uint8_t>(const int i) {
+  return tonumber(i);
+}
+
+template <>
+uint64_t VmState::arg<uint64_t>(const int i) {
   return tonumber(i);
 }
 

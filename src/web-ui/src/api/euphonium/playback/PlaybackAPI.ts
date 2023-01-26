@@ -1,5 +1,5 @@
 import APIAccessor from "../../APIAccessor";
-import { EqSettings, PlaybackState } from "./models";
+import { EqSettings, PlaybackState, PlaybackTrack } from "./models";
 
 const debounce = function <T extends (...args: any[]) => void>(
   callback: T,
@@ -76,6 +76,8 @@ export default class PlaybackAPI {
       state: isPaused ? "paused" : "playing",
     });
 
+  getRecentlyPlayed = () => this.apiAccessor.fetch<PlaybackTrack[]>("GET", "/playback/recent");
+
   playRadio = (
     stationName: string,
     favicon: string,
@@ -83,7 +85,7 @@ export default class PlaybackAPI {
   ) =>
     this.apiAccessor.fetch<void>("POST", "/radio/play", {
       url: stationUrl,
-      name: stationName,
+      title: stationName,
       iconUrl: favicon
     });
 }
