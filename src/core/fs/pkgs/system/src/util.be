@@ -4,8 +4,7 @@ class Util
     # Generates a deterministic name based on the mac address of the ESP
     # Example: Free navy school 13fc
     def generate_device_name()
-       
-        var mac = wifi.get_mac()
+        var mac = core.get_mac()
         var macParts = string.split(mac, ':')
         var last2Bytes =  macParts.pop()
         last2Bytes = macParts.pop() + last2Bytes
@@ -78,8 +77,5 @@ class Util
     end
 
 end
-
 util = Util()
 
-print("UTIL LOADED")
-print(util)

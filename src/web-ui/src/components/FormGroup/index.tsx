@@ -3,7 +3,9 @@ import {
   ConfigurationField,
   ConfigurationFieldType,
 } from "../../api/euphonium/plugins/models";
+import useIsMobile from "../../utils/isMobile.hook";
 import IconCard from "../ui/IconCard";
+import Separator from "../ui/Separator/Separator";
 import CheckboxField from "./fields/CheckboxField";
 import { FieldProps } from "./fields/FieldProps";
 import LinkButton from "./fields/LinkButton";
@@ -38,9 +40,10 @@ export default function FormGroup({
   label,
   onChangeFinished
 }: FormGroupProps) {
+  const isMobile = useIsMobile();
   return (
     <IconCard iconName="settings" label={label}>
-      <div class="flex flex-col space-y-5">
+      <div class="flex flex-col md:space-y-5">
         {fields.map((field) => {
           const FieldComponent: AnyComponent<FieldProps<any>> =
             FIELD_COMPONENTS[field.type];
@@ -48,15 +51,20 @@ export default function FormGroup({
             return <p>Unsupported field type: {field.type}</p>;
           }
           return (
-            <FieldComponent
-              key={field.key}
-              field={field}
-              value={value[field.key]}
-              onChange={(fieldValue: any) =>
-                onChange({ ...value, [field.key]: fieldValue })
-              }
-              onChangeFinished={onChangeFinished}
-            />
+            <>
+              <div class="mt-4 mb-4 md:mt-0 md:mb-0"> 
+                <FieldComponent
+                  key={field.key}
+                  field={field}
+                  value={value[field.key]}
+                  onChange={(fieldValue: any) =>
+                    onChange({ ...value, [field.key]: fieldValue })
+                  }
+                  onChangeFinished={onChangeFinished}
+                />
+              </div>
+              {isMobile ? <Separator /> : null}
+            </>
           );
         })}
       </div>

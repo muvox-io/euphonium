@@ -90,13 +90,13 @@ AudioTask::~AudioTask() {}
 
 void AudioTask::runTask() {
   EUPH_LOG(info, TASK, "Audio thread running");
-  bell::CentralAudioBuffer::AudioChunk currentChunk = {.pcmSize = 0};
+  bell::CentralAudioBuffer::AudioChunk* currentChunk;
+  uint32_t lastSampleRate = 44100;
 
   while (true) {
     if (!this->ctx->playbackController->isPaused) {
       // Handle pause request
       if (this->ctx->playbackController->requestPause) {
-
         std::scoped_lock lock(this->dspMutex);
         this->ctx->playbackController->requestPause = false;
 
@@ -109,14 +109,27 @@ void AudioTask::runTask() {
 
       currentChunk = this->ctx->audioBuffer->readChunk();
 
-      if (currentChunk.pcmSize > 0) {
+      if (currentChunk && currentChunk->pcmSize > 0) {
         std::scoped_lock lock(this->dspMutex);
+        if (lastSampleRate != currentChunk->sampleRate) {
+          lastSampleRate = currentChunk->sampleRate;
+          this->audioOutput->configure(static_cast<uint32_t>(lastSampleRate), 2,
+                                       16);
+        }
         // Pass data to DSP
-        size_t dataSize = this->dsp->process(
-            currentChunk.pcmData, currentChunk.pcmSize, 2,
-            bell::SampleRate::SR_44100, bell::BitWidth::BW_16);
+        size_t dataSize =
+            this->dsp->process(currentChunk->pcmData, currentChunk->pcmSize, 2,
+                               currentChunk->sampleRate, bell::BitWidth::BW_16);
 
-        this->audioOutput->feedPCM(currentChunk.pcmData, dataSize);
+        bell::tv scheduledTimestamp(currentChunk->sec, currentChunk->usec);
+
+        int64_t diff = (scheduledTimestamp - bell::tv::now()).ms();
+        while (diff > 25) {
+          BELL_SLEEP_MS(2);
+          diff = (scheduledTimestamp - bell::tv::now()).ms();
+        }
+
+        this->audioOutput->feedPCM(currentChunk->pcmData, dataSize);
       } else {
         BELL_SLEEP_MS(100);
       }

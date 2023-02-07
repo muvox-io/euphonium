@@ -19,6 +19,7 @@ class FormContext
         self.safe_copy_field(configuration, field, 'hint')
         self.safe_copy_field(configuration, field, 'default')
         self.safe_copy_field(configuration, field, 'group')
+        self.safe_copy_field(configuration, field, 'hidden')
 
         self.fields.push(field)
     end
@@ -35,6 +36,7 @@ class FormContext
         self.safe_copy_field(configuration, field, 'hint')
         self.safe_copy_field(configuration, field, 'default')
         self.safe_copy_field(configuration, field, 'group')
+        self.safe_copy_field(configuration, field, 'hidden')
 
         self.fields.push(field)
     end
@@ -63,6 +65,7 @@ class FormContext
         self.safe_copy_field(configuration, field, 'hint')
         self.safe_copy_field(configuration, field, 'default')
         self.safe_copy_field(configuration, field, 'group')
+        self.safe_copy_field(configuration, field, 'hidden')
 
         self.fields.push(field)
     end

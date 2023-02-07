@@ -1,5 +1,4 @@
 #include "Core.h"
-#include "DecoderGlobals.h"
 
 using namespace euph;
 
@@ -30,6 +29,7 @@ void Core::initialize() {
 
   // Register sources
   this->registerAudioSource(std::make_unique<RadioPlugin>(ctx));
+  this->registerAudioSource(std::make_unique<SnapcastPlugin>(ctx));
 
   this->http->initialize();
   this->audioOutput->setupBindings(ctx);

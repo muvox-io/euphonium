@@ -1,0 +1,7 @@
+{
+  "name": "snapcast",
+  "version": "0.1.0",
+  "description": "Snapcast support",
+  "author": "euphonium",
+  "init_hook": "plugin"
+}

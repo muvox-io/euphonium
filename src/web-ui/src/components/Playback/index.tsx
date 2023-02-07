@@ -21,7 +21,7 @@ interface PlaybackStateProps {
 const PlaybackImage = ({ playbackState }: PlaybackStateProps) => {
   if (!playbackState?.track?.iconUrl) return (<></>)
   return (<div><div class="absolute bg-gray-500 w-[80px] h-[80px] left-6 bottom-2 rounded-xl">
-    <img src={playbackState?.track?.iconUrl} class="rounded-xl"></img>
+    <img src={playbackState?.track?.iconUrl} class="rounded-xl w-full h-full bg-white object-contain"></img>
 
   </div><div class="w-[90px]"></div></div>)
 

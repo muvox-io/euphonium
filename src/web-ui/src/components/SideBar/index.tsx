@@ -8,13 +8,15 @@ import PluginsAPI from "../../api/euphonium/plugins/PluginsAPI";
 import APIFetcher from "../APIFetcher";
 
 import Icon from "../ui/Icon";
+import Separator from "../ui/Separator/Separator";
 
 const PluginIconMap = {
   dashboard: "home",
   radio: "radio",
   plugin: "playlist",
-  general: "settings",
-  hardware: "dac_settings",
+  general_settings: "settings",
+  hardware: "settings_sliders",
+  portaudio: "settings_sliders",
 } as { [key: string]: string };
 
 const SideBarItem = ({ displayName = "", name = "", type = "" }) => {
@@ -25,7 +27,7 @@ const SideBarItem = ({ displayName = "", name = "", type = "" }) => {
       <Match path={hrefUrl}>
         {({ matches, path, url }: any) => (
           <div
-            class={`text-m flex flex-row items-center ${
+            class={`text-l md:text-m flex flex-row items-center ${
               matches ? "text-app-accent" : "text-app-text-secondary "
             }`}
           >
@@ -45,7 +47,6 @@ const SideBarItem = ({ displayName = "", name = "", type = "" }) => {
         )}
       </Match>
     </Link>
-    // </SelectItem>
   );
 };
 
@@ -57,8 +58,9 @@ type CategoryProps = {
 
 const SideBarCategory = ({ plugins, filterType, header }: CategoryProps) => {
   return (
-    <div className="flex flex-col space-y-4">
-      <div className="mt-4 text-lg text-app-text-secondary md:text-sm font-normal">
+    <div className="flex flex-col space-y-4 mt-4">
+      <Separator/>
+      <div className="text-sm text-app-text-secondary md:text-sm font-normal">
         {header}
       </div>
 
@@ -75,7 +77,7 @@ export default ({ version = "", theme = "", onThemeChange = () => {} }) => {
   return (
     <div className="flex align-start relative md:w-[220px] md:min-w-[220px] flex-col bg-app-primary p-8 md:p-4 h-screen text-m space-y-2 overflow-y-auto">
       <div className="text-3xl md:text-2xl">Euphonium</div>
-      <div className="text-xs md:text-m text-app-text-secondary pb-3">
+      <div className="text-xs md:text-m text-app-text-secondary pb-5 md:pb-3">
         tiny audio platform
       </div>
       <APIFetcher

@@ -13,7 +13,7 @@ export default ({
 }: SelectProps) => {
   return (
     <div class="min-w-full flex flex-row items-center">
-      <div class="text-app-text-secondary font-thin text-l mb-2 mt-2">
+      <div class="text-app-text-secondary font-light text-m">
         {tooltip}
       </div>
       <div class="bg-app-secondary rounded-xl pr-2 ml-auto">

@@ -13,6 +13,7 @@ export default function NumberField({
       tooltip={field.label}
       width={90}
       value={value}
+      singleLine={true}
       onChange={(str) => onChange(str)}
       onBlur={onChangeFinished}
     />

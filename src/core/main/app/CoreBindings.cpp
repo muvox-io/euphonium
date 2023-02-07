@@ -16,11 +16,15 @@ void CoreBindings::setupBindings() {
   ctx->vm->export_this("platform", this, &CoreBindings::_getPlatform, "core");
   ctx->vm->export_this("load", this, &CoreBindings::_loadScript, "core");
   ctx->vm->export_this("load_config", this, &CoreBindings::_loadConfig, "core");
-  ctx->vm->export_this("confirm_onboarding", this, &CoreBindings::_confirmOnboarding, "core");
+  ctx->vm->export_this("confirm_onboarding", this,
+                       &CoreBindings::_confirmOnboarding, "core");
   ctx->vm->export_this("save_config", this, &CoreBindings::_saveConfig, "core");
   ctx->vm->export_this("get_time_ms", this, &CoreBindings::_getTimeMs, "core");
-  ctx->vm->export_this("trigger_pause", this, &CoreBindings::_triggerPause, "core");
-  ctx->vm->export_this("get_timestamp", this, &CoreBindings::_getTimestamp, "core");
+  ctx->vm->export_this("trigger_pause", this, &CoreBindings::_triggerPause,
+                       "core");
+  ctx->vm->export_this("get_timestamp", this, &CoreBindings::_getTimestamp,
+                       "core");
+  ctx->vm->export_this("get_mac", this, &CoreBindings::_getMac, "core");
 }
 
 std::string CoreBindings::_getPlatform() {
@@ -44,7 +48,8 @@ void CoreBindings::_triggerPause(bool isPaused) {
 
 uint64_t CoreBindings::_getTimestamp() {
   using namespace std::chrono;
-  return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+  return duration_cast<milliseconds>(system_clock::now().time_since_epoch())
+      .count();
 }
 
 void CoreBindings::_loadScript(std::string pkg, std::string path) {
@@ -63,8 +68,7 @@ void CoreBindings::_loadScript(std::string pkg, std::string path) {
 }
 
 std::string CoreBindings::_loadConfig(std::string pkg) {
-  std::string configPath =
-      fmt::format("{}/cfg/{}.json", ctx->rootPath, pkg);
+  std::string configPath = fmt::format("{}/cfg/{}.json", ctx->rootPath, pkg);
 
   EUPH_LOG(debug, TAG, "Loading config for [%s]", pkg.c_str());
 
@@ -79,8 +83,7 @@ std::string CoreBindings::_loadConfig(std::string pkg) {
 }
 
 bool CoreBindings::_saveConfig(std::string pkg, std::string cfg) {
-  std::string configPath =
-      fmt::format("{}/cfg/{}.json", ctx->rootPath, pkg);
+  std::string configPath = fmt::format("{}/cfg/{}.json", ctx->rootPath, pkg);
 
   EUPH_LOG(debug, TAG, "Loading config for [%s]", pkg.c_str());
 
@@ -98,6 +101,9 @@ void CoreBindings::_confirmOnboarding() {
   this->ctx->storage->writeFile(".configured", "");
 }
 
+std::string CoreBindings::_getMac() {
+  return "84:3c:08:25:0d:89";
+}
 
 long CoreBindings::_getTimeMs() {
   return std::chrono::duration_cast<std::chrono::milliseconds>(

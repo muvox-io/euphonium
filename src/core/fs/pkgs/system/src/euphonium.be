@@ -44,10 +44,6 @@ class EuphoniumInstance
     end
 
     def send_notification(type, from, text, submessage)
-        var second_message = ""
-        if submessage != nil 
-            second_message = submessage
-        end
         http.emit_event("notification", { 'type': type, 'message': text, 'source': from, 'submessage': submessage })
     end
 

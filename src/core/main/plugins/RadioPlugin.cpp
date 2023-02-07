@@ -50,25 +50,39 @@ void RadioPlugin::runTask() {
     std::scoped_lock playbackLock(runningMutex);
 
     try {
-      auto req = bell::HTTPStream::get(playbackUrl);
+      auto req = bell::HTTPClient::get(playbackUrl);
 
-      auto stream = std::make_unique<bell::EncodedAudioStream>();
-      stream->openWithStream(std::move(req));
+      auto container =
+          bell::AudioContainers::guessAudioContainer(req->stream());
+      if (container == nullptr) {
+        throw std::runtime_error("Unsupported codec container");
+      }
+
+      auto codec = bell::AudioCodecs::getCodec(container.get());
+      bool setupResult = codec->setup(container.get());
+      if (codec == nullptr || !setupResult) {
+        throw std::runtime_error("Requested codec unsupported");
+      }
 
       this->ctx->playbackController->lockPlayback("radio");
 
-
       uint32_t trackHash = hashFunc(playbackUrl);
-      size_t written, toWrite = 0;
+      uint32_t outlen, toWrite, written = 0;
+      uint8_t* data;
 
       // Guard playback only while song is requested
       while (isRunning) {
-        size_t readSize = stream->decodeFrame(dataTmp.data());
-        toWrite = readSize;
+        data = codec->decode(container.get(), outlen);
+        if (data == nullptr)
+          continue;
+        if (outlen < 128)
+          continue;
+        toWrite = outlen;
 
         while (toWrite > 0) {
           written = ctx->audioBuffer->writePCM(
-              dataTmp.data() + (readSize - toWrite), toWrite, trackHash);
+              data + (outlen - toWrite), toWrite, trackHash, codec->sampleRate,
+              codec->channelCount, bell::BitWidth::BW_16);
           toWrite -= written;
 
           // Buffer full, wait
@@ -79,7 +93,6 @@ void RadioPlugin::runTask() {
       }
 
       ctx->audioBuffer->unlockAccess();
-
       this->ctx->playbackController->unlockPlayback();
       EUPH_LOG(info, TASK, "Playback finished, buffer unlocked");
     } catch (...) {

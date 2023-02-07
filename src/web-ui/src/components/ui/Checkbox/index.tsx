@@ -6,8 +6,8 @@ type CheckboxProps = {
 
 export default ({ label = "", value, onChange }: CheckboxProps) => {
   return (
-    <div class="min-w-full flex flex-col items-start lg:flex-row lg:items-center">
-      <div class="text-app-text-secondary font-thin text-l mb-2 mt-2">
+    <div class="min-w-full flex flex-row items-center">
+      <div class="text-app-text-secondary font-light text-m">
         {label}
       </div>
       <input
@@ -18,7 +18,7 @@ export default ({ label = "", value, onChange }: CheckboxProps) => {
         id="checkbox"
         aria-describedby="checkbox"
         type="checkbox"
-        class="bg-app-secondary h-[45px]  p-3 rounded-xl min-w-[20px] self-stretch lg:self-auto lg:ml-auto"
+        class="bg-app-secondary h-[20px] md:h-[40px] p-3 rounded-xl min-w-[20px] lg:self-auto ml-auto"
       />
     </div>
   );

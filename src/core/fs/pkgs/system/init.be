@@ -18,8 +18,10 @@ core.load("system", "src/http.be")
 core.load("system", "src/hooks.be")
 core.load("system", "src/form_ctx.be")
 core.load("system", "src/plugin.be")
+core.load("system", "src/util.be")
 
 # Load core classes, http apis
 core.load("system", "src/playback.be")
 core.load("system", "src/euphonium.be")
+core.load("system", "src/general_settings.be")
 core.load("system", "src/api.be")

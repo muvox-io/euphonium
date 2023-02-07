@@ -27,6 +27,7 @@ class CoreBindings {
   bool _saveConfig(std::string pkg, std::string cfg);
   void _confirmOnboarding();
   void _triggerPause(bool isPaused);
+  std::string _getMac();
   long _getTimeMs();
 
  private:
