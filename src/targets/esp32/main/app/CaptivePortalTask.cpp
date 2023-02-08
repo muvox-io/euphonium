@@ -1,4 +1,5 @@
 #include "CaptivePortalTask.h"
+#include <mutex>
 
 using namespace euph;
 
@@ -183,8 +184,14 @@ void CaptivePortalTask::dnsRecv(struct sockaddr_in* premoteAddr, char* pusrdata,
          (struct sockaddr*)premoteAddr, sizeof(struct sockaddr_in));
 }
 
-void CaptivePortalTask::runTask() {
+void CaptivePortalTask::stopTask() {
+  isRunning = false;
+  std::scoped_lock lock(this->runningMutex);
+}
 
+void CaptivePortalTask::runTask() {
+  std::scoped_lock lock(this->runningMutex);
+  isRunning = true;
   struct sockaddr_in server_addr;
   uint32_t ret;
   struct sockaddr_in from;
@@ -213,10 +220,14 @@ void CaptivePortalTask::runTask() {
       vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
   } while (ret != 0);
+  struct timeval timeout;
 
-  EUPH_LOG(info, TASK, "DNS initialized");
+  // Set timeout to 1 second, so we can exit the loop at some point
+  timeout.tv_sec = 1;
+  timeout.tv_usec = 0;
+  setsockopt(sockFd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof timeout);
 
-  while (1) {
+  while (isRunning) {
     memset(&from, 0, sizeof(from));
     fromlen = sizeof(struct sockaddr_in);
     ret =
@@ -225,4 +236,7 @@ void CaptivePortalTask::runTask() {
     if (ret > 0)
       this->dnsRecv(&from, udp_msg, ret);
   }
+
+  isRunning = false;
+  ::close(sockFd);
 }

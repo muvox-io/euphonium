@@ -20,4 +20,4 @@ set(COMPONENT_REQUIRES
     core)
 register_component()
 
-component_compile_options(-std=gnu++17 -Wno-format -Wformat-truncation -Wrestrict -Wswitch -fdiagnostics-color=always)
+component_compile_options(-std=gnu++20 -Wno-format -Wformat-truncation -Wrestrict -Wswitch -fdiagnostics-color=always)

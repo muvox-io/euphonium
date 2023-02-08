@@ -121,6 +121,27 @@ void ESP32Connectivity::initializeSTA() {
   ESP_ERROR_CHECK(esp_wifi_start());
 }
 
+void ESP32Connectivity::displayNameLoaded(std::string& name) {
+  if (this->isApMode) {
+    // Stop the captive portal DNS task
+    this->captivePortalDNS->stopTask();
+
+    wifi_config_t apConfig = {};
+    memset(&apConfig, 0, sizeof(apConfig));
+    esp_wifi_get_config(WIFI_IF_AP, &apConfig);
+
+    // Copy the name into the SSID
+    strcpy((char*)apConfig.ap.ssid, name.c_str());
+    apConfig.ap.ssid_len = name.size();
+
+    esp_wifi_stop();
+    // Apply the new configuration
+    esp_wifi_set_config(WIFI_IF_AP, &apConfig);
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
+    esp_wifi_start();
+  }
+}
+
 void ESP32Connectivity::initializeAP() {
   this->jsonBody["error"] = false;
 
@@ -149,7 +170,7 @@ void ESP32Connectivity::initializeAP() {
   // set AP's credentials
   strcpy((char*)apConfig.ap.ssid, apSsid.c_str());
   strcpy((char*)apConfig.ap.password, apPasswd.c_str());
-  apConfig.ap.ssid_len = apSsid.size();
+  apConfig.ap.ssid_len = apSsid.length();
 
   esp_wifi_stop();
   ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
@@ -157,7 +178,6 @@ void ESP32Connectivity::initializeAP() {
   ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &staConfig));
 
   ESP_ERROR_CHECK(esp_wifi_start());
-  std::cout << "Starting ap mode" << std::endl;
 }
 
 void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
@@ -209,6 +229,7 @@ void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
     esp_ip4addr_ntoa(&event->ip_info.ip, strIp, IP4ADDR_STRLEN_MAX);
 
     EUPH_LOG(info, TAG, "Connected, ip addr %s", strIp);
+    this->captivePortalDNS->stopTask();
 
     this->data.ipAddr = strIp;
     this->data.type = ConnectivityType::WIFI_STA;

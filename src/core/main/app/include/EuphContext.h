@@ -55,6 +55,9 @@ struct Context {
   std::shared_ptr<bell::CentralAudioBuffer> audioBuffer;
   std::shared_ptr<euph::PlaybackController> playbackController;
 
+  // Display name of the device, gets replaced by user setting later on
+  std::string displayName = "Euphonium";
+
 
   /**
    * @brief Creates a context with the default utilities

@@ -2,6 +2,7 @@
 
 #include <sys/time.h>
 #include <arpa/inet.h>
+#include <atomic>
 #include <string>
 #include "BellTask.h"
 #include "esp_netif.h"
@@ -76,9 +77,12 @@ class CaptivePortalTask : public bell::Task {
   } __attribute__((packed));
 
   void runTask() override;
+  void stopTask();
 
  private:
   int sockFd;
+  std::atomic<bool> isRunning = false;
+  std::mutex runningMutex;
 
   void dnsRecv(struct sockaddr_in* premoteAddr, char* pusrdata,
                unsigned short length);

@@ -57,17 +57,11 @@ class BluetoothPlugin : Plugin
 
   def make_form(ctx, state)
       ctx.create_group('bluetooth', { 'label': 'General' })
-
-      ctx.text_field('receiverName', {
-          'label': "Speaker's name",
-          'default': "Euphonium ",
-          'group': 'bluetooth'
-      })
   end
 
   def on_event(event, data)
       if event == EVENT_PLUGIN_INIT
-        self._run_plugin('Euphonium')
+        self._run_plugin(general_settings.get_name())
       end
   end
 end

@@ -103,6 +103,9 @@ public:
     this->eventBus = eventBus;
   }
 
+  // Optional, override if you want to use the display name for ex. in the AP name
+  virtual void displayNameLoaded(std::string& name) = 0;
+
   void sendStateUpdate() {
     auto event = std::make_unique<ConnectivityEvent>();
     event->data = this->data;

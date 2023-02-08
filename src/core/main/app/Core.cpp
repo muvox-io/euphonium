@@ -93,6 +93,8 @@ void Core::initialize() {
 }
 
 void Core::initializePlugins() {
+  connectivity->displayNameLoaded(this->ctx->displayName);
+
   // Only initialize plugins when connected completely
   if (connectivity->data.state == Connectivity::State::CONNECTED &&
       !pluginsInitialized) {

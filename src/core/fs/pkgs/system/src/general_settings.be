@@ -8,6 +8,9 @@ class GeneralSettingsPlugin : Plugin
       self.type = "system"
 
       self.fetch_config()
+
+      # Apply display name to the native side
+      core.set_display_name(self.get_name())
   end
 
   def make_form(ctx, state)
@@ -28,11 +31,12 @@ class GeneralSettingsPlugin : Plugin
   end
 
   def on_event(event, data)
-    if event == EVENT_CONFIG_UPDATED
-    end
   end
 
   def get_name()
+    if self.state.find('playerName') == nil
+      return util.generate_device_name()
+    end
     return self.state['playerName']
   end
 end

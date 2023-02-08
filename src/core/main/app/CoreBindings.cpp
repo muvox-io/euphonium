@@ -25,6 +25,8 @@ void CoreBindings::setupBindings() {
   ctx->vm->export_this("get_timestamp", this, &CoreBindings::_getTimestamp,
                        "core");
   ctx->vm->export_this("get_mac", this, &CoreBindings::_getMac, "core");
+  ctx->vm->export_this("set_display_name", this, &CoreBindings::_setDisplayName,
+                       "core");
 }
 
 std::string CoreBindings::_getPlatform() {
@@ -44,6 +46,10 @@ void CoreBindings::_triggerPause(bool isPaused) {
   } else {
     this->ctx->playbackController->play();
   }
+}
+
+void CoreBindings::_setDisplayName(std::string name) {
+  this->ctx->displayName = name;
 }
 
 uint64_t CoreBindings::_getTimestamp() {

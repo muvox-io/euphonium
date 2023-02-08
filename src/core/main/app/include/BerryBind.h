@@ -22,10 +22,11 @@ extern "C" {
 #include <be_vm.h>
 }
 
+#undef str
+
 #include "BellUtils.h"
 #include "EuphLogger.h"
 
-#undef str
 
 namespace berry {
 typedef std::unordered_map<std::string, std::any> map;

@@ -37,6 +37,7 @@ class ESP32Connectivity : public Connectivity, public bell::Task {
   void registerHandlers(std::shared_ptr<bell::BellHTTPServer> http) override;
   void initializeAP();
   void initializeSTA();
+  void displayNameLoaded(std::string& name) override;
 
   void runTask() override;
 
@@ -46,7 +47,8 @@ class ESP32Connectivity : public Connectivity, public bell::Task {
   uint8_t DEFAULT_SCAN_LIST_SIZE = 10;
   uint8_t MAX_CONNECTION_ATTEMPTS = 3;
   wifi_ap_record_t scanInfo[10];
-
+  
+  std::string apName = "Euphonium";
   std::string nvsWiFiKey = "wifi_settings";
   std::string ssid;
   std::string password;
