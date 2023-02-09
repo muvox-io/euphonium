@@ -1,4 +1,7 @@
 #include "Core.h"
+#include "CoreEvents.h"
+#include "EventBus.h"
+#include "URLParser.h"
 
 using namespace euph;
 
@@ -110,6 +113,7 @@ void Core::handleEventLoop() {
   auto subscriber = static_cast<EventSubscriber*>(this);
   eventBus->addListener(EventType::VM_MAIN_EVENT, *subscriber);
   eventBus->addListener(EventType::CONNECTIVITY_EVENT, *subscriber);
+  eventBus->addListener(EventType::CONTEXT_URI_EVENT, *subscriber);
 
   while (true) {
     eventBus->eventSemaphore->wait();
@@ -142,6 +146,33 @@ void Core::handleEvent(std::unique_ptr<Event>& event) {
         BELL_LOG(error, TAG,
                  "Berry stack invalid, possible memory leak (%d > 0 !)",
                  be_top(ctx->vm->raw_ptr()));
+      }
+      break;
+    }
+    case EventType::CONTEXT_URI_EVENT: {
+      auto uriEvent = static_cast<ContextURIEvent*>(event.get());
+
+      // Parse URI
+      auto schemaIndex = uriEvent->uri.find_first_of("://");
+      if (schemaIndex == std::string::npos ||
+          schemaIndex + 3 >= uriEvent->uri.size()) {
+        EUPH_LOG(error, TAG, "Invalid Context URI: %s", uriEvent->uri.c_str());
+        break;
+      }
+
+      // Find name of the player
+      std::string playerName = uriEvent->uri.substr(0, schemaIndex);
+      std::string playerUri =
+          URLParser::urlDecode(uriEvent->uri.substr(schemaIndex + 3));
+      EUPH_LOG(info, TAG, "Received context URI {%s}", uriEvent->uri.c_str());
+
+      // Find audio source to query
+      for (auto& source : this->audioSources) {
+        if (source->getName() == playerName &&
+            source->supportsContextPlayback) {
+          source->queryContextURI(playerUri);
+          break;
+        }
       }
       break;
     }

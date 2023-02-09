@@ -23,7 +23,6 @@ class RadioPlugin : public AudioSourcePlugin, public bell::Task {
   ~RadioPlugin();
 
   void runPlugin();
-  void queryUrl(std::string url);
 
   // --- AudioSourcePlugin implementation
   void initializeBindings() override;
@@ -32,6 +31,8 @@ class RadioPlugin : public AudioSourcePlugin, public bell::Task {
 
   // -- BellTask implementation
   void runTask() override;
+
+  void queryContextURI(std::string uri) override;
 
  private:
   std::shared_ptr<euph::Context> ctx;

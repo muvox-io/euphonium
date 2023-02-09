@@ -14,8 +14,14 @@ class SnapcastPlugin : Plugin
       ctx.create_group('snapcast', { 'label': 'General' })
 
       ctx.text_field('serverUrl', {
-          'label': "Snapcast server URL",
+          'label': "Server address",
           'default': "",
+          'group': 'snapcast'
+      })
+
+      ctx.number_field('serverPort', {
+          'label': "Server port",
+          'default': "1704",
           'group': 'snapcast'
       })
 
@@ -26,13 +32,17 @@ class SnapcastPlugin : Plugin
       })
   end
 
-  def on_event(event, data)
-      if event == EVENT_SET_PAUSE
-          # cspot_set_pause(data)
-      end
+  def member(name)
+    return get_native('snapcast', name)
+  end
 
-      if event == EVENT_VOLUME_UPDATED
-          #cspot_set_volume_remote(data)
+  def on_event(event, data)
+      if event == EVENT_CONFIG_UPDATED
+        if self.state.find("enable") != nil && self.state.find("enable") == "true"
+          self._connect(self.state["serverUrl"], int(self.state["serverPort"]))
+        else
+          self._disconnect()
+        end
       end
   end
 end

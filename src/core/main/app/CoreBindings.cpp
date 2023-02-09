@@ -1,4 +1,7 @@
 #include "CoreBindings.h"
+#include <memory>
+#include "BellUtils.h"
+#include "CoreEvents.h"
 
 using namespace euph;
 
@@ -27,6 +30,8 @@ void CoreBindings::setupBindings() {
   ctx->vm->export_this("get_mac", this, &CoreBindings::_getMac, "core");
   ctx->vm->export_this("set_display_name", this, &CoreBindings::_setDisplayName,
                        "core");
+  ctx->vm->export_this("query_context_uri", this,
+                       &CoreBindings::_queryContextURI, "core");
 }
 
 std::string CoreBindings::_getPlatform() {
@@ -108,7 +113,12 @@ void CoreBindings::_confirmOnboarding() {
 }
 
 std::string CoreBindings::_getMac() {
-  return "84:3c:08:25:0d:89";
+  return bell::getMacAddress();
+}
+
+void CoreBindings::_queryContextURI(std::string uri) {
+  auto uriEvent = std::make_unique<ContextURIEvent>(uri);
+  this->ctx->eventBus->postEvent(std::move(uriEvent));
 }
 
 long CoreBindings::_getTimeMs() {

@@ -14,7 +14,7 @@ namespace snapcast {
 class Connection {
 
  public:
-  Connection();
+  Connection(std::string clientName);
   void writeHello();
   void connectWithServer(const std::string url, int port);
   void handleUpdate(std::shared_ptr<euph::Context> ctx);
@@ -24,8 +24,10 @@ class Connection {
   bell::tv timeDiff;
 
   int16_t sequenceNum = 0;
+  std::string clientName;
   bell::SocketStream socketStream;
   bell::OPUSDecoder opusDecoder;
+
   uint32_t decodedLen;
   BaseMessage message;
 

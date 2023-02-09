@@ -13,11 +13,6 @@ class CSpotPlugin : Plugin
   def make_form(ctx, state)
       ctx.create_group('spotify', { 'label': 'General' })
 
-      ctx.text_field('receiverName', {
-          'label': "Speaker's name",
-          'default': "Euphonium ",
-          'group': 'spotify'
-      })
       ctx.select_field('audioBitrate', {
           'label': "Audio bitrate",
           'default': "160",

@@ -29,6 +29,7 @@ class CoreBindings {
   void _triggerPause(bool isPaused);
   std::string _getMac();
   void _setDisplayName(std::string name);
+  void _queryContextURI(std::string uri);
   long _getTimeMs();
 
  private:

@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/build/euphoniumcli",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}/build",
             "environment": [],
             "externalConsole": false,
             "MIMode": "lldb"

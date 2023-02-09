@@ -39,7 +39,8 @@ class RadioPlugin : Plugin
     playback_state.notify_playback(request)
     playback_state.notify_state(STATE_PLAYING)
 
-    self._query_url(request["url"])
+    playback_state.query_context_uri("radio", request["url"])
+    # self._query_url(request["url"])
   end
 
   def make_form(ctx, state)

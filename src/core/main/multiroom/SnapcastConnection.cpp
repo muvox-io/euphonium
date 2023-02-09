@@ -1,15 +1,23 @@
 #include "SnapcastConnection.h"
+#include "BellUtils.h"
+#include "fmt/format.h"
 
 using namespace snapcast;
 
-Connection::Connection() {}
+Connection::Connection(std::string clientName) {
+  this->clientName = clientName;
+}
 
 void Connection::writeHello() {
   snapcast::HelloMessage message;
-  message.body = {{"Arch", "x86_64"},   {"ClientName", "Snapclient"},
-                  {"HostName", "dupa"}, {"ID", "00:11:22:33:44:55"},
-                  {"Instance", 1},      {"MAC", "00:11:22:33:44:55"},
-                  {"OS", "Arch Linux"}, {"SnapStreamProtocolVersion", 2},
+  std::string macAddress = bell::getMacAddress();
+  std::string hostName =
+      fmt::format("euphonium-{}", macAddress.substr(macAddress.length() - 4));
+
+  message.body = {{"Arch", "xtensa"},     {"ClientName", "Euphonium"},
+                  {"HostName", hostName}, {"ID", bell::getMacAddress()},
+                  {"Instance", 1},        {"MAC", bell::getMacAddress()},
+                  {"OS", "Euphonium"},    {"SnapStreamProtocolVersion", 2},
                   {"Version", "0.17.1"}};
 
   message.serialize(socketStream);

@@ -76,6 +76,25 @@ class Util
         return hostname
     end
 
+    def url_encode(str)
+        var encoded = ""
+        for i: 0..(size(str) - 1)
+            var c = str[i]
+            if string.byte(c) >= 65 && string.byte(c) <= 90
+                encoded += string.char(string.byte(c) + 32)
+            elif string.byte(c) >= 97 && string.byte(c) <= 122
+                encoded += c
+            elif string.byte(c) >= 48 && string.byte(c) <= 57
+                encoded += c
+            elif c == '-' || c == '_' || c == '.' || c == '~' || c == '!' || c == '*' || c == '(' || c == ')' || c == "'"
+                encoded += c
+            else
+                encoded += '%'
+                encoded += string.format("%02x", string.byte(c))
+            end
+        end
+        return encoded
+    end
 end
 util = Util()
 

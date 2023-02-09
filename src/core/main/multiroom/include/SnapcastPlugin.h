@@ -22,7 +22,8 @@ class SnapcastPlugin : public AudioSourcePlugin, public bell::Task {
   SnapcastPlugin(std::shared_ptr<euph::Context> ctx);
   ~SnapcastPlugin();
 
-  void runPlugin();
+  void _connect(std::string url, int port);
+  void _disconnect();
 
   // --- AudioSourcePlugin implementation
   void initializeBindings() override;

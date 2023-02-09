@@ -4,9 +4,11 @@
 
 namespace euph {
 class AudioSourcePlugin {
-public:
+ public:
   AudioSourcePlugin() = default;
-  ~AudioSourcePlugin() {};
+  ~AudioSourcePlugin(){};
+
+  bool supportsContextPlayback = false;
 
   // Export's plugins bindings to the VM
   virtual void initializeBindings() = 0;
@@ -16,5 +18,7 @@ public:
 
   // Return's its name
   virtual std::string getName() = 0;
+
+  virtual void queryContextURI(std::string uri) {};
 };
-}
+}  // namespace euph

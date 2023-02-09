@@ -5,6 +5,9 @@ using namespace euph;
 RadioPlugin::RadioPlugin(std::shared_ptr<euph::Context> ctx)
     : bell::Task("radio", 32 * 1024, 0, 1) {
   this->ctx = ctx;
+
+  // Can handle context playback via URIs
+  this->supportsContextPlayback = true;
 }
 
 RadioPlugin::~RadioPlugin() {}
@@ -13,12 +16,13 @@ void RadioPlugin::runPlugin() {
   startTask();
 }
 
-void RadioPlugin::queryUrl(std::string url) {
+void RadioPlugin::queryContextURI(std::string uri) {
   this->isRunning = false;
   std::scoped_lock lock(this->runningMutex);
-
   this->isRunning = true;
-  this->playbackURLQueue.push(url);
+  
+  // In case of radio, the URI is simply the playback URL
+  this->playbackURLQueue.push(uri);
 }
 
 std::string RadioPlugin::getName() {
@@ -32,7 +36,6 @@ void RadioPlugin::shutdownAudio() {
 
 void RadioPlugin::initializeBindings() {
   EUPH_LOG(info, TASK, "Initializing bindings");
-  ctx->vm->export_this("_query_url", this, &RadioPlugin::queryUrl, "radio");
   ctx->vm->export_this("_run_plugin", this, &RadioPlugin::runPlugin, "radio");
 }
 

@@ -36,6 +36,10 @@ class PlaybackState
     self.recently_played.push(track)
   end
 
+  def query_context_uri(name, context)
+    core.query_context_uri(name + "://" + util.url_encode(context))
+  end
+
   def notify_playback(track)
     self.current_track = track
     if self.current_track.find('hidden') == nil || !self.current_track.find('hidden')
