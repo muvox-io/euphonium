@@ -11,6 +11,7 @@ class GeneralSettingsPlugin : Plugin
 
       # Apply display name to the native side
       core.set_display_name(self.get_name())
+      euphonium.apply_volume(self.get_volume())
   end
 
   def make_form(ctx, state)
@@ -38,6 +39,19 @@ class GeneralSettingsPlugin : Plugin
       return util.generate_device_name()
     end
     return self.state['playerName']
+  end
+
+  def get_volume()
+    if self.state.find('volume') == nil
+      # default at hand volume
+      return 50
+    end
+    return self.state['volume']
+  end
+
+  def set_volume(volume)
+    self.state['volume'] = volume
+    self.persist_config()
   end
 end
 

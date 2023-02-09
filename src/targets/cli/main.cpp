@@ -25,6 +25,9 @@ class FakeConnectivity : public euph::Connectivity, public bell::Task {
   }
   ~FakeConnectivity() {}
 
+  void displayNameLoaded(std::string& name) override {
+  }
+
   void registerHandlers(std::shared_ptr<bell::BellHTTPServer> http) override {
 
     std::cout << "Registering handlers" << std::endl;

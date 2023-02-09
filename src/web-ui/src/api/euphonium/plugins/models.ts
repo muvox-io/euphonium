@@ -26,6 +26,7 @@ export interface ConfigurationField {
     value: string;
     label?: string;
     default?: string;
+    hidden?: boolean;
     values?: string[];
     hint?: string;
     placeholder?: string;

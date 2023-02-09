@@ -44,7 +44,7 @@ export default function FormGroup({
   return (
     <IconCard iconName="settings" label={label}>
       <div class="flex flex-col md:space-y-5">
-        {fields.map((field) => {
+        {fields.filter((e) => !e.hidden).map((field) => {
           const FieldComponent: AnyComponent<FieldProps<any>> =
             FIELD_COMPONENTS[field.type];
           if (!FieldComponent) {

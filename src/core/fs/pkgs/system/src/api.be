@@ -98,6 +98,10 @@ http.handle(HTTP_POST, '/playback/volume', def (request)
     var body = request.json_body()
     euphonium.apply_volume(int(body['volume']))
 
+    if body.find('persist') != nil && body['persist']
+        general_settings.set_volume(int(body['volume']))
+    end
+
     request.write_json(playback_state.get_state(), 200)
 end)
 

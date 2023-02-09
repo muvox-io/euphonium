@@ -8,7 +8,7 @@
             "name": "(lldb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/targets/cli/build/euphoniumcli",
+            "program": "${workspaceFolder}/build/euphoniumcli",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

@@ -46,8 +46,12 @@ const PlaybackVolume = ({ playbackState }: PlaybackStateProps) => {
     setLocalVolume(playbackState?.settings?.volume);
   }
 
-  const updateVolume = (volume: number) => {
-    playbackAPI.updateVolumeThrottled(volume);
+  const updateVolume = (volume: number, persist = false) => {
+    if (persist) {
+      playbackAPI.updateVolume(volume, persist = true);
+    } else {
+      playbackAPI.updateVolumeThrottled(volume);
+    }
     setLocalVolume(volume);
     playbackState!.settings.volume = volume;
   }
@@ -59,6 +63,7 @@ const PlaybackVolume = ({ playbackState }: PlaybackStateProps) => {
       type="range"
       id="volume"
       name="volume"
+      onMouseUp={({ target }: any) => updateVolume(target?.value, true)}
       min="0"
       max="100"
       onInput={({ target }: any) => updateVolume(target?.value)}

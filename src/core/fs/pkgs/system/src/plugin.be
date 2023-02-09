@@ -53,8 +53,6 @@ class Plugin
 
     # saves raw confugration into memory
     def persist_config()
-        print("Persist called")
-        print(json.dump(self.state))
         core.save_config(self.name, json.dump(self.state))
     end
 
