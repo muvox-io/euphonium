@@ -13,10 +13,11 @@
 namespace euph {
 enum class EventType : uint32_t {
   VM_MAIN_EVENT,
+  VM_RAW_COMMAND_EVENT,
   VM_ERROR_EVENT,
   CONNECTIVITY_EVENT,
   WEBSOCKET_EVENT,
-  CONTEXT_URI_EVENT
+  PLAYBACK_EVENT
 };
 
 class Event {

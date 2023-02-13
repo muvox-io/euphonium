@@ -6,3 +6,6 @@
 	path = src/core/external/bell
 	branch = develop
 	url = https://github.com/feelfreelinux/bell
+[submodule "src/core/external/cspot"]
+	path = src/core/external/cspot
+	url = https://github.com/feelfreelinux/cspot

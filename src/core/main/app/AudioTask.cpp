@@ -1,4 +1,6 @@
 #include "AudioTask.h"
+#include <memory>
+#include "CoreEvents.h"
 
 using namespace euph;
 
@@ -92,6 +94,9 @@ void AudioTask::runTask() {
   EUPH_LOG(info, TASK, "Audio thread running");
   bell::CentralAudioBuffer::AudioChunk* currentChunk;
   uint32_t lastSampleRate = 44100;
+  
+  // Used to detect track changes
+  size_t lastTrackHash = 0;
 
   while (true) {
     if (!this->ctx->playbackController->isPaused) {
@@ -110,6 +115,14 @@ void AudioTask::runTask() {
       currentChunk = this->ctx->audioBuffer->readChunk();
 
       if (currentChunk && currentChunk->pcmSize > 0) {
+        if (currentChunk->trackHash != lastTrackHash) {
+          lastTrackHash = currentChunk->trackHash;
+
+          // Track hash changed, enqueue a track change event
+          auto event = std::make_unique<TrackHashChangeEvent>(lastTrackHash);
+          this->ctx->eventBus->postEvent(std::move(event));
+        }
+
         std::scoped_lock lock(this->dspMutex);
         if (lastSampleRate != currentChunk->sampleRate) {
           lastSampleRate = currentChunk->sampleRate;
@@ -120,13 +133,16 @@ void AudioTask::runTask() {
         size_t dataSize =
             this->dsp->process(currentChunk->pcmData, currentChunk->pcmSize, 2,
                                currentChunk->sampleRate, bell::BitWidth::BW_16);
+        // Handle audio sync
+        // @TODO actually do it properly
+        if (currentChunk->sec != 0 || currentChunk->usec != 0) {
+          bell::tv scheduledTimestamp(currentChunk->sec, currentChunk->usec);
 
-        bell::tv scheduledTimestamp(currentChunk->sec, currentChunk->usec);
-
-        int64_t diff = (scheduledTimestamp - bell::tv::now()).ms();
-        while (diff > 25) {
-          BELL_SLEEP_MS(2);
-          diff = (scheduledTimestamp - bell::tv::now()).ms();
+          int64_t diff = (scheduledTimestamp - bell::tv::now()).ms();
+          while (diff > 25) {
+            BELL_SLEEP_MS(2);
+            diff = (scheduledTimestamp - bell::tv::now()).ms();
+          }
         }
 
         this->audioOutput->feedPCM(currentChunk->pcmData, dataSize);

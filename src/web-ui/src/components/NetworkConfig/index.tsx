@@ -50,6 +50,6 @@ export default ({connectivity}: OnboardingParams) => {
   const [onboardingState, setOnboardingState] = useState<'HELLO' | 'WIFI'>('HELLO');
 
   return <div class="flex justify-center h-screen">{
-    connectivity.state != "CONNECTED" ? (onboardingState == 'HELLO' ? <OnboardingHello setOnboardingState={setOnboardingState}/> : <WiFiConfigurator/>) : (<OnboardingHardwareDetected setOnboardingState={setOnboardingState}/>)
+    connectivity.state != "CONNECTED" ? (onboardingState == 'HELLO' ? <OnboardingHello setOnboardingState={setOnboardingState}/> : <WiFiConfigurator/>) : null
   }</div>
 };

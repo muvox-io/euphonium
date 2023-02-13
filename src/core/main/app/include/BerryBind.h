@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sys/types.h>
 #include <any>
 #include <cstring>
 #include <exception>
@@ -11,12 +12,13 @@
 #include <type_traits>
 #include <vector>
 
-#include "berry.h"
 extern "C" {
+#include "berry.h"
 #include <be_debug.h>
 #include <be_exec.h>
 #include <be_gc.h>
 #include <be_string.h>
+#include <berry_conf.h>
 #include <be_strlib.h>
 #include <be_vector.h>
 #include <be_vm.h>
@@ -40,11 +42,11 @@ berry::map to_map(std::unordered_map<std::string, T> inputMap) {
   }
   return berryMap;
 }
-
 class VmState {
  private:
   bool del;
   bvm* vm;
+  FILE* stdoutRedirect;
   std::vector<std::function<int(VmState&)>*> lambdas;
   static int call(bvm* vm);
   static int get_module_member(bvm* vm);
@@ -121,7 +123,7 @@ class VmState {
   bvm* raw_ptr() { return vm; }
 
   std::pair<int, std::string> debug_get_lineinfo();
-
+  void stdoutIntercept(const char* buf, ssize_t len);
   bool execute_string(const std::string& string, const std::string& tag);
 
   void lambda(std::function<int(VmState&)>* function, const std::string& name,
@@ -287,6 +289,11 @@ class VmState {
     };
     export_function(name, res, module);
   }
+
+  typedef std::function<void(const char* buffer, size_t len)> StdoutCallback;
+
+  // Set a callback to be called when the VM prints to stdout
+  StdoutCallback stdoutCallback = NULL;
 };
 
 typedef std::unordered_map<std::string, std::function<int(berry::VmState&)>*> moduleMap;

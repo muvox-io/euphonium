@@ -1,11 +1,22 @@
 import math
 
+var DAC_DRIVER_DEFAULT = "dac"
+var DAC_DRIVER_AMPLIFIER = "amplifier"
+
 class DACDriver
     var hardware_volume_control
     var state
     var name
     var signedness
     var datasheet_link
+    var default_volume_table
+    var type
+
+    def init()
+        self.type = DAC_DRIVER_DEFAULT
+        self.default_volume_table = []
+        self.hardware_volume_control = false
+    end
 
     def get_gpio(pin)
         return int(self.state[pin])
@@ -36,6 +47,13 @@ class DACDriver
     def make_config_form(ctx, state)
         ctx.create_group('i2s', { 'label': 'I2S GPIO' })
         ctx.create_group('i2c', { 'label': 'I2C GPIO' })
+
+        ctx.text_field('volume_table', {
+            'label': "Volume table",
+            'default': json.dump(self.default_volume_table),
+            'hidden': false,
+            'group': 'i2s',
+        })
         
         ctx.number_field('bck', {
             'label': "BCK",
@@ -72,6 +90,14 @@ class DACDriver
             'default': "0",
             'group': 'i2c',
         })
+    end
+
+    def get_volume_table()
+        var volume_table = self.default_volume_table
+        if self.state.find('volume_table') != nil
+            volume_table = json.load(self.state['volume_table'])
+        end
+        return volume_table
     end
 
     def bin(num)

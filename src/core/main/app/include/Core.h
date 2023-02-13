@@ -20,6 +20,7 @@
 #include "StorageAccessor.h"
 #include "Connectivity.h"
 #include "RadioPlugin.h"
+#include "CSpotPlugin.h"
 #include "SnapcastPlugin.h"
 #include "AudioTask.h"
 #include "AudioSourcePlugin.h"

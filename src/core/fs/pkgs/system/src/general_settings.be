@@ -25,10 +25,33 @@ class GeneralSettingsPlugin : Plugin
 
       ctx.number_field('volume', {
           'label': "Saved volume",
-          'default': 20,
+          'default': 0,
           'group': 'general',
-          'hidden': true
+          'hidden': false
       })
+
+      ctx.checkbox_field('onboardingHardware', {
+          'label': "Onboarding hardware confirmed",
+          'default': "false",
+          'group': 'general',
+          'hidden': false
+      })
+
+      ctx.number_field('onboardingMaxVolume', {
+          'label': "Onboarding max volume tuned",
+          'default': 0,
+          'group': 'general',
+          'hidden': false
+      })
+  end
+
+  def set_max_volume_tuned(max_volume)
+    self.state['onboardingMaxVolume'] = max_volume
+    self.persist_config()
+  end
+
+  def is_max_volume_tuned()
+    return self.state['onboardingMaxVolume'] != 0
   end
 
   def on_event(event, data)
@@ -46,7 +69,7 @@ class GeneralSettingsPlugin : Plugin
       # default at hand volume
       return 50
     end
-    return self.state['volume']
+    return int(self.state['volume'])
   end
 
   def set_volume(volume)

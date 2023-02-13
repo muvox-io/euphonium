@@ -50,6 +50,7 @@ class ESP32Connectivity : public Connectivity, public bell::Task {
   
   std::string apName = "Euphonium";
   std::string nvsWiFiKey = "wifi_settings";
+  std::string displayName;
   std::string ssid;
   std::string password;
   nlohmann::json jsonBody = {};

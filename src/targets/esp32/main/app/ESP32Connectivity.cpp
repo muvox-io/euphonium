@@ -1,5 +1,7 @@
 #include "ESP32Connectivity.h"
+#include "BellUtils.h"
 #include "esp_wifi.h"
+#include "mdns.h"
 
 using namespace euph;
 
@@ -69,8 +71,6 @@ void ESP32Connectivity::persistConfig() {
              esp_err_to_name(err));
   } else {
     EUPH_LOG(info, TAG, "Reading WiFi configuration from NVS storage...");
-
-    size_t wifiConfigSize = 0;
 
     nlohmann::json cfgBody = {};
     // Using FMT as nlohmann::json likes to break stack limits on sys_evt task
@@ -230,6 +230,12 @@ void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
 
     EUPH_LOG(info, TAG, "Connected, ip addr %s", strIp);
     this->captivePortalDNS->stopTask();
+    mdns_init();
+
+    // Set the hostname to the last 4 digits of the MAC address
+    std::string mac = bell::getMacAddress();
+    std::string hostname = "euphonium-" + mac.substr(mac.length() - 5, 2) + mac.substr(mac.length() - 2);
+    mdns_hostname_set(hostname.c_str());
 
     this->data.ipAddr = strIp;
     this->data.type = ConnectivityType::WIFI_STA;

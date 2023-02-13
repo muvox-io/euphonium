@@ -5,7 +5,7 @@ import "../../theme/main.scss";
 import { PlaybackDataContextProvider } from "../../utils/PlaybackContext";
 import APIFetcher from "../APIFetcher";
 import ConnectionLostModal from "../ConnectionLostModal";
-import Onboarding from "../Onboarding";
+import Onboarding from "../NetworkConfig";
 import Notifications from "../ui/Notifications";
 import css from "./App.module.scss";
 import NormalComponent from "./NormalComponent";

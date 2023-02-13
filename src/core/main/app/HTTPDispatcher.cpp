@@ -3,6 +3,8 @@
 #include <string_view>
 #include "BellHTTPServer.h"
 #include "BellUtils.h"
+#include "CoreEvents.h"
+#include "MDNSService.h"
 #include "civetweb.h"
 
 using namespace euph;
@@ -10,7 +12,6 @@ using namespace euph;
 HTTPDispatcher::HTTPDispatcher(std::shared_ptr<euph::Context> ctx) {
   this->ctx = ctx;
   this->responseSemaphore = std::make_unique<bell::WrappedSemaphore>(20);
-  int port = 8080;
 
 // TODO: Handle it properly
 #ifdef ESP_PLATFORM
@@ -55,8 +56,42 @@ void HTTPDispatcher::initialize() {
   });
 
   this->server->registerWS(
+      "/repl",
+      [this](struct mg_connection* conn, char* data, size_t dataSize) {
+        // Convert the data to a string
+        std::string dataString(data, dataSize);
+
+        // Post the event to the event bus
+        auto event = std::make_unique<VmRawCommandEvent>(dataString);
+        this->ctx->eventBus->postEvent(std::move(event));
+      },
+      [this](struct mg_connection* conn, bell::BellHTTPServer::WSState state) {
+        switch (state) {
+          case bell::BellHTTPServer::WSState::READY: {
+            EUPH_LOG(debug, TAG, "REPL websocket connection open");
+            std::scoped_lock lock(this->websocketConnectionsMutex);
+            this->replWebsocketConnections.push_back(conn);
+            break;
+          }
+          case bell::BellHTTPServer::WSState::CLOSED: {
+            EUPH_LOG(debug, TAG, "REPL websocket connection closed");
+            std::scoped_lock lock(this->websocketConnectionsMutex);
+            // remove the connection from the list
+            this->replWebsocketConnections.erase(
+                find(replWebsocketConnections.begin(),
+                     replWebsocketConnections.end(), conn));
+            break;
+          }
+          default:
+            break;
+        }
+      });
+
+  this->server->registerWS(
       "/events",
       [this](struct mg_connection* conn, char* data, size_t dataSize) {
+        if (data == nullptr || dataSize == 0)
+          return;
         // Convert the data to a string
         std::string dataString(data, dataSize);
 
@@ -123,6 +158,17 @@ void HTTPDispatcher::setupBindings() {
                        &HTTPDispatcher::_readRouteParams, "http");
   ctx->vm->export_this("_broadcast_websocket", this,
                        &HTTPDispatcher::_broadcastWebsocket, "http");
+  ctx->vm->export_this("_register_mdns", this, &HTTPDispatcher::_registerMDNS,
+                       "http");
+
+  ctx->vm->stdoutCallback = [this](const char* buffer, size_t size) {
+    std::scoped_lock lock(this->websocketConnectionsMutex);
+
+    // Redirect berry's stdout to all connected websockets in the REPL endpoint
+    for (auto&& conn : this->replWebsocketConnections) {
+      mg_websocket_write(conn, MG_WEBSOCKET_OPCODE_TEXT, buffer, size);
+    }
+  };
 }
 
 std::string HTTPDispatcher::_readBody(int connId) {
@@ -144,7 +190,7 @@ void HTTPDispatcher::_registerHandler(int httpMethod, std::string path,
                                       int handlerId) {
   HTTPDispatcher::Method method =
       static_cast<HTTPDispatcher::Method>(httpMethod);
-  switch (httpMethod) {
+  switch (method) {
     case HTTPDispatcher::Method::GET:
       this->server->registerGet(
           path, [this, handlerId](struct mg_connection* conn) {
@@ -153,6 +199,7 @@ void HTTPDispatcher::_registerHandler(int httpMethod, std::string path,
             // Prepare a response event to the scripting layer
             auto event = std::make_unique<HTTPDispatcher::VmEvent>(
                 handlerId, this->nextBindId);
+
             this->ctx->eventBus->postEvent(std::move(event));
 
             this->nextBindId = (this->nextBindId + 1) % MAX_CONNECTION_BINDS;
@@ -204,6 +251,20 @@ void HTTPDispatcher::_writeResponse(int connId, std::string body,
             statusCode, contentType.c_str());
   mg_write(conn, body.c_str(), body.size());
   this->responseSemaphore->give();
+}
+
+void HTTPDispatcher::_registerMDNS(std::string name, std::string type,
+                                   std::string proto, berry::map txt) {
+  std::map<std::string, std::string> txtMap;
+
+  // Convert berry::map to std::map, because the mdns library requires it
+  for (auto&& [key, value] : txt) {
+    if (std::any_cast<std::string>(&value)) {
+      txtMap[key] = std::any_cast<std::string>(value);
+    }
+  }
+
+  MDNSService::registerService(name, type, proto, "", port, txtMap);
 }
 
 berry::map HTTPDispatcher::_readRouteParams(int connId) {

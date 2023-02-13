@@ -1,4 +1,5 @@
 #include "BerryBind.h"
+#include <stdio.h>
 
 using namespace berry;
 
@@ -6,12 +7,31 @@ berry::moduleMap berry::moduleLambdas;
 
 VmState::VmState(bvm* vm) : vm(vm) {}
 
+int berryStdout(void* ctx, const char* buf, int len) {
+  auto state = (VmState*)ctx;
+  state->stdoutIntercept(buf, len);
+  ;
+  return len;
+}
+
+static char stdoutLineBuffer[256] = {0};
+
 VmState::VmState() {
+  stdoutRedirect = funopen(this, NULL, &berryStdout, NULL, NULL);
+  setvbuf(stdoutRedirect, stdoutLineBuffer, _IOLBF, sizeof(stdoutLineBuffer));
+  be_set_stdout(stdoutRedirect);
   vm = be_vm_new();
   be_set_obs_hook(vm, &VmState::berryObservability);
   be_pushntvfunction(vm, VmState::get_module_member);
   be_setglobal(vm, "get_native");
   be_pop(vm, 1);
+}
+
+void VmState::stdoutIntercept(const char* buf, ssize_t len) {
+  fwrite(buf, sizeof(char), len, stdout);
+  if (stdoutCallback != nullptr) {
+    stdoutCallback(buf, len);
+  }
 }
 
 void VmState::berryObservability(bvm* vm, int event...) {

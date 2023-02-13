@@ -136,3 +136,14 @@ http.handle(HTTP_POST, '/playback/status', def (request)
 
     request.write_json(playback_state.get_state(), 200)
 end)
+
+http.handle(HTTP_POST, '/playback/context', def (request)
+    var body = request.json_body()
+    if body.find('uri') != nil
+        core.query_context_uri(body['uri'])
+    end
+    request.write_json(playback_state.get_state(), 200)
+end)
+
+# Register for MDNS
+http.register_mdns(general_settings.get_name(), "_http", "_tcp", { "CPath": "/" })

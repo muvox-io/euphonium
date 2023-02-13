@@ -5,10 +5,10 @@
 
 #include "BellHTTPServer.h"
 #include "BerryBind.h"
+#include "EuphContext.h"
 #include "EventBus.h"
 #include "WrappedSemaphore.h"
 #include "civetweb.h"
-#include "EuphContext.h"
 #include "fmt/format.h"
 
 namespace euph {
@@ -16,6 +16,7 @@ class HTTPDispatcher {
  private:
   const std::string TAG = "http";
   std::shared_ptr<euph::Context> ctx;
+  int port = 8080;
 
   // Signal used to wait for the HTTP response, while waiting for the scripting layer to respond
   std::unique_ptr<bell::WrappedSemaphore> responseSemaphore;
@@ -34,6 +35,9 @@ class HTTPDispatcher {
 
   // List of connected websocket clients
   std::vector<struct mg_connection*> websocketConnections;
+
+  // List of connected websocket clients to the /repl endpoint
+  std::vector<struct mg_connection*> replWebsocketConnections;
 
   std::mutex websocketConnectionsMutex;
 
@@ -101,7 +105,6 @@ class HTTPDispatcher {
 
   void broadcastWebsocket(const std::string& body);
 
-
   std::shared_ptr<bell::BellHTTPServer> getServer();
 
   // Methods bind to the scripting API
@@ -112,5 +115,7 @@ class HTTPDispatcher {
   berry::map _readRouteParams(int connId);
   std::string _readBody(int connId);
   size_t _readContentLength(int connId);
+  void _registerMDNS(std::string name, std::string type, std::string proto,
+                     berry::map txt);
 };
 }  // namespace euph

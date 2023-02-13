@@ -13,4 +13,9 @@ export interface EuphoniumInfo {
     onboarding: boolean;
 }
 
-
+export interface AudioHardwareInfo {
+    driver: string;
+    driverType: "dac" | "amplifier";
+    hardwareVolume: number;
+    tuned: boolean;
+}

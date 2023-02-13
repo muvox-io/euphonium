@@ -1,10 +1,13 @@
 volume_strip = nil
 class MA12070P : DACDriver
     var volume_table
+    var ma_addr
     def init()
-        # define a volume table, saves up on log10
-        self.volume_table = [255,160,120,100,90,85,80, 75, 70, 65, 61, 57, 53, 50, 47, 44, 41, 38, 35, 32, 29, 26, 23, 20, 17, 14, 12, 10, 8, 6, 4, 2, 0]
+        super(self).init()
+        self.default_volume_table = [160, 98, 96, 94, 92, 89, 87, 85, 84, 82, 80, 78, 76, 75, 73, 71, 70, 68, 67, 65, 64, 62, 61, 60, 59, 57, 56, 55, 54, 53, 51, 50, 49, 48, 47, 46, 45, 44, 43, 43, 42, 41, 40, 39, 38, 38, 37, 36, 36, 35, 34, 34, 33, 32, 32, 31, 30, 30, 29, 29, 28, 28, 27, 27, 26, 26, 25, 25, 25, 24, 24, 23, 23, 23, 22, 22, 22, 21, 21, 21]
         self.name = "MA12070P"
+        self.ma_addr = 0x20
+        self.type = DAC_DRIVER_AMPLIFIER
         self.hardware_volume_control = true
         self.datasheet_link = "https://www.infineon.com/dgdl/Infineon-MA12070P-DS-v01_00-EN.pdf?fileId=5546d46264a8de7e0164b761f2f261e4"
     end
@@ -12,8 +15,6 @@ class MA12070P : DACDriver
     def init_i2s()
         # PINOUT: SDA: 23, SCL: 22, SDATA: 26, LRCLK: 25, BCLK: 5
         # All of I2S init logic goes here
-        
-        var ADDR = 0x20
 
         var config = I2SConfig()
         config.sample_rate = 44100
@@ -42,14 +43,14 @@ class MA12070P : DACDriver
         gpio.digital_write(self.get_gpio('enablePin'), gpio.LOW)
 
         # Set Amp to Left-justified format
-        i2c.write(ADDR, 53, 8)
+        i2c.write(self.ma_addr, 53, 8)
 
         # Set Volume to a safe level..
-        i2c.write(ADDR, 64, 0x50)
+        i2c.write(self.ma_addr, 64, 100)
 
         # Clear static error register.
-        i2c.write(ADDR, 45, 0x34)
-        i2c.write(ADDR, 45, 0x30)
+        i2c.write(self.ma_addr, 45, 0x34)
+        i2c.write(self.ma_addr, 45, 0x30)
 
         # Init done.
 
@@ -65,15 +66,11 @@ class MA12070P : DACDriver
     end
 
     def set_volume(volume)
-        # Volume is in range from 1 to 100
-        # Volume register is flipped in MA12070P.. Hence 100 - realvol.
-        var volume_step = volume / 100.0
-        var actual_volume = int(volume_step * 32)
+        var volume_table = self.get_volume_table()
+        var volume_index = int(((volume / 100.0) * (volume_table.size() - 1)) + 0.5)
+        
+        i2c.write(self.ma_addr, 64, volume_table[volume_index])
 
-        var ADDR = 0x20 
-
-        # Write it..
-        i2c.write(ADDR, 64, self.volume_table[actual_volume])
 
     end
 

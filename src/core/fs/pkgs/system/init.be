@@ -1,5 +1,6 @@
 import json
 import global
+import string
 
 # /-- core bindings, usually in bindings.be, but required for the core to function
 class Core

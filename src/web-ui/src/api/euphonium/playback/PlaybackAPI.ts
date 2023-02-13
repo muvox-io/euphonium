@@ -62,6 +62,12 @@ export default class PlaybackAPI {
   getPlaybackState = () =>
     this.apiAccessor.fetch<PlaybackState>("GET", "/playback");
 
+  queryContextURI = (uri: string) => {
+    this.apiAccessor.fetch<void>("POST", "/playback/context", {
+      uri
+    });
+  }
+
   updateVolume = (volume: number, persist = false) => {
     this.apiAccessor.fetch<void>("POST", "/playback/volume", {
       volume,

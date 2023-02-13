@@ -9,6 +9,7 @@ import PlaybackMobile from "../PlaybackMobile";
 import SideBar from "../SideBar";
 import SplashScreen from "../SplashScreen";
 import Redirect from "../ui/Redirect";
+import Onboarding from "./Onboarding";
 
 export default function NormalComponent({ info }: { info: EuphoniumInfo }) {
   const updateTheme = () => {
@@ -26,6 +27,7 @@ export default function NormalComponent({ info }: { info: EuphoniumInfo }) {
   const isMobile = useIsMobile();
   return (
     <div class="flex-row flex bg-app-primary md:bg-transparent">
+      <Onboarding/>
       {!isMobile ? (
         <SideBar version={info?.version} onThemeChange={() => toggleTheme()} />
       ) : null}
@@ -49,7 +51,7 @@ export default function NormalComponent({ info }: { info: EuphoniumInfo }) {
 
           <Redirect path="/" to="/web" />
         </Router>
-        { !isMobile ? <Playback /> : null }
+        {!isMobile ? <Playback /> : null}
       </div>
     </div>
   );

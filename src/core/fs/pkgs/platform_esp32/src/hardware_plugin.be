@@ -15,6 +15,35 @@ class HardwarePlugin : Plugin
 
         self.selected_driver = nil
         self.is_audio_output = true
+
+        http.handle(HTTP_GET, '/system/audio_hardware', def (request)
+            request.write_json(self.get_hardware_status(), 200)
+        end)
+        
+        http.handle(HTTP_POST, '/system/audio_hardware', def (request)
+            var body = request.json_body()
+            if body.find('max_volume') != nil
+                var max_volume = body['max_volume']
+                if max_volume >= 0 && max_volume <= 100
+                    general_settings.set_max_volume_tuned(max_volume)
+                    self.tune_max_volume(max_volume)
+                end
+            end
+
+            request.write_json(self.get_hardware_status(), 200)
+        end)
+    end
+
+    def get_hardware_status()
+        if self.selected_driver != nil
+            return {
+                'driver': self.selected_driver.name,
+                'driver_type': self.selected_driver.type,
+                'hardware_volume': self.selected_driver.hardware_volume_control,
+                'volume_table': self.selected_driver.get_volume_table(),
+                'tuned': general_settings.is_max_volume_tuned()
+            }
+        end
     end
 
     def make_form(ctx, state)
@@ -25,10 +54,12 @@ class HardwarePlugin : Plugin
         end
 
         ctx.create_group('boardGroup', { 'label': 'Board' })
+
         board_names = []
         for board : ESP32_BOARDS
             board_names.push(board["name"])
         end
+
         ctx.select_field('board', {
             'label': "Select your board type",
             'default': "custom",
@@ -64,7 +95,6 @@ class HardwarePlugin : Plugin
 
         ctx.create_group('driver', { 'label': 'DAC Driver' })
     
-
         ctx.select_field('dac', {
             'label': "Select DAC chip driver",
             'default': "dummy",
@@ -119,10 +149,36 @@ class HardwarePlugin : Plugin
         return false
     end
 
+    def tune_max_volume(max_vol)
+        # only applies the tuning to amplifiers
+        if self.selected_driver != nil && self.selected_driver.type == DAC_DRIVER_AMPLIFIER
+            # Calculate index of upper limit of volume table
+            var max_index = int((self.selected_driver.default_volume_table.size() * (real(max_vol) / 100)) + 0.5)
+
+            # Store a new volume table with the new upper limit
+            self.state['volume_table'] = json.dump(self.selected_driver.default_volume_table[0..max_index])
+            self.selected_driver.state = self.state
+
+            self.persist_config()
+        end
+    end
+
+    def autodetect_hardware()
+        for board : ESP32_BOARDS
+            if board["name"] == "μVox"
+                for key : board["state"].keys()
+                    self.state.setitem(key, board["state"][key])
+                end
+                break
+            end
+        end
+    end
+
     def on_event(event, data)
         if event == EVENT_CONFIG_UPDATED || event == EVENT_PLUGIN_INIT
+            self.autodetect_hardware()
             if self.state.find('dac') != nil
-              self.select_driver(self.state['dac'])
+                self.select_driver(self.state['dac'])
             end
         end
 
