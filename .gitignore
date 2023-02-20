@@ -5,6 +5,7 @@ dist/
 node_modules/
 .DS_Store
 euph-old
+*.o
 *.d
 .idea
 .cache/

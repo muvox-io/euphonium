@@ -28,6 +28,7 @@ stdenv.mkDerivation rec {
       bison
       gperf
       pkgconfig
+      protobuf
 
       esp-idf
       # esp-idf specific
