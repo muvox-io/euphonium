@@ -7,7 +7,9 @@
 #include <string>
 
 #include "BellTask.h"
+#include "CDNTrackStream.h"
 #include "CSpotContext.h"
+#include "CoreEvents.h"
 #include "LoginBlob.h"
 #include "Queue.h"
 #include "SpircHandler.h"
@@ -44,10 +46,14 @@ class CSpotPlugin : public AudioSourcePlugin,
   std::shared_ptr<cspot::SpircHandler> spircHandler;
   std::unique_ptr<bell::WrappedSemaphore> authenticatedSemaphore;
 
+  std::string requestedTrackId;
+  bool authenticationLoaded = false;
+
   bool isRunning = false;
   std::mutex runningMutex;
 
   int64_t expectedTrackHash = -1;
+  TrackInfoEvent::TrackInfo nextTrackInfo;
 
   // Hash function required by the player
   std::hash<std::string_view> hashFn;

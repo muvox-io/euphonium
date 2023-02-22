@@ -77,7 +77,7 @@ stdenv.mkDerivation rec {
     . $IDF_PYTHON_ENV_PATH/bin/activate
     pip install -r $IDF_PATH/tools/requirements/requirements.core.txt
     pip install protobuf grpcio-tools
-    
+
     runHook postInstall
   '';
 

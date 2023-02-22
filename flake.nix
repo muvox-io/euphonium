@@ -62,13 +62,23 @@
               ] ++ darwinPackages;
 
             shellHook = ''
-              export HOME=$TMP
               export IDF_PATH=${esp-idf}/sdk
-              export IDF_TOOLS_PATH=${esp-idf}/.espressif
+              export IDF_TOOLS_PATH=$(pwd)/nix/.espressif
               export PATH=$IDF_PATH/tools:$PATH
-
               export IDF_PYTHON_ENV_PATH=$IDF_TOOLS_PATH/python_env/idf5.0_py3.9_env
-              . $IDF_PYTHON_ENV_PATH/bin/activate
+              mkdir -p $IDF_TOOLS_PATH
+              if [ ! -e $IDF_PYTHON_ENV_PATH ]; then
+                touch $IDF_TOOLS_PATH/espidf.constraints.v5.0.txt
+                python -m venv $IDF_PYTHON_ENV_PATH
+                . $IDF_PYTHON_ENV_PATH/bin/activate
+                pip install -r $IDF_PATH/tools/requirements/requirements.core.txt
+                pip install protobuf grpcio-tools
+                $IDF_PATH/tools/idf_tools.py install
+              else
+                . $IDF_PYTHON_ENV_PATH/bin/activate
+              fi
+              idf_exports=$("$IDF_PATH/tools/idf_tools.py" export)
+              eval "$idf_exports"
             '';
           };
         };

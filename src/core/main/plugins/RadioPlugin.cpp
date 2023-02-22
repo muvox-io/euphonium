@@ -20,7 +20,7 @@ void RadioPlugin::queryContextURI(std::string uri) {
   this->isRunning = false;
   std::scoped_lock lock(this->runningMutex);
   this->isRunning = true;
-  
+
   // In case of radio, the URI is simply the playback URL
   this->playbackURLQueue.push(uri);
 }
@@ -68,7 +68,8 @@ void RadioPlugin::runTask() {
       }
 
       this->ctx->playbackController->lockPlayback("radio");
-
+      this->ctx->audioBuffer->clearBuffer();
+      
       uint32_t trackHash = hashFunc(playbackUrl);
       uint32_t outlen, toWrite, written = 0;
       uint8_t* data;

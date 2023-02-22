@@ -5,6 +5,42 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "GDB (ESP32)",
+            "type": "cppdbg",
+            "request": "launch",
+            "MIMode": "gdb",
+            "miDebuggerPath": "${workspaceFolder}/nix/.espressif/tools/xtensa-esp-elf-gdb/11.2_20220823/xtensa-esp-elf-gdb/bin/xtensa-esp32-elf-gdb",
+            "program": "${workspaceFolder}/src/targets/esp32/build/euphonium-esp32.elf",
+            "cwd": "${workspaceFolder}/src/targets/esp32/build",
+            "environment": [
+                {
+                    "name": "PATH",
+                    "value": "${env:PATH}"
+                }
+            ],
+            "setupCommands": [
+                {
+                    "text": "target remote :3333"
+                },
+                {
+                    "text": "set mem inaccessible-by-default off"
+                },
+                {
+                    "text": "set remote hardware-watchpoint-limit 2"
+                },
+                {
+                    "text": "mon reset halt"
+                },
+                {
+                    "text": "flushregs"
+                }
+            ],
+            "externalConsole": false,
+            "logging": {
+                "engineLogging": true
+            }
+        },
+        {
             "name": "(lldb) Launch",
             "type": "cppdbg",
             "request": "launch",

@@ -2,10 +2,12 @@
     "cmake.buildDirectory": "${workspaceFolder}/src/targets/esp32/build",
     "clangd.arguments": [
         "--background-index",
+        "--clang-tidy",
         "--query-driver=/**/bin/xtensa-esp32-elf-*"
     ],
     "clangd.path": "/Users/cspot/esp-clang/bin/clangd",
     "C_Cpp.intelliSenseEngine": "disabled",
     "cmake.sourceDirectory": "${workspaceFolder}/src/targets/esp32/main",
-    "editor.tabSize": 2
+    "editor.tabSize": 2,
+    "nixEnvSelector.nixFile": "${workspaceRoot}/flake.nix"
 }

@@ -35,7 +35,7 @@ const PlaybackSong = ({ playbackState }: PlaybackStateProps) => {
     </div>);
   }
 
-  return (<div class="text-white ml-4">{track?.title} <span class="text-app-text-secondary font-thin">via radio</span></div>)
+  return (<div class="text-white ml-4">{track?.title} <span class="text-app-text-secondary">via {track?.source}</span></div>)
 }
 
 const PlaybackVolume = ({ playbackState }: PlaybackStateProps) => {

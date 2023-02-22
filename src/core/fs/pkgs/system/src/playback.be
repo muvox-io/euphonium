@@ -12,6 +12,19 @@ class PlaybackState
     self.current_track = self.create_default_track()
     self.settings = self.create_default_settings()
     self.recently_played = []
+
+    events.register_native("trackInfo", def (data)
+      self.notify_playback({
+        'title': data['title'],
+        'trackURI': data['uri'],
+        'iconUrl': data['iconUrl'],
+        'artist': data['artist'],
+        'album': data['album'],
+        'source': data['source'],
+        'timestamp': core.get_time_ms(),
+        'hidden': false
+      })
+    end)
   end
 
   # initializes the current_track object

@@ -32,6 +32,8 @@ void CoreBindings::setupBindings() {
                        "core");
   ctx->vm->export_this("query_context_uri", this,
                        &CoreBindings::_queryContextURI, "core");
+  ctx->vm->export_this("set_native_volume", this,
+                       &CoreBindings::_setNativeVolume, "core");
 }
 
 std::string CoreBindings::_getPlatform() {
@@ -114,6 +116,10 @@ void CoreBindings::_confirmOnboarding() {
 
 std::string CoreBindings::_getMac() {
   return bell::getMacAddress();
+}
+
+void CoreBindings::_setNativeVolume(int volume) {
+  this->ctx->playbackController->currentVolume = volume;
 }
 
 void CoreBindings::_queryContextURI(std::string uri) {

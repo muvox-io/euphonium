@@ -24,6 +24,7 @@ struct PlaybackController {
   std::atomic<bool> isPaused = false;
   std::atomic<bool> requestPause = false;
   std::mutex playbackAccessMutex;
+  int currentVolume = 0;
 
   std::function<void(const std::string&)> playbackLockedHandler;
 

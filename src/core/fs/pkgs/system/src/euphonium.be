@@ -177,6 +177,7 @@ class EuphoniumInstance
       if volume >= 0 && volume <= 100
         var hardware_plugin = self.get_plugin('hardware')
 
+        core.set_native_volume(volume)
         playback_state.update_volume(volume)
         self.broadcast_event(EVENT_VOLUME_UPDATED, volume)
       end

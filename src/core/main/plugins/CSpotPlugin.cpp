@@ -1,7 +1,12 @@
 #include "CSpotPlugin.h"
 #include <any>
+#include <iostream>
 #include <mutex>
+#include "CDNTrackStream.h"
+#include "ConstantParameters.h"
 #include "CoreEvents.h"
+#include "SpircHandler.h"
+#include "TrackPlayer.h"
 #include "URLParser.h"
 
 using namespace euph;
@@ -26,20 +31,39 @@ void CSpotPlugin::handleEvent(std::unique_ptr<Event>& event) {
   if (event->subType == "trackHashChange") {
     auto hashEvent = static_cast<TrackHashChangeEvent*>(event.get());
     if (this->expectedTrackHash == hashEvent->hash) {
+
       // Next track has been reached
       if (this->spircHandler != nullptr) {
         this->spircHandler->notifyAudioReachedPlayback();
+
+        // Post the next track info
+        this->ctx->eventBus->postEvent(
+            std::make_unique<TrackInfoEvent>(this->nextTrackInfo));
       }
     }
   }
 }
 
-void CSpotPlugin::queryContextURI(std::string uri) {}
+void CSpotPlugin::queryContextURI(std::string uri) {
+  // Handle context playback
+  if (this->spircHandler == nullptr) {
+    if (!authenticationLoaded) {
+      // No saved authentication data, can't do anything
+      return;
+    }
+
+    // Authenticate with spotify
+    this->requestedTrackId = uri;
+    this->authenticatedSemaphore->give();
+  } else {
+
+  }
+}
 
 void CSpotPlugin::_authenticateSaved(std::string authData) {
   if (this->spircHandler == nullptr && this->loginBlob != nullptr) {
     this->loginBlob->loadJson(authData);
-    this->authenticatedSemaphore->give();
+    this->authenticationLoaded = true;
   }
 }
 
@@ -116,11 +140,33 @@ void CSpotPlugin::handleCSpotEvent(
       this->ctx->audioBuffer->clearBuffer();
       this->ctx->playbackController->pause();
       break;
+    case cspot::SpircHandler::EventType::VOLUME: {
+      int volume = std::get<int>(event->data) * 100 / MAX_VOLUME;
+      auto volumeEvent =
+          std::make_unique<AudioVolumeEvent>(volume, AudioVolumeEvent::REMOTE);
+
+      this->ctx->eventBus->postEvent(std::move(volumeEvent));
+      break;
+    }
     case cspot::SpircHandler::EventType::SEEK:
       this->ctx->audioBuffer->clearBuffer();
       break;
+    case cspot::SpircHandler::EventType::TRACK_INFO: {
+      auto spotifyTrack =
+          std::get<cspot::CDNTrackStream::TrackInfo>(event->data);
+      // Prepare the track info event
+      this->nextTrackInfo =
+          TrackInfoEvent::TrackInfo{.uri = "cspot://" + spotifyTrack.trackId,
+                                    .title = spotifyTrack.name,
+                                    .artist = spotifyTrack.artist,
+                                    .album = spotifyTrack.album,
+                                    .iconURL = spotifyTrack.imageUrl,
+                                    .canPlay = true,
+                                    .dontCache = false};
+      break;
+    }
     case cspot::SpircHandler::EventType::PLAYBACK_START:
-      // this->ctx->audioBuffer->clearBuffer();
+      this->ctx->audioBuffer->clearBuffer();
       break;
     default:
       break;
@@ -148,6 +194,7 @@ void CSpotPlugin::runTask() {
 
     // Ensure access to audio buffer, disable other sources
     this->ctx->playbackController->lockPlayback("cspot");
+    this->ctx->audioBuffer->clearBuffer();
 
     EUPH_LOG(info, TASK, "Creating player");
     // Start spotify session
@@ -169,6 +216,9 @@ void CSpotPlugin::runTask() {
       // Handle control events
       this->spircHandler->setEventHandler(
           [this](auto event) { this->handleCSpotEvent(std::move(event)); });
+      
+      // Update volume on remote
+      this->spircHandler->setRemoteVolume(this->ctx->playbackController->currentVolume * MAX_VOLUME / 100);
 
       // Start handling mercury messages
       cspotCtx->session->startTask();
@@ -180,7 +230,6 @@ void CSpotPlugin::runTask() {
       }
       this->spircHandler->disconnect();
       this->spircHandler = nullptr;
-      // Authentication received, process login-blob
     }
 
     // Unlock access to audio buffer

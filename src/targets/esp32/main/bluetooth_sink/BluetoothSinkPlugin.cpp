@@ -50,6 +50,8 @@ BluetoothSinkPlugin::BluetoothSinkPlugin(std::shared_ptr<euph::Context> ctx)
         if (isActive) {
           // Lock playback
           this->ctx->playbackController->lockPlayback("bluetooth");
+          this->ctx->audioBuffer->clearBuffer();
+          
           this->canPlay = true;
         } else if (this->canPlay) {
           this->ctx->playbackController->unlockPlayback();

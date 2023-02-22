@@ -6,7 +6,7 @@ export default function getBaseUrl() {
   }
 
   if (import.meta.env.MODE !== "production") {
-    return "http://192.168.1.85";
+    return "http://localhost:8080";
   }
 
   return window.location.origin;

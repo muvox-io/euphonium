@@ -26,6 +26,7 @@ class CoreBindings {
   uint64_t _getTimestamp();
   bool _saveConfig(std::string pkg, std::string cfg);
   void _confirmOnboarding();
+  void _setNativeVolume(int volume);
   void _triggerPause(bool isPaused);
   std::string _getMac();
   void _setDisplayName(std::string name);
