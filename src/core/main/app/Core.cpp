@@ -1,6 +1,8 @@
 #include "Core.h"
+#include <memory>
 #include "CoreEvents.h"
 #include "EventBus.h"
+#include "OTAHandler.h"
 #include "URLParser.h"
 #include "berry.h"
 
@@ -28,6 +30,7 @@ void Core::initialize() {
   this->http = std::make_shared<euph::HTTPDispatcher>(this->ctx);
   this->pkgLoader = std::make_shared<euph::PackageLoader>(this->ctx);
   this->bindings = std::make_unique<euph::CoreBindings>(this->ctx);
+  this->otaHandler = std::make_unique<euph::OTAHandler>(this->ctx);
   this->audioTask =
       std::make_shared<euph::AudioTask>(this->ctx, this->audioOutput);
 
@@ -38,6 +41,9 @@ void Core::initialize() {
 
   this->http->initialize();
   this->audioOutput->setupBindings(ctx);
+
+  // Register HTTP handlers for OTA
+  this->otaHandler->registerHandlers(this->http->getServer());
 
   // For handling source switching
   this->ctx->playbackController->playbackLockedHandler =
@@ -149,7 +155,6 @@ void Core::handleEvent(std::unique_ptr<Event>& event) {
         BELL_LOG(error, TAG,
                  "Berry stack invalid, possible memory leak (%d > 0 !)",
                  be_top(ctx->vm->raw_ptr()));
-
       }
       break;
     }

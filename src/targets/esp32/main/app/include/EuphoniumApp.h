@@ -25,6 +25,7 @@ class EuphoniumApp : public bell::Task {
   void runTask() override;
 
  private:
+  void printBuildInfo();
   void initializeStorage();
   std::shared_ptr<euph::ESP32Connectivity> connectivity;
   std::shared_ptr<euph::EventBus> eventBus;

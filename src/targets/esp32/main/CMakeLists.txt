@@ -16,6 +16,7 @@ set(COMPONENT_REQUIRES
     esp_netif
     lwip
     esp_timer
+    app_update
     esp_wifi
     core)
 register_component()

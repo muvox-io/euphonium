@@ -11,6 +11,8 @@ void PackageLoader::loadValidPackages() {
   EUPH_LOG(info, TAG, "Loading packages");
   std::string path = fmt::format("{}/pkgs", ctx->rootPath);
 
+  std::string summaryString = "";
+  
   // iterate over all the files in the pkgs directory
   for (auto file : ctx->storage->listFiles(path)) {
 
@@ -37,10 +39,18 @@ void PackageLoader::loadValidPackages() {
       info.initHook = manifest["init_hook"];
 
       this->packages.push_back(info);
-      EUPH_LOG(info, TAG, "Registered package: %s", info.name.c_str());
+      summaryString += fmt::format("{}=={}, ", info.name, info.version);
     } catch (...) {
       continue;
     }
+  }
+
+  if (summaryString.size() > 0) {
+    // Remove two trailling char
+    summaryString.pop_back();
+    summaryString.pop_back();
+
+    EUPH_LOG(info, TAG, "Registered following packages [%s]", summaryString.c_str());
   }
 }
 

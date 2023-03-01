@@ -1,6 +1,7 @@
 #include "StorageAccessor.h"
 #include <iostream>
 #include <stdexcept>
+#include "BellTar.h"
 
 using namespace euph;
 
@@ -26,21 +27,51 @@ StorageAccessor::StorageAccessor()
 StorageAccessor::~StorageAccessor() {}
 
 std::string StorageAccessor::readFile(std::string_view path) {
+  std::string result;
+  bool success = false;
 
+  this->executeFromTask([&result, &path, &success]() {
+    std::ifstream file(path.data(), std::ios::binary);
+
+    if (!file.is_open()) {
+      // Cannot open file
+      return;
+    }
+
+    // read file size
+    file.seekg(0, std::ios::end);
+    size_t fileSize = file.tellg();
+    file.seekg(0, std::ios::beg);
+    result.resize(fileSize);
+
+    // Read the file into string
+    file.read(&result[0], fileSize);
+    success = true;
+  });
+
+  if (success) {
+    return result;
+  } else {
+    throw std::runtime_error("Failed to read file");
+  }
+}
+
+void StorageAccessor::extractTar(std::string_view path, std::string_view dest) {
   this->currentOperation = Operation{
-      .type = OperationType::READ,
-      .format = OperationFormat::TEXT,
+      .type = OperationType::EXTRACT,
+      .format = OperationFormat::BINARY,
       .status = OperationStatus::PENDING,
       .path = (char*)path.data(),
+      .dataBinary = {},
+      .dataText = (char*)dest.data(),
+      .dataCon = nullptr,
   };
 
   this->requestSemaphore->give();
   this->responseSemaphore->wait();
 
-  if (this->currentOperation.status == OperationStatus::SUCCESS) {
-    return this->currentOperation.dataText;
-  } else {
-    throw std::runtime_error("Failed to read file");
+  if (this->currentOperation.status != OperationStatus::SUCCESS) {
+    throw std::runtime_error("Failed to extract tar");
   }
 }
 
@@ -50,7 +81,27 @@ void StorageAccessor::writeFile(std::string_view path, std::string_view body) {
       .format = OperationFormat::TEXT,
       .status = OperationStatus::PENDING,
       .path = (char*)path.data(),
-      .dataText = std::string(body),
+      .dataBinary = std::vector<uint8_t>(body.begin(), body.end()),
+      .writeAppend = false,
+  };
+
+  this->requestSemaphore->give();
+  this->responseSemaphore->wait();
+
+  if (this->currentOperation.status != OperationStatus::SUCCESS) {
+    throw std::runtime_error("Failed to write file");
+  }
+}
+
+void StorageAccessor::writeFileBytes(std::string_view path,
+                                     std::vector<uint8_t> bytes, bool append) {
+  this->currentOperation = Operation{
+      .type = OperationType::WRITE,
+      .format = OperationFormat::BINARY,
+      .status = OperationStatus::PENDING,
+      .path = (char*)path.data(),
+      .dataBinary = bytes,
+      .writeAppend = append,
   };
 
   this->requestSemaphore->give();
@@ -62,36 +113,59 @@ void StorageAccessor::writeFile(std::string_view path, std::string_view body) {
 }
 
 std::vector<uint8_t> StorageAccessor::readFileBinary(std::string_view path) {
-  this->currentOperation = Operation{
-      .type = OperationType::READ,
-      .format = OperationFormat::BINARY,
-      .path = (char*)path.data(),
-  };
+  std::vector<uint8_t> result;
+  bool success = false;
 
-  this->requestSemaphore->give();
-  this->responseSemaphore->wait();
+  this->executeFromTask([&result, &path, &success]() {
+    std::ifstream file(path.data(), std::ios::binary);
 
-  if (this->currentOperation.status == OperationStatus::SUCCESS) {
-    return this->currentOperation.dataBinary;
+    if (!file.is_open()) {
+      // Cannot open file
+      return;
+    }
+
+    // read file size
+    file.seekg(0, std::ios::end);
+    size_t fileSize = file.tellg();
+    file.seekg(0, std::ios::beg);
+    result.resize(fileSize);
+
+    // Read the file into string
+    file.read((char*)result.data(), fileSize);
+    success = true;
+  });
+
+  if (success) {
+    return result;
   } else {
     throw std::runtime_error("Failed to read file");
   }
 }
 
 std::vector<std::string> StorageAccessor::listFiles(std::string_view path) {
-  this->currentOperation = Operation{
-      .type = OperationType::LIST_DIRS,
-      .format = OperationFormat::BINARY,
-      .path = (char*)path.data(),
-  };
 
-  this->requestSemaphore->give();
-  this->responseSemaphore->wait();
+  std::vector<std::string> result;
+  bool success = false;
 
-  if (this->currentOperation.status == OperationStatus::SUCCESS) {
-    return this->currentOperation.dataPaths;
+  this->executeFromTask([&result, &path, &success]() {
+    std::ofstream file(path.data(), std::ios::binary);
+    DIR* dir;
+    struct dirent* ent;
+    if ((dir = opendir(path.data())) != NULL) {
+      /* print all the files and directories within directory */
+      while ((ent = readdir(dir)) != NULL) {
+        result.push_back(ent->d_name);
+      }
+      closedir(dir);
+
+      success = true;
+    }
+  });
+
+  if (success) {
+    return result;
   } else {
-    throw std::runtime_error("Failed to list dirs");
+    throw std::runtime_error("Failed to list directories");
   }
 }
 
@@ -120,6 +194,17 @@ bool StorageAccessor::strEndsWith(std::string const& fullString,
   } else {
     return false;
   }
+}
+
+void StorageAccessor::executeFromTask(std::function<void()> func) {
+  std::scoped_lock lock(this->operationMutex);
+  this->currentOperation = Operation{
+      .type = OperationType::FUNC,
+      .workFunc = func,
+  };
+
+  this->requestSemaphore->give();
+  this->responseSemaphore->wait();
 }
 
 void StorageAccessor::runTask() {
@@ -233,19 +318,41 @@ void StorageAccessor::runTask() {
       }
     }
 
+    if (this->currentOperation.type == OperationType::FUNC) {
+      this->currentOperation.workFunc();
+      this->currentOperation.status = OperationStatus::SUCCESS;
+    }
+
+    if (this->currentOperation.type == OperationType::EXTRACT) {
+      std::string filePath = this->currentOperation.path;
+      std::ifstream file(filePath, std::ios::binary);
+
+      if (!file.is_open()) {
+        // Archive does not exist
+        this->currentOperation.status = OperationStatus::FAILURE;
+      } else {
+        bell::BellTar::reader tarReader(file);
+        tarReader.extract_all_files(this->currentOperation.dataText);
+
+        this->currentOperation.status = OperationStatus::SUCCESS;
+      }
+    }
+
     if (this->currentOperation.type == OperationType::WRITE) {
-      std::ofstream file(this->currentOperation.path, std::ios::binary);
+      std::ofstream file(this->currentOperation.path,
+                         currentOperation.writeAppend
+                             ? (std::ios::binary | std::ios::app)
+                             : (std::ios::binary));
 
       // if file doesnt exist, create it
       if (!file.is_open()) {
-        printf("Creating file\n");
         file.open(this->currentOperation.path, std::ios::out);
       }
 
       // check if file exists
       if (file.is_open()) {
-        file.write(this->currentOperation.dataText.c_str(),
-                   this->currentOperation.dataText.size());
+        file.write((char*)this->currentOperation.dataBinary.data(),
+                   this->currentOperation.dataBinary.size());
 
         this->currentOperation.status = OperationStatus::SUCCESS;
       } else {

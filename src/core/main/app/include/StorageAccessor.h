@@ -1,5 +1,6 @@
 #pragma once
 
+#include <dirent.h>
 #include <fstream>
 #include <istream>
 #include <memory>
@@ -7,7 +8,6 @@
 #include <string>
 #include <string_view>
 #include <vector>
-#include <dirent.h>
 
 // For mg_connection
 #include "BellTask.h"
@@ -26,7 +26,7 @@ namespace euph {
 class StorageAccessor : public bell::Task {
  public:
   // Indicates the type of the operation
-  enum class OperationType { READ, WRITE, LIST_DIRS };
+  enum class OperationType { READ, WRITE, LIST_DIRS, EXTRACT, FUNC };
 
   // Indicates the format of the data
   enum class OperationFormat {
@@ -49,6 +49,8 @@ class StorageAccessor : public bell::Task {
     std::string dataText;
     std::vector<std::string> dataPaths;
     struct mg_connection* dataCon;
+    std::function<void()> workFunc;
+    bool writeAppend;
   };
 
   StorageAccessor();
@@ -71,12 +73,37 @@ class StorageAccessor : public bell::Task {
   void writeFile(std::string_view path, std::string_view body);
 
   /**
+   * @brief Writes a vector of bytes to a file
+   * 
+   * @param path Path to the file
+   * @param body Vector of bytes to write to the file
+   * @param append If true, the data will be appended to the file. Otherwise, the file will be overwritten.
+   */
+  void writeFileBytes(std::string_view path, std::vector<uint8_t> body,
+                      bool append = false);
+
+  /**
+   * @brief Extracts a tar archive from @param path to @param dest
+   * 
+   * @param path Path to the archive
+   * @param dest Path to the destination directory
+   */
+  void extractTar(std::string_view path, std::string_view dest);
+
+  /**
    * @brief Reads a file from the filesystem and returns it as a vector of bytes
    * 
    * @param path Path to the file
    * @return std::vector<uint8_t> 
    */
   std::vector<uint8_t> readFileBinary(std::string_view path);
+
+  /**
+   * @brief Executes a function from the context of this task, allowing it to access the filesystem.
+   * 
+   * @param func Function to execute
+   */
+  void executeFromTask(std::function<void()> func);
 
   /**
    * @brief Reads a file from the filesystem and writes it to a socket. Used in HTTP Server.
@@ -103,11 +130,12 @@ class StorageAccessor : public bell::Task {
   // Current operation
   Operation currentOperation;
 
-  bool strEndsWith(std::string const &fullString, std::string const &ending);
+  bool strEndsWith(std::string const& fullString, std::string const& ending);
 
   // Semaphores used to synchronize the task
   std::unique_ptr<bell::WrappedSemaphore> requestSemaphore;
   std::unique_ptr<bell::WrappedSemaphore> responseSemaphore;
+  std::mutex operationMutex;
 
   void runTask() override;
 };

@@ -16,6 +16,7 @@
 
 #include "CoreEvents.h"
 #include "HTTPDispatcher.h"
+#include "OTAHandler.h"
 #include "PackageLoader.h"
 #include "StorageAccessor.h"
 #include "Connectivity.h"
@@ -38,6 +39,7 @@ class Core : public euph::EventSubscriber {
   std::shared_ptr<euph::Context> ctx = nullptr;
 
   std::shared_ptr<euph::HTTPDispatcher> http;
+  std::shared_ptr<euph::OTAHandler> otaHandler;
   std::shared_ptr<euph::PackageLoader> pkgLoader;
   std::shared_ptr<euph::AudioTask> audioTask;
   std::shared_ptr<euph::AudioOutput> audioOutput;

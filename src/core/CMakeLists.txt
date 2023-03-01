@@ -7,7 +7,7 @@ set(CMAKE_COLOR_DIAGNOSTICS ON)
 
 # Force cspot to use bell provided by us
 set(CSPOT_EXTERNAL_BELL "bell"
-        CACHE INTERNAL ""
+  CACHE INTERNAL ""
 )
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/bell ${CMAKE_CURRENT_BINARY_DIR}/bell)
@@ -22,6 +22,13 @@ if(NOT DEFINED HTTP_SERVER_PORT)
   set(HTTP_SERVER_PORT 80)
 endif()
 
+if(DEFINED ENV{EUPH_VERSION})
+  add_definitions(-DEUPH_VERSION="$ENV{EUPH_VERSION}")
+else()
+  add_definitions(-DEUPH_VERSION="debug")
+  add_definitions(-DEUPH_DEBUG)
+endif()
+
 add_definitions(-DHTTP_SERVER_PORT=${HTTP_SERVER_PORT})
 
 include_directories("main/app/include")
@@ -29,6 +36,10 @@ include_directories("main/plugins/include")
 include_directories("main/multiroom/include")
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+if(ESP_PLATFORM)
+  list(APPEND EXTRA_REQ_LIBS "idf::app_update")
+endif()
 
 add_library(euphonium STATIC ${SOURCES})
 

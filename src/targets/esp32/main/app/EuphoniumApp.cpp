@@ -1,4 +1,7 @@
 #include "EuphoniumApp.h"
+#include "esp_app_format.h"
+#include "esp_ota_ops.h"
+#include "esp_partition.h"
 
 using namespace euph;
 
@@ -11,6 +14,7 @@ EuphoniumApp::EuphoniumApp() : bell::Task("app", 24 * 1024, 1, 0) {
   this->statusTask = std::make_shared<euph::StatusLED>(eventBus);
   this->memoryMonitor = std::make_shared<euph::MemoryMonitorTask>();
 
+  this->printBuildInfo();
   startTask();
 }
 
@@ -38,6 +42,25 @@ void EuphoniumApp::initializeStorage() {
   }
 
   EUPH_LOG(info, TASK, "Storage mounted.");
+}
+
+void EuphoniumApp::printBuildInfo() {
+  const esp_partition_t* runningPartition = esp_ota_get_running_partition();
+  esp_app_desc_t runningAppInfo;
+  const esp_partition_t* configuredParition = esp_ota_get_boot_partition();
+
+  EUPH_LOG(info, TASK, "Euphonium running on ESP32");
+  EUPH_LOG(info, TASK, " Build version     : %s", EUPH_VERSION);
+  EUPH_LOG(info, TASK, " Running partition : %s, size 0x%08" PRIx32 "",
+           runningPartition->label, runningPartition->size);
+  if (ESP_OK ==
+      esp_ota_get_partition_description(runningPartition, &runningAppInfo)) {
+    EUPH_LOG(info, TASK, " Running OTA       : %s", runningAppInfo.version);
+  }
+  if (runningPartition != configuredParition) {
+    EUPH_LOG(info, TASK, "OTA partition mismatch, expected %s",
+             configuredParition->label);
+  }
 }
 
 void EuphoniumApp::runTask() {
