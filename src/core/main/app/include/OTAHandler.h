@@ -11,7 +11,8 @@
 #endif
 
 namespace euph {
-constexpr size_t MAX_OTA_PACKAGE_SIZE = 1024 * 512;
+constexpr size_t MAX_OTA_PACKAGE_SIZE = 1024 * 1024 * 10;
+constexpr size_t MAX_OTA_BUFFER_SIZE = 1024 * 32;
 constexpr auto DEFAULT_PKG_UPDATE_PATH = "/tmp/pkg.tar";
 constexpr auto DEFAULT_PKG_EXTRACT_PATH = "/tmp/pkg";
 
@@ -21,6 +22,7 @@ constexpr auto DEFAULT_PKG_EXTRACT_PATH = "/tmp/pkg";
 class OTAHandler {
  private:
   std::shared_ptr<euph::Context> ctx;
+  std::string TAG = "OTAHandler";
 
  public:
   OTAHandler(std::shared_ptr<euph::Context> ctx);
@@ -31,6 +33,7 @@ class OTAHandler {
     std::string sha1;
     Type type = Type::INVALID;
     size_t currentSize = 0;
+    std::vector<uint8_t> otaBuffer;
 
 #ifdef ESP_PLATFORM
     esp_ota_handle_t otaUpdateHandle = 0;
@@ -40,7 +43,8 @@ class OTAHandler {
     std::shared_ptr<euph::Context> ctx;
   };
 
-  void registerHandlers(std::shared_ptr<bell::BellHTTPServer>);
+  void initialize(std::shared_ptr<bell::BellHTTPServer>);
+
   std::string validatePackage();
 };
 }  // namespace euph

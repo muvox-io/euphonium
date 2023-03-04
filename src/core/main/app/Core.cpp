@@ -4,6 +4,7 @@
 #include "EventBus.h"
 #include "OTAHandler.h"
 #include "URLParser.h"
+#include "X509Bundle.h"
 #include "berry.h"
 
 using namespace euph;
@@ -42,8 +43,27 @@ void Core::initialize() {
   this->http->initialize();
   this->audioOutput->setupBindings(ctx);
 
-  // Register HTTP handlers for OTA
-  this->otaHandler->registerHandlers(this->http->getServer());
+  // Register HTTP handlers for OTA, update packages if necessary
+  this->otaHandler->initialize(this->http->getServer());
+
+  // Check if contains X509 SSL bundle
+  this->ctx->storage->executeFromTask([this]() {
+    std::ifstream bundleFile(this->ctx->rootPath +
+                             "/pkgs/system/x509_crt_bundle");
+
+    if (bundleFile.is_open()) {
+      EUPH_LOG(info, this->TAG, "SSL bundle read successfully, attaching");
+      std::vector<uint8_t> bundleContents(
+          (std::istreambuf_iterator<char>(bundleFile)),
+          std::istreambuf_iterator<char>());
+
+      bell::X509Bundle::init(bundleContents.data(), bundleContents.size());
+    } else {
+      EUPH_LOG(
+          info, this->TAG,
+          "WARNING: SSL bundle not found, booting without SSL verification");
+    }
+  });
 
   // For handling source switching
   this->ctx->playbackController->playbackLockedHandler =
