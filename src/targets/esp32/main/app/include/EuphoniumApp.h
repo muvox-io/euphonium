@@ -15,6 +15,7 @@
 #include "MemoryMonitorTask.h"
 #include "StatusLED.h"
 #include "I2SAudioOutput.h"
+#include "ManufacuringShell.h"
 
 namespace euph {
 class EuphoniumApp : public bell::Task {
@@ -32,6 +33,7 @@ class EuphoniumApp : public bell::Task {
   std::shared_ptr<euph::I2SAudioOutput> audioOutput;
   std::shared_ptr<euph::StatusLED> statusTask;
   std::shared_ptr<euph::MemoryMonitorTask> memoryMonitor;
+  std::shared_ptr<euph::ManufacuringShell> manufacuringShell;
 
   std::unique_ptr<euph::Core> core;
 };

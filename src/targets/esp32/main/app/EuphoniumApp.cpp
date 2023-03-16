@@ -13,6 +13,7 @@ EuphoniumApp::EuphoniumApp() : bell::Task("app", 24 * 1024, 1, 0) {
   this->audioOutput = std::make_shared<euph::I2SAudioOutput>();
   this->statusTask = std::make_shared<euph::StatusLED>(eventBus);
   this->memoryMonitor = std::make_shared<euph::MemoryMonitorTask>();
+  this->manufacuringShell = std::make_shared<euph::ManufacuringShell>(eventBus);
 
   this->printBuildInfo();
   startTask();

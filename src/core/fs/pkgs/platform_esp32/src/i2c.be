@@ -23,6 +23,11 @@ class I2C
         _i2c.delete()
     end
 
+    def is_installed()
+        return _i2c.is_installed()
+    end
+
+
     def detect(addr)
         return _i2c.detect(addr)
     end
