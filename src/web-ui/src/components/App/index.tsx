@@ -19,20 +19,26 @@ export function App() {
   updateTheme();
   return (
     <>
+      <ConnectionLostModal></ConnectionLostModal>
       <APIFetcher api={SystemAPI} fetch={(api) => api.getSystemInfo()}>
         {(info: EuphoniumInfo) => {
-          const onboarding = info?.connectivity?.state != "CONNECTED" || info?.onboarding;
+          const onboarding =
+            info?.connectivity?.state != "CONNECTED" || info?.onboarding;
           return (
-            <div className={`${css.mainWrapper} ${onboarding ? css.mainWrapperWaves : css.mainWrapperStatic}`}>
-              <ConnectionLostModal></ConnectionLostModal>
+            <div
+              className={`${css.mainWrapper} ${
+                onboarding ? css.mainWrapperWaves : css.mainWrapperStatic
+              }`}
+            >
               <PlaybackDataContextProvider>
                 <div class="h-screen w-screen">
                   <Notifications />
                   {/* <Onboarding/> */}
-                  {onboarding ?
-                    (<Onboarding connectivity={info.connectivity} />)
-                    : (<NormalComponent info={info} />)
-                  }
+                  {onboarding ? (
+                    <Onboarding connectivity={info.connectivity} />
+                  ) : (
+                    <NormalComponent info={info} />
+                  )}
                 </div>
               </PlaybackDataContextProvider>
             </div>
