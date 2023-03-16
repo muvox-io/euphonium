@@ -32,3 +32,4 @@ targets/esp32/app/dependencies.lock
 targets/esp32/app/spiffs/*
 py/
 .direnv
+src/core/fs/cfg/*.json
