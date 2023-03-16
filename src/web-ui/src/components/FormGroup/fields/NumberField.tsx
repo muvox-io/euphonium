@@ -6,15 +6,15 @@ export default function NumberField({
   value,
   onChange,
   onChangeFinished,
-}: FieldProps<string>) {
+}: FieldProps<number>) {
   return (
     <Input
       type="number"
       tooltip={field.label}
       width={90}
-      value={value}
+      value={value.toString()}
       singleLine={true}
-      onChange={(str) => onChange(str)}
+      onChange={(str) => onChange(parseFloat(str))}
       onBlur={onChangeFinished}
     />
   );
