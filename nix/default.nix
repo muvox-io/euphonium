@@ -60,5 +60,13 @@ rec {
       idf.py build
       runHook postBuild
     '';
+    installPhase = ''
+      cd build
+      mkdir -p $out $out/bootloader $out/partition_table
+      cp storage.bin $out/storage.bin
+      cp euphonium-esp32.bin $out/euphonium-esp32.bin
+      cp bootloader/bootloader.bin $out/bootloader/bootloader.bin
+      cp partition_table/partition-table.bin $out/partition_table/partition-table.bin
+    '';
   };
 }

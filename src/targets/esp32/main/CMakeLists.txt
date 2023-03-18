@@ -17,6 +17,8 @@ set(COMPONENT_REQUIRES
     lwip
     esp_timer
     app_update
+    esp_littlefs
+    espressif__mdns
     esp_wifi
     core)
 register_component()
