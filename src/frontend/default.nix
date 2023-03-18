@@ -1,7 +1,6 @@
 { stdenv, callPackage, nodejs, nodePackages, writeShellScriptBin }:
 
 let
-  # Import & invoke the generated files from node2nix
   generated = callPackage ./nix { inherit nodejs; };
 
   # node2nix wrapper to update nix files on npm changes
@@ -15,7 +14,6 @@ let
   '';
 
 in {
-  # Location of the node_modules system dependencies
   inherit (generated) nodeDependencies;
 
   # Build recipe for the static assets
@@ -24,7 +22,7 @@ in {
     src = ./.;
     buildInputs = [ nodejs ];
     buildPhase = ''
-      export HOME=$(pwd)
+      export HOME=$TMP
       ln -s ${generated.nodeDependencies}/lib/node_modules ./node_modules
       export PATH="${generated.nodeDependencies}/bin:$PATH"
       npm run build
