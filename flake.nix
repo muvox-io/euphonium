@@ -19,7 +19,12 @@
           overlays = [ overlay ];
         };
 
-        apps = { };
+        apps = {
+          flash-storage = {
+            type = "app";
+            program = "${pkgs.euphonium.flash-storage}/bin/flash-storage";
+          };
+        };
 
         packages = {
           frontend = pkgs.euphonium.frontend;
@@ -29,6 +34,7 @@
 
         devShells = {
           esp32 = pkgs.euphonium.shell-esp32;
+          frontend = pkgs.euphonium.shell-frontend;
         };
 
       in

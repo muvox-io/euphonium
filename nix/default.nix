@@ -1,4 +1,4 @@
-{ stdenv, pkgs }:
+{ stdenv, pkgs, writeShellScriptBin }:
 
 let
   frontend-pkg = (pkgs.callPackage ../src/frontend { });
@@ -7,6 +7,7 @@ in
 rec {
   # Euphonium's webinterface
   frontend = frontend-pkg.static;
+  shell-frontend = frontend-pkg.shell;
 
   # Build recipe for storage
   fs-esp32 = stdenv.mkDerivation {
@@ -41,6 +42,17 @@ rec {
       export IDF_PYTHON_ENV_PATH=$IDF_TOOLS_PATH/python_env/idf5.0_py3.9_env 
     '';
   };
+
+  # Helper for flashing storage partition
+  flash-storage = writeShellScriptBin "flash-storage" ''
+    #!/bin/bash
+    if [ "$2" = "" ]
+    then
+      echo "Usage: flash-storage -- <path to storage.bin> <port>"
+      exit 1
+    fi
+    ${esp-idf}/bin/esptool.py -p $2 -b 460800 --before default_reset --after hard_reset --chip esp32  write_flash --flash_mode dio --flash_size detect --flash_freq 80m 0x10000 $1
+  '';
 
   # Build target esp32
   app-esp32 = stdenv.mkDerivation {

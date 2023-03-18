@@ -160,6 +160,14 @@ stdenv.mkDerivation rec {
     --set IDF_PYTHON_ENV_PATH $out/.espressif/python_env/idf5.0_py3.9_env \
     --set IDF_PATH $out/sdk/ \
     --prefix PATH : "${lib.makeBinPath propagatedBuildInputs}"
+
+    # wrapper around esptool.py
+    makeWrapper $out/.espressif/python_env/idf5.0_py3.9_env/bin/python $out/bin/esptool.py \
+    --add-flags $out/sdk/components/esptool_py/esptool/esptool.py \
+    --set IDF_TOOLS_PATH $out/.espressif \
+    --set IDF_PYTHON_ENV_PATH $out/.espressif/python_env/idf5.0_py3.9_env \
+    --set IDF_PATH $out/sdk/ \
+    --prefix PATH : "${lib.makeBinPath propagatedBuildInputs}"
     runHook postInstall
   '';
 
