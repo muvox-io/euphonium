@@ -7,8 +7,7 @@
   outputs = { self, nixpkgs, flake-utils }:
     let
       overlay = final: prev: {
-        euphonium = (final.callPackage ./. { } // {
-        });
+        euphonium = (final.callPackage ./nix { });
       };
     in
     {
@@ -20,20 +19,22 @@
           overlays = [ overlay ];
         };
 
-        apps = {
-        };
+        apps = { };
 
         packages = {
           frontend = pkgs.euphonium.frontend;
           fs-esp32 = pkgs.euphonium.fs-esp32;
+          app-esp32 = pkgs.euphonium.app-esp32;
         };
 
         devShells = {
+          esp32 = pkgs.euphonium.shell-esp32;
         };
 
       in
       {
         inherit apps devShells packages;
         checks = packages;
+        devShell = devShells.esp32;
       });
 }

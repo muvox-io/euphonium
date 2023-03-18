@@ -18,7 +18,7 @@ let
     "linux-armel" = "12qgd7v6yhvcp9vrrv0knys1lcl40jmc1kn6gsqhvz4n8khjdfvg";
     "linux-armhf" = "04hv96gaarwhqa8n36pjx3mz1mqi27kxa6npmz3jljmhlidqhpdh";
     "linux-i686" = "1jvf58p96w7kd573dhh1qv8hzl0bmidq6ai1c4h7l80qn82y1y2x";
-    "macos" = "1i2x1nsvk35v63kn74vczm6bgcgr0jhwlz4zk163ljh2vagi1bqr";
+    "macos" = "1gq9ai0pf5cvacg9kw6l0nk08s6k01r4n8g4q6z3m7j6aqy8g78w";
     "macos-arm64" = "0fvw5b9myjj1z298q2j51in9j94qnrhdk1addi4zs1skvjq4jwi9";
   };
   platform = platforms.${stdenv.system};
