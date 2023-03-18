@@ -14,9 +14,9 @@ export default function ConnectionLostModal(): JSX.Element | null {
   let [open, setOpen] = useState(false); // determines whether the modal should be shown
   let [showImpulse, setShowImpulse] = useState(false); // determines whether the modal should show the impulse animation, which is shown on every error
   let apiAccessor = useContext(APIAccessorContext);
-
   useEffect(() => {
     let errorListener = (e: any) => {
+      console.log(e);
       setShowImpulse(true);
       setOpen(true);
       setTimeout(() => {

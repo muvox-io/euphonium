@@ -1,36 +1,15 @@
 import getBaseUrl from "./baseUrl";
 
+
 class EuphEventsEmitter {
-  webSocket?: WebSocket;
+  webSocket = new WebSocket(`${getBaseUrl().replace("http://", "ws://")}/events`);
   _events: Record<string, Array<(data: any) => void>> = {};
-  isConnected = false;
 
   constructor() {
-    this.connect();
-  }
-
-  connect() {
-    this.webSocket = new WebSocket(
-      `${getBaseUrl().replace("http://", "ws://")}/events`
-    );
     this.webSocket.onmessage = (event: any) => {
       const { type, data } = JSON.parse(event.data);
+      console.log(type);
       this.emit(type, data);
-    };
-    this.webSocket.onclose = () => {
-      this.emit("error", null);
-      this.isConnected = false;
-    };
-    this.webSocket.onerror = () => {
-      this.emit("error", null);
-      this.isConnected = false;
-      setTimeout(() => {
-        this.connect();
-      }, 2000);
-    };
-    this.webSocket.onopen = () => {
-      this.emit("open", null);
-      this.isConnected = true;
     };
   }
 
@@ -44,9 +23,7 @@ class EuphEventsEmitter {
 
   removeListener(name: string, listenerToRemove: any) {
     if (!this._events[name]) {
-      throw new Error(
-        `Can't remove a listener. Event "${name}" doesn't exits.`
-      );
+      throw new Error(`Can't remove a listener. Event "${name}" doesn't exits.`);
     }
 
     const filterListeners = (listener: any) => listener !== listenerToRemove;
@@ -56,7 +33,7 @@ class EuphEventsEmitter {
 
   emit(name: string, data: any) {
     if (!this._events[name]) {
-      return;
+      throw new Error(`Can't emit an event. Event "${name}" doesn't exits.`);
     }
 
     const fireCallbacks = (callback: any) => {

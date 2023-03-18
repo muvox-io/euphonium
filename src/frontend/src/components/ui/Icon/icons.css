@@ -6,10 +6,11 @@
   font-display: block;
 }
 
-[class^="icon-"],
-[class*=" icon-"] {
+
+
+[class^="icon-"], [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: "euph" !important;
+  font-family: 'euph' !important;
   speak: never;
   font-style: normal;
   font-weight: normal;
@@ -23,6 +24,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-arrow_left:before {
+  content: "\e908";
+}
+.icon-arrow_right:before {
+  content: "\e909";
+}
 .icon-radio:before {
   content: "\e900";
 }
@@ -86,4 +93,3 @@
 .icon-volume_mute:before {
   content: "\ea2a";
 }
-

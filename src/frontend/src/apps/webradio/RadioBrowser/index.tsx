@@ -4,7 +4,6 @@ import { getStationsByName } from "../../../api/radiobrowser/api";
 import { Station } from "../../../api/radiobrowser/models";
 import Card from "../../../components/ui/Card";
 import Icon from "../../../components/ui/Icon";
-import Input from "../../../components/ui/Input";
 import useAPI from "../../../utils/useAPI.hook";
 
 const Radio = ({
@@ -39,14 +38,16 @@ const Radio = ({
             name="play"
           />
         </div>
-        {/* <Icon name="save" /> */}
       </div>
     </div>
   );
 };
 
 export default () => {
+  const pageSize = 30;
+
   const [radios, setRadios] = useState<Station[]>([]);
+  const [page, setPage] = useState(0);
 
   return (
     <div class="mb-[150px]">
@@ -56,7 +57,7 @@ export default () => {
             placeholder={"Search radios"}
             className="pl-10 bg-app-primary h-[45px] p-3 rounded-xl min-w-full"
             onChange={(e: any) =>
-              getStationsByName(e.target.value, 30, 0).then(setRadios)
+              getStationsByName(e.target.value, pageSize, page * pageSize).then(setRadios)
             }
           ></input>
           <div class="text-app-text-secondary left-1 top-3 absolute">
@@ -84,6 +85,18 @@ export default () => {
             Results empty.
           </div>
         )}
+        <div class="flex flex-row text-2xl">
+          <div class={`${page > 0 ? 'bg-app-primary' : ''} text-app-text-secondary w-[40px] h-[40px] rounded-xl mr-3 flex justify-center items-center`}>
+            <Icon name="arrow_right" />
+          </div>
+
+          <div class="text-app-text-secondary text-[18px] bg-app-primary w-[40px] h-[40px] rounded-xl mr-3 flex justify-center items-center">
+            1/1
+          </div>
+          <div class="text-app-text-secondary bg-app-primary w-[40px] h-[40px] rounded-xl mr-3 flex justify-center items-center">
+            <Icon name="arrow_left" />
+          </div>
+        </div>
       </Card>
     </div>
   );
