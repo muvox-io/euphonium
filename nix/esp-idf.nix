@@ -104,7 +104,7 @@ let
     ];
   };
   toolchain = pkgs.callPackage ./toolchain.nix { };
-  idf-python-env = (pkgs.python39.withPackages (p: with p; [ pip idf-component-manager esptool esp-coredump esp-idf-monitor esp-idf-kconfig freertos-gdb protobuf grpcio ]));
+  idf-python-env = (pkgs.python39.withPackages (p: with p; [ pip idf-component-manager esptool esp-coredump esp-idf-monitor esp-idf-kconfig freertos-gdb p.protobuf grpcio-tools ]));
 in
 stdenv.mkDerivation rec {
   pname = "esp-idf";
@@ -159,6 +159,7 @@ stdenv.mkDerivation rec {
     --set IDF_TOOLS_PATH $out/.espressif \
     --set IDF_PYTHON_ENV_PATH $out/.espressif/python_env/idf5.0_py3.9_env \
     --set IDF_PATH $out/sdk/ \
+    --set PYTHONPATH ${idf-python-env}/${idf-python-env.sitePackages}:$PYTHONPATH \
     --prefix PATH : "${lib.makeBinPath propagatedBuildInputs}"
 
     # wrapper around esptool.py
@@ -173,6 +174,7 @@ stdenv.mkDerivation rec {
 
   shellHook = ''
     export PYTHONPATH=${idf-python-env}/${idf-python-env.sitePackages}:$PYTHONPATH
+    export PATH="${lib.makeBinPath propagatedBuildInputs}":$PATH
   '';
 
   phases = [ "unpackPhase" "preBuildPhase" "installPhase" ];

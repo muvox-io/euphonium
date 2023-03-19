@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchurl, makeWrapper }:
+{ stdenv, lib, buildFHSUserEnv, makeWrapper, fetchurl }:
 
 let
   platforms = {
@@ -11,6 +11,11 @@ let
     "aarch64-darwin" = "macos-arm64";
     "i686-windows" = "win32";
     "x86_64-windows" = "win64";
+  };
+  fhsEnv = if stdenv.isDarwin then {} else buildFHSUserEnv {
+    name = "esp32-toolchain-env";
+    targetPkgs = pkgs: with pkgs; [ zlib ];
+    runScript = "";
   };
   platformHash = {
     "linux-amd64" = "0c6z97x9lq5q5x181473zc27kf80i2vgs6kxxf7x2xc2w43q93b9";
@@ -38,8 +43,18 @@ stdenv.mkDerivation rec {
 
   phases = [ "unpackPhase" "installPhase" ];
 
-  installPhase = ''
+  # FHS env not supported on darwin, although nix darwin is inherently impure so it does not matter
+  installPhase = if stdenv.isDarwin then ''
     cp -r . $out
+  '' else ''
+    cp -r . $out
+    for FILE in $(ls $out/bin); do
+      FILE_PATH="$out/bin/$FILE"
+      if [[ -x $FILE_PATH ]]; then
+        mv $FILE_PATH $FILE_PATH-unwrapped
+        makeWrapper ${fhsEnv}/bin/esp32-toolchain-env $FILE_PATH --add-flags "$FILE_PATH-unwrapped"
+      fi
+    done
   '';
 
   meta = with lib; {

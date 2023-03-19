@@ -39,7 +39,7 @@ rec {
       export IDF_PATH=${esp-idf}/sdk
       export IDF_TOOLS_PATH=${esp-idf}/.espressif
       export PATH=$IDF_PATH/tools:$PATH
-      export IDF_PYTHON_ENV_PATH=$IDF_TOOLS_PATH/python_env/idf5.0_py3.9_env 
+      export IDF_PYTHON_ENV_PATH=$IDF_TOOLS_PATH/python_env/idf5.0_py3.9_env
     '';
   };
 
@@ -58,11 +58,21 @@ rec {
   app-esp32 = stdenv.mkDerivation {
     name = "euphonium-esp32";
     src = ../.;
-    nativeBuildInputs = [ esp-idf fs-esp32 ];
+
+    nativeBuildInputs = with pkgs; [ esp-idf fs-esp32 pkg-config bash python39 ];
+
+    # Patch nanopb shebangs to refer ot provided python
+    postPatch = ''
+      patchShebangs src/core/external/bell/external/nanopb/generator/*
+    '';
+
     buildPhase = ''
       runHook preBuild
       export HOME=$TMP
       cd src/targets/esp32
+
+      export IDF_PATH=${esp-idf}/sdk
+      export IDF_TOOLS_PATH=${esp-idf}/.espressif
 
       # Include built fs
       rm -rf fs
@@ -80,5 +90,6 @@ rec {
       cp bootloader/bootloader.bin $out/bootloader/bootloader.bin
       cp partition_table/partition-table.bin $out/partition_table/partition-table.bin
     '';
+    dontConfigure = true;
   };
 }
