@@ -28,7 +28,7 @@ const PlaybackDataContextProvider = ({ children }: any) => {
 
   return (
     <PlaybackDataContext.Provider value={playbackState}>
-      {...children}
+      {children}
     </PlaybackDataContext.Provider>
   );
 };

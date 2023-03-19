@@ -1,11 +1,10 @@
 import { defineConfig } from 'vite'
 import preact from '@preact/preset-vite'
-import viteCompression from 'vite-plugin-compression'
+import { compression } from 'vite-plugin-compression2'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [preact(), viteCompression({
-    deleteOriginFile: true,
-    ext: '.gz'
+  plugins: [preact(), compression({
+    deleteOriginalAssets: true
   })]
 });

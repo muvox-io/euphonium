@@ -3,7 +3,7 @@ import { Component, AnyComponent, JSX, FunctionComponent } from "preact";
 export default function ErrorBoundaryWrapper<P>(
   Component: FunctionComponent<P>
 ) {
-  return (props: P) => {
+  return (props: any) => {
     return (
       <ErrorBoundary component={Component} componentProps={props}>
         <Component {...props} />
