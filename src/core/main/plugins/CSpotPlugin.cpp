@@ -209,7 +209,7 @@ void CSpotPlugin::runTask() {
 
       // Handle audio data
       this->spircHandler->getTrackPlayer()->setDataCallback(
-          [this](uint8_t* data, size_t len, std::string_view trackId) {
+          [this](uint8_t* data, size_t len, std::string_view trackId, size_t sequence) {
             return this->handleAudioData(data, len, trackId);
           });
 

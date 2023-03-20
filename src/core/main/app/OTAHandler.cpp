@@ -6,7 +6,6 @@
 #include "BellHTTPServer.h"
 #include "BellTar.h"
 #include "civetweb.h"
-#include "esp_ota_ops.h"
 
 using namespace euph;
 
