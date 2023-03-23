@@ -1,21 +1,22 @@
 #pragma once
 
 #include <memory>
+#include "EEPROMDriver.h"
 #include "esp_littlefs.h"
 #include "esp_vfs.h"
 
 #include "BellTask.h"
 #include "BellUtils.h"
 
+#include "BluetoothSinkPlugin.h"
 #include "Core.h"
 #include "ESP32Connectivity.h"
-#include "EuphLogger.h"
 #include "ESP32Platform.h"
-#include "BluetoothSinkPlugin.h"
-#include "MemoryMonitorTask.h"
-#include "StatusLED.h"
+#include "EuphLogger.h"
 #include "I2SAudioOutput.h"
 #include "ManufacuringShell.h"
+#include "MemoryMonitorTask.h"
+#include "StatusLED.h"
 
 namespace euph {
 class EuphoniumApp : public bell::Task {
@@ -34,6 +35,7 @@ class EuphoniumApp : public bell::Task {
   std::shared_ptr<euph::StatusLED> statusTask;
   std::shared_ptr<euph::MemoryMonitorTask> memoryMonitor;
   std::shared_ptr<euph::ManufacuringShell> manufacuringShell;
+  std::shared_ptr<euph::EEPROMDriver> eepromDriver;
 
   std::unique_ptr<euph::Core> core;
 };

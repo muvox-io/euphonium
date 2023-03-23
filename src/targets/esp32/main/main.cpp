@@ -7,6 +7,9 @@
 #include "nvs_flash.h"
 #include "sdkconfig.h"
 
+#define MUVOX_SDA 23
+#define MUVOX_SCL 22
+
 extern "C" {
 void app_main(void);
 }
@@ -24,6 +27,20 @@ void app_main(void) {
   // Setup NETIF, main event loop
   ESP_ERROR_CHECK(esp_netif_init());
   ESP_ERROR_CHECK(esp_event_loop_create_default());
+
+  // TODO: Move this to some kind of platform initialization
+  i2c_config_t i2c_config = {
+      .mode = I2C_MODE_MASTER,
+      .sda_io_num = MUVOX_SDA,
+      .scl_io_num = MUVOX_SCL,
+      .sda_pullup_en = GPIO_PULLUP_ENABLE,
+      .scl_pullup_en = GPIO_PULLUP_ENABLE,
+  };
+
+  // Install I2C port 0
+  i2c_config.master.clk_speed = 100000;
+  i2c_param_config(0, &i2c_config);
+  i2c_driver_install(0, I2C_MODE_MASTER, false, false, false);
 
   // Start the app
   auto app = new euph::EuphoniumApp();

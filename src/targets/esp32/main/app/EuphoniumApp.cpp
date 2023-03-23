@@ -1,4 +1,5 @@
 #include "EuphoniumApp.h"
+#include "BellUtils.h"
 #include "esp_app_format.h"
 #include "esp_ota_ops.h"
 #include "esp_partition.h"
@@ -14,6 +15,7 @@ EuphoniumApp::EuphoniumApp() : bell::Task("app", 24 * 1024, 1, 0) {
   this->statusTask = std::make_shared<euph::StatusLED>(eventBus);
   this->memoryMonitor = std::make_shared<euph::MemoryMonitorTask>();
   this->manufacuringShell = std::make_shared<euph::ManufacuringShell>(eventBus);
+  this->eepromDriver = std::make_shared<euph::EEPROMDriver>(0, 0x50);
 
   this->printBuildInfo();
   startTask();

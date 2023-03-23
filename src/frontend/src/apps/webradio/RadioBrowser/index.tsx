@@ -85,7 +85,7 @@ export default () => {
             Results empty.
           </div>
         )}
-        <div class="flex flex-row text-2xl">
+        {/* <div class="flex flex-row text-2xl">
           <div class={`${page > 0 ? 'bg-app-primary' : ''} text-app-text-secondary w-[40px] h-[40px] rounded-xl mr-3 flex justify-center items-center`}>
             <Icon name="arrow_right" />
           </div>
@@ -96,7 +96,7 @@ export default () => {
           <div class="text-app-text-secondary bg-app-primary w-[40px] h-[40px] rounded-xl mr-3 flex justify-center items-center">
             <Icon name="arrow_left" />
           </div>
-        </div>
+        </div> */}
       </Card>
     </div>
   );

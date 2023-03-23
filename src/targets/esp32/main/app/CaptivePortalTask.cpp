@@ -4,7 +4,7 @@
 using namespace euph;
 
 CaptivePortalTask::CaptivePortalTask()
-    : bell::Task("CaptivePortal", 1024 * 4, 0, 0) {}
+    : bell::Task("CaptivePortal", 1024 * 8, 0, 0) {}
 
 void CaptivePortalTask::setn16(void* pp, int16_t n) {
   char* p = (char*)pp;

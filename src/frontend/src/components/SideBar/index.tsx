@@ -28,7 +28,7 @@ const SideBarItem = ({ displayName = "", name = "", type = "" }) => {
         {({ matches, path, url }: any) => (
           <div
             class={`text-l md:text-m flex flex-row items-center ${
-              matches ? "text-app-accent" : "text-app-text-secondary "
+              url == hrefUrl ? "text-app-accent" : "text-app-text-secondary "
             }`}
           >
             <span class="text-2xl -ml-2 mr-1">
