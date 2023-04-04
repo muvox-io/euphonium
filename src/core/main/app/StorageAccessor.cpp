@@ -89,7 +89,7 @@ void StorageAccessor::writeFile(std::string_view path, std::string_view body) {
   this->responseSemaphore->wait();
 
   if (this->currentOperation.status != OperationStatus::SUCCESS) {
-    throw std::runtime_error("Failed to write file");
+    throw std::runtime_error("Failed to write file at " + std::string(path));
   }
 }
 
@@ -108,7 +108,7 @@ void StorageAccessor::writeFileBytes(std::string_view path,
   this->responseSemaphore->wait();
 
   if (this->currentOperation.status != OperationStatus::SUCCESS) {
-    throw std::runtime_error("Failed to write file");
+    throw std::runtime_error("Failed to write file at " + std::string(path));
   }
 }
 
@@ -230,7 +230,8 @@ void StorageAccessor::runTask() {
       if (!file.is_open()) {
         filePath = filePath + ".gz";
         file = std::ifstream(filePath, std::ios::binary);
-        EUPH_LOG(info, TASK, "File not found, trying to use gz alternative");
+        EUPH_LOG(info, TASK, "File %s not found, trying to use gz alternative",
+                 this->currentOperation.path);
 
         // read file size
         file.seekg(0, std::ios::end);
