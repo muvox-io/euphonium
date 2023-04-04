@@ -34,6 +34,7 @@ rec {
 
   # Esp32 devshell
   shell-esp32 = pkgs.mkShell {
+    packages = with pkgs; [ mbedtls ];
     inputsFrom = [ esp-idf ];
     shellHook = ''
       export IDF_PATH=${esp-idf}/sdk
