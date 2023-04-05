@@ -33,3 +33,4 @@ targets/esp32/app/spiffs/*
 py/
 .direnv
 src/core/fs/cfg/*.json
+.vscode
