@@ -16,7 +16,6 @@ export default function ConnectionLostModal(): JSX.Element | null {
   let apiAccessor = useContext(APIAccessorContext);
   useEffect(() => {
     let errorListener = (e: any) => {
-      console.log(e);
       setShowImpulse(true);
       setOpen(true);
       setTimeout(() => {
@@ -29,6 +28,14 @@ export default function ConnectionLostModal(): JSX.Element | null {
     };
     eventSource.on("error", errorListener);
     eventSource.on("open", openListener);
+    eventSource.on("close", errorListener);
+    eventSource.on("connecting", () => {
+      setShowImpulse(true);
+
+      setTimeout(() => {
+        setShowImpulse(false);
+      }, 501);
+    });
     return () => {
       eventSource.removeListener("error", errorListener);
       eventSource.removeListener("open", openListener);

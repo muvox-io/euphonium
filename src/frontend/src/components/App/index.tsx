@@ -20,6 +20,7 @@ export function App() {
   const result = useGetSystemInfoQuery();
   return (
     <>
+      <ConnectionLostModal></ConnectionLostModal>
       <ReduxAPIFetcher result={result}>
         {({ data: info }) => {
           const onboarding =
@@ -30,7 +31,6 @@ export function App() {
                 onboarding ? css.mainWrapperWaves : css.mainWrapperStatic
               }`}
             >
-              <ConnectionLostModal></ConnectionLostModal>
               <PlaybackDataContextProvider>
                 <div class="h-screen w-screen">
                   <Notifications />
