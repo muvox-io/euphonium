@@ -1,11 +1,10 @@
-import { Connectivity, EuphoniumInfo } from "../../api/euphonium/system/models";
-import SystemAPI from "../../api/euphonium/system/SystemAPI";
 import "../../index.css";
+import { useGetSystemInfoQuery } from "../../redux/api/euphonium/system/systemApi";
 import "../../theme/main.scss";
 import { PlaybackDataContextProvider } from "../../utils/PlaybackContext";
-import APIFetcher from "../APIFetcher";
 import ConnectionLostModal from "../ConnectionLostModal";
 import Onboarding from "../NetworkConfig";
+import ReduxAPIFetcher from "../ReduxAPIFetcher";
 import Notifications from "../ui/Notifications";
 import css from "./App.module.scss";
 import NormalComponent from "./NormalComponent";
@@ -17,28 +16,35 @@ export function App() {
   };
 
   updateTheme();
+
+  const result = useGetSystemInfoQuery();
   return (
     <>
-      <APIFetcher api={SystemAPI} fetch={(api) => api.getSystemInfo()}>
-        {(info: EuphoniumInfo) => {
-          const onboarding = info?.connectivity?.state != "CONNECTED" || info?.onboarding;
+      <ReduxAPIFetcher result={result}>
+        {({ data: info }) => {
+          const onboarding =
+            info?.connectivity?.state != "CONNECTED" || info?.onboarding;
           return (
-            <div className={`${css.mainWrapper} ${onboarding ? css.mainWrapperWaves : css.mainWrapperStatic}`}>
+            <div
+              className={`${css.mainWrapper} ${
+                onboarding ? css.mainWrapperWaves : css.mainWrapperStatic
+              }`}
+            >
               <ConnectionLostModal></ConnectionLostModal>
               <PlaybackDataContextProvider>
                 <div class="h-screen w-screen">
                   <Notifications />
-                  {/* <Onboarding/> */}
-                  {onboarding ?
-                    (<Onboarding connectivity={info.connectivity} />)
-                    : (<NormalComponent info={info} />)
-                  }
+                  {onboarding ? (
+                    <Onboarding connectivity={info?.connectivity!} />
+                  ) : (
+                    <NormalComponent info={info} />
+                  )}
                 </div>
               </PlaybackDataContextProvider>
             </div>
           );
         }}
-      </APIFetcher>
+      </ReduxAPIFetcher>
     </>
   );
 }

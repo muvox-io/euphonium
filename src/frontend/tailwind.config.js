@@ -2,7 +2,12 @@ const colors = require("tailwindcss/colors");
 
 module.exports = {
   mode: "jit",
-  purge: ["./src/**/*.html", "./src/**/*.jsx", "./src/**/*.tsx", "./safelist.txt"],
+  purge: [
+    "./src/**/*.html",
+    "./src/**/*.jsx",
+    "./src/**/*.tsx",
+    "./safelist.txt",
+  ],
   darkMode: "class", // or 'media' or 'class'
   theme: {
     colors: {
@@ -23,14 +28,14 @@ module.exports = {
       current: "currentColor",
       black: colors.black,
       white: colors.white,
-      gray: colors.trueGray,
+      gray: colors.neutral,
       green: colors.green,
-        blue: colors.blue,
+      blue: colors.blue,
       notif: {
-          error: "#f44321",
-          success: "#00a852",
-          info: "#2f747e",
-          warning: "#b58a12",
+        error: "#f44321",
+        success: "#00a852",
+        info: "#2f747e",
+        warning: "#b58a12",
       },
       grey: {
         DEFAULT: "#4f4f4f",
