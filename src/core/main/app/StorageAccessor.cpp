@@ -186,6 +186,20 @@ void StorageAccessor::readFileToSocket(std::string_view path,
   }
 }
 
+void StorageAccessor::deleteFile(std::string_view path) {
+  this->currentOperation = Operation{
+      .type = OperationType::DELETE,
+      .path = (char*)path.data(),
+  };
+
+  this->requestSemaphore->give();
+  this->responseSemaphore->wait();
+
+  if (this->currentOperation.status == OperationStatus::FAILURE) {
+    throw std::runtime_error("Failed to delete file");
+  }
+}
+
 bool StorageAccessor::strEndsWith(std::string const& fullString,
                                   std::string const& ending) {
   if (fullString.length() >= ending.length()) {
@@ -379,6 +393,14 @@ void StorageAccessor::runTask() {
       } else {
 
         this->currentOperation.status = OperationStatus::FAILURE;
+      }
+    }
+
+    if(this->currentOperation.type == OperationType::DELETE) {
+      if (std::remove(this->currentOperation.path) != 0) {
+        this->currentOperation.status = OperationStatus::FAILURE;
+      } else {
+        this->currentOperation.status = OperationStatus::SUCCESS;
       }
     }
 

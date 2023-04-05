@@ -22,9 +22,9 @@ class CoreBindings {
   std::string _getVersion();
   std::string _getPlatform();
   void _loadScript(std::string pkg, std::string path);
-  std::string _loadConfig(std::string pkg);
+  std::string _loadConfig(std::string pluginName);
   uint64_t _getTimestamp();
-  bool _saveConfig(std::string pkg, std::string cfg);
+  bool _saveConfig(std::string pluginName, std::string cfg);
   void _confirmOnboarding();
   void _setNativeVolume(int volume);
   void _triggerPause(bool isPaused);
@@ -32,6 +32,8 @@ class CoreBindings {
   void _setDisplayName(std::string name);
   void _queryContextURI(std::string uri);
   long _getTimeMs();
+  void _deleteConfigFiles();
+  void _restart();
 
  private:
   const std::string TAG = "core-bindings";

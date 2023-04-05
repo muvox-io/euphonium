@@ -3,6 +3,14 @@
 #include "BellUtils.h"
 #include "CoreEvents.h"
 
+#ifdef ESP_PLATFORM
+#include "esp_system.h"
+#else
+// execv
+#include <unistd.h>
+
+#endif
+
 using namespace euph;
 
 CoreBindings::CoreBindings(std::shared_ptr<euph::Context> ctx) {
@@ -34,6 +42,9 @@ void CoreBindings::setupBindings() {
                        &CoreBindings::_queryContextURI, "core");
   ctx->vm->export_this("set_native_volume", this,
                        &CoreBindings::_setNativeVolume, "core");
+  ctx->vm->export_this("delete_config_files", this,
+                       &CoreBindings::_deleteConfigFiles, "core");
+  ctx->vm->export_this("restart", this, &CoreBindings::_restart, "core");
 }
 
 std::string CoreBindings::_getPlatform() {
@@ -80,10 +91,11 @@ void CoreBindings::_loadScript(std::string pkg, std::string path) {
   }
 }
 
-std::string CoreBindings::_loadConfig(std::string pkg) {
-  std::string configPath = fmt::format("{}/cfg/{}.json", ctx->rootPath, pkg);
+std::string CoreBindings::_loadConfig(std::string pluginName) {
+  std::string configPath =
+      fmt::format("{}/cfg/{}.json", ctx->rootPath, pluginName);
 
-  EUPH_LOG(debug, TAG, "Loading config for [%s]", pkg.c_str());
+  EUPH_LOG(debug, TAG, "Loading config for [%s]", pluginName.c_str());
 
   try {
     std::string configBody = this->ctx->storage->readFile(configPath);
@@ -95,10 +107,11 @@ std::string CoreBindings::_loadConfig(std::string pkg) {
   return "{}";
 }
 
-bool CoreBindings::_saveConfig(std::string pkg, std::string cfg) {
-  std::string configPath = fmt::format("{}/cfg/{}.json", ctx->rootPath, pkg);
+bool CoreBindings::_saveConfig(std::string pluginName, std::string cfg) {
+  std::string configPath =
+      fmt::format("{}/cfg/{}.json", ctx->rootPath, pluginName);
 
-  EUPH_LOG(debug, TAG, "Loading config for [%s]", pkg.c_str());
+  EUPH_LOG(debug, TAG, "Saving config for [%s]", pluginName.c_str());
 
   try {
     this->ctx->storage->writeFile(configPath, cfg);
@@ -135,4 +148,28 @@ long CoreBindings::_getTimeMs() {
 
 void CoreBindings::_sleepMS(int ms) {
   BELL_SLEEP_MS(ms);
+}
+
+void CoreBindings::_deleteConfigFiles() {
+  std::vector<std::string> files =
+      this->ctx->storage->listFiles(fmt::format("{}/cfg/", ctx->rootPath));
+  for (auto file : files) {
+    // skip files not ending with .json
+    if (this->ctx->storage->strEndsWith(file, ".json") == false) {
+      continue;
+    }
+    auto fullPath = fmt::format("{}/cfg/{}", ctx->rootPath, file);
+    BELL_LOG(debug, TAG, "Deleting config file: %s", fullPath.c_str());
+    this->ctx->storage->deleteFile(fullPath);
+  }
+}
+
+void CoreBindings::_restart() {
+EUPH_LOG(info, TAG, "Restarting the application...");
+#ifdef ESP_PLATFORM
+  esp_restart();
+#else
+  execv("/proc/self/exe", NULL);
+#endif
+
 }
