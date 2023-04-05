@@ -1,14 +1,21 @@
+import {
+  statusChanged,
+  WebsocketStatus,
+} from "../../redux/reducers/websocketReducer";
+import store from "../../redux/store";
 import getBaseUrl from "./baseUrl";
 
 class EuphEventsEmitter {
   webSocket!: WebSocket;
   _events: Record<string, Array<(data: any) => void>> = {};
 
-  constructor() {
+  constructor(private reduxStore: typeof store) {
     this.connect();
   }
 
   connect() {
+    this.reduxStore.dispatch(statusChanged(WebsocketStatus.CONNECTING));
+
     this.emit("connecting", null);
     this.webSocket = new WebSocket(
       `${getBaseUrl().replace("http://", "ws://")}/events`
@@ -19,12 +26,19 @@ class EuphEventsEmitter {
       this.emit(type, data);
     };
     this.webSocket.onerror = (event: any) => {
+      this.reduxStore.dispatch(
+        statusChanged(WebsocketStatus.WAITING_FOR_RECONNECT)
+      );
       this.emit("error", event);
     };
     this.webSocket.onopen = (event: any) => {
+      this.reduxStore.dispatch(statusChanged(WebsocketStatus.CONNECTED));
       this.emit("open", event);
     };
     this.webSocket.onclose = (event: any) => {
+      this.reduxStore.dispatch(
+        statusChanged(WebsocketStatus.WAITING_FOR_RECONNECT)
+      );
       this.emit("close", event);
       setTimeout(() => {
         this.connect();
@@ -65,4 +79,6 @@ class EuphEventsEmitter {
   }
 }
 
-export default new EuphEventsEmitter();
+const eventSource = new EuphEventsEmitter(store);
+
+export default eventSource;

@@ -1,11 +1,9 @@
-import { useState, useEffect } from "preact/hooks";
-import Card from "../ui/Card";
-import Equalizer from "../Equalizer";
-import Icon from "../ui/Icon";
-import eventSource from "../../api/euphonium/eventSource";
-import usePlaybackState from "../../utils/usePlaybackState.hook";
-import useAPI from "../../utils/useAPI.hook";
+import { useState } from "preact/hooks";
 import PlaybackAPI from "../../api/euphonium/playback/PlaybackAPI";
+import useAPI from "../../utils/useAPI.hook";
+import usePlaybackState from "../../utils/usePlaybackState.hook";
+import Card from "../ui/Card";
+import Icon from "../ui/Icon";
 
 export default function () {
   const playbackState = usePlaybackState();
