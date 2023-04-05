@@ -18,6 +18,7 @@ export enum ConfigurationFieldType {
     CHECKBOX = "checkbox_field",
     LINK_BUTTON = "link_button",
     MODAL_CONFIRM = "modal_confirm",
+    BUTTON_FIELD = "button_field",
 }
 
 export interface ConfigurationField {
@@ -34,6 +35,7 @@ export interface ConfigurationField {
     link?: string;
     okValue?: string;
     cancelValue?: string;
+    buttonText?:string;
 }
 
 export interface PluginConfiguration {

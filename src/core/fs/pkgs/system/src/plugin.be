@@ -51,11 +51,12 @@ class Plugin
         return self.state
     end
 
-    # saves raw confugration into memory
+    # saves raw confugration to disk
     def persist_config()
         core.save_config(self.name, json.dump(self.state))
     end
 
+    # load plugin configuration from disk
     def fetch_config()
         var config = core.load_config(self.name)
         var loaded_state = json.load(config)

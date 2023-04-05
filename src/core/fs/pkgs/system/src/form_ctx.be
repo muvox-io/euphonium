@@ -97,6 +97,19 @@ class FormContext
         self.fields.push(field)
     end
 
+    def button_field(key, configuration)
+        var field = {
+            'key': key,
+            'type': 'button_field',
+            'label': configuration['label']
+        }
+        self.safe_copy_field(configuration, field, 'buttonText')
+        self.safe_copy_field(configuration, field, 'hint')
+        self.safe_copy_field(configuration, field, 'group')
+
+        self.fields.push(field)
+    end
+
     def create_group(key, configuration)
         var field = {
             'key': key,
@@ -108,6 +121,7 @@ class FormContext
         self.fields.push(field)
     end
 
+    # Applies a state object to the form schema, so that each field has the value property
     def apply_state(state)
         for field : self.fields
             if (state.find(field['key']) != nil)

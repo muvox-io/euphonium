@@ -89,7 +89,7 @@ void StorageAccessor::writeFile(std::string_view path, std::string_view body) {
   this->responseSemaphore->wait();
 
   if (this->currentOperation.status != OperationStatus::SUCCESS) {
-    throw std::runtime_error("Failed to write file");
+    throw std::runtime_error("Failed to write file at " + std::string(path));
   }
 }
 
@@ -108,7 +108,7 @@ void StorageAccessor::writeFileBytes(std::string_view path,
   this->responseSemaphore->wait();
 
   if (this->currentOperation.status != OperationStatus::SUCCESS) {
-    throw std::runtime_error("Failed to write file");
+    throw std::runtime_error("Failed to write file at " + std::string(path));
   }
 }
 
@@ -186,6 +186,20 @@ void StorageAccessor::readFileToSocket(std::string_view path,
   }
 }
 
+void StorageAccessor::deleteFile(std::string_view path) {
+  this->currentOperation = Operation{
+      .type = OperationType::DELETE,
+      .path = (char*)path.data(),
+  };
+
+  this->requestSemaphore->give();
+  this->responseSemaphore->wait();
+
+  if (this->currentOperation.status == OperationStatus::FAILURE) {
+    throw std::runtime_error("Failed to delete file");
+  }
+}
+
 bool StorageAccessor::strEndsWith(std::string const& fullString,
                                   std::string const& ending) {
   if (fullString.length() >= ending.length()) {
@@ -230,7 +244,8 @@ void StorageAccessor::runTask() {
       if (!file.is_open()) {
         filePath = filePath + ".gz";
         file = std::ifstream(filePath, std::ios::binary);
-        EUPH_LOG(info, TASK, "File not found, trying to use gz alternative");
+        EUPH_LOG(info, TASK, "File %s not found, trying to use gz alternative",
+                 this->currentOperation.path);
 
         // read file size
         file.seekg(0, std::ios::end);
@@ -378,6 +393,14 @@ void StorageAccessor::runTask() {
       } else {
 
         this->currentOperation.status = OperationStatus::FAILURE;
+      }
+    }
+
+    if(this->currentOperation.type == OperationType::DELETE) {
+      if (std::remove(this->currentOperation.path) != 0) {
+        this->currentOperation.status = OperationStatus::FAILURE;
+      } else {
+        this->currentOperation.status = OperationStatus::SUCCESS;
       }
     }
 

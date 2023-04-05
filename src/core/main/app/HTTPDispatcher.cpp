@@ -11,7 +11,7 @@ using namespace euph;
 
 HTTPDispatcher::HTTPDispatcher(std::shared_ptr<euph::Context> ctx) {
   this->ctx = ctx;
-  this->responseSemaphore = std::make_unique<bell::WrappedSemaphore>(20);
+  this->responseSemaphore = std::make_unique<bell::WrappedSemaphore>(0);
 
 // TODO: Handle it properly
 #ifdef ESP_PLATFORM
@@ -194,8 +194,8 @@ void HTTPDispatcher::_registerHandler(int httpMethod, std::string path,
     case HTTPDispatcher::Method::GET:
       this->server->registerGet(
           path, [this, handlerId](struct mg_connection* conn) {
+            std::scoped_lock lock(httpRequestMutex);
             this->bindConnections[this->nextBindId] = conn;
-
             // Prepare a response event to the scripting layer
             auto event = std::make_unique<HTTPDispatcher::VmEvent>(
                 handlerId, this->nextBindId);
@@ -211,6 +211,7 @@ void HTTPDispatcher::_registerHandler(int httpMethod, std::string path,
     case HTTPDispatcher::Method::POST:
       this->server->registerPost(
           path, [this, handlerId](struct mg_connection* conn) {
+            std::scoped_lock lock(httpRequestMutex);
             this->bindConnections[this->nextBindId] = conn;
 
             // Prepare a response event to the scripting layer

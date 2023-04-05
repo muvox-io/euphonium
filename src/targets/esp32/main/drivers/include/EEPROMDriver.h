@@ -8,7 +8,7 @@
 namespace euph {
 
 // Structure of the EEPROM content
-struct EEPROMContent {
+struct __attribute__((packed)) EEPROMContent {
   uint8_t magic[2];      // Magic bytes
   uint8_t format;        // Format version
   char model[4];         // Model string
@@ -22,6 +22,10 @@ class EEPROMDriver {
  private:
   i2c_port_t port;
   uint8_t address;
+  int maxAckTries = 256;
+
+  // Wait for eeprom write acknowledgement
+  void waitForAck();
 
  public:
   EEPROMDriver(i2c_port_t port, uint8_t address);
@@ -29,10 +33,14 @@ class EEPROMDriver {
   // Returns true if the EEPROM is present at the given address, else otherwise
   bool isPresent();
 
-  void writeByte(uint8_t data, uint16_t offset);
-  void writeBytes(uint8_t* data, uint16_t offset, size_t size);
-  uint8_t readByte(uint16_t offset);
-  std::vector<uint8_t> readBytes(uint16_t offset, size_t size);
+  EEPROMContent readContent();
+  void writeContent(const EEPROMContent& content);
+
+  // Low level eeprom access methods
+  void writeByte(uint8_t data, uint8_t offset);
+  void writeBytes(uint8_t* data, size_t data_len, uint8_t offset);
+  uint8_t readByte(uint8_t offset);
+  std::vector<uint8_t> readBytes(size_t size, uint8_t offset);
 };
 
 }  // namespace euph

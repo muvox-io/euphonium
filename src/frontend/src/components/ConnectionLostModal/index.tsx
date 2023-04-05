@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from "preact/hooks";
 import { APIAccessorContext } from "../../api/APIAccessor";
 import getBaseUrl from "../../api/euphonium/baseUrl";
 import eventSource from "../../api/euphonium/eventSource";
-import Modal from "../Modal";
+import Modal from "../ui/Modal";
 import Spinner from "../ui/Spinner";
 
 /**

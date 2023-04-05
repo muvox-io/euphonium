@@ -1,13 +1,17 @@
 {
   description = "euphonium - Tiny audio platform";
 
-  inputs.nixpkgs.url = "nixpkgs/nixos-22.11";
-  inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs = {
+    nixpkgs.url = "nixpkgs/nixos-22.11";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, nixpkgs-unstable, flake-utils }:
     let
       overlay = final: prev: {
         euphonium = (final.callPackage ./nix { });
+        unstable = nixpkgs-unstable.legacyPackages.${prev.system};
       };
     in
     {

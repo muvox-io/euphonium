@@ -5,9 +5,16 @@ using namespace berry;
 
 berry::moduleMap berry::moduleLambdas;
 
+
 VmState::VmState(bvm* vm) : vm(vm) {}
 
-int berryStdout(void* ctx, const char* buf, int len) {
+int berryStdoutBSD(void* ctx, const char* buf, int len) {
+  auto state = (VmState*)ctx;
+  state->stdoutIntercept(buf, len);
+  return len;
+}
+
+ssize_t berryStdoutLinux(void* ctx, const char* buf, size_t len) {
   auto state = (VmState*)ctx;
   state->stdoutIntercept(buf, len);
   return len;
@@ -16,7 +23,13 @@ int berryStdout(void* ctx, const char* buf, int len) {
 static char stdoutLineBuffer[256] = {0};
 
 VmState::VmState() {
-  stdoutRedirect = funopen(this, NULL, &berryStdout, NULL, NULL);
+#ifdef __linux__
+  stdoutRedirect = fopencookie(this, "w", (cookie_io_functions_t) {
+    .write  = berryStdoutLinux
+  });
+#else
+  stdoutRedirect = funopen(this, NULL, &berryStdoutBSD, NULL, NULL);
+#endif
   setvbuf(stdoutRedirect, stdoutLineBuffer, _IOLBF, sizeof(stdoutLineBuffer));
   be_set_stdout(stdoutRedirect);
   vm = be_vm_new();

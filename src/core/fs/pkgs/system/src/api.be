@@ -25,7 +25,6 @@ http.handle(HTTP_GET, '/plugins/:name', def (request)
         if plugin.name == request.route_params()['name']
             var ctx = FormContext()
             plugin.make_form(ctx, plugin.state)
-
             request.write_json({
                 'displayName': plugin.display_name,
                 'themeColor': plugin.theme_color,
@@ -46,8 +45,6 @@ http.handle(HTTP_POST, '/plugins/:name', def (request)
     }
 
     var body = request.json_body()
-    print(request.route_params())
-    print(body)
     var plugin = euphonium.get_plugin(request.route_params()['name'])
     var isDraft = body['isPreview']
     var state = json.load(json.dump(plugin.state))

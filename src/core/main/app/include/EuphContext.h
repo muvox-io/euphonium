@@ -89,6 +89,6 @@ struct Context {
   }
 
   // Path to the root of the filesystem
-  std::string rootPath = "../src/core/fs";
+  std::string rootPath = "../../../core/fs";
 };
 }  // namespace euph

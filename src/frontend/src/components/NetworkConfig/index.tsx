@@ -16,7 +16,7 @@ const OnboardingHello = ({ setOnboardingState }: any) => {
       Thanks for trying out Euphonium. This wizard will guide you
       through the initial setup of your device.
       <br /><br />
-      Before we begin, make sure you have access to a stable network, and know it’s credentials.
+      Before we begin, make sure you have access to a stable network, and know it's credentials.
     </div>
 
     <Button onClick={() => {

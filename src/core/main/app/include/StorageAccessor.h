@@ -26,7 +26,7 @@ namespace euph {
 class StorageAccessor : public bell::Task {
  public:
   // Indicates the type of the operation
-  enum class OperationType { READ, WRITE, LIST_DIRS, EXTRACT, FUNC };
+  enum class OperationType { READ, WRITE, LIST_DIRS, EXTRACT, FUNC, DELETE };
 
   // Indicates the format of the data
   enum class OperationFormat {
@@ -124,13 +124,24 @@ class StorageAccessor : public bell::Task {
    */
   std::vector<std::string> listFiles(std::string_view path);
 
+
+  void deleteFile(std::string_view path);
+
+  /**
+   * @brief Utility function to check if a string ends with another string
+   * 
+   * @param fullString 
+   * @param ending 
+   * @return true 
+   * @return false 
+   */
+  bool strEndsWith(std::string const& fullString, std::string const& ending);
  private:
   const size_t HTTP_CHUNK_SIZE = 1024;
 
   // Current operation
   Operation currentOperation;
 
-  bool strEndsWith(std::string const& fullString, std::string const& ending);
 
   // Semaphores used to synchronize the task
   std::unique_ptr<bell::WrappedSemaphore> requestSemaphore;

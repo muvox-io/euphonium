@@ -1,0 +1,40 @@
+class ResetRestorePlugin : Plugin 
+  def init()
+    self.name = "reset_restore"
+    self.theme_color = "#1DB954"
+    self.display_name = "Reset & Restore"
+    self.type = "system"
+    self.state = {}
+    # self.fetch_config()
+  end
+  def make_form(ctx, state)
+    ctx.create_group('reset', { 'label': 'Reset' })
+
+    ctx.button_field('factoryResetButton', {
+        'label': "Factory reset",
+        'buttonText': "Reset",
+        'group': 'reset',
+    })
+    if state.find("factoryResetButton") == true 
+      state.setitem("factoryResetButton", false)
+      state.setitem("factoryResetConfirm", nil)
+      ctx.modal_confirm("factoryResetConfirm", {
+        'label': "Board changed",
+        'hint': "Are you sure you want to reset euphonium to factory defaults?",
+        'group': 'reset',
+        'default': nil,
+        'okValue': true,
+        'cancelValue': false
+      })
+    end
+    if state.find("factoryResetConfirm") == true 
+      state.setitem("factoryResetConfirm", nil)
+      core.delete_config_files();
+      core.restart();
+    end
+  end
+end
+
+var reset_restore = ResetRestorePlugin()
+
+euphonium.register_plugin(reset_restore)
