@@ -93,7 +93,7 @@ void BluetoothSinkPlugin::shutdownAudio() {
 }
 
 void BluetoothSinkPlugin::initializeBindings() {
-  EUPH_LOG(info, TASK, "Initializing bindings");
+  EUPH_LOG(info, TASK, "Initializing bluetooth bindings");
   this->ctx->vm->export_this("_run_plugin", this,
                              &BluetoothSinkPlugin::runPlugin, "bluetooth");
 }

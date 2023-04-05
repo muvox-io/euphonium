@@ -30,6 +30,7 @@ class ResetRestorePlugin : Plugin
     if state.find("factoryResetConfirm") == true 
       state.setitem("factoryResetConfirm", nil)
       core.delete_config_files();
+      wifi.clear_config();
       core.restart();
     end
   end

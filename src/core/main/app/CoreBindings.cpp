@@ -45,6 +45,9 @@ void CoreBindings::setupBindings() {
   ctx->vm->export_this("delete_config_files", this,
                        &CoreBindings::_deleteConfigFiles, "core");
   ctx->vm->export_this("restart", this, &CoreBindings::_restart, "core");
+
+  ctx->vm->export_this("clear_config", this, &CoreBindings::_clearWifiConfig,
+                       "wifi");
 }
 
 std::string CoreBindings::_getPlatform() {
@@ -165,11 +168,16 @@ void CoreBindings::_deleteConfigFiles() {
 }
 
 void CoreBindings::_restart() {
-EUPH_LOG(info, TAG, "Restarting the application...");
+  EUPH_LOG(info, TAG, "Restarting the application...");
 #ifdef ESP_PLATFORM
   esp_restart();
 #else
   execv("/proc/self/exe", NULL);
 #endif
+}
 
+void CoreBindings::_clearWifiConfig() {
+  this->ctx->storage->executeFromTask([this]() {
+     this->ctx->connectivity->clearConfig();
+  });
 }

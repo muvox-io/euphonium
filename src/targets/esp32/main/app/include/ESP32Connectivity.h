@@ -31,6 +31,7 @@ class ESP32Connectivity : public Connectivity, public bell::Task {
 
   void persistConfig();
   void requestScan();
+  void clearConfig() override;
   void attemptConnect(const std::string& ssid, const std::string& passwd);
   void handleEvent(esp_event_base_t event_base, int32_t event_id,
                    void* event_data);
@@ -40,6 +41,7 @@ class ESP32Connectivity : public Connectivity, public bell::Task {
   void displayNameLoaded(std::string& name) override;
 
   void runTask() override;
+
 
  private:
   std::string TAG = "ESP32Connectivity";

@@ -34,6 +34,7 @@ class CoreBindings {
   long _getTimeMs();
   void _deleteConfigFiles();
   void _restart();
+  void _clearWifiConfig();
 
  private:
   const std::string TAG = "core-bindings";
