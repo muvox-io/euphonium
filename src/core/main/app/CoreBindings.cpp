@@ -74,7 +74,7 @@ void CoreBindings::_loadScript(std::string pkg, std::string path) {
   try {
     std::string scriptBody = this->ctx->storage->readFile(scriptPath);
 
-    this->ctx->vm->execute_string(scriptBody, pkg);
+    this->ctx->vm->execute_string(scriptBody, scriptPath);
   } catch (...) {
     EUPH_LOG(error, TAG, "Failed to load script: %s", scriptPath.c_str());
   }
