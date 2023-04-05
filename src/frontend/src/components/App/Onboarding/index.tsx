@@ -139,37 +139,5 @@ const VolumeTuningModal = ({ configUpdated }: any) => {
 };
 
 export default ({}) => {
-  const onboardingSteps: Record<string, any> = {
-    onboardingHardware: HardwareDetectedModal,
-    onboardingMaxVolume: VolumeTuningModal,
-  };
-
-  const [schema, setSchema] = useState<ConfigurationField[]>([]);
-  const pluginsApi = useAPI(PluginsAPI);
-
-  const loadConfig = async () => {
-    const { configSchema } = await pluginsApi.getPluginConfiguration(
-      "general_settings"
-    );
-    setSchema(configSchema);
-  };
-
-  useEffect(() => {
-    loadConfig();
-  }, []);
-
-  for (const onboardingStepKey of Object.keys(onboardingSteps)) {
-    const onboardingStepConfig = schema.find(
-      (field) => field.key == onboardingStepKey
-    );
-    if (
-      onboardingStepConfig &&
-      (onboardingStepConfig.value == "false" || !onboardingStepConfig.value)
-    ) {
-      const OnboardingStepComponent = onboardingSteps[onboardingStepKey];
-      return <OnboardingStepComponent configUpdated={loadConfig} />;
-    }
-  }
-
   return <></>;
 };
