@@ -107,9 +107,7 @@ const NetworkList = ({ setConfigState, connectivity }: NetworkListParams) => {
             </Button>
           </>
         ) : null}
-        {hasNetworks ? (
-          <div class="mt-2 w-full text-center">Show remaining</div>
-        ) : null}
+        
       </div>
     </FloatingCard>
   );
