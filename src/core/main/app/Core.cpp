@@ -27,6 +27,7 @@ void Core::initialize() {
 
   EUPH_LOG(info, TAG, "Initializing context");
   this->ctx = euph::Context::createWithBus(this->eventBus);
+  ctx->connectivity = this->connectivity;
 
   this->http = std::make_shared<euph::HTTPDispatcher>(this->ctx);
   this->pkgLoader = std::make_shared<euph::PackageLoader>(this->ctx);

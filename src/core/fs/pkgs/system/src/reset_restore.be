@@ -19,7 +19,7 @@ class ResetRestorePlugin : Plugin
       state.setitem("factoryResetButton", false)
       state.setitem("factoryResetConfirm", nil)
       ctx.modal_confirm("factoryResetConfirm", {
-        'label': "Board changed",
+        'label': "Factory reset",
         'hint': "Are you sure you want to reset euphonium to factory defaults?",
         'group': 'reset',
         'default': nil,
@@ -30,6 +30,7 @@ class ResetRestorePlugin : Plugin
     if state.find("factoryResetConfirm") == true 
       state.setitem("factoryResetConfirm", nil)
       core.delete_config_files();
+      wifi.clear_config();
       core.restart();
     end
   end

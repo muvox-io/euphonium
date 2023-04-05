@@ -1,12 +1,19 @@
 #pragma once
 
+// forward declaration of Context
+namespace euph {
+struct Context;
+class Connectivity;
+}
+
 #include <memory>
 
 #include "CentralAudioBuffer.h"
 
+#include "BerryBind.h"
+#include "Connectivity.h"
 #include "EventBus.h"
 #include "StorageAccessor.h"
-#include "BerryBind.h"
 
 /**
  * @brief The main context of the application.
@@ -28,13 +35,9 @@ struct PlaybackController {
 
   std::function<void(const std::string&)> playbackLockedHandler;
 
-  void pause() {
-    this->requestPause = true;
-  }
+  void pause() { this->requestPause = true; }
 
-  void play() {
-    this->isPaused = false;
-  }
+  void play() { this->isPaused = false; }
 
   void lockPlayback(const std::string& source) {
     if (playbackLockedHandler != NULL) {
@@ -44,9 +47,7 @@ struct PlaybackController {
     playbackAccessMutex.lock();
   }
 
-  void unlockPlayback() {
-    playbackAccessMutex.unlock();
-  }
+  void unlockPlayback() { playbackAccessMutex.unlock(); }
 };
 
 struct Context {
@@ -55,10 +56,10 @@ struct Context {
   std::shared_ptr<euph::EventBus> eventBus;
   std::shared_ptr<bell::CentralAudioBuffer> audioBuffer;
   std::shared_ptr<euph::PlaybackController> playbackController;
+  std::shared_ptr<euph::Connectivity> connectivity;
 
   // Display name of the device, gets replaced by user setting later on
   std::string displayName = "Euphonium";
-
 
   /**
    * @brief Creates a context with the default utilities
@@ -74,7 +75,8 @@ struct Context {
     return ctx;
   }
 
-  static std::shared_ptr<euph::Context> createWithBus(std::shared_ptr<euph::EventBus> bus) {
+  static std::shared_ptr<euph::Context> createWithBus(
+      std::shared_ptr<euph::EventBus> bus) {
     auto ctx = std::make_shared<euph::Context>();
     ctx->storage = std::make_shared<euph::StorageAccessor>();
     ctx->vm = std::make_shared<berry::VmState>();
@@ -82,9 +84,9 @@ struct Context {
     ctx->playbackController = std::make_shared<euph::PlaybackController>();
     ctx->eventBus = bus;
 
-    #ifdef ESP_PLATFORM
+#ifdef ESP_PLATFORM
     ctx->rootPath = "/fs";
-    #endif
+#endif
     return ctx;
   }
 

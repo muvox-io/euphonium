@@ -10,10 +10,10 @@
 
 namespace euph {
 class Connectivity {
-protected:
+ protected:
   std::shared_ptr<EventBus> eventBus;
 
-public:
+ public:
   Connectivity() = default;
   ~Connectivity() = default;
 
@@ -54,7 +54,6 @@ public:
     }
   }
 
-
   struct ConnectivityData {
     State state;
     ConnectivityType type;
@@ -64,16 +63,15 @@ public:
 
     std::string jsonBody = "{}";
 
-
     nlohmann::json toJson() {
       auto subJsonBody = nlohmann::json::parse(jsonBody);
 
       nlohmann::json connectivityEventJson = {
-                  {"state", Connectivity::stateToString(state)},
-                  {"type", Connectivity::typeToString(type)},
-                  {"ssid", ssid},
-                  {"ip", ipAddr},
-                  {"body", subJsonBody},
+          {"state", Connectivity::stateToString(state)},
+          {"type", Connectivity::typeToString(type)},
+          {"ssid", ssid},
+          {"ip", ipAddr},
+          {"body", subJsonBody},
       };
 
       return connectivityEventJson;
@@ -95,9 +93,7 @@ public:
 
   ConnectivityData data;
 
-  ConnectivityData& getData() {
-    return this->data;
-  }
+  ConnectivityData& getData() { return this->data; }
 
   void setEventBus(std::shared_ptr<EventBus> eventBus) {
     this->eventBus = eventBus;
@@ -113,5 +109,7 @@ public:
   }
 
   virtual void registerHandlers(std::shared_ptr<bell::BellHTTPServer> http) = 0;
+
+  virtual void clearConfig() = 0;
 };
 }  // namespace euph

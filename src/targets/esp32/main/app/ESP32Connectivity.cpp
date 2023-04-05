@@ -81,8 +81,25 @@ void ESP32Connectivity::persistConfig() {
     std::string cfg = cfgBody.dump();
 
     handle->set_string(nvsWiFiKey.c_str(), cfg.c_str());
+    handle->commit();
   }
 }
+
+void ESP32Connectivity::clearConfig() {
+  esp_err_t err;
+  std::unique_ptr<nvs::NVSHandle> handle =
+      nvs::open_nvs_handle("storage", NVS_READWRITE, &err);
+  if (err != ESP_OK) {
+    EUPH_LOG(error, TAG, "Error (%s) opening NVS handle!\n",
+             esp_err_to_name(err));
+  } else {
+    EUPH_LOG(info, TAG, "Clearing WiFi configuration from NVS storage...");
+
+    handle->erase_item(nvsWiFiKey.c_str());
+    handle->commit();
+  }
+}
+
 
 void ESP32Connectivity::initializeWiFiStack() {
   // set netif
