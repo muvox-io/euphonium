@@ -90,6 +90,9 @@ rec {
       cp euphonium-esp32.bin $out/euphonium-esp32.bin
       cp bootloader/bootloader.bin $out/bootloader/bootloader.bin
       cp partition_table/partition-table.bin $out/partition_table/partition-table.bin
+      cp ota_data_initial.bin $out/ota_data_initial.bin
+      cp *-flash_args $out/
+      cp flash_args $out/
     '';
     dontConfigure = true;
   };

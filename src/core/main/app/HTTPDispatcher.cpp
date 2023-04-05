@@ -11,7 +11,7 @@ using namespace euph;
 
 HTTPDispatcher::HTTPDispatcher(std::shared_ptr<euph::Context> ctx) {
   this->ctx = ctx;
-  this->responseSemaphore = std::make_unique<bell::WrappedSemaphore>(0);
+  this->responseSemaphore = std::make_unique<bell::WrappedSemaphore>(MAX_CONNECTION_BINDS + 1); // a safe value
 
 // TODO: Handle it properly
 #ifdef ESP_PLATFORM

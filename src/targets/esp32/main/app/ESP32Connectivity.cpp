@@ -1,4 +1,6 @@
 #include "ESP32Connectivity.h"
+#include <algorithm>
+#include <map>
 #include "BellUtils.h"
 #include "esp_wifi.h"
 #include "mdns.h"
@@ -204,21 +206,49 @@ void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
 
     jsonBody["networks"] = nlohmann::json::array();
 
+    // After scanning we arrange the networks using the following rules:
+    // 1. Networks with the same SSID are listed only once
+    // 2. The network with the highest RSSI is listed, if there are multiple
+    // 3. Networks are sorted by RSSI, highest first
+
+
+    // map of the networks
+    std::map<std::string, nlohmann::json> networksMap;
+
     for (int i = 0; (i < DEFAULT_SCAN_LIST_SIZE) && (i < apCount); i++) {
       auto network = scanInfo[i];
       EUPH_LOG(info, TAG, "Got network %s", (char*)scanInfo[i].ssid);
       std::string networkSsid((char*)network.ssid);
-
-      // Add a JSON structure of the network to the list
-      jsonBody["networks"].push_back({
+      // check if the network is already in the map
+      if (networksMap.find(networkSsid) != networksMap.end()) {
+        // if it is, check if the rssi is higher
+        if (networksMap[networkSsid]["rssi"].get<int>() < network.rssi) {
+          // if it is, update the rssi
+          networksMap[networkSsid]["rssi"] = network.rssi;
+        }
+        continue;
+      }
+      // Add a JSON structure to the map
+      networksMap[networkSsid] = {
           {"ssid", networkSsid},
           {"rssi", network.rssi},
           {"open", network.authmode == WIFI_AUTH_OPEN},
-      });
+      };
     }
 
     this->jsonBody["scanning"] = false;
 
+    auto networks_arr = nlohmann::json::array();
+    for (auto& network : networksMap) {
+      networks_arr.push_back(network.second);
+    }
+
+    // sort the networks by rssi
+    std::sort(networks_arr.begin(), networks_arr.end(),
+              [](nlohmann::json& a, nlohmann::json& b) {
+                return a["rssi"].get<int>() > b["rssi"].get<int>();
+              });
+    this->jsonBody["networks"] = networks_arr;
     this->dataUpdateSemaphore->give();
 
     this->isScanning = false;
@@ -234,7 +264,8 @@ void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
 
     // Set the hostname to the last 4 digits of the MAC address
     std::string mac = bell::getMacAddress();
-    std::string hostname = "euphonium-" + mac.substr(mac.length() - 5, 2) + mac.substr(mac.length() - 2);
+    std::string hostname = "euphonium-" + mac.substr(mac.length() - 5, 2) +
+                           mac.substr(mac.length() - 2);
     mdns_hostname_set(hostname.c_str());
 
     this->data.ipAddr = strIp;
