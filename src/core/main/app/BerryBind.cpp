@@ -10,7 +10,6 @@ VmState::VmState(bvm* vm) : vm(vm) {}
 int berryStdout(void* ctx, const char* buf, int len) {
   auto state = (VmState*)ctx;
   state->stdoutIntercept(buf, len);
-  ;
   return len;
 }
 

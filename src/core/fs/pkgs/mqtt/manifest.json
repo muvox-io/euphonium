@@ -1,0 +1,7 @@
+{
+  "name": "mqtt",
+  "version": "0.1.0",
+  "description": "Adds support for MQTT Broker connection",
+  "author": "euphonium",
+  "init_hook": "plugin"
+}

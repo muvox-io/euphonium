@@ -26,6 +26,8 @@
 #include "AudioTask.h"
 #include "AudioSourcePlugin.h"
 #include "DecoderGlobals.h"
+#include "SystemPlugin.h"
+#include "MQTTPlugin.h"
 
 namespace euph {
 class Core : public euph::EventSubscriber {
@@ -46,6 +48,7 @@ class Core : public euph::EventSubscriber {
 
   std::unique_ptr<euph::CoreBindings> bindings;
   std::vector<std::unique_ptr<euph::AudioSourcePlugin>> audioSources = {};
+  std::vector<std::unique_ptr<euph::SystemPlugin>> systemPlugins = {};
 
   std::atomic<bool> pluginsInitialized = false;
 
@@ -57,6 +60,7 @@ class Core : public euph::EventSubscriber {
   void handleEvent(std::unique_ptr<Event>& event) override;
   void handleEventLoop();
   void registerAudioSource(std::unique_ptr<euph::AudioSourcePlugin> source);
+  void registerSystemPlugin(std::unique_ptr<euph::SystemPlugin> plugin);
   void initializePlugins();
 
   // Used in platform implementations to export platform-specific bindings to the vm

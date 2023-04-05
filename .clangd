@@ -1,5 +1,5 @@
 CompileFlags:
-   CompilationDatabase: src/targets/esp32/build # Search build/ directory for compile_commands.json
+   CompilationDatabase: build # Search build/ directory for compile_commands.json
    Add:
       [
          -Wno-unknown-warning,

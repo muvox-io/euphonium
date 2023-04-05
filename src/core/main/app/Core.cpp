@@ -40,6 +40,9 @@ void Core::initialize() {
   this->registerAudioSource(std::make_unique<CSpotPlugin>(ctx));
   this->registerAudioSource(std::make_unique<SnapcastPlugin>(ctx));
 
+  // Register system plugins
+  this->registerSystemPlugin(std::make_unique<MQTTPlugin>(ctx));
+
   this->http->initialize();
   this->audioOutput->setupBindings(ctx);
 
@@ -95,6 +98,10 @@ void Core::initialize() {
     this->exportPlatformBindings(this->ctx);
   }
 
+  for (auto& plugin : this->systemPlugins) {
+    plugin->initializeBindings();
+  }
+
   for (auto& source : this->audioSources) {
     source->initializeBindings();
   }
@@ -148,6 +155,10 @@ void Core::handleEventLoop() {
     eventBus->eventSemaphore->wait();
     eventBus->update();
   }
+}
+
+void Core::registerSystemPlugin(std::unique_ptr<euph::SystemPlugin> plugin) {
+  this->systemPlugins.push_back(std::move(plugin));
 }
 
 void Core::registerAudioSource(
