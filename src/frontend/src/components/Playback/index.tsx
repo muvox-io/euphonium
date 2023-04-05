@@ -1,16 +1,11 @@
-import { useEffect, useState } from "preact/hooks";
-import eventSource from "../../api/euphonium/eventSource";
+import { useState } from "preact/hooks";
 import {
   PlaybackState,
-  PlaybackStatus,
+  PlaybackStatus
 } from "../../api/euphonium/playback/models";
 import PlaybackAPI from "../../api/euphonium/playback/PlaybackAPI";
-import useIsMobile from "../../utils/isMobile.hook";
 import useAPI from "../../utils/useAPI.hook";
 import usePlaybackState from "../../utils/usePlaybackState.hook";
-import APIFetcher from "../APIFetcher";
-import Equalizer from "../Equalizer";
-import Modal from "../Modal";
 import Icon from "../ui/Icon";
 
 

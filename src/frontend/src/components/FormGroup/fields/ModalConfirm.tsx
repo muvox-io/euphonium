@@ -1,4 +1,4 @@
-import Modal from "../../Modal";
+import Modal from "../../ui/Modal";
 import Button from "../../ui/Button";
 import { FieldProps } from "./FieldProps";
 

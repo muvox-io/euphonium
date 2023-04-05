@@ -8,7 +8,7 @@ import PluginsAPI from "../../../api/euphonium/plugins/PluginsAPI";
 import SystemAPI from "../../../api/euphonium/system/SystemAPI";
 import useAPI from "../../../utils/useAPI.hook";
 import usePlaybackState from "../../../utils/usePlaybackState.hook";
-import Modal from "../../Modal";
+import Modal from "../../ui/Modal";
 import Button from "../../ui/Button";
 
 const HardwareDetectedModal = ({ configUpdated }: any) => {
