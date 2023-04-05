@@ -43,6 +43,8 @@ class HTTPDispatcher {
 
   std::mutex webAccessMutex;
 
+  std::mutex httpRequestMutex;
+
   std::shared_ptr<bell::BellHTTPServer> server;
 
  public:
