@@ -54,4 +54,42 @@
       background: transparent;
     }
   }
+  &.loading {
+    position: relative;
+    user-select: none;
+    &.primary {
+      background: var(--accent-dark);
+      color: var(--accent-dark);
+      &:hover {
+        background: var(--accent-dark);
+        color: var(--accent-dark);
+      }
+    
+    }
+    
+    &:after {
+      content: " ";
+      position: absolute;
+      top: calc(50% - 2rem/2);
+      left: calc(50% - 2rem/2);
+      width: 2rem;
+      height: 2rem;
+      border-radius: 9999px;
+      opacity: 0.6;
+
+      border: 3px solid  var(--text-primary);
+      border-left: 3px solid transparent;
+
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
