@@ -8,7 +8,7 @@ import { useGetGlobalModalsQuery } from "../../redux/api/euphonium/pluginsApi";
 const GlobalModals = () => {
   const { data, isSuccess } = useGetGlobalModalsQuery();
   if (!isSuccess) return <div></div>;
-  return <div>{JSON.stringify(data)}</div>;
+  return null;
 };
 
 export default GlobalModals;
