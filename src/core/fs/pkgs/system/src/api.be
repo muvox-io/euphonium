@@ -75,6 +75,20 @@ http.handle(HTTP_POST, '/plugins/:name', def (request)
     end
 end)
 
+# Returns a list of all plugins which request to show a global modal
+# The client then needs to fetch the plugin's config form and display the modals in it
+http.handle(HTTP_GET, '/global-modals', def (request)
+    result = []
+    for plugin : euphonium.plugins
+        var ctx = FormContext()
+        plugin.make_form(ctx, plugin.state)
+        if ctx.has_global_modal()
+            result.push(plugin.name)
+        end
+    end
+    request.write_json(result, 200)
+end)
+
 
 http.handle(HTTP_GET, '/system', def (request)
     request.write_json({

@@ -1,7 +1,8 @@
 import "../../index.css";
 import { useGetSystemInfoQuery } from "../../redux/api/euphonium/euphoniumApi";
 import "../../theme/main.scss";
-import ConnectionLostModal from "../ConnectionLostModal";
+import ConnectionLostModalTrigger from "../ConnectionLostModalTrigger";
+import ModalsHost from "../ModalsHost";
 import Onboarding from "../NetworkConfig";
 import ReduxAPIFetcher from "../ReduxAPIFetcher";
 import Notifications from "../ui/Notifications";
@@ -19,7 +20,8 @@ export function App() {
   const result = useGetSystemInfoQuery();
   return (
     <>
-      <ConnectionLostModal></ConnectionLostModal>
+      <ModalsHost />
+      <ConnectionLostModalTrigger />
       <ReduxAPIFetcher result={result}>
         {({ data: info }) => {
           const onboarding =

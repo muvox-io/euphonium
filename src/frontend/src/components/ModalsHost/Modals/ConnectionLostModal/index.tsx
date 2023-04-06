@@ -1,10 +1,10 @@
 import { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { useSelector } from "react-redux";
-import getBaseUrl from "../../api/euphonium/baseUrl";
-import { WebsocketStatus } from "../../redux/reducers/websocketReducer";
-import Modal from "../ui/Modal";
-import Spinner from "../ui/Spinner";
+import getBaseUrl from "../../../../api/euphonium/baseUrl";
+import { WebsocketStatus } from "../../../../redux/reducers/websocketReducer";
+import Modal from "../../../ui/Modal";
+import Spinner from "../../../ui/Spinner";
 
 /**
  * ConnectionLostModal detects when the eventSource used for notifications fails and displays a modal
@@ -14,9 +14,9 @@ export default function ConnectionLostModal(): JSX.Element | null {
   let websocketStatus = useSelector(
     (state: any) => state.websocket.status as WebsocketStatus
   );
-  const open =
-    websocketStatus !== WebsocketStatus.CONNECTED &&
-    websocketStatus !== WebsocketStatus.INIIAL;
+  // const open =
+  //   websocketStatus !== WebsocketStatus.CONNECTED &&
+  //   websocketStatus !== WebsocketStatus.INIIAL;
   const isConnecting = websocketStatus === WebsocketStatus.CONNECTING;
   let [showImpulse, setShowImpulse] = useState(false); // determines whether the modal should show the impulse animation, which is shown on every error
   useEffect(() => {
@@ -29,7 +29,6 @@ export default function ConnectionLostModal(): JSX.Element | null {
     }
     return () => {};
   }, [isConnecting]);
-  if (!open) return null;
   return (
     <Modal header="Connection lost">
       <div class="flex flex-col mt-16">

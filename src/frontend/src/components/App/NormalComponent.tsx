@@ -4,6 +4,7 @@ import RadioBrowser from "../../apps/webradio/RadioBrowser";
 import useIsMobile from "../../utils/isMobile.hook";
 import ConfiguratorCard from "../ConfiguratorCard";
 import ErrorBoundaryWrapper from "../ErrorBoundaryWrapper";
+import GlobalModals from "../GlobalModals";
 import Playback from "../Playback";
 import PlaybackMobile from "../PlaybackMobile";
 import SideBar from "../SideBar";
@@ -27,7 +28,7 @@ export default function NormalComponent({ info }: { info: EuphoniumInfo }) {
   const isMobile = useIsMobile();
   return (
     <div class="flex-row flex bg-app-primary md:bg-transparent">
-      <Onboarding />
+      <GlobalModals />
       {!isMobile && (
         <SideBar version={info?.version} onThemeChange={() => toggleTheme()} />
       )}
