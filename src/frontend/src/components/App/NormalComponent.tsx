@@ -27,10 +27,10 @@ export default function NormalComponent({ info }: { info: EuphoniumInfo }) {
   const isMobile = useIsMobile();
   return (
     <div class="flex-row flex bg-app-primary md:bg-transparent">
-      <Onboarding/>
-      {!isMobile ? (
+      <Onboarding />
+      {!isMobile && (
         <SideBar version={info?.version} onThemeChange={() => toggleTheme()} />
-      ) : null}
+      )}
       <div class="flex-grow h-screen overflow-y-auto md:pb-20">
         <Router>
           {isMobile ? <Route path="/web" component={SideBar} /> : null}
