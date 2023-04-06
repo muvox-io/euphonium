@@ -33,10 +33,10 @@ class ResetRestorePlugin : Plugin
     end
 
     # testing...
-    ctx.modal_group("test_modal", {
-      'title': "Test modal",
-      'global': true,
-    })
+    # ctx.modal_group("test_modal", {
+    #   'title': "Test modal",
+    #   'global': true,
+    # })
   end
   def perform_factory_reset()
     core.delete_config_files();
