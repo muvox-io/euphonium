@@ -1,6 +1,7 @@
 import { createAction, createReducer } from "@reduxjs/toolkit";
 
 export enum WebsocketStatus {
+  INIIAL = "INITIAL",
   CONNECTING = "CONNECTING",
   WAITING_FOR_RECONNECT = "WAITING_FOR_RECONNECT",
   CONNECTED = "CONNECTED",
@@ -12,7 +13,7 @@ export interface WebsocketState {
 }
 
 const initialState: WebsocketState = {
-  status: WebsocketStatus.CONNECTING,
+  status: WebsocketStatus.INIIAL,
   ping: null,
 };
 
@@ -21,6 +22,13 @@ export const statusChanged = createAction<WebsocketStatus>(
 );
 
 export const pingReceived = createAction<number>("websocket/pingReceived");
+
+export const websocketMessage = (type: string, data: any) => {
+  return {
+    type: "websocket/"+ type,
+    payload: data,
+  };
+}
 
 export const websocketReducer = createReducer(initialState, (builder) => {
   builder

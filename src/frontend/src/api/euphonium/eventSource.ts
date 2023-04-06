@@ -1,5 +1,6 @@
 import {
   statusChanged,
+  websocketMessage,
   WebsocketStatus,
 } from "../../redux/reducers/websocketReducer";
 import store from "../../redux/store";
@@ -21,9 +22,9 @@ class EuphEventsEmitter {
       `${getBaseUrl().replace("http://", "ws://")}/events`
     );
     this.webSocket.onmessage = (event: any) => {
-      const { type, data } = JSON.parse(event.data);
-
-      this.emit(type, data);
+      const msg = JSON.parse(event.data);
+      this.reduxStore.dispatch(websocketMessage(msg.type, msg.data));
+      this.emit(msg.type, msg.data);
     };
     this.webSocket.onerror = (event: any) => {
       this.reduxStore.dispatch(

@@ -1,7 +1,6 @@
 import "../../index.css";
-import { useGetSystemInfoQuery } from "../../redux/api/euphonium/system/systemApi";
+import { useGetSystemInfoQuery } from "../../redux/api/euphonium/euphoniumApi";
 import "../../theme/main.scss";
-import { PlaybackDataContextProvider } from "../../utils/PlaybackContext";
 import ConnectionLostModal from "../ConnectionLostModal";
 import Onboarding from "../NetworkConfig";
 import ReduxAPIFetcher from "../ReduxAPIFetcher";
@@ -31,16 +30,14 @@ export function App() {
                 onboarding ? css.mainWrapperWaves : css.mainWrapperStatic
               }`}
             >
-              <PlaybackDataContextProvider>
-                <div class="h-screen w-screen">
-                  <Notifications />
-                  {onboarding ? (
-                    <Onboarding connectivity={info?.connectivity!} />
-                  ) : (
-                    <NormalComponent info={info} />
-                  )}
-                </div>
-              </PlaybackDataContextProvider>
+              <div class="h-screen w-screen">
+                <Notifications />
+                {onboarding ? (
+                  <Onboarding connectivity={info?.connectivity!} />
+                ) : (
+                  <NormalComponent info={info} />
+                )}
+              </div>
             </div>
           );
         }}

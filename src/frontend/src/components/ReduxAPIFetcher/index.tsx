@@ -1,4 +1,4 @@
-import { useGetSystemInfoQuery } from "../../redux/api/euphonium/system/systemApi";
+import { useGetSystemInfoQuery } from "../../redux/api/euphonium/euphoniumApi";
 import Spinner from "../ui/Spinner";
 
 export interface UsedReduxProperties {
