@@ -72,34 +72,17 @@ class MQTTPlugin : Plugin
   end
 
   def setup_basic_handlers()
-    self.subscribe("euphonium/volume/set", def (payload)
-      print("Setting volume to " + payload)
-      euphonium.apply_volume(int(payload))
-    end)
-
-    self.subscribe("euphonium/volume/volume_up", def (payload)
-      euphonium.apply_volume(playback_state.get_state()['settings']['volume'] + int(payload))
-    end)
-
-    self.subscribe("euphonium/volume/volume_down", def (payload)
-      euphonium.apply_volume(playback_state.get_state()['settings']['volume'] - int(payload))
-    end)
-
-    self.subscribe("euphonium/playback/toggle", def (payload)
-      if playback_state.get_state()['settings']['state'] == STATE_PLAYING
-        
-        playback_state.notify_state(STATE_PAUSED)
-      else
-        playback_state.notify_state(STATE_PLAYING)
-      end
-    end)
+    # TODO - set MQTT handlers here
   end
 
   def on_event(event, data)
-    if event == EVENT_CONFIG_UPDATED
+    if event == EVENT_CONFIG_UPDATED || event == EVENT_PLUGIN_INIT
       if self.state.find("enable") != nil && self.state.find("enable") == "true"
         self._connect(self.state["brokerUrl"], int(self.state["brokerPort"]), self.state["username"], self.state["password"])
         self.setup_basic_handlers()
+      end
+      if self.state.find("enable") != nil && self.state.find("enable") == "false"
+        self._disconnect()
       end
     end
   end

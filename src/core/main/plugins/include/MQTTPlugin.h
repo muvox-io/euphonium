@@ -67,6 +67,7 @@ class MQTTPlugin : public SystemPlugin, public bell::Task {
   void _disconnect();
 
  private:
+  std::atomic<bool> isConnected = false;
   std::string host, username, password;
   int port;
 
@@ -76,6 +77,6 @@ class MQTTPlugin : public SystemPlugin, public bell::Task {
   std::unique_ptr<bell::MQTTClient> client;
 
   std::atomic<bool> isRunning = false;
-  std::mutex runningMutex;
+  std::mutex runningMutex, connectionMutex;
 };
 }  // namespace euph

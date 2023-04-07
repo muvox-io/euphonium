@@ -26,9 +26,10 @@ MQTTPlugin::~MQTTPlugin() {}
 
 void MQTTPlugin::initializeBindings() {
   // Export native code to berry
-  this->ctx->vm->export_this("_connect", this, &MQTTPlugin::_configure,
-                             "mqtt");
+  this->ctx->vm->export_this("_connect", this, &MQTTPlugin::_configure, "mqtt");
   this->ctx->vm->export_this("_publish", this, &MQTTPlugin::_publish, "mqtt");
+  this->ctx->vm->export_this("_disconnect", this, &MQTTPlugin::_disconnect,
+                             "mqtt");
   this->ctx->vm->export_this("_subscribe", this, &MQTTPlugin::_subscribe,
                              "mqtt");
 }
@@ -49,13 +50,19 @@ void MQTTPlugin::runTask() {
     EUPH_LOG(info, TASK, "Connecting to MQTT broker at %s:%d",
              this->host.c_str(), this->port);
 
+    std::scoped_lock connectionLock(this->connectionMutex);
     try {
       this->client->connect(this->host, this->port, this->username,
                             this->password);
+      // Mark as connected
+      isConnected = true;
+
+      EUPH_LOG(info, TASK, "Broker connected, waiting for messages");
+
       // Holds incoming message request
       MessageRequest request;
 
-      while (this->client->isConnected()) {
+      while (isConnected) {
         // Handler client's request if available, sync with the broker otherwise
         if (this->messageQueue.wtpop(request, 100)) {
           switch (request.type) {
@@ -72,13 +79,34 @@ void MQTTPlugin::runTask() {
       }
 
     } catch (...) {
+      EUPH_LOG(error, TASK, "Failed to connect to MQTT broker");
       // TODO relay to VM
+    }
+
+    if (isConnected) {
+      // Disconnect the client
+      this->client->disconnect();
+
+      // Mark as disconnected
+      isConnected = false;
     }
   }
 }
 
 void MQTTPlugin::_configure(std::string host, int port, std::string username,
                             std::string password) {
+  // Ensure the task is running
+  if (!isRunning) {
+    this->startTask();
+  }
+
+  if (this->isConnected) {
+    // Disconnect the client
+    isConnected = false;
+
+    // Wait for the connection to be closed
+    std::scoped_lock connectionLock(this->connectionMutex);
+  }
 
   // Assign the configuration
   this->host = host;
@@ -88,8 +116,6 @@ void MQTTPlugin::_configure(std::string host, int port, std::string username,
 
   // Request a connection
   this->connectionRequested->give();
-
-  startTask();
 }
 
 void MQTTPlugin::_publish(std::string topic, std::string payload) {
@@ -103,11 +129,12 @@ void MQTTPlugin::_subscribe(std::string topic) {
 }
 
 void MQTTPlugin::_disconnect() {
-  this->isRunning = false;
-
-  // Ensure the task is not running
-  std::scoped_lock lock(this->runningMutex);
+  if (!isConnected)
+    return;
 
   // Disconnect the client
-  this->client->disconnect();
+  isConnected = false;
+
+  // Wait for the connection to be closed
+  std::scoped_lock lock(this->connectionMutex);
 }
