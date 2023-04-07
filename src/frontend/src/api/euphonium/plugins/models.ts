@@ -25,7 +25,6 @@ export enum ConfigurationFieldType {
 export interface ConfigurationField {
   type: ConfigurationFieldType;
   key: string;
-  value: string;
   label?: string;
   default?: string;
   hidden?: boolean;
@@ -48,4 +47,5 @@ export interface PluginConfiguration {
   configSchema: ConfigurationField[];
   themeColor: string;
   displayName: string;
+  state: any;
 }

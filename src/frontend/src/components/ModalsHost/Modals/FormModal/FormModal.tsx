@@ -20,15 +20,7 @@ const FormModal = ({
             (f) => f.group === config.data.modalGroupKey
           );
 
-          const value = Object.fromEntries(
-            fields
-              .filter(
-                (f) =>
-                  f.type !== ConfigurationFieldType.GROUP &&
-                  f.type !== ConfigurationFieldType.MODAL_GROUP
-              )
-              .map((field) => [field.key, field.value])
-          );
+          const value = data?.state;
 
           return (
             <FormGroup

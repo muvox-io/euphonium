@@ -155,17 +155,4 @@ class FormContext
         return false
     end
 
-    # Applies a state object to the form schema, so that each field has the value property
-    def apply_state(state)
-        for field : self.fields
-            if (state.find(field['key']) != nil)
-                field['value'] = state[field['key']]
-            else
-                if field.find('default') != nil
-                    field['value'] = field['default']
-                end
-            end
-        end
-        return self.fields
-    end
 end

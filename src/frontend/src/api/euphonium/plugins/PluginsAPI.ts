@@ -27,11 +27,4 @@ export default class PluginsAPI {
       { isPreview, configuration: config }
     );
 
-  fieldsToValues = (fields: ConfigurationField[]) => {
-    const values: { [key: string]: string } = {};
-    fields.forEach((field) => {
-      values[field.key] = field.value;
-    });
-    return values;
-  };
 }
