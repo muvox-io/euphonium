@@ -37,7 +37,7 @@ function CardContents({
       ...formValue,
       ...Object.fromEntries(
         pluginConfig.configSchema
-          .filter((f) => f.type !== ConfigurationFieldType.GROUP)
+          .filter((f) => f.type !== ConfigurationFieldType.GROUP && f.type !== ConfigurationFieldType.MODAL_GROUP)
           .map((field) => [field.key, field.value])
       ),
     });

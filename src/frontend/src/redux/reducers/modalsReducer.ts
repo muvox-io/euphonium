@@ -5,13 +5,13 @@ export enum ModalType {
   FORM_MODAL = "FORM_MODAL",
 }
 
-export interface ModalConfig {
+export interface ModalConfig<D = any> {
   id: string;
   title: string;
   dismissable: boolean;
   type: ModalType;
   priority: number;
-  data: any;
+  data: D;
 }
 
 export interface ModalsState {
