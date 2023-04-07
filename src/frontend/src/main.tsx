@@ -4,8 +4,6 @@ import { App } from "./components/App";
 import store from "./redux/store";
 
 render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
+  <Provider store={store}>{(<App />) as any}</Provider>,
   document.getElementById("app")!
 );
