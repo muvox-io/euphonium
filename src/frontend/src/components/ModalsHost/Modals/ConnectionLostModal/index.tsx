@@ -1,40 +1,34 @@
 import { JSX } from "preact";
-import { useContext, useEffect, useState } from "preact/hooks";
-import { APIAccessorContext } from "../../api/APIAccessor";
-import getBaseUrl from "../../api/euphonium/baseUrl";
-import eventSource from "../../api/euphonium/eventSource";
-import Modal from "../ui/Modal";
-import Spinner from "../ui/Spinner";
+import { useEffect, useState } from "preact/hooks";
+import { useSelector } from "react-redux";
+import getBaseUrl from "../../../../api/euphonium/baseUrl";
+import { WebsocketStatus } from "../../../../redux/reducers/websocketReducer";
+import Modal from "../../../ui/Modal";
+import Spinner from "../../../ui/Spinner";
 
 /**
- * ConnectionLostModal dects wjen the eventSource used for notifications fails and displays a modal
+ * ConnectionLostModal detects when the eventSource used for notifications fails and displays a modal
  * prompting the user to check his connection.
  */
 export default function ConnectionLostModal(): JSX.Element | null {
-  let [open, setOpen] = useState(false); // determines whether the modal should be shown
+  let websocketStatus = useSelector(
+    (state: any) => state.websocket.status as WebsocketStatus
+  );
+  // const open =
+  //   websocketStatus !== WebsocketStatus.CONNECTED &&
+  //   websocketStatus !== WebsocketStatus.INIIAL;
+  const isConnecting = websocketStatus === WebsocketStatus.CONNECTING;
   let [showImpulse, setShowImpulse] = useState(false); // determines whether the modal should show the impulse animation, which is shown on every error
-  let apiAccessor = useContext(APIAccessorContext);
   useEffect(() => {
-    let errorListener = (e: any) => {
-      console.log(e);
+    if (isConnecting) {
       setShowImpulse(true);
-      setOpen(true);
-      setTimeout(() => {
+      const timeout = setTimeout(() => {
         setShowImpulse(false);
       }, 501);
-    };
-    let openListener = (e: any) => {
-      setOpen(false);
-      apiAccessor.notifyReconnect();
-    };
-    eventSource.on("error", errorListener);
-    eventSource.on("open", openListener);
-    return () => {
-      eventSource.removeListener("error", errorListener);
-      eventSource.removeListener("open", openListener);
-    };
-  }, [eventSource, setShowImpulse, setOpen]);
-  if (!open) return null;
+      return () => clearTimeout(timeout);
+    }
+    return () => {};
+  }, [isConnecting]);
   return (
     <Modal header="Connection lost">
       <div class="flex flex-col mt-16">

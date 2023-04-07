@@ -29,10 +29,24 @@ class ResetRestorePlugin : Plugin
     end
     if state.find("factoryResetConfirm") == true 
       state.setitem("factoryResetConfirm", nil)
-      core.delete_config_files();
-      wifi.clear_config();
-      core.restart();
+      self.perform_factory_reset()
     end
+
+   
+    # ctx.modal_group("test_modal", {
+    #   'title': "Test modal",
+    #   'global': true,
+    # })
+    # ctx.button_field("test_modal_button", {
+    #   'label': "Test asassaas",
+    #   'buttonText': "eerreer",
+    #   'group': 'test_modal',
+    # })
+  end
+  def perform_factory_reset()
+    core.delete_config_files();
+    wifi.clear_config();
+    core.restart();
   end
 end
 

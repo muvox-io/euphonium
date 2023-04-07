@@ -24,11 +24,14 @@ http.handle(HTTP_GET, '/plugins/:name', def (request)
     for plugin : euphonium.plugins
         if plugin.name == request.route_params()['name']
             var ctx = FormContext()
-            plugin.make_form(ctx, plugin.state)
+            var state = json.load(json.dump(plugin.state)) # deep copy
+
+            plugin.make_form(ctx, state)
             request.write_json({
                 'displayName': plugin.display_name,
                 'themeColor': plugin.theme_color,
-                'configSchema': ctx.apply_state(plugin.state)
+                'configSchema': ctx.fields,
+                'state': plugin.state
             }, 200)
             return
         end
@@ -47,7 +50,7 @@ http.handle(HTTP_POST, '/plugins/:name', def (request)
     var body = request.json_body()
     var plugin = euphonium.get_plugin(request.route_params()['name'])
     var isDraft = body['isPreview']
-    var state = json.load(json.dump(plugin.state))
+    var state = json.load(json.dump(plugin.state)) # deep copy
 
     for key : body['configuration'].keys()
         state[key] = body['configuration'][key]
@@ -59,7 +62,8 @@ http.handle(HTTP_POST, '/plugins/:name', def (request)
     result = { 
         'displayName': plugin.display_name,
         'themeColor': plugin.theme_color,
-        'configSchema': ctx.apply_state(state)
+        'configSchema': ctx.fields,
+        'state': state
     }
 
     if (!isDraft)
@@ -73,6 +77,20 @@ http.handle(HTTP_POST, '/plugins/:name', def (request)
         euphonium.send_notification("info", plugin.name, "Configuration updated")
         plugin.on_event(EVENT_CONFIG_UPDATED, plugin.state)
     end
+end)
+
+# Returns a list of all plugins which request to show a global modal
+# The client then needs to fetch the plugin's config form and display the modals in it
+http.handle(HTTP_GET, '/global-modals', def (request)
+    result = []
+    for plugin : euphonium.plugins
+        var ctx = FormContext()
+        plugin.make_form(ctx, plugin.state)
+        if ctx.has_global_modal()
+            result.push(plugin.name)
+        end
+    end
+    request.write_json(result, 200)
 end)
 
 

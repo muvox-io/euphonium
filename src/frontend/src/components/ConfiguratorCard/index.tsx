@@ -22,24 +22,14 @@ function CardContents({
   setPluginConfig: (pluginConfig: PluginConfiguration) => void;
 }) {
   const pluginsAPI = useAPI(PluginsAPI);
-  const [formValue, setFormValue] = useState(
-    Object.fromEntries(
-      pluginConfig.configSchema
-        .filter((f) => f.type !== ConfigurationFieldType.GROUP)
-        .map((field) => [field.key, field.value])
-    )
-  );
+  const [formValue, setFormValue] = useState(pluginConfig.configSchema);
 
   const [isDirty, setIsDirty] = useState(false);
 
   useEffect(() => {
     setFormValue({
       ...formValue,
-      ...Object.fromEntries(
-        pluginConfig.configSchema
-          .filter((f) => f.type !== ConfigurationFieldType.GROUP)
-          .map((field) => [field.key, field.value])
-      ),
+      ...pluginConfig.state,
     });
   }, [pluginConfig]);
 

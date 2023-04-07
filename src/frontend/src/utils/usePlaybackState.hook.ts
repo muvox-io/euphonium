@@ -1,7 +1,7 @@
-import { useContext } from "preact/hooks";
 import { PlaybackState } from "../api/euphonium/playback/models";
-import { PlaybackDataContext } from "./PlaybackContext";
+import { useGetPlaybackStateQuery } from "../redux/api/euphonium/playbackApi";
 
-export default function usePlaybackState(): PlaybackState {
-  return useContext(PlaybackDataContext);
+export default function usePlaybackState(): PlaybackState | undefined {
+  const { data } = useGetPlaybackStateQuery();
+  return data;
 }

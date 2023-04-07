@@ -121,17 +121,38 @@ class FormContext
         self.fields.push(field)
     end
 
-    # Applies a state object to the form schema, so that each field has the value property
-    def apply_state(state)
+    # Creates a modal group, which is a group of fields that are displayed in a modal
+    # Configuration:
+    #   title: The title of the modal
+    #   dismissable: Whether the modal can be dismissed by clicking outside of it
+    #   global: Whether the modal should be shown everywhere in the app, not just in the current plugin
+    #   priority: The priority of the modal, higher priority modals are shown first
+    def modal_group(key, configuration)
+        var field = {
+            'key': key,
+            'type': 'modal_group',
+            'title': configuration['title'],
+            'dismissable': false,
+            'global': false,
+            'priority': 0
+        }
+        if (configuration.find('dismissable') == true)
+            field['dismissable'] = true
+        end
+        if (configuration.find('global') == true)
+            field['global'] = true
+        end
+        self.safe_copy_field(configuration, field, 'priority')
+        self.fields.push(field)
+    end
+
+    def has_global_modal()
         for field : self.fields
-            if (state.find(field['key']) != nil)
-                field['value'] = state[field['key']]
-            else
-                if field.find('default') != nil
-                    field['value'] = field['default']
-                end
+            if (field['type'] == 'modal_group' && field['global'] == true)
+                return true
             end
         end
-        return self.fields
+        return false
     end
+
 end

@@ -1,6 +1,9 @@
 import { useEffect, useState } from "preact/hooks";
 import PlaybackAPI from "../../../api/euphonium/playback/PlaybackAPI";
-import { getStationsByName } from "../../../api/radiobrowser/api";
+import {
+  getStationsByName,
+  getTopStations,
+} from "../../../api/radiobrowser/api";
 import { Station } from "../../../api/radiobrowser/models";
 import Card from "../../../components/ui/Card";
 import Icon from "../../../components/ui/Icon";
@@ -32,9 +35,7 @@ const Radio = ({
       <div class="bg-green-600 active:bg-green-800 text-white w-10 h-10 rounded-full absolute flex -bottom-2 -right-2 cursor-pointer">
         <div class="mt-[9px] ml-[5px]">
           <Icon
-            onClick={() =>
-              playbackAPI.playRadio(name, favicon, url_resolved)
-            }
+            onClick={() => playbackAPI.playRadio(name, favicon, url_resolved)}
             name="play"
           />
         </div>
@@ -48,7 +49,9 @@ export default () => {
 
   const [radios, setRadios] = useState<Station[]>([]);
   const [page, setPage] = useState(0);
-
+  useEffect(() => {
+    getTopStations(pageSize, page * pageSize).then(setRadios);
+  }, [page]);
   return (
     <div class="mb-[150px]">
       <Card title="Web radio" subtitle="application">
@@ -56,9 +59,16 @@ export default () => {
           <input
             placeholder={"Search radios"}
             className="pl-10 bg-app-primary h-[45px] p-3 rounded-xl min-w-full"
-            onChange={(e: any) =>
-              getStationsByName(e.target.value, pageSize, page * pageSize).then(setRadios)
-            }
+            onChange={(e: any) => {
+              if (e.target.value.length > 1) {
+                getStationsByName(
+                  e.target.value,
+                  pageSize,
+                  page * pageSize
+                ).then(setRadios);
+                return;
+              }
+            }}
           ></input>
           <div class="text-app-text-secondary left-1 top-3 absolute">
             <Icon name="search" />

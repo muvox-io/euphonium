@@ -28,6 +28,6 @@ export interface PlaybackTrack {
 
 export interface PlaybackState {
   settings: PlaybackSettings;
-  track: PlaybackTrack;
+  track: PlaybackTrack | null;
 }
 

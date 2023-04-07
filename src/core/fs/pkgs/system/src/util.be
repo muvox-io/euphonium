@@ -70,7 +70,7 @@ class Util
             hostname = hostname[0..32]
         end
         if size(hostname) <  1
-            hostname = "DDD-UPA"
+            hostname = "EUPHONIUM"
         end
         
         return hostname

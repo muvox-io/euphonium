@@ -1,15 +1,49 @@
+import {
+  statusChanged,
+  websocketMessage,
+  WebsocketStatus,
+} from "../../redux/reducers/websocketReducer";
+import store from "../../redux/store";
 import getBaseUrl from "./baseUrl";
 
-
 class EuphEventsEmitter {
-  webSocket = new WebSocket(`${getBaseUrl().replace("http://", "ws://")}/events`);
+  webSocket!: WebSocket;
   _events: Record<string, Array<(data: any) => void>> = {};
 
-  constructor() {
+  constructor(private reduxStore: typeof store) {
+    this.connect();
+  }
+
+  connect() {
+    this.reduxStore.dispatch(statusChanged(WebsocketStatus.CONNECTING));
+
+    this.emit("connecting", null);
+    this.webSocket = new WebSocket(
+      `${getBaseUrl().replace("http://", "ws://")}/events`
+    );
     this.webSocket.onmessage = (event: any) => {
-      const { type, data } = JSON.parse(event.data);
-      console.log(type);
-      this.emit(type, data);
+      const msg = JSON.parse(event.data);
+      this.reduxStore.dispatch(websocketMessage(msg.type, msg.data));
+      this.emit(msg.type, msg.data);
+    };
+    this.webSocket.onerror = (event: any) => {
+      this.reduxStore.dispatch(
+        statusChanged(WebsocketStatus.WAITING_FOR_RECONNECT)
+      );
+      this.emit("error", event);
+    };
+    this.webSocket.onopen = (event: any) => {
+      this.reduxStore.dispatch(statusChanged(WebsocketStatus.CONNECTED));
+      this.emit("open", event);
+    };
+    this.webSocket.onclose = (event: any) => {
+      this.reduxStore.dispatch(
+        statusChanged(WebsocketStatus.WAITING_FOR_RECONNECT)
+      );
+      this.emit("close", event);
+      setTimeout(() => {
+        this.connect();
+      }, 5000);
     };
   }
 
@@ -23,7 +57,9 @@ class EuphEventsEmitter {
 
   removeListener(name: string, listenerToRemove: any) {
     if (!this._events[name]) {
-      throw new Error(`Can't remove a listener. Event "${name}" doesn't exits.`);
+      throw new Error(
+        `Can't remove a listener. Event "${name}" doesn't exits.`
+      );
     }
 
     const filterListeners = (listener: any) => listener !== listenerToRemove;
@@ -33,7 +69,7 @@ class EuphEventsEmitter {
 
   emit(name: string, data: any) {
     if (!this._events[name]) {
-      throw new Error(`Can't emit an event. Event "${name}" doesn't exits.`);
+      return;
     }
 
     const fireCallbacks = (callback: any) => {
@@ -44,4 +80,6 @@ class EuphEventsEmitter {
   }
 }
 
-export default new EuphEventsEmitter();
+const eventSource = new EuphEventsEmitter(store);
+
+export default eventSource;
