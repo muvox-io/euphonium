@@ -5,6 +5,7 @@
 
 #include "BellHTTPServer.h"
 #include "BerryBind.h"
+#include "Connectivity.h"
 #include "EuphContext.h"
 #include "EventBus.h"
 #include "WrappedSemaphore.h"
@@ -12,11 +13,18 @@
 #include "fmt/format.h"
 
 namespace euph {
-class HTTPDispatcher {
+
+class HTTPDispatcher: public EventSubscriber {
+
  private:
   const std::string TAG = "http";
   std::shared_ptr<euph::Context> ctx;
   int port = 8080;
+
+  // Used for captive portal detection
+  std::atomic<bool> isRunningAPMode = false;
+
+  static constexpr auto CAPTIVE_DEFAULT_HOST = "192.168.4.1";
 
   // Signal used to wait for the HTTP response, while waiting for the scripting layer to respond
   std::unique_ptr<bell::WrappedSemaphore> responseSemaphore;
@@ -96,6 +104,9 @@ class HTTPDispatcher {
       return m;
     }
   };
+
+  // --- EventSubscriber interface ---
+  void handleEvent(std::unique_ptr<Event>& event) override;
 
   // Initializes the dispatcher
   void initialize();

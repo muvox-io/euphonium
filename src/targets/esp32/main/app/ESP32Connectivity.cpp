@@ -2,7 +2,10 @@
 #include <algorithm>
 #include <map>
 #include "BellUtils.h"
+#include "esp_err.h"
+#include "esp_system.h"
 #include "esp_wifi.h"
+#include "esp_wifi_default.h"
 #include "mdns.h"
 
 using namespace euph;
@@ -72,7 +75,7 @@ void ESP32Connectivity::persistConfig() {
     EUPH_LOG(error, TAG, "Error (%s) opening NVS handle!\n",
              esp_err_to_name(err));
   } else {
-    EUPH_LOG(info, TAG, "Reading WiFi configuration from NVS storage...");
+    EUPH_LOG(info, TAG, "Writing WiFi configuration to NVS storage...");
 
     nlohmann::json cfgBody = {};
     // Using FMT as nlohmann::json likes to break stack limits on sys_evt task
@@ -100,13 +103,12 @@ void ESP32Connectivity::clearConfig() {
   }
 }
 
-
 void ESP32Connectivity::initializeWiFiStack() {
   // set netif
-  esp_netif_t* staNetif = esp_netif_create_default_wifi_sta();
+  staNetif = esp_netif_create_default_wifi_sta();
   assert(staNetif);
 
-  esp_netif_t* apNetif = esp_netif_create_default_wifi_ap();
+  apNetif = esp_netif_create_default_wifi_ap();
   assert(apNetif);
 
   // initialize with default configuration
@@ -202,16 +204,20 @@ void ESP32Connectivity::initializeAP() {
 void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
                                     int32_t event_id, void* event_data) {
   if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_AP_START) {
-    // AP Mode has started successfully - let the rest of the system know.
-    this->data.state = State::CONNECTED_NO_INTERNET;
-    this->data.type = ConnectivityType::WIFI_AP;
+    if (this->isApMode) {
+      // AP Mode has started successfully - let the rest of the system know.
+      this->data.state = State::CONNECTED_NO_INTERNET;
+      this->data.type = ConnectivityType::WIFI_AP;
 
-    EUPH_LOG(debug, TAG, "Sending state update...");
+      EUPH_LOG(debug, TAG, "Sending state update...");
 
-    // Update
-    this->dataUpdateSemaphore->give();
+      // Update
+      this->dataUpdateSemaphore->give();
 
-    this->captivePortalDNS->startTask();
+      // Start ap
+      this->captivePortalDNS->startTask();
+    }
+
   } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_SCAN_DONE) {
     // Scan finished
     uint16_t number = DEFAULT_SCAN_LIST_SIZE;
@@ -227,7 +233,6 @@ void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
     // 1. Networks with the same SSID are listed only once
     // 2. The network with the highest RSSI is listed, if there are multiple
     // 3. Networks are sorted by RSSI, highest first
-
 
     // map of the networks
     std::map<std::string, nlohmann::json> networksMap;
@@ -276,7 +281,6 @@ void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
     esp_ip4addr_ntoa(&event->ip_info.ip, strIp, IP4ADDR_STRLEN_MAX);
 
     EUPH_LOG(info, TAG, "Connected, ip addr %s", strIp);
-    this->captivePortalDNS->stopTask();
     mdns_init();
 
     // Set the hostname to the last 4 digits of the MAC address
@@ -292,16 +296,6 @@ void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
 
     this->dataUpdateSemaphore->give();
     this->persistConfig();
-
-    // Disable AP mode after successful connection
-    if (isApMode) {
-      // Give the server a bit to respond
-      BELL_SLEEP_MS(2000);
-
-      // Go back to STA mode
-      ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-      isApMode = false;
-    }
   } else if (event_base == WIFI_EVENT &&
              event_id == WIFI_EVENT_STA_DISCONNECTED) {
     if (this->data.state == Connectivity::State::CONNECTING) {
@@ -404,5 +398,23 @@ void ESP32Connectivity::runTask() {
     this->dataUpdateSemaphore->wait();
     this->data.jsonBody = this->jsonBody.dump();
     this->sendStateUpdate();
+
+    if (this->data.state == Connectivity::State::CONNECTED && isApMode) {
+      // Set AP mode to false, as we are now connected to a network
+      this->isApMode = false;
+
+      // Wait a bit, so that the client can see the new state
+      BELL_SLEEP_MS(1000 * 2);
+
+      this->captivePortalDNS->stopTask();
+
+      // Disable ap mode
+      esp_wifi_stop();
+      ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+      esp_wifi_start();
+
+      // Reconnect to the network
+      esp_wifi_connect();
+    }
   }
 }

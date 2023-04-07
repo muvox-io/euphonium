@@ -60,6 +60,10 @@ class ESP32Connectivity : public Connectivity, public bell::Task {
   int connectionAttempts = 0;
   std::atomic<bool> isScanning = false;
   bool isApMode = false;
+
+  esp_netif_t* staNetif = nullptr;
+  esp_netif_t* apNetif = nullptr;
+
   std::unique_ptr<bell::WrappedSemaphore> dataUpdateSemaphore;
   std::unique_ptr<euph::CaptivePortalTask> captivePortalDNS;
 };

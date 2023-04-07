@@ -4,6 +4,7 @@
 #include "BellHTTPServer.h"
 #include "BellUtils.h"
 #include "CoreEvents.h"
+#include "EventBus.h"
 #include "MDNSService.h"
 #include "civetweb.h"
 
@@ -11,7 +12,8 @@ using namespace euph;
 
 HTTPDispatcher::HTTPDispatcher(std::shared_ptr<euph::Context> ctx) {
   this->ctx = ctx;
-  this->responseSemaphore = std::make_unique<bell::WrappedSemaphore>(MAX_CONNECTION_BINDS + 1); // a safe value
+  this->responseSemaphore = std::make_unique<bell::WrappedSemaphore>(
+      MAX_CONNECTION_BINDS + 1);  // a safe value
 
 // TODO: Handle it properly
 #ifdef ESP_PLATFORM
@@ -19,16 +21,34 @@ HTTPDispatcher::HTTPDispatcher(std::shared_ptr<euph::Context> ctx) {
 #endif
 
   this->server = std::make_shared<bell::BellHTTPServer>(port);
+  auto subscriber = static_cast<EventSubscriber*>(this);
+  this->ctx->eventBus->addListener(EventType::CONNECTIVITY_EVENT, *subscriber);
 }
 
 HTTPDispatcher::~HTTPDispatcher() {}
 
+void HTTPDispatcher::handleEvent(std::unique_ptr<Event>& event) {
+  if (event->eventType == EventType::CONNECTIVITY_EVENT) {
+    auto connectivityEvent =
+        static_cast<Connectivity::ConnectivityEvent*>(event.get());
+    auto connectivityData = connectivityEvent->data;
+
+    // Update the connectivity type
+    this->isRunningAPMode = ctx->connectivity->getData().type ==
+                            Connectivity::ConnectivityType::WIFI_AP;
+  }
+}
+
 void HTTPDispatcher::initialize() {
   EUPH_LOG(debug, TAG, "Registering HTTP handlers");
-  std::mutex serveMutex;
+
+  // Assign connectivity type
+  this->isRunningAPMode = ctx->connectivity->getData().type ==
+                          Connectivity::ConnectivityType::WIFI_AP;
 
   // Handle captive portal redirect
   this->server->registerNotFound([this](struct mg_connection* conn) {
+    BELL_LOG(debug, TAG, "Redirecting to captive portal");
     mg_printf(conn,
               "HTTP/1.1 302 Temporary Redirect\r\nContent-Type: text/html"
               "\r\nLocation: /\r\nAccess-Control-Allow-Origin: "
@@ -127,6 +147,21 @@ std::shared_ptr<bell::BellHTTPServer> HTTPDispatcher::getServer() {
 }
 
 void HTTPDispatcher::serveWeb(struct mg_connection* conn) {
+  const char* hostHeader = mg_get_header(conn, "Host");
+  if (hostHeader != nullptr && this->isRunningAPMode) {
+    // Redirect all hosts that differ from the default one to the default one
+    if (std::string_view(hostHeader).find(CAPTIVE_DEFAULT_HOST) ==
+        std::string::npos) {
+      mg_printf(conn,
+                "HTTP/1.1 302 Temporary Redirect\r\nContent-Type: text/html"
+                "\r\nLocation: http://%s/\r\nAccess-Control-Allow-Origin: "
+                "*\r\nConnection: close\r\n\r\n"
+                "Redirect to the captive portal",
+                CAPTIVE_DEFAULT_HOST);
+      return;
+    }
+  }
+
   auto reqInfo = mg_get_request_info(conn);
   std::string_view uri = std::string_view(reqInfo->local_uri);
 

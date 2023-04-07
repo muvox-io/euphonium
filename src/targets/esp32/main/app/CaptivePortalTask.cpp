@@ -1,242 +1,243 @@
 #include "CaptivePortalTask.h"
 #include <mutex>
+#include "BellUtils.h"
 
 using namespace euph;
+
+// DNS Header Packet
+typedef struct __attribute__((__packed__)) {
+  uint16_t id;
+  uint16_t flags;
+  uint16_t qd_count;
+  uint16_t an_count;
+  uint16_t ns_count;
+  uint16_t ar_count;
+} dns_header_t;
+
+// DNS Question Packet
+typedef struct {
+  uint16_t type;
+  uint16_t cl;
+} dns_question_t;
+
+// DNS Answer Packet
+typedef struct __attribute__((__packed__)) {
+  uint16_t ptr_offset;
+  uint16_t type;
+  uint16_t cl;
+  uint32_t ttl;
+  uint16_t addr_len;
+  uint32_t ip_addr;
+} dns_answer_t;
 
 CaptivePortalTask::CaptivePortalTask()
     : bell::Task("CaptivePortal", 1024 * 8, 0, 0) {}
 
-void CaptivePortalTask::setn16(void* pp, int16_t n) {
-  char* p = (char*)pp;
-  *p++ = (n >> 8);
-  *p++ = (n & 0xff);
+CaptivePortalTask::~CaptivePortalTask() {
+  stopTask();
 }
 
-CaptivePortalTask::~CaptivePortalTask() {}
+char* CaptivePortalTask::parseDnsName(char* rawName, char* parsedName,
+                                      size_t parsedNameMaxLen) {
 
-void CaptivePortalTask::setn32(void* pp, int32_t n) {
-  char* p = (char*)pp;
-  *p++ = (n >> 24) & 0xff;
-  *p++ = (n >> 16) & 0xff;
-  *p++ = (n >> 8) & 0xff;
-  *p++ = (n & 0xff);
-}
+  char* label = rawName;
+  char* name_itr = parsedName;
+  int name_len = 0;
 
-uint16_t CaptivePortalTask::ntohs(uint16_t* in) {
-  char* p = (char*)in;
-  return ((p[0] << 8) & 0xff00) | (p[1] & 0xff);
-}
-
-char* CaptivePortalTask::labelToStr(char* packet, char* labelPtr, int packetSz,
-                                    char* res, int resMaxLen) {
-  int i, j, k;
-  char* endPtr = NULL;
-  i = 0;
   do {
-    if ((*labelPtr & 0xC0) == 0) {
-      j = *labelPtr++;  // skip past length
-      // Add separator period if there already is data in res
-      if (i < resMaxLen && i != 0)
-        res[i++] = '.';
-      // Copy label to res
-      for (k = 0; k < j; k++) {
-        if ((labelPtr - packet) > packetSz)
-          return NULL;
-        if (i < resMaxLen)
-          res[i++] = *labelPtr++;
-      }
-    } else if ((*labelPtr & 0xC0) == 0xC0) {
-      // Compressed label pointer
-      endPtr = labelPtr + 2;
-      int offset = this->ntohs(((uint16_t*)labelPtr)) & 0x3FFF;
-      // Check if offset points to somewhere outside of the packet
-      if (offset > packetSz)
-        return NULL;
-      labelPtr = &packet[offset];
-    }
-    // check for out-of-bound-ness
-    if ((labelPtr - packet) > packetSz)
+    int sub_name_len = *label;
+    // (len + 1) since we are adding  a '.'
+    name_len += (sub_name_len + 1);
+    if (name_len > parsedNameMaxLen) {
       return NULL;
-  } while (*labelPtr != 0);
-  res[i] = 0;  // zero-terminate
-  if (endPtr == NULL)
-    endPtr = labelPtr + 1;
-  return endPtr;
+    }
+
+    // Copy the sub name that follows the the label
+    memcpy(name_itr, label + 1, sub_name_len);
+    name_itr[sub_name_len] = '.';
+    name_itr += (sub_name_len + 1);
+    label += sub_name_len + 1;
+  } while (*label != 0);
+
+  // Terminate the final string, replacing the last '.'
+  parsedName[name_len - 1] = '\0';
+  // Return pointer to first char after the name
+  return label + 1;
 }
 
-char* CaptivePortalTask::strToLabel(char* str, char* label, int maxLen) {
-  char* len = label;    // ptr to len byte
-  char* p = label + 1;  // ptr to next label byte to be written
-  while (1) {
-    if (*str == '.' || *str == 0) {
-      *len = ((p - len) - 1);  // write len of label bit
-      len = p;                 // pos of len for next part
-      p++;                     // data ptr is one past len
-      if (*str == 0)
-        break;  // done
-      str++;
-    } else {
-      *p++ = *str++;  // copy byte
-          //if ((p-label)>maxLen) return NULL;	// check out of bounds
+int CaptivePortalTask::parseDnsRequest(char* req, size_t reqLen, char* dnsReply,
+                                       size_t dnsReplyMaxLen) {
+  if (reqLen > dnsReplyMaxLen) {
+    return -1;
+  }
+
+  // Prepare the reply
+  memset(dnsReply, 0, dnsReplyMaxLen);
+  memcpy(dnsReply, req, reqLen);
+
+  // Endianess of NW packet different from chip
+  dns_header_t* header = (dns_header_t*)dnsReply;
+  EUPH_LOG(info, TASK,
+           "DNS query with header id: 0x%X, flags: 0x%X, qd_count: %d",
+           ntohs(header->id), ntohs(header->flags), ntohs(header->qd_count));
+
+  // Not a standard query
+  if ((header->flags & OPCODE_MASK) != 0) {
+    return 0;
+  }
+
+  // Set question response flag
+  header->flags |= QR_FLAG;
+
+  uint16_t qd_count = ntohs(header->qd_count);
+  header->an_count = htons(qd_count);
+
+  int reply_len = qd_count * sizeof(dns_answer_t) + reqLen;
+  if (reply_len > dnsReplyMaxLen) {
+    return -1;
+  }
+
+  // Pointer to current answer and question
+  char* cur_ans_ptr = dnsReply + reqLen;
+  char* cur_qd_ptr = dnsReply + sizeof(dns_header_t);
+  char name[128];
+
+  // Respond to all questions with the ESP32's IP address
+  for (int i = 0; i < qd_count; i++) {
+    char* name_end_ptr = parseDnsName(cur_qd_ptr, name, sizeof(name));
+    if (name_end_ptr == NULL) {
+      EUPH_LOG(error, TASK, "Failed to parse DNS question: %s", cur_qd_ptr);
+      return -1;
+    }
+
+    dns_question_t* question = (dns_question_t*)(name_end_ptr);
+    uint16_t qd_type = ntohs(question->type);
+    uint16_t qd_class = ntohs(question->cl);
+
+    EUPH_LOG(debug, TASK, "Received type: %d | Class: %d | Question for: %s",
+             qd_type, qd_class, name);
+
+    if (qd_type == QD_TYPE_A) {
+      dns_answer_t* answer = (dns_answer_t*)cur_ans_ptr;
+
+      answer->ptr_offset = htons(0xC000 | (cur_qd_ptr - dnsReply));
+      answer->type = htons(qd_type);
+      answer->cl = htons(qd_class);
+      answer->ttl = htonl(ANS_TTL_SEC);
+
+      esp_netif_ip_info_t ip_info;
+      esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_AP_DEF"),
+                            &ip_info);
+      EUPH_LOG(debug, TASK,
+               "Answer with PTR offset: 0x%" PRIX16 " and IP 0x%" PRIX32,
+               ntohs(answer->ptr_offset), ip_info.ip.addr);
+
+      answer->addr_len = htons(sizeof(ip_info.ip.addr));
+      answer->ip_addr = ip_info.ip.addr;
     }
   }
-  *len = 0;
-  return p;  // ptr to first free byte in resp
-}
-
-void CaptivePortalTask::dnsRecv(struct sockaddr_in* premoteAddr, char* pusrdata,
-                                unsigned short length) {
-  char buff[WIFI_CAPTIVE_PORTAL_ESP_IDF_DNS_LEN];
-  char reply[WIFI_CAPTIVE_PORTAL_ESP_IDF_DNS_LEN];
-  int i;
-  char* rend = &reply[length];
-  char* p = pusrdata;
-  DNSHeader* hdr = (DNSHeader*)p;
-  DNSHeader* rhdr = (DNSHeader*)&reply[0];
-  p += sizeof(DNSHeader);
-
-  // Some sanity checks:
-  if (length > WIFI_CAPTIVE_PORTAL_ESP_IDF_DNS_LEN)
-    return;  // Packet is longer than DNS implementation allows
-  if (length < sizeof(DNSHeader))
-    return;  // Packet is too short
-  if (hdr->ancount || hdr->nscount || hdr->arcount)
-    return;  // this is a reply, don't know what to do with it
-  if (hdr->flags & WIFI_CAPTIVE_PORTAL_ESP_IDF_DNS_FLAG_TC)
-    return;  // truncated, can't use this
-  // Reply is basically the request plus the needed data
-  memcpy(reply, pusrdata, length);
-  rhdr->flags |= WIFI_CAPTIVE_PORTAL_ESP_IDF_DNS_FLAG_QR;
-
-  for (i = 0; i < this->ntohs(&hdr->qdcount); i++) {
-    // Grab the labels in the q string
-    p = this->labelToStr(pusrdata, p, length, buff, sizeof(buff));
-    if (p == NULL)
-      return;
-    DNSQuestionFooter* qf = (DNSQuestionFooter*)p;
-    p += sizeof(DNSQuestionFooter);
-
-    EUPH_LOG(info, TASK,
-             "WIFI_CAPTIVE_PORTAL_ESP_IDF_DNS_Q (type 0x%X cl 0x%X) for %s",
-             this->ntohs(&qf->type), this->ntohs(&qf->cl), buff);
-
-    if (this->ntohs(&qf->type) == WIFI_CAPTIVE_PORTAL_ESP_IDF_DNS_QTYPE_A) {
-      // They want to know the IPv4 address of something.
-      // Build the response.
-
-      rend = this->strToLabel(buff, rend,
-                              sizeof(reply) - (rend - reply));  // Add the label
-      if (rend == NULL)
-        return;
-      DNSResourceFooter* rf = (DNSResourceFooter*)rend;
-      rend += sizeof(DNSResourceFooter);
-      setn16(&rf->type, WIFI_CAPTIVE_PORTAL_ESP_IDF_DNS_QTYPE_A);
-      setn16(&rf->cl, WIFI_CAPTIVE_PORTAL_ESP_IDF_DNS_QCLASS_IN);
-      setn32(&rf->ttl, 0);
-      setn16(&rf->rdlength, 4);  // IPv4 addr is 4 bytes;
-      // Grab the current IP of the softap interface
-
-      esp_netif_ip_info_t info;
-      esp_netif_get_ip_info(esp_netif_next(NULL), &info);
-      *rend++ = ip4_addr1(&info.ip);
-      *rend++ = ip4_addr2(&info.ip);
-      *rend++ = ip4_addr3(&info.ip);
-      *rend++ = ip4_addr4(&info.ip);
-      this->setn16(&rhdr->ancount, this->ntohs(&rhdr->ancount) + 1);
-    } else if (this->ntohs(&qf->type) ==
-               WIFI_CAPTIVE_PORTAL_ESP_IDF_DNS_QTYPE_NS) {
-      // Give ns server. Basically can be whatever we want because it'll get resolved to our IP later anyway.
-      rend = this->strToLabel(buff, rend,
-                              sizeof(reply) - (rend - reply));  // Add the label
-      DNSResourceFooter* rf = (DNSResourceFooter*)rend;
-      rend += sizeof(DNSResourceFooter);
-      setn16(&rf->type, WIFI_CAPTIVE_PORTAL_ESP_IDF_DNS_QTYPE_NS);
-      setn16(&rf->cl, WIFI_CAPTIVE_PORTAL_ESP_IDF_DNS_QCLASS_IN);
-      setn16(&rf->ttl, 0);
-      setn16(&rf->rdlength, 4);
-      *rend++ = 2;
-      *rend++ = 'n';
-      *rend++ = 's';
-      *rend++ = 0;
-      this->setn16(&rhdr->ancount, this->ntohs(&rhdr->ancount) + 1);
-    } else if (this->ntohs(&qf->type) ==
-               WIFI_CAPTIVE_PORTAL_ESP_IDF_DNS_QTYPE_URI) {
-      // Give uri to us
-      rend = this->strToLabel(buff, rend,
-                              sizeof(reply) - (rend - reply));  // Add the label
-      DNSResourceFooter* rf = (DNSResourceFooter*)rend;
-      rend += sizeof(DNSResourceFooter);
-      DNSUriHeader* uh = (DNSUriHeader*)rend;
-      rend += sizeof(DNSUriHeader);
-      setn16(&rf->type, WIFI_CAPTIVE_PORTAL_ESP_IDF_DNS_QTYPE_URI);
-      setn16(&rf->cl, WIFI_CAPTIVE_PORTAL_ESP_IDF_DNS_QCLASS_URI);
-      setn16(&rf->ttl, 0);
-      setn16(&rf->rdlength, 4 + 16);
-      setn16(&uh->prio, 10);
-      setn16(&uh->weight, 1);
-      memcpy(rend, "http://esp.nonet", 16);
-      rend += 16;
-      this->setn16(&rhdr->ancount, this->ntohs(&rhdr->ancount) + 1);
-    }
-  }
-  // Send the response
-  sendto(this->sockFd, (uint8_t*)reply, rend - reply, 0,
-         (struct sockaddr*)premoteAddr, sizeof(struct sockaddr_in));
+  return reply_len;
 }
 
 void CaptivePortalTask::stopTask() {
+  EUPH_LOG(debug, TASK, "Stopping Captive Portal Task");
   isRunning = false;
   std::scoped_lock lock(this->runningMutex);
+  EUPH_LOG(debug, TASK, "Stopped Captive Portal Task");
 }
 
 void CaptivePortalTask::runTask() {
   std::scoped_lock lock(this->runningMutex);
   isRunning = true;
-  struct sockaddr_in server_addr;
-  uint32_t ret;
-  struct sockaddr_in from;
-  socklen_t fromlen;
-  char udp_msg[WIFI_CAPTIVE_PORTAL_ESP_IDF_DNS_LEN];
+  char rx_buffer[128];
+  char addr_str[128];
+  int addr_family;
+  int ip_protocol;
 
-  memset(&server_addr, 0, sizeof(server_addr));
-  server_addr.sin_family = AF_INET;
-  server_addr.sin_addr.s_addr = INADDR_ANY;
-  uint16_t port = 53;
-  server_addr.sin_port = htons(&port);
-  server_addr.sin_len = sizeof(server_addr);
+  struct sockaddr_in dest_addr;
+  dest_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  dest_addr.sin_family = AF_INET;
+  dest_addr.sin_port = htons(DNS_PORT);
+  addr_family = AF_INET;
+  ip_protocol = IPPROTO_IP;
+  inet_ntoa_r(dest_addr.sin_addr, addr_str, sizeof(addr_str) - 1);
 
+  int sock = socket(addr_family, SOCK_DGRAM, ip_protocol);
+  if (sock < 0) {
+    EUPH_LOG(error, TASK, "Unable to create socket: errno %d", errno);
+    isRunning = false;
+    return;
+  }
+
+  int err = 1;
   do {
-    sockFd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sockFd == -1) {
-      EUPH_LOG(info, TASK, "dns_task failed to create sock!");
-      vTaskDelay(1000 / portTICK_PERIOD_MS);
+    err = bind(sock, (struct sockaddr*)&dest_addr, sizeof(dest_addr));
+    if (err < 0) {
+      EUPH_LOG(error, TASK, "Socket unable to bind: errno %d, retrying", errno);
     }
-  } while (sockFd == -1);
-
-  do {
-    ret = bind(sockFd, (struct sockaddr*)&server_addr, sizeof(server_addr));
-    if (ret != 0) {
-      EUPH_LOG(info, TASK, "dns_task failed to bind sock!");
-      vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-  } while (ret != 0);
+    BELL_SLEEP_MS(1000);
+  } while (err != 0);
+  EUPH_LOG(error, TASK, "Socket bound, port %d", DNS_PORT);
   struct timeval timeout;
 
   // Set timeout to 1 second, so we can exit the loop at some point
   timeout.tv_sec = 1;
   timeout.tv_usec = 0;
-  setsockopt(sockFd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof timeout);
+  setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof timeout);
 
   while (isRunning) {
-    memset(&from, 0, sizeof(from));
-    fromlen = sizeof(struct sockaddr_in);
-    ret =
-        recvfrom(sockFd, (uint8_t*)udp_msg, WIFI_CAPTIVE_PORTAL_ESP_IDF_DNS_LEN,
-                 0, (struct sockaddr*)&from, (socklen_t*)&fromlen);
-    if (ret > 0)
-      this->dnsRecv(&from, udp_msg, ret);
+    struct sockaddr_in6 source_addr;  // Large enough for both IPv4 or IPv6
+    socklen_t socklen = sizeof(source_addr);
+    int len = recvfrom(sock, rx_buffer, sizeof(rx_buffer) - 1, 0,
+                       (struct sockaddr*)&source_addr, &socklen);
+
+    // Error occurred during receiving
+    if (len < 0) {
+      if (errno == EWOULDBLOCK || errno == EAGAIN) {
+        // Timeout, just continue the loop
+        continue;
+      }
+      EUPH_LOG(error, TASK, "recvfrom failed: errno %d", errno);
+      close(sock);
+      break;
+    }
+    // Data received
+    else {
+      // Get the sender's ip address as string
+      if (source_addr.sin6_family == PF_INET) {
+        inet_ntoa_r(((struct sockaddr_in*)&source_addr)->sin_addr.s_addr,
+                    addr_str, sizeof(addr_str) - 1);
+      } else if (source_addr.sin6_family == PF_INET6) {
+        inet6_ntoa_r(source_addr.sin6_addr, addr_str, sizeof(addr_str) - 1);
+      }
+
+      // Null-terminate whatever we received and treat like a string...
+      rx_buffer[len] = 0;
+
+      char reply[DNS_MAX_LEN];
+      int reply_len = parseDnsRequest(rx_buffer, len, reply, DNS_MAX_LEN);
+
+      EUPH_LOG(debug, TASK,
+               "Received %d bytes from %s | DNS reply with len: %d", len,
+               addr_str, reply_len);
+      if (reply_len <= 0) {
+        EUPH_LOG(error, TASK, "Failed to prepare a DNS reply");
+      } else {
+        int err = sendto(sock, reply, reply_len, 0,
+                         (struct sockaddr*)&source_addr, sizeof(source_addr));
+        if (err < 0) {
+          EUPH_LOG(error, TASK, "Error occurred during sending: errno %d",
+                   errno);
+          break;
+        }
+      }
+    }
   }
 
+  if (sock != -1) {
+    EUPH_LOG(error, TASK, "Shutting down socket");
+    shutdown(sock, 0);
+    close(sock);
+  }
   isRunning = false;
-  ::close(sockFd);
 }

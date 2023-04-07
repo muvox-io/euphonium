@@ -80,7 +80,6 @@ void MQTTPlugin::runTask() {
 void MQTTPlugin::_configure(std::string host, int port, std::string username,
                             std::string password) {
 
-  if (this->conn)
   // Assign the configuration
   this->host = host;
   this->port = port;
