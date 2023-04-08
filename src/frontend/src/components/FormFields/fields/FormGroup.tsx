@@ -1,29 +1,18 @@
-import FormFields from "..";
+import FormFields, { FormFieldsProps } from "..";
 import {
-  ConfigurationField
+  ConfigurationField,
+  ConfigurationFieldGroup,
 } from "../../../api/euphonium/plugins/models";
 import IconCard from "../../ui/IconCard";
-
-export interface FormGroupProps {
-  field: ConfigurationField;
-  value: any;
-  onChange: (value: any) => void;
-  label?: string;
-  onChangeFinished?: () => void;
-}
-
+import { FieldProps } from "./FieldProps";
 
 export default function FormGroup({
   field,
-  value,
-  onChange,
-  label,
-  onChangeFinished,
-}: FormGroupProps) {
- 
+  pluginName,
+}: FieldProps<ConfigurationFieldGroup>) {
   return (
-    <IconCard iconName="settings" label={label}>
-      <FormFields fields={field.children!} value={value} onChange={onChange} />
+    <IconCard iconName="settings" label={field.label}>
+      <FormFields fields={field.children!} pluginName={pluginName} />
     </IconCard>
   );
 }

@@ -1,4 +1,7 @@
-import { ConfigurationFieldType } from "../../api/euphonium/plugins/models";
+import {
+  ConfigurationFieldType,
+  ConfigurationModalGroup,
+} from "../../api/euphonium/plugins/models";
 import {
   useGetGlobalModalsQuery,
   useGetPluginConfigurationQuery,
@@ -13,18 +16,18 @@ const GlobalModalsForPlugin = ({ pluginName }: { pluginName: string }) => {
     <>
       {data.configSchema
         .filter((f) => f.type === ConfigurationFieldType.MODAL_GROUP)
-        .map((f) => {
+        .map((f: ConfigurationModalGroup) => {
           return (
             <ModalTrigger
-              key={pluginName + f.key}
-              id={pluginName + f.key}
+              key={pluginName + f.id}
+              id={pluginName + "." + f.id}
               type={ModalType.FORM_MODAL}
               priority={f.priority}
               dismissable={f.dismissable}
               title={f.title}
               data={{
                 pluginName,
-                modalGroupKey: f.key,
+                fields: f.children
               }}
             />
           );

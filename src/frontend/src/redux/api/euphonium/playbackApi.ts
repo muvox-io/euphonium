@@ -22,8 +22,10 @@ const playbackApi = EuphoniumApi.injectEndpoints({
         await cacheEntryRemoved;
         eventSource.removeListener("playback", listener);
       },
+      
     }),
   }),
+  
 });
 
 export const { useGetPlaybackStateQuery } = playbackApi;

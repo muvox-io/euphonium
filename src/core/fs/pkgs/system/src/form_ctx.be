@@ -10,12 +10,14 @@ class BaseFormContext
         end
     end
 
-    def text_field(key, configuration)
+    def text_field(id, configuration)
         var field = {
-            'key': key,
+            'id': id,
+            'stateKey': id,
             'type': 'text_field',
             'label': configuration['label']
         }
+        self.safe_copy_field(configuration, field, 'stateKey')
         self.safe_copy_field(configuration, field, 'hint')
         self.safe_copy_field(configuration, field, 'default')
      
@@ -26,16 +28,16 @@ class BaseFormContext
        return _FieldContext(field, self.root_context)
     end
 
-    def link_button(key, configuration)
+    def link_button(id, configuration)
         var field = {
-            'key': key,
+            'id': id,
             'type': 'link_button',
             'label': configuration['label'],
             'link': configuration['link'],
             'placeholder': configuration['placeholder']
         }
         self.safe_copy_field(configuration, field, 'hint')
-        self.safe_copy_field(configuration, field, 'default')
+        
        
         self.safe_copy_field(configuration, field, 'hidden')
 
@@ -44,13 +46,15 @@ class BaseFormContext
         return _FieldContext(field, self.root_context)
     end
 
-    def modal_confirm(key, configuration)
+    def modal_confirm(id, configuration)
         var field = {
-            'key': key,
+            'id': id,
+            'stateKey': id,
             'type': 'modal_confirm',
             'label': configuration['label'],
             'hint': configuration['hint'],
         }
+        self.safe_copy_field(configuration, field, 'stateKey')
         self.safe_copy_field(configuration, field, 'hint')
         self.safe_copy_field(configuration, field, 'default')
        
@@ -61,12 +65,14 @@ class BaseFormContext
     end
 
 
-    def number_field(key, configuration)
+    def number_field(id, configuration)
         var field = {
-            'key': key,
+            'id': id,
+            'stateKey': id,
             'type': 'number_field',
             'label': configuration['label']
         }
+        self.safe_copy_field(configuration, field, 'stateKey')
         self.safe_copy_field(configuration, field, 'hint')
         self.safe_copy_field(configuration, field, 'default')
        
@@ -74,12 +80,14 @@ class BaseFormContext
         return _FieldContext(field, self.root_context)
     end
 
-    def checkbox_field(key, configuration)
+    def checkbox_field(id, configuration)
         var field = {
-            'key': key,
+            'id': id,
+            'stateKey': id,
             'type': 'checkbox_field',
             'label': configuration['label']
         }
+        self.safe_copy_field(configuration, field, 'stateKey')
         self.safe_copy_field(configuration, field, 'hint')
         self.safe_copy_field(configuration, field, 'default')
 
@@ -88,13 +96,15 @@ class BaseFormContext
         return _FieldContext(field, self.root_context)
     end
 
-    def select_field(key, configuration)
+    def select_field(id, configuration)
         var field = {
-            'key': key,
+            'id': id,
+            'stateKey': id,
             'type': 'select_field',
             'label': configuration['label'],
             'values': configuration['values']
         }
+        self.safe_copy_field(configuration, field, 'stateKey')
         self.safe_copy_field(configuration, field, 'hint')
         self.safe_copy_field(configuration, field, 'default')
 
@@ -103,12 +113,14 @@ class BaseFormContext
         return _FieldContext(field, self.root_context)
     end
 
-    def button_field(key, configuration)
+    def button_field(id, configuration)
         var field = {
-            'key': key,
+            'id': id,
+            'stateKey': id,
             'type': 'button_field',
             'label': configuration['label']
         }
+        self.safe_copy_field(configuration, field, 'stateKey')
         self.safe_copy_field(configuration, field, 'buttonText')
         self.safe_copy_field(configuration, field, 'hint')
 
@@ -117,12 +129,14 @@ class BaseFormContext
         return _FieldContext(field, self.root_context)
     end
 
-    def create_group(key, configuration)
+    def create_group(id, configuration)
         var field = {
-            'key': key,
+            'id': id,
+            'stateKey': id,
             'type': 'group',
             'label': configuration['label']
         }
+        self.safe_copy_field(configuration, field, 'stateKey')
         self.safe_copy_field(configuration, field, 'hint')
 
         self.add(field)
@@ -135,9 +149,9 @@ class BaseFormContext
     #   dismissable: Whether the modal can be dismissed by clicking outside of it
     #   global: Whether the modal should be shown everywhere in the app, not just in the current plugin
     #   priority: The priority of the modal, higher priority modals are shown first
-    def modal_group(key, configuration)
+    def modal_group(id, configuration)
         var field = {
-            'key': key,
+            'id': id,
             'type': 'modal_group',
             'title': configuration['title'],
             'dismissable': false,
@@ -169,6 +183,14 @@ class FieldContext : BaseFormContext
     def add(field)
         self.data['children'].push(field)
     end
+    def has_been(event_name)
+        for event : self.root_context.events
+            if event['fieldId'] == self.data['id'] && event['name'] == event_name
+                return true
+            end
+        end
+        return false
+    end
 end
 
 _FieldContext = FieldContext
@@ -176,9 +198,11 @@ _FieldContext = FieldContext
 class FormContext : BaseFormContext
     var children
     var root_context
-    def init()
+    var events
+    def init(events)
         self.children = []
         self.root_context = self
+        self.events = events == nil ? [] : events
     end
 
     def add(field)

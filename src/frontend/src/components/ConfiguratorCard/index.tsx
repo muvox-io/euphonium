@@ -1,70 +1,31 @@
-import { useEffect, useState } from "preact/hooks";
 import {
-  ConfigurationFieldType,
-  PluginConfiguration,
+  PluginConfiguration
 } from "../../api/euphonium/plugins/models";
-import PluginsAPI from "../../api/euphonium/plugins/PluginsAPI";
-import useAPI from "../../utils/useAPI.hook";
-import APIFetcher from "../APIFetcher";
+import { useGetPluginConfigurationQuery } from "../../redux/api/euphonium/pluginsApi";
+import { pluginDirtySelector } from "../../redux/reducers/pluginConfigurationsReducer";
 import Dashboard from "../Dashboard";
 import FormFields from "../FormFields";
-import FormGroup from "../FormFields";
+import ReduxAPIFetcher from "../ReduxAPIFetcher";
 import Button from "../ui/Button";
 import Card from "../ui/Card";
 
 function CardContents({
   pluginConfig,
-  plugin,
-  setPluginConfig,
+  pluginName,
 }: {
-  plugin: string;
+  pluginName: string;
   pluginConfig: PluginConfiguration;
-  setPluginConfig: (pluginConfig: PluginConfiguration) => void;
 }) {
-  const pluginsAPI = useAPI(PluginsAPI);
-  const [formValue, setFormValue] = useState(pluginConfig.configSchema);
-
-  const [isDirty, setIsDirty] = useState(false);
-
-  useEffect(() => {
-    setFormValue({
-      ...formValue,
-      ...pluginConfig.state,
-    });
-  }, [pluginConfig]);
-
-  const [shouldMakeRequest, setShouldMakeRequest] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      if (shouldMakeRequest) {
-        setShouldMakeRequest(false);
-        const resp = await pluginsAPI.updatePluginConfiguration(
-          plugin,
-          formValue,
-          true
-        );
-        setPluginConfig(resp);
-      }
-    })();
-  }, [formValue, shouldMakeRequest]);
-
+  const isDirty = pluginDirtySelector(pluginName);
   return (
     <Card title={pluginConfig.displayName} subtitle={"plugin configuration"}>
-      <FormFields fields={pluginConfig.configSchema} value={formValue}  />
+      <FormFields fields={pluginConfig.configSchema} pluginName={pluginName} />
       <div class="flex flex-col mt-[50px] md:mt-0">
         <Button
           type="primary"
           disabled={!isDirty}
           class="self-stretch md:self-end"
-          onClick={async () => {
-            const resp = await pluginsAPI.updatePluginConfiguration(
-              plugin,
-              formValue,
-              false // no preview
-            );
-            setPluginConfig(resp);
-          }}
+          onClick={async () => {}}
         >
           Apply changes
         </Button>
@@ -78,25 +39,13 @@ export default function ConfiguratorCard({ plugin }: { plugin: string }) {
     return <Dashboard />;
   }
 
+  const result = useGetPluginConfigurationQuery(plugin);
+
   return (
-    <APIFetcher
-      api={PluginsAPI}
-      fetch={(api) => api.getPluginConfiguration(plugin)}
-      dependencies={[plugin]}
-    >
-      {(
-        pluginConfig: PluginConfiguration,
-        refresh: () => void,
-        setPluginConfig: (p: PluginConfiguration) => void
-      ) => {
-        return (
-          <CardContents
-            plugin={plugin}
-            pluginConfig={pluginConfig}
-            setPluginConfig={setPluginConfig}
-          />
-        );
+    <ReduxAPIFetcher result={result}>
+      {({ data }) => {
+        return <CardContents pluginName={plugin} pluginConfig={data!} />;
       }}
-    </APIFetcher>
+    </ReduxAPIFetcher>
   );
 }

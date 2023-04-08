@@ -46,17 +46,16 @@ http.handle(HTTP_POST, '/plugins/:name', def (request)
     var result = {
         'status': 'error'
     }
-
     var body = request.json_body()
     var plugin = euphonium.get_plugin(request.route_params()['name'])
     var isDraft = body['isPreview']
     var state = json.load(json.dump(plugin.state)) # deep copy
-
-    for key : body['configuration'].keys()
-        state[key] = body['configuration'][key]
+    var events = body['events']
+    for key : body['state'].keys()
+        state[key] = body['state'][key]
     end
 
-    var ctx = FormContext()
+    var ctx = FormContext(events)
     plugin.make_form(ctx, state)
 
     result = { 
@@ -70,9 +69,7 @@ http.handle(HTTP_POST, '/plugins/:name', def (request)
         plugin.state = state
         plugin.persist_config()
     end
-
     request.write_json(result, 200)
-
     if (!isDraft)
         euphonium.send_notification("info", plugin.name, "Configuration updated")
         plugin.on_event(EVENT_CONFIG_UPDATED, plugin.state)

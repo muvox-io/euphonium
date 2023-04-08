@@ -10,21 +10,31 @@ class ResetRestorePlugin : Plugin
   def make_form(ctx, state)
     var group = ctx.create_group('reset', { 'label': 'Reset' })
 
-    group.button_field('factoryResetButton', {
+    var btn = group.button_field('factoryResetButton', {
         'label': "Factory reset",
         'buttonText': "Reset",
-        'group': 'reset',
     })
+
+    if btn.has_been("click")
+      state.setitem("factoryResetButton", true)
+    end
     if state.find("factoryResetButton") == true 
-      state.setitem("factoryResetButton", false)
-      state.setitem("factoryResetConfirm", nil)
-      group.modal_confirm("factoryResetConfirm", {
-        'label': "Factory reset",
-        'hint': "Are you sure you want to reset euphonium to factory defaults?",
-        'group': 'reset',
-        'default': nil,
-        'okValue': true,
-        'cancelValue': false
+      
+      var modal_group = group.modal_group("factoryResetConfirm", {
+        'title': "Factory reset",
+      })
+      modal_group.text_field("factoryResetConfirmText", {
+        'label': "Are you sure you want to reset the device to factory defaults?",
+        'default': "Are you sure you want to reset the device to factory defaults?",
+      
+      })
+      modal_group.button_field("factoryResetConfirmButton", {
+        'label': "Confirm",
+        'buttonText': "Confirm",
+      })
+      modal_group.button_field("factoryResetCancelButton", {
+        'label': "Cancel",
+        'buttonText': "Cancel",
       })
     end
     if state.find("factoryResetConfirm") == true 

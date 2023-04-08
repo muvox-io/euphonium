@@ -1,12 +1,6 @@
-import { ConfigurationField } from "../../../api/euphonium/plugins/models";
+import { BaseConfigurationField, ConfigurationField } from "../../../api/euphonium/plugins/models";
 
-export interface FieldProps<T> {
-    field: ConfigurationField;
-    value: T;
-    onChange: (value: T) => void;
-
-    /**
-     * Called to reload other field states.
-     */
-    onChangeFinished?: () => void;
+export interface FieldProps<T extends BaseConfigurationField = BaseConfigurationField> {
+    pluginName: string;
+    field: T;
 }

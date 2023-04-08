@@ -1,10 +1,9 @@
 import { AnyComponent, FunctionComponent } from "preact";
 import {
   ConfigurationField,
-  ConfigurationFieldType,
+  ConfigurationFieldType
 } from "../../api/euphonium/plugins/models";
 import useIsMobile from "../../utils/isMobile.hook";
-import IconCard from "../ui/IconCard";
 import Separator from "../ui/Separator/Separator";
 import ButtonField from "./fields/ButtonField";
 import CheckboxField from "./fields/CheckboxField";
@@ -12,15 +11,15 @@ import { FieldProps } from "./fields/FieldProps";
 import FormGroup from "./fields/FormGroup";
 import LinkButton from "./fields/LinkButton";
 import ModalConfirm from "./fields/ModalConfirm";
+import ModalGroup from "./fields/ModalGroup";
 import NumberField from "./fields/NumberField";
 import SelectField from "./fields/SelectField";
 import TextField from "./fields/TextField";
 
-export interface FormGroupProps {
+export interface FormFieldsProps {
+  pluginName: string;
   fields: ConfigurationField[];
-  value: any;
-  onChange: (value: any) => void;
-  onChangeFinished?: () => void;
+ 
 }
 
 export const FIELD_COMPONENTS: {
@@ -34,20 +33,19 @@ export const FIELD_COMPONENTS: {
   [ConfigurationFieldType.MODAL_CONFIRM]: ModalConfirm,
   [ConfigurationFieldType.BUTTON_FIELD]: ButtonField,
   [ConfigurationFieldType.GROUP]: FormGroup,
+  [ConfigurationFieldType.MODAL_GROUP]: ModalGroup,
 };
 
 export default function FormFields({
   fields,
-  value,
-  onChange,
-  onChangeFinished,
-}: FormGroupProps) {
+  pluginName
+}: FormFieldsProps) {
   const isMobile = useIsMobile();
-  console.log("value", value)
+  
   return (
     <div class="flex flex-col md:space-y-5">
       {fields
-        .filter((e) => !e.hidden)
+        .filter((e) => !(e as any).hidden) // TODO: fix typing
         .map((field) => {
           const FieldComponent: AnyComponent<FieldProps<any>> =
             FIELD_COMPONENTS[field.type];
@@ -58,13 +56,9 @@ export default function FormFields({
             <>
               <div class="mt-4 mb-4 md:mt-0 md:mb-0">
                 <FieldComponent
-                  key={field.key}
+                  key={field.id}
                   field={field}
-                  value={value}
-                  onChange={(fieldValue: any) =>
-                    onChange({ ...value, [field.key]: fieldValue })
-                  }
-                  onChangeFinished={onChangeFinished}
+                  pluginName={pluginName}
                 />
               </div>
               {isMobile ? <Separator /> : null}

@@ -22,29 +22,95 @@ export enum ConfigurationFieldType {
   MODAL_GROUP = "modal_group",
 }
 
-export interface ConfigurationField {
+export interface BaseConfigurationField {
   type: ConfigurationFieldType;
-  key: string;
+  id: string;
+}
 
-  children?: ConfigurationField[];
+export interface ConfigurationFieldGroup extends BaseConfigurationField {
+  type: ConfigurationFieldType.GROUP;
+  label: string;
+  children: ConfigurationField[];
+}
 
-  label?: string;
+export interface  ConfigurationModalGroup extends BaseConfigurationField {
+  type: ConfigurationFieldType.MODAL_GROUP;
+  children: ConfigurationField[];
+  title: string;
+  dismissable: boolean;
+  global: boolean;
+  priority: number;
+}
+
+export interface ConfigurationFieldLinkButton extends BaseConfigurationField {
+  type: ConfigurationFieldType.LINK_BUTTON;
+  label: string;
+  link: string;
+  placeholder: string;
+}
+
+export interface ConfigurationFieldWithStateKey extends BaseConfigurationField {
+  stateKey: string;
+}
+
+export interface ConfigurationFieldText extends ConfigurationFieldWithStateKey {
+  type: ConfigurationFieldType.TEXT;
+  label: string;
+
+  hint?: string;
   default?: string;
   hidden?: boolean;
-  values?: string[];
+}
+
+export interface ModalConfirmField extends ConfigurationFieldWithStateKey {
+  type: ConfigurationFieldType.MODAL_CONFIRM;
+  label: string;
   hint?: string;
-  placeholder?: string;
-  group?: string;
-  link?: string;
+
+  default?: string;
   okValue?: string;
   cancelValue?: string;
-  buttonText?: string;
-
-  // modal group
-  priority?: number;
-  dismissable?: boolean;
-  title?: string;
 }
+
+export interface NumberField extends ConfigurationFieldWithStateKey {
+  type: ConfigurationFieldType.NUMBER;
+  label: string;
+  hint?: string;
+  default?: number;
+}
+
+export interface CheckboxField extends ConfigurationFieldWithStateKey {
+  type: ConfigurationFieldType.CHECKBOX;
+  label: string;
+  hint?: string;
+  default?: boolean;
+}
+
+export interface SelectField extends ConfigurationFieldWithStateKey {
+  type: ConfigurationFieldType.SELECT;
+  label: string;
+  values: string[];
+  hint?: string;
+  default?: string;
+}
+
+export interface ConfigurationButtonField extends ConfigurationFieldWithStateKey {
+  type: ConfigurationFieldType.BUTTON_FIELD;
+  label: string;
+  hint?: string;
+  buttonText?: string;
+}
+
+export type ConfigurationField =
+  | ConfigurationFieldGroup
+  | ConfigurationFieldText
+  | SelectField
+  | NumberField
+  | CheckboxField
+  | ConfigurationFieldLinkButton
+  | ModalConfirmField
+  | ConfigurationButtonField
+  | ModalGroup;
 
 export interface PluginConfiguration {
   configSchema: ConfigurationField[];

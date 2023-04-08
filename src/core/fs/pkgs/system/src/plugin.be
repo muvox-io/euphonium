@@ -29,7 +29,7 @@ class Plugin
 
         for field : ctx.children
             if (field.find('default') != nil)
-                self.state[field['key']] = field['default']
+                self.state[field['stateKey']] = field['default']
             end
         end
     end
