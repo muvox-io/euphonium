@@ -1,14 +1,14 @@
-import { useCallback, useEffect, useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import {
   ConfigurationFieldType,
   PluginConfiguration,
 } from "../../api/euphonium/plugins/models";
 import PluginsAPI from "../../api/euphonium/plugins/PluginsAPI";
 import useAPI from "../../utils/useAPI.hook";
-import { useDebouncedCallback } from "../../utils/useDebouncedCallback";
 import APIFetcher from "../APIFetcher";
 import Dashboard from "../Dashboard";
-import FormGroup from "../FormGroup";
+import FormFields from "../FormFields";
+import FormGroup from "../FormFields";
 import Button from "../ui/Button";
 import Card from "../ui/Card";
 
@@ -49,32 +49,9 @@ function CardContents({
     })();
   }, [formValue, shouldMakeRequest]);
 
-  const groupFields = pluginConfig.configSchema.filter(
-    (field) => field.type === ConfigurationFieldType.GROUP
-  );
-
   return (
     <Card title={pluginConfig.displayName} subtitle={"plugin configuration"}>
-      {groupFields.map((group) => {
-        const fieldsInGroup = pluginConfig.configSchema.filter(
-          (field) => field.group == group.key
-        );
-        return (
-          <FormGroup
-            key={group.key}
-            label={group.label}
-            fields={fieldsInGroup}
-            onChange={(value) => {
-              setIsDirty(true);
-              setFormValue({ ...formValue, ...value });
-            }}
-            onChangeFinished={() => {
-              setShouldMakeRequest(true);
-            }}
-            value={formValue}
-          />
-        );
-      })}
+      <FormFields fields={pluginConfig.configSchema} value={formValue}  />
       <div class="flex flex-col mt-[50px] md:mt-0">
         <Button
           type="primary"

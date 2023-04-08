@@ -1,9 +1,9 @@
-class FormContext
-    var fields
-    def init()
-        self.fields = []
-    end
 
+
+var _FieldContext # Forward declaration
+
+# abstract class with utitlity functions for creating forms
+class BaseFormContext
     def safe_copy_field(configuration, field, field_name)
         if (configuration.find(field_name) != nil)
             field[field_name] = configuration[field_name]
@@ -18,12 +18,13 @@ class FormContext
         }
         self.safe_copy_field(configuration, field, 'hint')
         self.safe_copy_field(configuration, field, 'default')
-        self.safe_copy_field(configuration, field, 'group')
+     
         self.safe_copy_field(configuration, field, 'hidden')
 
-        self.fields.push(field)
-    end
+       self.add(field)
 
+       return _FieldContext(field, self.root_context)
+    end
 
     def link_button(key, configuration)
         var field = {
@@ -35,10 +36,12 @@ class FormContext
         }
         self.safe_copy_field(configuration, field, 'hint')
         self.safe_copy_field(configuration, field, 'default')
-        self.safe_copy_field(configuration, field, 'group')
+       
         self.safe_copy_field(configuration, field, 'hidden')
 
-        self.fields.push(field)
+        self.add(field)
+
+        return _FieldContext(field, self.root_context)
     end
 
     def modal_confirm(key, configuration)
@@ -50,11 +53,13 @@ class FormContext
         }
         self.safe_copy_field(configuration, field, 'hint')
         self.safe_copy_field(configuration, field, 'default')
-        self.safe_copy_field(configuration, field, 'group')
+       
         self.safe_copy_field(configuration, field, 'okValue')
         self.safe_copy_field(configuration, field, 'cancelValue')
-        self.fields.push(field)
+        self.add(field)
+        return _FieldContext(field, self.root_context)
     end
+
 
     def number_field(key, configuration)
         var field = {
@@ -64,10 +69,9 @@ class FormContext
         }
         self.safe_copy_field(configuration, field, 'hint')
         self.safe_copy_field(configuration, field, 'default')
-        self.safe_copy_field(configuration, field, 'group')
+       
         self.safe_copy_field(configuration, field, 'hidden')
-
-        self.fields.push(field)
+        return _FieldContext(field, self.root_context)
     end
 
     def checkbox_field(key, configuration)
@@ -78,9 +82,10 @@ class FormContext
         }
         self.safe_copy_field(configuration, field, 'hint')
         self.safe_copy_field(configuration, field, 'default')
-        self.safe_copy_field(configuration, field, 'group')
 
-        self.fields.push(field)
+
+        self.add(field)
+        return _FieldContext(field, self.root_context)
     end
 
     def select_field(key, configuration)
@@ -92,9 +97,10 @@ class FormContext
         }
         self.safe_copy_field(configuration, field, 'hint')
         self.safe_copy_field(configuration, field, 'default')
-        self.safe_copy_field(configuration, field, 'group')
 
-        self.fields.push(field)
+
+        self.add(field)
+        return _FieldContext(field, self.root_context)
     end
 
     def button_field(key, configuration)
@@ -105,9 +111,10 @@ class FormContext
         }
         self.safe_copy_field(configuration, field, 'buttonText')
         self.safe_copy_field(configuration, field, 'hint')
-        self.safe_copy_field(configuration, field, 'group')
 
-        self.fields.push(field)
+
+        self.add(field)
+        return _FieldContext(field, self.root_context)
     end
 
     def create_group(key, configuration)
@@ -118,10 +125,11 @@ class FormContext
         }
         self.safe_copy_field(configuration, field, 'hint')
 
-        self.fields.push(field)
+        self.add(field)
+        return _FieldContext(field, self.root_context)
     end
 
-    # Creates a modal group, which is a group of fields that are displayed in a modal
+    # Creates a modal group, which is whose children are displayed in a modal
     # Configuration:
     #   title: The title of the modal
     #   dismissable: Whether the modal can be dismissed by clicking outside of it
@@ -143,11 +151,42 @@ class FormContext
             field['global'] = true
         end
         self.safe_copy_field(configuration, field, 'priority')
-        self.fields.push(field)
+        self.add(field)
+        return _FieldContext(field, self.root_context)
+    end
+
+
+end
+
+class FieldContext : BaseFormContext
+    var data
+    var root_context
+    def init(data, root_context)
+        self.data = data
+        self.data['children'] = []
+        self.root_context = root_context
+    end
+    def add(field)
+        self.data['children'].push(field)
+    end
+end
+
+_FieldContext = FieldContext
+
+class FormContext : BaseFormContext
+    var children
+    var root_context
+    def init()
+        self.children = []
+        self.root_context = self
+    end
+
+    def add(field)
+        self.children.push(field)
     end
 
     def has_global_modal()
-        for field : self.fields
+        for field : self.children
             if (field['type'] == 'modal_group' && field['global'] == true)
                 return true
             end

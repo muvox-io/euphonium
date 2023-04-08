@@ -9,6 +9,7 @@ import Separator from "../ui/Separator/Separator";
 import ButtonField from "./fields/ButtonField";
 import CheckboxField from "./fields/CheckboxField";
 import { FieldProps } from "./fields/FieldProps";
+import FormGroup from "./fields/FormGroup";
 import LinkButton from "./fields/LinkButton";
 import ModalConfirm from "./fields/ModalConfirm";
 import NumberField from "./fields/NumberField";
@@ -19,7 +20,6 @@ export interface FormGroupProps {
   fields: ConfigurationField[];
   value: any;
   onChange: (value: any) => void;
-  label?: string;
   onChangeFinished?: () => void;
 }
 
@@ -33,45 +33,44 @@ export const FIELD_COMPONENTS: {
   [ConfigurationFieldType.LINK_BUTTON]: LinkButton,
   [ConfigurationFieldType.MODAL_CONFIRM]: ModalConfirm,
   [ConfigurationFieldType.BUTTON_FIELD]: ButtonField,
+  [ConfigurationFieldType.GROUP]: FormGroup,
 };
 
-export default function FormGroup({
+export default function FormFields({
   fields,
   value,
   onChange,
-  label,
   onChangeFinished,
 }: FormGroupProps) {
   const isMobile = useIsMobile();
+  console.log("value", value)
   return (
-    <IconCard iconName="settings" label={label}>
-      <div class="flex flex-col md:space-y-5">
-        {fields
-          .filter((e) => !e.hidden)
-          .map((field) => {
-            const FieldComponent: AnyComponent<FieldProps<any>> =
-              FIELD_COMPONENTS[field.type];
-            if (!FieldComponent) {
-              return <p>Unsupported field type: {field.type}</p>;
-            }
-            return (
-              <>
-                <div class="mt-4 mb-4 md:mt-0 md:mb-0">
-                  <FieldComponent
-                    key={field.key}
-                    field={field}
-                    value={value[field.key]}
-                    onChange={(fieldValue: any) =>
-                      onChange({ ...value, [field.key]: fieldValue })
-                    }
-                    onChangeFinished={onChangeFinished}
-                  />
-                </div>
-                {isMobile ? <Separator /> : null}
-              </>
-            );
-          })}
-      </div>
-    </IconCard>
+    <div class="flex flex-col md:space-y-5">
+      {fields
+        .filter((e) => !e.hidden)
+        .map((field) => {
+          const FieldComponent: AnyComponent<FieldProps<any>> =
+            FIELD_COMPONENTS[field.type];
+          if (!FieldComponent) {
+            return <p>Unsupported field type: {field.type}</p>;
+          }
+          return (
+            <>
+              <div class="mt-4 mb-4 md:mt-0 md:mb-0">
+                <FieldComponent
+                  key={field.key}
+                  field={field}
+                  value={value}
+                  onChange={(fieldValue: any) =>
+                    onChange({ ...value, [field.key]: fieldValue })
+                  }
+                  onChangeFinished={onChangeFinished}
+                />
+              </div>
+              {isMobile ? <Separator /> : null}
+            </>
+          );
+        })}
+    </div>
   );
 }

@@ -8,9 +8,9 @@ class ResetRestorePlugin : Plugin
     # self.fetch_config()
   end
   def make_form(ctx, state)
-    ctx.create_group('reset', { 'label': 'Reset' })
+    var group = ctx.create_group('reset', { 'label': 'Reset' })
 
-    ctx.button_field('factoryResetButton', {
+    group.button_field('factoryResetButton', {
         'label': "Factory reset",
         'buttonText': "Reset",
         'group': 'reset',
@@ -18,7 +18,7 @@ class ResetRestorePlugin : Plugin
     if state.find("factoryResetButton") == true 
       state.setitem("factoryResetButton", false)
       state.setitem("factoryResetConfirm", nil)
-      ctx.modal_confirm("factoryResetConfirm", {
+      group.modal_confirm("factoryResetConfirm", {
         'label': "Factory reset",
         'hint': "Are you sure you want to reset euphonium to factory defaults?",
         'group': 'reset',

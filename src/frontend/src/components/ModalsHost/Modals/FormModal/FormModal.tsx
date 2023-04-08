@@ -2,7 +2,7 @@ import React from "react";
 import { ConfigurationFieldType } from "../../../../api/euphonium/plugins/models";
 import { useGetPluginConfigurationQuery } from "../../../../redux/api/euphonium/pluginsApi";
 import { ModalConfig } from "../../../../redux/reducers/modalsReducer";
-import FormGroup from "../../../FormGroup";
+import FormGroup from "../../../FormFields";
 import ReduxAPIFetcher from "../../../ReduxAPIFetcher";
 import Modal from "../../../ui/Modal";
 

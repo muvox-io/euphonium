@@ -25,6 +25,9 @@ export enum ConfigurationFieldType {
 export interface ConfigurationField {
   type: ConfigurationFieldType;
   key: string;
+
+  children?: ConfigurationField[];
+
   label?: string;
   default?: string;
   hidden?: boolean;

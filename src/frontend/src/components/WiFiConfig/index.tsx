@@ -6,7 +6,7 @@ import {
 } from "../../api/euphonium/wifi/models";
 import WiFiAPI from "../../api/euphonium/wifi/WiFiAPI";
 import useAPI from "../../utils/useAPI.hook";
-import TextField from "../FormGroup/fields/TextField";
+import TextField from "../FormFields/fields/TextField";
 import Button from "../ui/Button";
 import Icon from "../ui/Icon";
 import Input from "../ui/NewInput";
