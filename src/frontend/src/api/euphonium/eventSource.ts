@@ -33,6 +33,7 @@ class EuphEventsEmitter {
       this.emit("error", event);
     };
     this.webSocket.onopen = (event: any) => {
+      console.log("websocket opened")
       this.reduxStore.dispatch(statusChanged(WebsocketStatus.CONNECTED));
       this.emit("open", event);
     };

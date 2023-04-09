@@ -27,7 +27,8 @@ const GlobalModalsForPlugin = ({ pluginName }: { pluginName: string }) => {
               title={f.title}
               data={{
                 pluginName,
-                fields: f.children
+                fields: f.children,
+                fieldId: f.id,
               }}
             />
           );

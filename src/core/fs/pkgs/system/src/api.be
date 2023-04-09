@@ -58,6 +58,11 @@ http.handle(HTTP_POST, '/plugins/:name', def (request)
     var ctx = FormContext(events)
     plugin.make_form(ctx, state)
 
+    if ctx.redraw_requested # some plugins mutate the state they depend on, so a second pass is required
+        ctx = FormContext() # reset the context, but don't pass the events
+        plugin.make_form(ctx, state)
+    end
+
     result = { 
         'displayName': plugin.display_name,
         'themeColor': plugin.theme_color,

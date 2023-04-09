@@ -22,6 +22,7 @@ export default function ModalGroup({
       data={{
         pluginName,
         fields: field.children,
+        fieldId: field.id,
       }}
     />
   );

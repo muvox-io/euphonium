@@ -199,10 +199,12 @@ class FormContext : BaseFormContext
     var children
     var root_context
     var events
+    var redraw_requested
     def init(events)
         self.children = []
         self.root_context = self
         self.events = events == nil ? [] : events
+        self.redraw_requested = false
     end
 
     def add(field)
@@ -216,6 +218,10 @@ class FormContext : BaseFormContext
             end
         end
         return false
+    end
+
+    def request_redraw()
+        self.redraw_requested = true
     end
 
 end

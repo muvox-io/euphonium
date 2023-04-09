@@ -16,42 +16,41 @@ class ResetRestorePlugin : Plugin
     })
 
     if btn.has_been("click")
-      state.setitem("factoryResetButton", true)
+      state.setitem("show_factory_reset_modal", true)
     end
-    if state.find("factoryResetButton") == true 
-      
+    if state.find("show_factory_reset_modal") == true 
       var modal_group = group.modal_group("factoryResetConfirm", {
         'title': "Factory reset",
       })
       modal_group.text_field("factoryResetConfirmText", {
         'label': "Are you sure you want to reset the device to factory defaults?",
         'default': "Are you sure you want to reset the device to factory defaults?",
-      
       })
-      modal_group.button_field("factoryResetConfirmButton", {
+      var confirm_button = modal_group.button_field("factoryResetConfirmButton", {
         'label': "Confirm",
         'buttonText': "Confirm",
       })
-      modal_group.button_field("factoryResetCancelButton", {
+      var cancel_button = modal_group.button_field("factoryResetCancelButton", {
         'label': "Cancel",
         'buttonText': "Cancel",
       })
+      if cancel_button.has_been("click") || modal_group.has_been("dismiss")
+        state.setitem("show_factory_reset_modal", nil)
+        ctx.request_redraw() # we need to redraw the form to remove the modal, otherwise it will be stuck
+      end
+      if confirm_button.has_been("click")
+        state.setitem("show_factory_reset_modal", nil)
+        state.setitem("factory_reset_in_progress", true)
+        self.perform_factory_reset()
+        ctx.request_redraw() # we need to redraw the form to remove the modal, otherwise it will be stuck
+      end
     end
-    if state.find("factoryResetConfirm") == true 
-      state.setitem("factoryResetConfirm", nil)
-      self.perform_factory_reset()
+    if state.find("factory_reset_in_progress") == true
+      group.text_field("factoryResetInProgressText", {
+        'label': "Factory reset in progress",
+        'default': "Factory reset in progress",
+      })
     end
-
-   
-    # ctx.modal_group("test_modal", {
-    #   'title': "Test modal",
-    #   'global': true,
-    # })
-    # ctx.button_field("test_modal_button", {
-    #   'label': "Test asassaas",
-    #   'buttonText': "eerreer",
-    #   'group': 'test_modal',
-    # })
   end
   def perform_factory_reset()
     core.delete_config_files();
