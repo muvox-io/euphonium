@@ -1,7 +1,7 @@
-{ stdenv, callPackage, nodejs, nodePackages, writeShellScriptBin }:
+{ stdenv, callPackage, nodejs-16_x, nodePackages, writeShellScriptBin }:
 
 let
-  generated = callPackage ./nix { inherit nodejs; };
+  generated = callPackage ./nix { nodejs = nodejs-16_x; };
 
   # node2nix wrapper to update nix files on npm changes
   node2nix = writeShellScriptBin "node2nix" ''
@@ -20,7 +20,7 @@ in {
   static = stdenv.mkDerivation {
     name = "euphonium-frontend";
     src = ./.;
-    buildInputs = [ nodejs ];
+    buildInputs = [ nodejs-16_x ];
     buildPhase = ''
       export HOME=$TMP
       ln -s ${generated.nodeDependencies}/lib/node_modules ./node_modules
