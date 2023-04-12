@@ -26,12 +26,13 @@ class Plugin
         self.state = {}
         var ctx = FormContext()
         self.make_form(ctx, self.state)
-
-        for field : ctx.children
-            if (field.find('default') != nil)
-                self.state[field['stateKey']] = field['default']
+        var all_fields = ctx.children
+        # walk fields recursively
+        ctx.walk(def (data)
+            if data.find("default") != nil && data.find("stateKey") != nil
+                self.state[data["stateKey"]] = data["default"]
             end
-        end
+        end)
     end
 
     # Called to initialize audio when `is_audio_output` == true
@@ -54,6 +55,20 @@ class Plugin
     # saves raw confugration to disk
     def persist_config()
         core.save_config(self.name, json.dump(self.state))
+    end
+
+    # utility function to add apply button to a form
+    def add_apply_button(ctx, state)
+        if ctx.button_field("_apply_button", {
+            "label": "",
+            "buttonText": "Apply changes"
+        }).has_been("click")
+            self.state = state
+            self.persist_config()
+            # todo: rework api so that no circular dependency
+            # euphonium.send_notification("info", plugin.name, "Configuration updated")
+            self.on_event(EVENT_CONFIG_UPDATED, self.state)
+        end
     end
 
     # load plugin configuration from disk

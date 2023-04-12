@@ -1,8 +1,10 @@
 import { AnyComponent, FunctionComponent } from "preact";
+import { useSelector } from "react-redux";
 import {
   ConfigurationField,
   ConfigurationFieldType
 } from "../../api/euphonium/plugins/models";
+import { pluginStateReadySelector } from "../../redux/reducers/pluginConfigurationsReducer";
 import useIsMobile from "../../utils/isMobile.hook";
 import Separator from "../ui/Separator/Separator";
 import ButtonField from "./fields/ButtonField";
@@ -41,7 +43,8 @@ export default function FormFields({
   pluginName
 }: FormFieldsProps) {
   const isMobile = useIsMobile();
-  
+  const isPluginStateReady = useSelector(pluginStateReadySelector(pluginName));
+  if(!isPluginStateReady) return null; // wait for plugin state to be ready between receiving the response and applying the state via redux
   return (
     <div class="flex flex-col md:space-y-5">
       {fields

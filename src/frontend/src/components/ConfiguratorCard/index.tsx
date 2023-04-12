@@ -1,6 +1,4 @@
-import {
-  PluginConfiguration
-} from "../../api/euphonium/plugins/models";
+import { PluginConfiguration } from "../../api/euphonium/plugins/models";
 import { useGetPluginConfigurationQuery } from "../../redux/api/euphonium/pluginsApi";
 import { pluginDirtySelector } from "../../redux/reducers/pluginConfigurationsReducer";
 import Dashboard from "../Dashboard";
@@ -16,20 +14,9 @@ function CardContents({
   pluginName: string;
   pluginConfig: PluginConfiguration;
 }) {
-  const isDirty = pluginDirtySelector(pluginName);
   return (
     <Card title={pluginConfig.displayName} subtitle={"plugin configuration"}>
       <FormFields fields={pluginConfig.configSchema} pluginName={pluginName} />
-      <div class="flex flex-col mt-[50px] md:mt-0">
-        <Button
-          type="primary"
-          disabled={!isDirty}
-          class="self-stretch md:self-end"
-          onClick={async () => {}}
-        >
-          Apply changes
-        </Button>
-      </div>
     </Card>
   );
 }

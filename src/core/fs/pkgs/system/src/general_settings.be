@@ -15,34 +15,36 @@ class GeneralSettingsPlugin : Plugin
   end
 
   def make_form(ctx, state)
-      ctx.create_group('general', { 'label': 'General' })
+      var group = ctx.create_group('general', { 'label': 'General' })
 
-      ctx.text_field('playerName', {
+      group.text_field('playerName', {
           'label': "Player's name",
           'default': util.generate_device_name(),
           'group': 'general'
       })
 
-      ctx.number_field('volume', {
+      group.number_field('volume', {
           'label': "Saved volume",
           'default': 0,
           'group': 'general',
           'hidden': false
       })
 
-      ctx.checkbox_field('onboardingHardware', {
+      group.checkbox_field('onboardingHardware', {
           'label': "Onboarding hardware confirmed",
           'default': "false",
           'group': 'general',
           'hidden': false
       })
 
-      ctx.number_field('onboardingMaxVolume', {
+      group.number_field('onboardingMaxVolume', {
           'label': "Onboarding max volume tuned",
           'default': 0,
           'group': 'general',
           'hidden': false
       })
+
+      self.add_apply_button(ctx, state)
   end
 
   def set_max_volume_tuned(max_volume)

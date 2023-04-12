@@ -69,16 +69,7 @@ http.handle(HTTP_POST, '/plugins/:name', def (request)
         'configSchema': ctx.children,
         'state': state
     }
-
-    if (!isDraft)
-        plugin.state = state
-        plugin.persist_config()
-    end
     request.write_json(result, 200)
-    if (!isDraft)
-        euphonium.send_notification("info", plugin.name, "Configuration updated")
-        plugin.on_event(EVENT_CONFIG_UPDATED, plugin.state)
-    end
 end)
 
 # Returns a list of all plugins which request to show a global modal

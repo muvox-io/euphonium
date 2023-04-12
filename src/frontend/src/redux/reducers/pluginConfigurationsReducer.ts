@@ -87,9 +87,8 @@ export const onFieldChanged =
     await dispatch(
       pluginsApiEndpoints.postPluginConfiguration.initiate({
         pluginName,
-        state: (getState() as RootState).pluginConfigurations.states[
-          pluginName
-        ].state,
+        state: (getState() as RootState).pluginConfigurations.states[pluginName]
+          .state,
         isPreview: true,
         events: [],
       })
@@ -129,6 +128,12 @@ export const pluginDirtySelector =
   (pluginName: string) => (state: RootState) => {
     const pluginState = state.pluginConfigurations.states[pluginName];
     return pluginState.dirty;
+  };
+
+export const pluginStateReadySelector =
+  (pluginName: string) => (state: RootState) => {
+    const pluginState = state.pluginConfigurations.states[pluginName];
+    return pluginState != null;
   };
 
 export const pluginConfigurationsReducer = createReducer(

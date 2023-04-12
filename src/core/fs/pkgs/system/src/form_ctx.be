@@ -224,4 +224,17 @@ class FormContext : BaseFormContext
         self.redraw_requested = true
     end
 
+    def walk(f)
+        self._walk_arr(f, self.children)
+    end
+
+    def _walk_arr(f, arr)
+        for field : arr
+            f(field)
+            if (field['children'] != nil)
+                self._walk_arr(f, field['children'])
+            end
+        end
+    end
+
 end
