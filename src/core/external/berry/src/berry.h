@@ -135,7 +135,7 @@ enum berrorcode {
 
 #ifdef __cplusplus
 #ifdef __cpp_constexpr
-  #define BE_CONSTEXPR          constexpr                            /**< BE_CONSTEXPR */
+  #define BE_CONSTEXPR          constexpr                              /**< BE_CONSTEXPR */
 #else
   #define BE_CONSTEXPR                                                 /**< BE_CONSTEXPR */
 #endif
@@ -189,7 +189,31 @@ typedef struct bntvmodobj {
         bntvfunc f;                                 /**< f */
         const char *s;                              /**< s */
         const void *o;                              /**< o */
+#ifdef __cplusplus
+        BE_CONSTEXPR value(bint v) : i(v) {}        /**< i */
+        BE_CONSTEXPR value(breal v) : r(v) {}       /**< r */
+        BE_CONSTEXPR value(bbool v) : b(v) {}       /**< b */
+        BE_CONSTEXPR value(bntvfunc v) : f(v) {}    /**< f */
+        BE_CONSTEXPR value(const char *v) : s(v) {} /**< s */
+        BE_CONSTEXPR value(const void *v) : o(v) {} /**< o */
+#endif
     } u;                                            /**< u */
+#ifdef __cplusplus
+    BE_CONSTEXPR bntvmodobj(const char *name) :
+        name(name), type(BE_CNIL), u(bint(0)) {}    /**< bntvmodobj */
+    BE_CONSTEXPR bntvmodobj(const char *name, bint v) :
+        name(name), type(BE_CINT), u(v) {}          /**< bntvmodobj */
+    BE_CONSTEXPR bntvmodobj(const char *name, breal v) :
+        name(name), type(BE_CREAL), u(v) {}         /**< bntvmodobj */
+    BE_CONSTEXPR bntvmodobj(const char *name, bbool v) :
+        name(name), type(BE_CBOOL), u(v) {}         /**< bntvmodobj */
+    BE_CONSTEXPR bntvmodobj(const char *name, bntvfunc v) :
+        name(name), type(BE_CFUNCTION), u(v) {}     /**< bntvmodobj */
+    BE_CONSTEXPR bntvmodobj(const char *name, const char *v) :
+        name(name), type(BE_CSTRING), u(v) {}       /**< bntvmodobj */
+    BE_CONSTEXPR bntvmodobj(const char *name, int _tpye, const void *v) :
+        name(name), type(_tpye), u(v) {}            /**< bntvmodobj */
+#endif
 } bntvmodobj_t; /**< bntvmodobj_t */
 
 /**
