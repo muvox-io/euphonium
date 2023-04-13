@@ -79,14 +79,14 @@ export interface NumberField extends ConfigurationFieldWithStateKey {
   default?: number;
 }
 
-export interface CheckboxField extends ConfigurationFieldWithStateKey {
+export interface CheckboxFieldConfiguration extends ConfigurationFieldWithStateKey {
   type: ConfigurationFieldType.CHECKBOX;
   label: string;
   hint?: string;
   default?: boolean;
 }
 
-export interface SelectField extends ConfigurationFieldWithStateKey {
+export interface SelectFieldConfiguration extends ConfigurationFieldWithStateKey {
   type: ConfigurationFieldType.SELECT;
   label: string;
   values: string[];
@@ -104,9 +104,9 @@ export interface ConfigurationButtonField extends ConfigurationFieldWithStateKey
 export type ConfigurationField =
   | ConfigurationFieldGroup
   | ConfigurationFieldText
-  | SelectField
+  | SelectFieldConfiguration
   | NumberField
-  | CheckboxField
+  | CheckboxFieldConfiguration
   | ConfigurationFieldLinkButton
   | ModalConfirmField
   | ConfigurationButtonField

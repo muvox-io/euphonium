@@ -15,33 +15,37 @@ class CSpotPlugin : Plugin
   end
 
   def make_form(ctx, state)
-      ctx.create_group('spotify', { 'label': 'General' })
+      var group_ctx = ctx.create_group('spotify', { 'label': 'General' })
 
-      ctx.select_field('audioBitrate', {
+      group_ctx.select_field('audioBitrate', {
           'label': "Audio bitrate",
           'default': "160",
           'values': ['320', '160', '96'],
           'group': 'spotify'
       })
-      ctx.checkbox_field('overrideAp', {
-          'label': "Override access point address",
-          'default': "false",
-          'group': 'spotify'
-      })
+      
 
-      ctx.text_field('authData', {
+      group_ctx.text_field('authData', {
           'label': "Saved auth data",
           'default': "",
           'group': 'spotify'
       })
 
-      if state.find('overrideAp') != nil && state['overrideAp'] == 'true'
-          ctx.text_field('apAddress', {
+      group_ctx.checkbox_field('overrideAp', {
+          'label': "Override access point address",
+          'default': "false",
+          'group': 'spotify'
+      })
+
+      if state.find('overrideAp') != nil && state['overrideAp']
+        group_ctx.text_field('apAddress', {
               'label': "Access point address",
               'default': "",
               'group': 'spotify'
           })
       end
+
+      self.add_apply_button(ctx, state)
   end
 
   def register_discovery()

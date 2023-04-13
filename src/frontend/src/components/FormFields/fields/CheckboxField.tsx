@@ -1,14 +1,31 @@
 import { FieldProps } from "./FieldProps";
 import Checkbox from "../../ui/Checkbox";
+import { CheckboxFieldConfiguration } from "../../../api/euphonium/plugins/models";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  onFieldChanged,
+  pluginStateSelector,
+} from "../../../redux/reducers/pluginConfigurationsReducer";
 
-export default function CheckboxField(props: FieldProps<string>) {
+export default function CheckboxField({
+  pluginName,
+  field,
+}: FieldProps<CheckboxFieldConfiguration>) {
+  const pluginState = useSelector(pluginStateSelector(pluginName));
+  const dispatch = useDispatch();
   return (
     <Checkbox
-      label={props.field.label || "???"}
-      value={props.value === "true"}
+      label={field.label || "???"}
+      value={pluginState[field.stateKey] == true}
       onChange={(v) => {
-        props.onChange(v ? "true" : "false");
-        props.onChangeFinished && props.onChangeFinished();
+        dispatch(
+          onFieldChanged({
+            pluginName,
+            key: field.stateKey,
+            value: v,
+            debounce: false,
+          }) as any
+        );
       }}
     />
   );
