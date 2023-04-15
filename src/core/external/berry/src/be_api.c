@@ -881,7 +881,6 @@ BERRY_API bbool be_pushiter(bvm *vm, int index)
         return btrue;
     } else if (var_islist(v)) {
         blist *list = var_toobj(v);
-        be_stack_require(vm, 1 + BE_STACK_FREE_MIN);
         bvalue *iter = be_incrtop(vm);
         var_setobj(iter, BE_COMPTR, be_list_data(list) - 1);
         return btrue;

@@ -153,6 +153,7 @@ extern const bcstring be_const_str_tan;
 extern const bcstring be_const_str_tanh;
 extern const bcstring be_const_str_time;
 extern const bcstring be_const_str_tob64;
+extern const bcstring be_const_str_tobool;
 extern const bcstring be_const_str_tohex;
 extern const bcstring be_const_str_tolower;
 extern const bcstring be_const_str_top;
