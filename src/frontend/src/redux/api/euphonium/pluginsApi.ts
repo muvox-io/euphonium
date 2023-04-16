@@ -1,4 +1,7 @@
-import { PluginConfiguration } from "../../../api/euphonium/plugins/models";
+import {
+  PluginConfiguration,
+  PluginEntry,
+} from "../../../api/euphonium/plugins/models";
 import { stateFromServerApplied } from "../../reducers/pluginConfigurationsReducer";
 import { EuphoniumApi } from "./euphoniumApi";
 import { PostPluginConfigurationArgs } from "./pluginsApiModel";
@@ -10,6 +13,10 @@ const pluginsApi = EuphoniumApi.injectEndpoints({
      */
     getGlobalModals: builder.query<string[], void>({
       query: () => "/global-modals",
+    }),
+
+    listPlugins: builder.query<PluginEntry[], void>({
+      query: () => "/plugins",
     }),
 
     getPluginConfiguration: builder.query<PluginConfiguration, string>({
@@ -31,10 +38,7 @@ const pluginsApi = EuphoniumApi.injectEndpoints({
         method: "POST",
         body: args,
       }),
-      onQueryStarted: async (
-        { pluginName },
-        { dispatch, queryFulfilled }
-      ) => {
+      onQueryStarted: async ({ pluginName }, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
           console.log("DATA FROM SERVER", data);
@@ -55,5 +59,6 @@ const pluginsApi = EuphoniumApi.injectEndpoints({
 export const {
   useGetGlobalModalsQuery,
   useGetPluginConfigurationQuery,
+  useListPluginsQuery,
   endpoints: pluginsApiEndpoints,
 } = pluginsApi;

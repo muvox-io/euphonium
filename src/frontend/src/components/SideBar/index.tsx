@@ -1,12 +1,11 @@
 import { Link, Match } from "preact-router/match";
-import { useEffect, useState } from "preact/hooks";
 import {
   PluginEntry,
   PluginEntryType,
 } from "../../api/euphonium/plugins/models";
-import PluginsAPI from "../../api/euphonium/plugins/PluginsAPI";
-import APIFetcher from "../APIFetcher";
 
+import { useListPluginsQuery } from "../../redux/api/euphonium/pluginsApi";
+import ReduxAPIFetcher from "../ReduxAPIFetcher";
 import Icon from "../ui/Icon";
 import Separator from "../ui/Separator/Separator";
 
@@ -74,19 +73,19 @@ const SideBarCategory = ({ plugins, filterType, header }: CategoryProps) => {
 };
 
 export default ({ version = "", theme = "", onThemeChange = () => {} }) => {
+  const result = useListPluginsQuery();
   return (
     <div className="flex align-start relative md:w-[220px] md:min-w-[220px] flex-col bg-app-primary p-8 md:p-4 h-screen text-m space-y-2 overflow-y-auto">
       <div className="text-3xl md:text-2xl">Euphonium</div>
       <div className="text-xs md:text-m text-app-text-secondary pb-5 md:pb-3">
         tiny audio platform
       </div>
-      <APIFetcher
-        api={PluginsAPI}
-        fetch={(api) => api.getPlugins()}
-        cacheKey="sidebar"
+      <ReduxAPIFetcher
+        result={result}
       >
-        {(pluginsFromAPI: PluginEntry[]) => {
-          let plugins = [...pluginsFromAPI];
+        {({data}) => {
+          if(!data) return (<></>);
+          let plugins = [...data];
           return (
             <>
               <SideBarItem displayName="Dashboard" name="home"></SideBarItem>
@@ -110,7 +109,7 @@ export default ({ version = "", theme = "", onThemeChange = () => {} }) => {
             </>
           );
         }}
-      </APIFetcher>
+    </ReduxAPIFetcher>
       <div
         onClick={(v) => onThemeChange()}
         class="absolute bg-app-secondary rounded-full w-8 h-8 right-4 bottom-4 flex text-xl items-center justify-center cursor-pointer"
