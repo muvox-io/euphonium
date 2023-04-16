@@ -44,12 +44,7 @@ class RadioPlugin : Plugin
 
   def make_form(ctx, state)
       ctx.create_group('radio', { 'label': 'General' })
-
-      ctx.text_field('receiverName', {
-          'label': "Speaker's name",
-          'default': "Euphonium ",
-          'group': 'radio'
-      })
+      self.add_apply_button(ctx, state)
   end
 
   def on_event(event, data)
