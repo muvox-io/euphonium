@@ -1,3 +1,6 @@
+
+import debug
+
 var HTTP_GET = 0
 var HTTP_POST = 1
 
@@ -80,6 +83,7 @@ class HTTP
             self.handlers[req_data['handler_id']](request)
         except .. as e,m
             print('exception in http handler: ' + e + ': ' + m)
+            debug.traceback()
             # respond with error if an exception was thrown before the request was written
             if !request.did_write
                 request.write_json({
