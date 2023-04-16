@@ -1,5 +1,11 @@
+
+var MQTT_STATE_DISABLED = "Disabled"
+var MQTT_STATE_INVALID_CONFIG = "Invalid config"
+var MQTT_STATE_CONNECTING = "Connecting"
+
 class MQTTPlugin : Plugin
   var subscriptions
+  var current_status
   def init()
       self.apply_default_values()
 
@@ -11,6 +17,8 @@ class MQTTPlugin : Plugin
       self.fetch_config()
       self.subscriptions = {}
 
+      self.current_status = MQTT_STATE_DISABLED
+    
       events.register_native("mqtt_publish_received", def (data)
         print(data)
         if self.subscriptions.find(data["topic"]) != nil
@@ -21,39 +29,40 @@ class MQTTPlugin : Plugin
   end
 
   def make_form(ctx, state)
-      ctx.create_group('mqtt', { 'label': 'General' })
+      var group = ctx.create_group('mqtt', { 'label': 'General' })
 
-      ctx.checkbox_field('enable', {
+      group.checkbox_field('enable', {
           'label': "Connect to MQTT broker",
           'default': "false",
           'group': 'mqtt'
       })
 
-      if state.find('enable') != nil && state['enable'] == "true"
-        ctx.text_field('brokerUrl', {
+      if state.find('enable') != nil && state['enable']
+        group.text_field('brokerUrl', {
           'label': "Broker host url",
           'default': "",
           'group': 'mqtt'
         })
 
-        ctx.number_field('brokerPort', {
+        group.number_field('brokerPort', {
           'label': "Broker port",
-          'default': "1883",
+          'default': 1883,
           'group': 'mqtt'
         })
         
-        ctx.text_field('username', {
+        group.text_field('username', {
           'label': "Username",
           'default': "",
           'group': 'mqtt'
         })
 
-        ctx.text_field('password', {
+        group.text_field('password', {
           'label': "Password",
           'default': "",
           'group': 'mqtt'
         })
       end
+      self.add_apply_button(ctx, state)
   end
 
   def member(name)
@@ -77,11 +86,15 @@ class MQTTPlugin : Plugin
 
   def on_event(event, data)
     if event == EVENT_CONFIG_UPDATED || event == EVENT_PLUGIN_INIT
-      if self.state.find("enable") != nil && self.state.find("enable") == "true"
+      if self.state.find("enable") != nil && self.state.find("enable")
+        if self.state.find("brokerUrl") == nil || self.state.find("brokerPort") == nil || self.state.find("username") == nil || self.state.find("password") == nil
+          self.current_status = MQTT_STATE_INVALID_CONFIG
+          return
+        end
         self._connect(self.state["brokerUrl"], int(self.state["brokerPort"]), self.state["username"], self.state["password"])
         self.setup_basic_handlers()
       end
-      if self.state.find("enable") != nil && self.state.find("enable") == "false"
+      if self.state.find("enable") != nil && !self.state.find("enable")
         self._disconnect()
       end
     end
