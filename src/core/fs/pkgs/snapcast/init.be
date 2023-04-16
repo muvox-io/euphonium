@@ -11,25 +11,27 @@ class SnapcastPlugin : Plugin
   end
 
   def make_form(ctx, state)
-      ctx.create_group('snapcast', { 'label': 'General' })
+      var group = ctx.create_group('snapcast', { 'label': 'General' })
 
-      ctx.text_field('serverUrl', {
+      group.text_field('serverUrl', {
           'label': "Server address",
           'default': "",
           'group': 'snapcast'
       })
 
-      ctx.number_field('serverPort', {
+      group.number_field('serverPort', {
           'label': "Server port",
           'default': "1704",
           'group': 'snapcast'
       })
 
-      ctx.checkbox_field('enable', {
+      group.checkbox_field('enable', {
           'label': "Enable snapcast client",
           'default': "false",
           'group': 'snapcast'
       })
+
+      self.add_apply_button(ctx, state)
   end
 
   def member(name)
