@@ -3,8 +3,10 @@ var HTTP_POST = 1
 
 class HTTPRequest
     var conn_id
+    var did_write
     def init(conn_id)
         self.conn_id = conn_id
+        self.did_write = false
     end
 
     def member(name)
@@ -38,14 +40,17 @@ class HTTPRequest
     def write_json(body, status)
         var json_body = json.dump(body ? body : { 'status': 'error' })
         self._write_response(self.conn_id, json_body, "application/json", status ? status : 200)
+        self.did_write = true
     end
 
     def write_text(body, status)
         self._write_response(self.conn_id, body, "text/plain", status ? status : 200)
+        self.did_write = true
     end
 
     def write_raw(body, status, content_type)
         self._write_response(self.conn_id, body, content_type, status ? status : 200)
+        self.did_write = true
     end
 end
 
@@ -71,7 +76,18 @@ class HTTP
 
     def handle_event(req_data)
         var request = HTTPRequest(req_data['conn_id'])
-        self.handlers[req_data['handler_id']](request)
+        try
+            self.handlers[req_data['handler_id']](request)
+        except .. as e,m
+            print('exception in http handler: ' + e + ': ' + m)
+            # respond with error if an exception was thrown before the request was written
+            if !request.did_write
+                request.write_json({
+                    'status': 'error',
+                    'error': e + ': ' + m,
+                }, 500)
+            end
+        end
     end
 
     # handle request
