@@ -11,7 +11,6 @@ export const EuphoniumApi = createApi({
       query: () => "/system/info",
     }),
   }),
-  
 });
 
 export const { useGetSystemInfoQuery } = EuphoniumApi;

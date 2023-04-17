@@ -29,6 +29,7 @@ class MQTTPlugin : Plugin
   end
 
   def make_form(ctx, state)
+      
       var group = ctx.create_group('mqtt', { 'label': 'General' })
 
       group.checkbox_field('enable', {
@@ -38,6 +39,7 @@ class MQTTPlugin : Plugin
       })
 
       if state.find('enable') != nil && state['enable']
+        print(self.state["brokerPort"])
         group.text_field('brokerUrl', {
           'label': "Broker host url",
           'default': "",
@@ -87,6 +89,7 @@ class MQTTPlugin : Plugin
   def on_event(event, data)
     if event == EVENT_CONFIG_UPDATED || event == EVENT_PLUGIN_INIT
       if self.state.find("enable") != nil && self.state.find("enable")
+        
         if self.state.find("brokerUrl") == nil || self.state.find("brokerPort") == nil || self.state.find("username") == nil || self.state.find("password") == nil
           self.current_status = MQTT_STATE_INVALID_CONFIG
           return

@@ -66,7 +66,14 @@ class Plugin
             self.state = state
             self.persist_config()
             # todo: rework api so that no circular dependency
-            # euphonium.send_notification("info", plugin.name, "Configuration updated")
+            http.emit_event("notification", 
+                { 
+                    'type': 'info',
+                    'message': "Configuration updated",
+                    'source': self.name,
+                }
+            )
+            print("asdf")
             self.on_event(EVENT_CONFIG_UPDATED, self.state)
         end
     end
