@@ -34,7 +34,6 @@ export class ErrorBoundary extends Component<
   }
 
   static getDerivedStateFromError(error: Error) {
-    console.log("STATE_FROM_ERROR");
     // Update state so the next render will show the fallback UI.
     return { error, timestamp: Date.now() };
   }
@@ -45,11 +44,6 @@ export class ErrorBoundary extends Component<
   ) {
     // do a shallow compare of componment props and clear error if they are diffrent
     // also check the timestamp, and don't clear if the rror happened in the last 100ms
-    console.log("STATE_FROM_PROPS", Date.now() - state.timestamp!);
-    console.log(
-      JSON.stringify(props.componentProps) !==
-        JSON.stringify(state.lastComponentProps)
-    );
     if (
       state.lastComponentProps &&
       state.error &&

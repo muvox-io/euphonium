@@ -5,6 +5,7 @@ import { modalsReducer } from "./reducers/modalsReducer";
 import { pluginConfigurationsReducer } from "./reducers/pluginConfigurationsReducer";
 import { websocketReducer } from "./reducers/websocketReducer";
 import { notificationsReducer } from "./reducers/notificationsReducer";
+import { localPlaybackStateReducer } from "./reducers/localPlaybackState";
 
 const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ const store = configureStore({
     modals: modalsReducer,
     pluginConfigurations: pluginConfigurationsReducer,
     notifications: notificationsReducer,
+    localPlaybackState: localPlaybackStateReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(EuphoniumApi.middleware),
