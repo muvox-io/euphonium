@@ -1,13 +1,18 @@
 import Modal from "../../ui/Modal";
 import Button from "../../ui/Button";
 import { FieldProps } from "./FieldProps";
+import { ConfigurationModalConfirmField } from "../../../api/euphonium/plugins/models";
+import { useDispatch, useSelector } from "react-redux";
+import { onFieldChanged, pluginStateSelector } from "../../../redux/reducers/pluginConfigurationsReducer";
 
 export default function ModalConfirm({
   field,
-  value,
-  onChange,
-  onChangeFinished,
-}: FieldProps<boolean | string>) {
+  pluginName
+  
+}: FieldProps<ConfigurationModalConfirmField>) {
+  const pluginState = useSelector(pluginStateSelector(pluginName));
+  const dispatch = useDispatch();
+  let value = pluginState[field.stateKey];
   let okValue = field.okValue || true;
   let cancelValue = field.cancelValue || false;
   if (value === okValue || value === cancelValue) {
@@ -19,8 +24,13 @@ export default function ModalConfirm({
       <div className="flex flex-col mt-10">
         <Button
           onClick={() => {
-            onChange(okValue);
-            onChangeFinished && onChangeFinished();
+            dispatch(onFieldChanged({
+              pluginName,
+              key: field.stateKey,
+              value: okValue,
+              debounce: false
+            }) as any)
+            
           }}
           kind="primary"
         >
@@ -28,8 +38,12 @@ export default function ModalConfirm({
         </Button>
         <Button
           onClick={() => {
-            onChange(cancelValue);
-            onChangeFinished && onChangeFinished();
+            dispatch(onFieldChanged({
+              pluginName,
+              key: field.stateKey,
+              value: okValue,
+              debounce: false
+            }) as any)
           }}
           kind="borderless"
         >
