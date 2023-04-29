@@ -14,8 +14,8 @@ const GlobalModalsForPlugin = ({ pluginName }: { pluginName: string }) => {
   if (!isSuccess || !data) return <div></div>;
   return (
     <>
-      {data.configSchema
-        .filter((f) => f.type === ConfigurationFieldType.MODAL_GROUP)
+      {(data.configSchema
+        .filter((f) => f.type === ConfigurationFieldType.MODAL_GROUP) as ConfigurationModalGroup[])
         .map((f: ConfigurationModalGroup) => {
           return (
             <ModalTrigger

@@ -1,13 +1,11 @@
+import { ConfigurationFieldLinkButton } from "../../../api/euphonium/plugins/models";
 import Button from "../../ui/Button";
 import Input from "../../ui/Input";
 import { FieldProps } from "./FieldProps";
 
 export default function LinkButton({
   field,
-  value,
-  onChange,
-  onChangeFinished,
-}: FieldProps<string>) {
+}: FieldProps<ConfigurationFieldLinkButton>) {
   return (
     <div class="min-w-full flex flex-col items-start lg:flex-row lg:items-center">
       <div class="text-app-text-secondary font-thin text-l mb-2 mt-2">

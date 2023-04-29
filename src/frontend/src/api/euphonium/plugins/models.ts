@@ -62,7 +62,7 @@ export interface ConfigurationFieldText extends ConfigurationFieldWithStateKey {
   hidden?: boolean;
 }
 
-export interface ModalConfirmField extends ConfigurationFieldWithStateKey {
+export interface ConfigurationModalConfirmField extends ConfigurationFieldWithStateKey {
   type: ConfigurationFieldType.MODAL_CONFIRM;
   label: string;
   hint?: string;
@@ -72,7 +72,7 @@ export interface ModalConfirmField extends ConfigurationFieldWithStateKey {
   cancelValue?: string;
 }
 
-export interface NumberField extends ConfigurationFieldWithStateKey {
+export interface ConfigurationNumberField extends ConfigurationFieldWithStateKey {
   type: ConfigurationFieldType.NUMBER;
   label: string;
   hint?: string;
@@ -105,12 +105,12 @@ export type ConfigurationField =
   | ConfigurationFieldGroup
   | ConfigurationFieldText
   | SelectFieldConfiguration
-  | NumberField
+  | ConfigurationNumberField
   | CheckboxFieldConfiguration
   | ConfigurationFieldLinkButton
-  | ModalConfirmField
+  | ConfigurationModalConfirmField
   | ConfigurationButtonField
-  | ModalGroup;
+  | ConfigurationModalGroup;
 
 export interface PluginConfiguration {
   configSchema: ConfigurationField[];
