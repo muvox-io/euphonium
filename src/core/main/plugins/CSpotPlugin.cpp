@@ -2,7 +2,6 @@
 #include <any>
 #include <iostream>
 #include <mutex>
-#include "CDNTrackStream.h"
 #include "ConstantParameters.h"
 #include "CoreEvents.h"
 #include "SpircHandler.h"
@@ -152,17 +151,17 @@ void CSpotPlugin::handleCSpotEvent(
       this->ctx->audioBuffer->clearBuffer();
       break;
     case cspot::SpircHandler::EventType::TRACK_INFO: {
-      auto spotifyTrack =
-          std::get<cspot::CDNTrackStream::TrackInfo>(event->data);
-      // Prepare the track info event
-      this->nextTrackInfo =
-          TrackInfoEvent::TrackInfo{.uri = "cspot://" + spotifyTrack.trackId,
-                                    .title = spotifyTrack.name,
-                                    .artist = spotifyTrack.artist,
-                                    .album = spotifyTrack.album,
-                                    .iconURL = spotifyTrack.imageUrl,
-                                    .canPlay = true,
-                                    .dontCache = false};
+      // auto spotifyTrack =
+      //     std::get<cspot::CDNTrackStream::TrackInfo>(event->data);
+      // // Prepare the track info event
+      // this->nextTrackInfo =
+      //     TrackInfoEvent::TrackInfo{.uri = "cspot://" + spotifyTrack.trackId,
+      //                               .title = spotifyTrack.name,
+      //                               .artist = spotifyTrack.artist,
+      //                               .album = spotifyTrack.album,
+      //                               .iconURL = spotifyTrack.imageUrl,
+      //                               .canPlay = true,
+      //                               .dontCache = false};
       break;
     }
     case cspot::SpircHandler::EventType::PLAYBACK_START:

@@ -2,6 +2,10 @@
 #include <memory>
 #include "CoreEvents.h"
 
+#include "AudioPipeline.h"
+#include "BellDSP.h"
+#include "Gain.h"
+
 using namespace euph;
 
 AudioTask::AudioTask(std::shared_ptr<euph::Context> ctx,
@@ -17,8 +21,10 @@ AudioTask::AudioTask(std::shared_ptr<euph::Context> ctx,
   std::string defaultPipeline = "{ \"transforms\": [] }";
 
   try {
-    defaultPipeline = this->ctx->storage->readFile(this->pipelinePath);
+    defaultPipeline =
+        this->ctx->storage->readFile(this->ctx->rootPath + this->pipelinePath);
   } catch (...) {}
+
   this->loadDSPFromString(defaultPipeline);
 
   this->exportBindings();
@@ -81,7 +87,12 @@ void AudioTask::loadDSPFromString(const std::string& str) {
   dsp->applyPipeline(this->currentPipeline);
   cJSON_Delete(root);
 
-  this->ctx->storage->writeFile(this->ctx->rootPath + this->pipelinePath, str);
+  try {
+    this->ctx->storage->writeFile(this->ctx->rootPath + this->pipelinePath,
+                                  str);
+  } catch (...) {
+    EUPH_LOG(error, TASK, "Failed to write pipeline to disk");
+  }
 }
 
 void AudioTask::_configureDSP(std::string dspPreset) {
@@ -94,7 +105,7 @@ void AudioTask::runTask() {
   EUPH_LOG(info, TASK, "Audio thread running");
   bell::CentralAudioBuffer::AudioChunk* currentChunk;
   uint32_t lastSampleRate = 44100;
-  
+
   // Used to detect track changes
   size_t lastTrackHash = 0;
 
