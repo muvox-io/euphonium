@@ -62,8 +62,8 @@ void RadioPlugin::runTask() {
       }
 
       auto codec = bell::AudioCodecs::getCodec(container.get());
-      bool setupResult = codec->setup(container.get());
-      if (codec == nullptr || !setupResult) {
+
+      if (codec == nullptr) {
         throw std::runtime_error("Requested codec unsupported");
       }
 

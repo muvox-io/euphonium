@@ -1,8 +1,11 @@
-{ stdenv, pkgs, writeShellScriptBin }:
+{ stdenv, pkgs, writeShellScriptBin, darwin}:
 
 let
   frontend-pkg = (pkgs.callPackage ../src/frontend { });
   esp-idf = (pkgs.callPackage ./esp-idf.nix { });
+  llvmPackages = pkgs.llvmPackages_14;
+  stdenv = llvmPackages.libcxxStdenv;
+
 in
 rec {
   # Euphonium's webinterface
@@ -34,11 +37,13 @@ rec {
 
   # Esp32 devshell
   shell-esp32 = pkgs.mkShell {
-    packages = with pkgs; [ unstable.mbedtls avahi avahi-compat portaudio];
+    packages = with pkgs; [ unstable.mbedtls avahi avahi-compat portaudio] ++ [llvmPackages.libcxxClang llvmPackages.libclang llvmPackages.libllvm ] ++ lib.optionals stdenv.isDarwin
+    (with darwin.apple_sdk.frameworks; [ CoreFoundation CoreServices ]);
     inputsFrom = [ esp-idf ];
     shellHook = ''
       export IDF_PATH=${esp-idf}/sdk
       export IDF_TOOLS_PATH=${esp-idf}/.espressif
+      export IWYU_LLVM_ROOT_PATH=${llvmPackages.libclang.lib}
       export PATH=$IDF_PATH/tools:$PATH
       export IDF_PYTHON_ENV_PATH=$IDF_TOOLS_PATH/python_env/idf5.0_py3.9_env
     '';

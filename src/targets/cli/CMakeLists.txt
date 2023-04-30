@@ -20,4 +20,6 @@ include_directories(".")
 
 add_executable(euphoniumcli ${SOURCES})
 target_link_libraries(euphoniumcli bell euphonium  ${CMAKE_DL_LIBS} ${THINGS_TO_LINK})
+target_link_options(euphoniumcli PUBLIC -fsanitize=address)
+target_compile_options(euphoniumcli PUBLIC -fsanitize=address -fno-omit-frame-pointer -O1)
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
