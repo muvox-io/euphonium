@@ -22,8 +22,8 @@ class MA12070P : DACDriver
         
         # MCLK: 22.58MHz @ 44.1KHz - sufficient for running the dedicated dsp!
         config.mclk = 512       
-        config.comm_format = I2S_CHANNEL_FMT_RIGHT_LEFT
-        config.channel_format = I2S_COMM_FORMAT_I2S
+        config.comm_format = I2S_COMM_FORMAT_I2S
+        config.channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT
 
         i2s.install(config)
         i2s.set_pins(self.get_i2s_pins())

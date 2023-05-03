@@ -10,8 +10,8 @@ class I2SDriver : DACDriver
       config.sample_rate = 44100
       config.bits_per_sample = 16
       config.mclk = 0
-      config.comm_format = I2S_CHANNEL_FMT_RIGHT_LEFT
-      config.channel_format = I2S_COMM_FORMAT_I2S
+      config.comm_format = I2S_COMM_FORMAT_I2S
+      config.channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT
 
       i2s.install(config)
       i2s.set_pins(self.get_i2s_pins())
