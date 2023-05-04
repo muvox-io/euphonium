@@ -39,7 +39,7 @@ class MQTTPlugin : Plugin
       })
 
       if state.find('enable') != nil && state['enable']
-        print(self.state["brokerPort"])
+        
         group.text_field('brokerUrl', {
           'label': "Broker host url",
           'default': "",
