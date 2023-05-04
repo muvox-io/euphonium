@@ -135,7 +135,7 @@ void Core::initializePlugins() {
   connectivity->displayNameLoaded(this->ctx->displayName);
 
   // Only initialize plugins when connected completely
-  if (connectivity->data.state == Connectivity::State::CONNECTED &&
+  if ((connectivity->data.state == Connectivity::State::CONNECTED ||connectivity->data.state == Connectivity::State::CONNECTED_NO_INTERNET ) &&
       !pluginsInitialized) {
     // Initialize plugins
     auto event = std::make_unique<GenericVmEvent>("plugins_ready");
