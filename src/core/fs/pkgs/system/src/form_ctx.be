@@ -129,6 +129,16 @@ class BaseFormContext
         return _FieldContext(field, self.root_context)
     end
 
+    def paragraph(id, configuration)
+        var field = {
+            'id': id,
+            'type': 'paragraph',
+            'text': configuration['text']
+        }
+        self.add(field)
+        return _FieldContext(field, self.root_context)
+    end
+
     def create_group(id, configuration)
         var field = {
             'id': id,

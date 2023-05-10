@@ -20,6 +20,7 @@ export enum ConfigurationFieldType {
   MODAL_CONFIRM = "modal_confirm",
   BUTTON_FIELD = "button_field",
   MODAL_GROUP = "modal_group",
+  PARAGRAPH = "paragraph",
 }
 
 export interface BaseConfigurationField {
@@ -101,6 +102,11 @@ export interface ConfigurationButtonField extends ConfigurationFieldWithStateKey
   buttonText?: string;
 }
 
+export interface ConfigurationParagraph extends ConfigurationFieldWithStateKey {
+  type: ConfigurationFieldType.PARAGRAPH;
+  text: string;
+}
+
 export type ConfigurationField =
   | ConfigurationFieldGroup
   | ConfigurationFieldText
@@ -110,7 +116,8 @@ export type ConfigurationField =
   | ConfigurationFieldLinkButton
   | ConfigurationModalConfirmField
   | ConfigurationButtonField
-  | ConfigurationModalGroup;
+  | ConfigurationModalGroup
+  | ConfigurationParagraph;
 
 export interface PluginConfiguration {
   configSchema: ConfigurationField[];

@@ -17,6 +17,7 @@ import ModalGroup from "./fields/ModalGroup";
 import NumberField from "./fields/NumberField";
 import SelectField from "./fields/SelectField";
 import TextField from "./fields/TextField";
+import Paragraph from "./fields/Paragraph";
 
 export interface FormFieldsProps {
   pluginName: string;
@@ -36,6 +37,7 @@ export const FIELD_COMPONENTS: {
   [ConfigurationFieldType.BUTTON_FIELD]: ButtonField,
   [ConfigurationFieldType.GROUP]: FormGroup,
   [ConfigurationFieldType.MODAL_GROUP]: ModalGroup,
+  [ConfigurationFieldType.PARAGRAPH]: Paragraph,
 };
 
 export default function FormFields({
