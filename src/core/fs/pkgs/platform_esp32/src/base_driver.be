@@ -83,6 +83,53 @@ class DACDriver
             'label': "SCL",
             'default': 0,
         })
+        var i2c_scan_button = i2c_group.button_field("i2c_scan_button", {
+            'label': "",
+            'buttonText': "Scan I2C bus",
+        })
+        
+        if i2c_scan_button.has_been("click")
+            
+            if !i2c.is_installed()
+               i2c.install(self.get_gpio('sda'), self.get_gpio('scl'))
+            end
+            var results = []
+            for i : 0..127
+                results.push(i2c.detect(i))
+            end
+            state.setitem("i2c_scan_result", results)
+        end
+
+        if state.find("i2c_scan_result") != nil
+            var modal_group = i2c_group.modal_group("i2c_scan_modal", {
+                'title': "I2C scan",
+            })
+            var i = 0
+            var curr_row = ""
+            for res : state['i2c_scan_result']
+                var txt = ""
+                if res 
+                    txt = string.format("0x%02x ", i, txt)
+                end
+                curr_row += txt
+                
+                i += 1
+            end
+        
+            modal_group.paragraph("i2c_scan_txt", {
+                'text': curr_row
+            })
+
+            var done_button = modal_group.button_field("i2c_scan_done_button", {
+                'label': "",
+                'buttonText': "Done",
+            })
+            if done_button.has_been("click") || modal_group.has_been("dismiss")
+                state.setitem("i2c_scan_result", nil)
+                ctx.request_redraw() # we need to redraw the form to remove the modal, otherwise it will be stuck
+            end
+        end
+        
     end
 
     def get_volume_table()

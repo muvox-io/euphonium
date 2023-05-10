@@ -8,7 +8,8 @@
 bool isInstalled = false;
 
 void i2cMasterInstall(int sda, int scl, int clkSpeed) {
-  BELL_LOG(info, "esp32", "Installing I2C driver");
+  BELL_LOG(info, "esp32", "Installing I2C driver: sda = %d, scl = %d",
+           sda, scl);
   i2c_config_t i2c_config = {
       .mode = I2C_MODE_MASTER,
       .sda_io_num = sda,
@@ -19,7 +20,10 @@ void i2cMasterInstall(int sda, int scl, int clkSpeed) {
 
   i2c_config.master.clk_speed = clkSpeed;
   i2c_param_config(i2c_port, &i2c_config);
-  i2c_driver_install(i2c_port, I2C_MODE_MASTER, false, false, false);
+  esp_err_t err = i2c_driver_install(i2c_port, I2C_MODE_MASTER, false, false, false);
+  if(err != ESP_OK) {
+    BELL_LOG(error, "esp32", "Failed to install I2C driver: %s", esp_err_to_name(err));
+  }
   isInstalled = true;
 }
 
