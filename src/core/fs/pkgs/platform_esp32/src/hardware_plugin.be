@@ -53,14 +53,14 @@ class HardwarePlugin : Plugin
             drivers.push(driver.name)
         end
 
-        ctx.create_group('boardGroup', { 'label': 'Board' })
+        var board_group = ctx.create_group('boardGroup', { 'label': 'Board' })
 
         board_names = []
         for board : ESP32_BOARDS
             board_names.push(board["name"])
         end
 
-        ctx.select_field('board', {
+        board_group.select_field('board', {
             'label': "Select your board type",
             'default': "custom",
             'group': 'boardGroup',
@@ -93,9 +93,9 @@ class HardwarePlugin : Plugin
             end
         end
 
-        ctx.create_group('driver', { 'label': 'DAC Driver' })
+        var driver_group = ctx.create_group('driver', { 'label': 'DAC Driver' })
     
-        ctx.select_field('dac', {
+        driver_group.select_field('dac', {
             'label': "Select DAC chip driver",
             'default': "dummy",
             'group': 'driver',
@@ -105,10 +105,9 @@ class HardwarePlugin : Plugin
         for driver : self.registered_drivers
             if driver.name == state['dac']
                 if driver.datasheet_link != nil && driver.datasheet_link != ""
-                    ctx.link_button('datasheet', {
+                    driver_group.link_button('datasheet', {
                         'label': "Datasheet",
                         'link': driver.datasheet_link,
-                        'group': 'driver',
                         'placeholder': 'PDF'
                     })
                 end
@@ -116,6 +115,9 @@ class HardwarePlugin : Plugin
                 break
             end
         end
+
+        self.add_apply_button(ctx, state)
+
     end
 
     # register driver implementation

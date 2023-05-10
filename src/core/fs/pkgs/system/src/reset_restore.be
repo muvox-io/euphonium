@@ -22,9 +22,8 @@ class ResetRestorePlugin : Plugin
       var modal_group = group.modal_group("factoryResetConfirm", {
         'title': "Factory reset",
       })
-      modal_group.text_field("factoryResetConfirmText", {
-        'label': "Are you sure you want to reset the device to factory defaults?",
-        'default': "Are you sure you want to reset the device to factory defaults?",
+      modal_group.paragraph("factoryResetConfirmText", {
+        'text': "Are you sure you want to reset the device to factory defaults?",
       })
       var confirm_button = modal_group.button_field("factoryResetConfirmButton", {
         'label': "Confirm",

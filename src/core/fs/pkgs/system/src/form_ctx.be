@@ -77,6 +77,7 @@ class BaseFormContext
         self.safe_copy_field(configuration, field, 'default')
        
         self.safe_copy_field(configuration, field, 'hidden')
+        self.add(field)
         return _FieldContext(field, self.root_context)
     end
 

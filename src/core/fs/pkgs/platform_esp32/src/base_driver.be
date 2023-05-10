@@ -45,50 +45,44 @@ class DACDriver
     end
 
     def make_config_form(ctx, state)
-        ctx.create_group('i2s', { 'label': 'I2S GPIO' })
-        ctx.create_group('i2c', { 'label': 'I2C GPIO' })
+        print("make_config_form")
+        var i2s_group = ctx.create_group('i2s', { 'label': 'I2S GPIO ddd' })
+        var i2c_group = ctx.create_group('i2c', { 'label': 'I2C GPIO' })
 
-        ctx.text_field('volume_table', {
+        i2s_group.text_field('volume_table', {
             'label': "Volume table",
-            'default': json.dump(self.default_volume_table),
-            'hidden': false,
-            'group': 'i2s',
+            'default': json.dump(self.default_volume_table)
         })
         
-        ctx.number_field('bck', {
+        i2s_group.number_field('bck', {
             'label': "BCK",
-            'default': "0",
-            'group': 'i2s',
+            'default': 0,
+
         })
 
-        ctx.number_field('ws', {
+        i2s_group.number_field('ws', {
             'label': "WS",
-            'default': "0",
-            'group': 'i2s',
+            'default': 0,
         })
 
-        ctx.number_field('data', {
+        i2s_group.number_field('data', {
             'label': "DATA",
-            'default': "0",
-            'group': 'i2s',
+            'default': 0,
         })
 
-        ctx.number_field('mclk', {
+        i2s_group.number_field('mclk', {
             'label': "MCLK",
-            'default': "0",
-            'group': 'i2s',
+            'default': 0,
         })
 
-        ctx.number_field('sda', {
+        i2c_group.number_field('sda', {
             'label': "SDA",
-            'default': "0",
-            'group': 'i2c',
+            'default': 0,
         })
 
-        ctx.number_field('scl', {
+        i2c_group.number_field('scl', {
             'label': "SCL",
-            'default': "0",
-            'group': 'i2c',
+            'default': 0,
         })
     end
 

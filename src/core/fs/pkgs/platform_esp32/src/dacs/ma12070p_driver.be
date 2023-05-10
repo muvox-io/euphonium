@@ -75,20 +75,21 @@ class MA12070P : DACDriver
     end
 
     def make_config_form(ctx, state)
-        ctx.create_group('MA12070P_pins', { 'label': 'DAC binary pins' })
+        super(self).make_config_form(ctx, state)
+        var pins_group = ctx.create_group('MA12070P_pins', { 'label': 'DAC binary pins' })
         
-        ctx.number_field('enablePin', {
+        pins_group.number_field('enablePin', {
             'label': "Enable Pin",
-            'default': "0",
+            'default': 0,
             'group': 'MA12070P_pins',
         })
 
-        ctx.number_field('mutePin', {
+        pins_group.number_field('mutePin', {
             'label': "Mute Pin",
-            'default': "0",
+            'default': 0,
             'group': 'MA12070P_pins',
         })
-        super(self).make_config_form(ctx, state)
+       
     end
 
 end
