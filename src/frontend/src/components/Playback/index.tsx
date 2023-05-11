@@ -75,8 +75,12 @@ const VolumeSlider = (_props: VolumeSliderProps) => {
         name="volume"
         min={props.min}
         max={props.max}
-        onMouseUp={({ target }: any) => props.onVolumeChange(target?.value)}
-        onInput={({ target }: any) => props.onVolumeChange(target?.value)}
+        onMouseUp={({ target }: any) =>
+          props.onVolumeChange(parseFloat(target?.value))
+        }
+        onInput={({ target }: any) =>
+          props.onVolumeChange(parseFloat(target?.value))
+        }
         value={props.volume}
         onWheel={({ target, deltaY }: any) => {
           let delta = deltaY > 0 ? -1 : 1;
