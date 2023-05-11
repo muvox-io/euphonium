@@ -33,14 +33,16 @@ BluetoothSinkPlugin::BluetoothSinkPlugin(std::shared_ptr<euph::Context> ctx)
   this->a2dpDriver->eventHandler = [this](A2DPDriver::Event& event) {
     switch (event.type) {
       case A2DPDriver::EventType::VOLUME: {
-        uint8_t volume = std::get<uint8_t>(event.data);
-        // Ensure no repeated events
-        if (volume != this->lastVolume) {
-          this->lastVolume = volume;
-          // Prepare audio event
-          auto event = std::make_unique<euph::AudioVolumeEvent>(
-              volume, AudioVolumeEvent::REMOTE);
-          this->ctx->eventBus->postEvent(std::move(event));
+        if (this->canPlay) {
+          uint8_t volume = std::get<uint8_t>(event.data);
+          // Ensure no repeated events
+          if (volume != this->lastVolume) {
+            this->lastVolume = volume;
+            // Prepare audio event
+            auto event = std::make_unique<euph::AudioVolumeEvent>(
+                volume, AudioVolumeEvent::REMOTE);
+            this->ctx->eventBus->postEvent(std::move(event));
+          }
         }
         break;
       }
@@ -51,7 +53,7 @@ BluetoothSinkPlugin::BluetoothSinkPlugin(std::shared_ptr<euph::Context> ctx)
           // Lock playback
           this->ctx->playbackController->lockPlayback("bluetooth");
           this->ctx->audioBuffer->clearBuffer();
-          
+
           this->canPlay = true;
         } else if (this->canPlay) {
           this->ctx->playbackController->unlockPlayback();

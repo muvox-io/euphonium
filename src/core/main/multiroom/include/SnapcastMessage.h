@@ -163,8 +163,6 @@ struct TimeMessage {
   }
 
   void deserialize(BaseMessage& base) {
-    uint32_t codecSizeTmp;
-
     // Pepare input stream
     bell::IMemoryStream istr(base.body.data(), base.body.size());
     bell::BinaryStream bs(&istr);

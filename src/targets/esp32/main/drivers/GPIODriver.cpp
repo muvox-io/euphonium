@@ -14,7 +14,6 @@ int gpioAnalogRead(int pin) {
 }
 
 void gpioPinMode(int pin, int mode) {
-  int selectedMode = 0;
   gpio_reset_pin((gpio_num_t)pin);
   switch (mode) {
     case 1:
