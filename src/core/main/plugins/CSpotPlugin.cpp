@@ -55,7 +55,6 @@ void CSpotPlugin::queryContextURI(std::string uri) {
     this->requestedTrackId = uri;
     this->authenticatedSemaphore->give();
   } else {
-
   }
 }
 
@@ -151,17 +150,16 @@ void CSpotPlugin::handleCSpotEvent(
       this->ctx->audioBuffer->clearBuffer();
       break;
     case cspot::SpircHandler::EventType::TRACK_INFO: {
-      // auto spotifyTrack =
-      //     std::get<cspot::CDNTrackStream::TrackInfo>(event->data);
-      // // Prepare the track info event
-      // this->nextTrackInfo =
-      //     TrackInfoEvent::TrackInfo{.uri = "cspot://" + spotifyTrack.trackId,
-      //                               .title = spotifyTrack.name,
-      //                               .artist = spotifyTrack.artist,
-      //                               .album = spotifyTrack.album,
-      //                               .iconURL = spotifyTrack.imageUrl,
-      //                               .canPlay = true,
-      //                               .dontCache = false};
+      auto spotifyTrack = std::get<cspot::TrackInfo>(event->data);
+      // Prepare the track info event
+      this->nextTrackInfo =
+          TrackInfoEvent::TrackInfo{.uri = "cspot://" + spotifyTrack.trackId,
+                                    .title = spotifyTrack.name,
+                                    .artist = spotifyTrack.artist,
+                                    .album = spotifyTrack.album,
+                                    .iconURL = spotifyTrack.imageUrl,
+                                    .canPlay = true,
+                                    .dontCache = false};
       break;
     }
     case cspot::SpircHandler::EventType::PLAYBACK_START:
@@ -215,9 +213,10 @@ void CSpotPlugin::runTask() {
       // Handle control events
       this->spircHandler->setEventHandler(
           [this](auto event) { this->handleCSpotEvent(std::move(event)); });
-      
+
       // Update volume on remote
-      this->spircHandler->setRemoteVolume(this->ctx->playbackController->currentVolume * MAX_VOLUME / 100);
+      this->spircHandler->setRemoteVolume(
+          this->ctx->playbackController->currentVolume * MAX_VOLUME / 100);
 
       // Start handling mercury messages
       cspotCtx->session->startTask();
