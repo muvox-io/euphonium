@@ -4,7 +4,7 @@
 namespace euph {
 struct Context;
 class Connectivity;
-}
+}  // namespace euph
 
 #include <memory>
 
@@ -35,9 +35,18 @@ struct PlaybackController {
 
   std::function<void(const std::string&)> playbackLockedHandler;
 
-  void pause() { this->requestPause = true; }
+  void pause() {
+    if (!this->isPaused) {
+      this->requestPause = true;
+    }
+  }
 
-  void play() { this->isPaused = false; }
+  void play() {
+    if (this->isPaused) {
+      this->isPaused = false;
+      this->requestPause = false;
+    }
+  }
 
   void lockPlayback(const std::string& source) {
     if (playbackLockedHandler != NULL) {
