@@ -140,6 +140,17 @@ class BaseFormContext
         return _FieldContext(field, self.root_context)
     end
 
+    def table(id, configuration)
+        var field = {
+            'id': id,
+            'type': 'table',
+            'table_columns': configuration['columns'],
+            'table_data': configuration['data']
+        }
+        self.add(field)
+        return _FieldContext(field, self.root_context)
+    end
+
     def create_group(id, configuration)
         var field = {
             'id': id,

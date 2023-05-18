@@ -15,9 +15,53 @@ class ResetRestorePlugin : Plugin
         'buttonText': "Reset",
     })
 
+    var system_load_btn = group.button_field('cpuStatsBtn', {
+        'label': "Get CPU statistics",
+        'buttonText': "Measure",
+    })
+
+    if system_load_btn.has_been("click")
+      state.setitem("show_cpu_stats", true)
+    end
+
     if btn.has_been("click")
       state.setitem("show_factory_reset_modal", true)
     end
+
+    if state.find("show_cpu_stats") == true 
+
+      var modal_group = group.modal_group("cpuStats", {
+        'title': "System usage statistics",
+      })
+      modal_group.table("system_load", {
+        'columns': [
+          {
+            'title': 'Task',
+            'align': 'right'
+          },
+          {
+            'title': 'Absolute time',
+            'align': 'right'
+          },
+          {
+            'title': '% Time',
+            'align': 'right'
+          }
+        ],
+        'data': [
+          ['CSpot', '22112', '11%'],
+          ['AudioOutput', '3215', '1%'],
+          ['Radio', '555', '0%']
+        ]
+      })
+
+      if modal_group.has_been("dismiss")
+        state.setitem("show_cpu_stats", nil)
+        ctx.request_redraw() # we need to redraw the form to remove the modal, otherwise it will be stuck
+      end
+
+    end
+
     if state.find("show_factory_reset_modal") == true 
       var modal_group = group.modal_group("factoryResetConfirm", {
         'title': "Factory reset",

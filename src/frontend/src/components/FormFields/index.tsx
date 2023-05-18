@@ -18,6 +18,7 @@ import NumberField from "./fields/NumberField";
 import SelectField from "./fields/SelectField";
 import TextField from "./fields/TextField";
 import Paragraph from "./fields/Paragraph";
+import Table from "./fields/Table";
 
 export interface FormFieldsProps {
   pluginName: string;
@@ -38,6 +39,7 @@ export const FIELD_COMPONENTS: {
   [ConfigurationFieldType.GROUP]: FormGroup,
   [ConfigurationFieldType.MODAL_GROUP]: ModalGroup,
   [ConfigurationFieldType.PARAGRAPH]: Paragraph,
+  [ConfigurationFieldType.TABLE]: Table,
 };
 
 export default function FormFields({
