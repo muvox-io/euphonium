@@ -1,29 +1,3 @@
-def get_data_2()
-  stats = freertos.get_task_stats(1000)
-  print(stats)
-  return {
-    'columns': [
-      {
-        'title': 'Task',
-        'align': 'left'
-      },
-      {
-        'title': 'Time',
-        'align': 'center'
-      },
-      {
-        'title': 'Usage',
-        'align': 'center'
-      }
-    ],
-    'data': [
-      ['CSpot', '22112', '11%'],
-      ['AudioOutput', '3215', '1%'],
-      ['Radio', '555', '0%']
-    ]
-  }
-end
-
 class ResetRestorePlugin : Plugin 
   def init()
     self.name = "reset_restore"
@@ -41,60 +15,10 @@ class ResetRestorePlugin : Plugin
         'buttonText': "Reset",
     })
 
-    var system_load_btn = group.button_field('cpuStatsBtn', {
-        'label': "Get CPU statistics",
-        'buttonText': "Measure",
-    })
-
-    if system_load_btn.has_been("click")
-      state.setitem("show_cpu_stats", true)
-    end
-
     if btn.has_been("click")
       state.setitem("show_factory_reset_modal", true)
     end
 
-    if state.find("show_cpu_stats") == true 
-
-      var modal_group = group.modal_group("cpuStats", {
-        'title': "System usage statistics",
-      })
-      var data = get_data_2()
-      modal_group.table("system_load", data)
-
-      if modal_group.has_been("dismiss")
-        state.setitem("show_cpu_stats", nil)
-        ctx.request_redraw() # we need to redraw the form to remove the modal, otherwise it will be stuck
-      end
-
-    end
-
-    if state.find("show_factory_reset_modal") == true 
-      var modal_group = group.modal_group("factoryResetConfirm", {
-        'title': "Factory reset",
-      })
-      modal_group.paragraph("factoryResetConfirmText", {
-        'text': "Are you sure you want to reset the device to factory defaults?",
-      })
-      var confirm_button = modal_group.button_field("factoryResetConfirmButton", {
-        'label': "Confirm",
-        'buttonText': "Confirm",
-      })
-      var cancel_button = modal_group.button_field("factoryResetCancelButton", {
-        'label': "Cancel",
-        'buttonText': "Cancel",
-      })
-      if cancel_button.has_been("click") || modal_group.has_been("dismiss")
-        state.setitem("show_factory_reset_modal", nil)
-        ctx.request_redraw() # we need to redraw the form to remove the modal, otherwise it will be stuck
-      end
-      if confirm_button.has_been("click")
-        state.setitem("show_factory_reset_modal", nil)
-        state.setitem("factory_reset_in_progress", true)
-        self.perform_factory_reset()
-        ctx.request_redraw() # we need to redraw the form to remove the modal, otherwise it will be stuck
-      end
-    end
     if state.find("factory_reset_in_progress") == true
       group.text_field("factoryResetInProgressText", {
         'label': "Factory reset in progress",

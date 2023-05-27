@@ -2,14 +2,13 @@
 
 #include <freertos/task.h>
 
-static std::vector<berry::map> getRuntimeStatistics(uint16_t waitTimeMs) {
-  std::vector<berry::map> result;
+static berry::list getRuntimeStatistics(int waitTimeMs) {
+  berry::list result;
   std::vector<TaskStatus_t> startTaskStatuses, endTaskStatuses;
 
   // Allocate array to store task states
   startTaskStatuses.resize(uxTaskGetNumberOfTasks() + 5);
   uint32_t startRunTime, endRunTime;
-  esp_err_t ret;
   uint32_t totalTime;
 
   // Get current task states
@@ -52,19 +51,32 @@ static std::vector<berry::map> getRuntimeStatistics(uint16_t waitTimeMs) {
       continue;
     }
 
+    int taskElapsedTime =
+        (endTask->ulRunTimeCounter - startTask.ulRunTimeCounter);
     // Task matched, add stats
     result.push_back(berry::map{
         {"name", std::string(startTask.pcTaskName)},
-        {"runtime", endTask->ulRunTimeCounter - startTask.ulRunTimeCounter},
-        {"percentage",
-         (endTask->ulRunTimeCounter - startTask.ulRunTimeCounter) * 100 /
-             totalTime * portNUM_PROCESSORS},
+        {"runtime", taskElapsedTime},
+        {"core", (int)endTask->xCoreID},
+        {
+            "percentage",
+            (int)((int)(taskElapsedTime * 100UL) /
+                  (totalTime * portNUM_PROCESSORS)),
+        },
     });
   }
 
+  // Sort task list by percentage
+  std::sort(result.begin(), result.end(), [](const auto& lhs, const auto& rhs) {
+    auto left = std::any_cast<berry::map>(lhs);
+    auto right = std::any_cast<berry::map>(rhs);
+
+    return std::any_cast<int>(left["percentage"]) >
+           std::any_cast<int>(right["percentage"]);
+  });
   return result;
 }
 
 void exportFreeRTOSDriver(std::shared_ptr<berry::VmState> berry) {
-  berry->export_function("get_task_stats", &getRuntimeStatistics, "freertos");
+  berry->export_function("get_task_stats", &getRuntimeStatistics, "devtools");
 }

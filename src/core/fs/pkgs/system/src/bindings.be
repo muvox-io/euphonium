@@ -18,14 +18,7 @@ class WiFi
     end
 end
 
-class FreeRTOS
-    def member(name)
-        return get_native('freertos', name)
-    end
-end
-
 # Export APIs
 persistor = Persistor()
 playback = Playback()
-freertos = FreeRTOS()
 wifi = WiFi()

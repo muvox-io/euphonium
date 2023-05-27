@@ -45,7 +45,7 @@ class DACDriver
     end
 
     def make_config_form(ctx, state)
-        var i2s_group = ctx.create_group('i2s', { 'label': 'I2S GPIO ddd' })
+        var i2s_group = ctx.create_group('i2s', { 'label': 'I2S GPIO' })
         var i2c_group = ctx.create_group('i2c', { 'label': 'I2C GPIO' })
 
         i2s_group.text_field('volume_table', {

@@ -36,23 +36,3 @@ export default function Table({
     </tbody>
   </table>)
 }
-
-// const DrawTable = (table: any) => {
-//   const drawHeadRow = (row: any) =>
-//     return (<thead>
-//       <tr>
-//         {row.map((header: any) => {
-//           return (<th>{header}</th>);
-//         })}
-//       </tr>
-//     </thead>);
-//   }
-
-
-//   return (<table class="table-auto">
-//     {table.map((row: any) => {
-
-//       return drawDataRow(row);
-//     })}
-//   </table>);
-// }
