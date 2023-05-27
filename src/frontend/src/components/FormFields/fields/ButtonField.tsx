@@ -38,7 +38,7 @@ export default function ButtonField({
   };
   return (
     <div class="min-w-full flex flex-col items-start lg:flex-row lg:items-center">
-      <div class="text-app-text-secondary font-thin text-l mb-2 mt-2">
+      <div class="text-app-text-secondary font-light text-m mb-2 mt-2">
         {field.label}
       </div>
       <div class="grow" style={{ flexGrow: "1" }}>

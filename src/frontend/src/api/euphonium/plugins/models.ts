@@ -10,6 +10,17 @@ export interface PluginEntry {
   displayName: string;
 }
 
+export enum TableColumnAlignment {
+  LEFT = "left",
+  RIGHT = "right",
+  CENTER = "center"
+}
+
+export interface TableColumn {
+  title: string;
+  align: TableColumnAlignment;
+}
+
 export enum ConfigurationFieldType {
   GROUP = "group",
   TEXT = "text_field",
@@ -21,6 +32,7 @@ export enum ConfigurationFieldType {
   BUTTON_FIELD = "button_field",
   MODAL_GROUP = "modal_group",
   PARAGRAPH = "paragraph",
+  TABLE = "table"
 }
 
 export interface BaseConfigurationField {
@@ -107,6 +119,12 @@ export interface ConfigurationParagraph extends ConfigurationFieldWithStateKey {
   text: string;
 }
 
+export interface ConfigurationTable extends ConfigurationFieldWithStateKey {
+  type: ConfigurationFieldType.TABLE;
+  table_columns: TableColumn[];
+  table_data: string[][];
+}
+
 export type ConfigurationField =
   | ConfigurationFieldGroup
   | ConfigurationFieldText
@@ -117,7 +135,8 @@ export type ConfigurationField =
   | ConfigurationModalConfirmField
   | ConfigurationButtonField
   | ConfigurationModalGroup
-  | ConfigurationParagraph;
+  | ConfigurationParagraph
+  | ConfigurationTable
 
 export interface PluginConfiguration {
   configSchema: ConfigurationField[];
