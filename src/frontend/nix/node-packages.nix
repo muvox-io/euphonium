@@ -1228,15 +1228,6 @@ let
         sha512 = "7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==";
       };
     };
-    "loose-envify-1.4.0" = {
-      name = "loose-envify";
-      packageName = "loose-envify";
-      version = "1.4.0";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/loose-envify/-/loose-envify-1.4.0.tgz";
-        sha512 = "lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==";
-      };
-    };
     "lru-cache-5.1.1" = {
       name = "lru-cache";
       packageName = "lru-cache";
@@ -1505,15 +1496,6 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/quick-lru/-/quick-lru-5.1.1.tgz";
         sha512 = "WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==";
-      };
-    };
-    "react-18.2.0" = {
-      name = "react";
-      packageName = "react";
-      version = "18.2.0";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/react/-/react-18.2.0.tgz";
-        sha512 = "/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==";
       };
     };
     "react-is-16.13.1" = {
@@ -1969,7 +1951,6 @@ let
       sources."kolorist-1.7.0"
       sources."lilconfig-2.1.0"
       sources."lines-and-columns-1.2.4"
-      sources."loose-envify-1.4.0"
       sources."lru-cache-5.1.1"
       sources."merge2-1.4.1"
       sources."micromatch-4.0.5"
@@ -2000,7 +1981,6 @@ let
       sources."preact-router-4.1.0"
       sources."queue-microtask-1.2.3"
       sources."quick-lru-5.1.1"
-      sources."react-18.2.0"
       sources."react-is-18.2.0"
       sources."react-redux-8.0.5"
       sources."read-cache-1.0.0"
