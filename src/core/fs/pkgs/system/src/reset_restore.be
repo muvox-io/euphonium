@@ -1,3 +1,29 @@
+def get_data_2()
+  stats = freertos.get_task_stats(1000)
+  print(stats)
+  return {
+    'columns': [
+      {
+        'title': 'Task',
+        'align': 'left'
+      },
+      {
+        'title': 'Time',
+        'align': 'center'
+      },
+      {
+        'title': 'Usage',
+        'align': 'center'
+      }
+    ],
+    'data': [
+      ['CSpot', '22112', '11%'],
+      ['AudioOutput', '3215', '1%'],
+      ['Radio', '555', '0%']
+    ]
+  }
+end
+
 class ResetRestorePlugin : Plugin 
   def init()
     self.name = "reset_restore"
@@ -33,27 +59,8 @@ class ResetRestorePlugin : Plugin
       var modal_group = group.modal_group("cpuStats", {
         'title': "System usage statistics",
       })
-      modal_group.table("system_load", {
-        'columns': [
-          {
-            'title': 'Task',
-            'align': 'right'
-          },
-          {
-            'title': 'Absolute time',
-            'align': 'right'
-          },
-          {
-            'title': '% Time',
-            'align': 'right'
-          }
-        ],
-        'data': [
-          ['CSpot', '22112', '11%'],
-          ['AudioOutput', '3215', '1%'],
-          ['Radio', '555', '0%']
-        ]
-      })
+      var data = get_data_2()
+      modal_group.table("system_load", data)
 
       if modal_group.has_been("dismiss")
         state.setitem("show_cpu_stats", nil)

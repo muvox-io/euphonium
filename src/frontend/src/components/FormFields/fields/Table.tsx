@@ -7,7 +7,7 @@ const drawTableHeader = (columns: TableColumn[]) => {
   return (<thead>
     <tr>
       {columns.map((column) =>
-        <th class="text-app-text-primary text-left pr-4">
+        <th class={`text-${column.align} text-app-text-primary font-normal pb-2 pr-4 border-b border-app-border`}>
           {column.title}
         </th>
       )}
@@ -15,11 +15,12 @@ const drawTableHeader = (columns: TableColumn[]) => {
   </thead>);
 }
 
-const drawTableData = (data: string[][]) => {
+const drawTableData = (data: string[][], columns: TableColumn[]) => {
   return (data.map((row) =>
     <tr>
       {row.map((element) => {
-        return <td class="pr-4 pr-4 text-left">{element}</td>
+        const { align } = columns[row.indexOf(element)]
+        return <td class={`text-${align} pt-2 pr-4 text-left`}>{element}</td>
       })}
     </tr>
   ))
@@ -28,10 +29,10 @@ const drawTableData = (data: string[][]) => {
 export default function Table({
   field,
 }: FieldProps<ConfigurationTable>) {
-  return (<table class="table-auto">
+  return (<table class="table-auto lg:min-w-[400px] text-[16px] font-mono">
     {drawTableHeader(field.table_columns)}
     <tbody>
-      {drawTableData(field.table_data)}
+      {drawTableData(field.table_data, field.table_columns)}
     </tbody>
   </table>)
 }
