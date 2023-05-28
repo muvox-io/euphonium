@@ -44,7 +44,11 @@ export default function ButtonField({
       <div class="grow" style={{ flexGrow: "1" }}>
         {/** fucking tailwind */}
       </div>
-      <Button class="self-stretch lg:self-end lg:ml-auto" onClick={onClicked}>
+      <Button
+        class="self-stretch lg:self-end lg:ml-auto"
+        onClick={onClicked}
+        loadingState={isLoading}
+      >
         {field.label || field.buttonText}
       </Button>
     </div>
