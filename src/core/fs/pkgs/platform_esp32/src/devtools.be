@@ -57,14 +57,14 @@ class DevtoolsPlugin : Plugin
     if state.find("show_cpu_stats") == true 
 
       var modal_group = group.modal_group("cpuStats", {
-        'title': "System usage statistics",
+        'title': "System usage statistics (last 1000ms)",
       })
-      var data = self.fetch_task_stats_table()
-      modal_group.table("system_load", data)
-
       if modal_group.has_been("dismiss")
         state.setitem("show_cpu_stats", nil)
         ctx.request_redraw() # we need to redraw the form to remove the modal, otherwise it will be stuck
+      else
+        var data = self.fetch_task_stats_table()
+        modal_group.table("system_load", data)
       end
     end
   end
