@@ -161,6 +161,7 @@ void AudioTask::runTask() {
         BELL_SLEEP_MS(100);
       }
     } else {
+      printf("Audio thread paused\n");
       BELL_SLEEP_MS(100);
     }
   }

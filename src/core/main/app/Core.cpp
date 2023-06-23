@@ -44,7 +44,6 @@ void Core::initialize() {
   // Register system plugins
   this->registerSystemPlugin(std::make_unique<MQTTPlugin>(ctx));
 
-  this->http->initialize();
   this->audioOutput->setupBindings(ctx);
 
   // Register HTTP handlers for OTA, update packages if necessary
@@ -128,6 +127,10 @@ void Core::initialize() {
 #else
   this->pkgLoader->loadWithHook("platform_desktop");
 #endif
+
+  // Initialize HTTP
+  this->http->initialize();
+
   initializePlugins();
 }
 

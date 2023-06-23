@@ -77,10 +77,9 @@ void RadioPlugin::runTask() {
       // Guard playback only while song is requested
       while (isRunning) {
         data = codec->decode(container.get(), outlen);
-        if (data == nullptr)
+        if (data == nullptr) {
           continue;
-        if (outlen < 128)
-          continue;
+        }
         toWrite = outlen;
 
         while (toWrite > 0) {
