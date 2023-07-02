@@ -22,21 +22,30 @@ const Radio = ({
   return (
     <div class="bg-app-primary p-5 flex flex-col relative rounded-xl">
       <img
-        class="w-10 h-10 rounded-full bg-white border-app-border border absolute -right-2 -top-2 shadow-xl object-contain"
+        class="w-10 h-10 rounded-full bg-white border-app-border border shadow-xl object-contain"
+        hidden={!favicon}
         src={
           favicon ||
           "https://www.veryicon.com/download/png/media/music-series/sound-wave-1-2?s=256"
         }
       />
-      <div class="font-normal max-w-[80%] -mt-1 mb-2 truncate">{name}</div>
+      <div class="font-normal max-w-[80%] -mt-1 mb-2 truncate">{name || 'Unknown station'}</div>
       <div class="font-regular text-sm truncate text-gray-400">
         {codec} Codec • {bitrate} kbps • {countrycode}
       </div>
       <div class="bg-green-600 active:bg-green-800 text-white w-10 h-10 rounded-full absolute flex -bottom-2 -right-2 cursor-pointer">
         <div class="mt-[9px] ml-[5px]">
           <Icon
-            onClick={() => playbackAPI.playRadio(name, favicon, url_resolved)}
+            onClick={() => {}}
             name="play"
+          />
+        </div>
+      </div>
+      <div class="bg-gray-500 active:bg-green-800 text-white w-10 h-10 rounded-full absolute flex -bottom-2 right-10 cursor-pointer">
+        <div class="mt-[9px] ml-[5px]">
+          <Icon
+            onClick={() => {}}
+            name="favorite"
           />
         </div>
       </div>
@@ -45,12 +54,17 @@ const Radio = ({
 };
 
 export default () => {
+
+  const filterInvalidStations = (stations: Station[]) => {
+    return stations.filter((station) => station.name && station.name.trim().length > 1);
+  }
+
   const pageSize = 30;
 
   const [radios, setRadios] = useState<Station[]>([]);
   const [page, setPage] = useState(0);
   useEffect(() => {
-    getTopStations(pageSize, page * pageSize).then(setRadios);
+    getTopStations(pageSize, page * pageSize).then(filterInvalidStations).then(setRadios);
   }, [page]);
   return (
     <div class="mb-[150px]">
@@ -74,14 +88,7 @@ export default () => {
             <Icon name="search" />
           </div>
         </div>
-        {/* <Input
-          onSubmit={(e) => {
-            getStationsByName(e).then(setRadios);
-          }}
-          value=""
-          placeholder="Search radio-browser.info"
-          icon="search"
-        /> */}
+        <div class="text-app-text-secondary mt-4">Favorite stations</div>
         {radios.length > 0 && (
           <div class="grid md:grid-cols-2 grid-cols-1 xl:grid-cols-3 gap-8 mt-5">
             {radios.map((radio) => (
@@ -95,18 +102,6 @@ export default () => {
             Results empty.
           </div>
         )}
-        {/* <div class="flex flex-row text-2xl">
-          <div class={`${page > 0 ? 'bg-app-primary' : ''} text-app-text-secondary w-[40px] h-[40px] rounded-xl mr-3 flex justify-center items-center`}>
-            <Icon name="arrow_right" />
-          </div>
-
-          <div class="text-app-text-secondary text-[18px] bg-app-primary w-[40px] h-[40px] rounded-xl mr-3 flex justify-center items-center">
-            1/1
-          </div>
-          <div class="text-app-text-secondary bg-app-primary w-[40px] h-[40px] rounded-xl mr-3 flex justify-center items-center">
-            <Icon name="arrow_left" />
-          </div>
-        </div> */}
       </Card>
     </div>
   );

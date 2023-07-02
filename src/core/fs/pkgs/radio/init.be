@@ -21,10 +21,35 @@ class RadioPlugin : Plugin
           req.write_json({ "success": false })
         end
       end)
+
+      # Save a radio station as favorite
+      http.handle(HTTP_POST, "/radio/favorite", def (req)
+        var radioJSONBody = req.json_body()
+        var radios = self.get_favorite_stations()
+
+        # Add received radio
+        radios.push(radioJSONBody)
+
+        # save results
+        self.state['favorites'] = json.dump(radios)
+        req.write_json(radios)
+        self.persist_config()
+      end)
   end
 
   def member(name)
     return get_native('radio', name)
+  end
+
+  def get_favorite_stations()
+    var radios = []
+
+    # Favorite radios get serialized as a JSON array in config
+    if self.state.find('favorites') != nil
+      radios = json.load(self.state['favorites'])
+    end
+
+    return radios
   end
 
   # prepares track metadata
@@ -43,17 +68,22 @@ class RadioPlugin : Plugin
   end
 
   def make_form(ctx, state)
-      ctx.create_group('radio', { 'label': 'General' })
+      var group = ctx.create_group('radio', { 'label': 'General' })
+
+      group.text_field('serverUrl', {
+          'label': "Radio Browser Instance",
+          'default': "https://radio-browser.gkindustries.pl/",
+          'group': 'radio'
+      })
+
       self.add_apply_button(ctx, state)
   end
 
   def on_event(event, data)
       if event == EVENT_SET_PAUSE
-          # cspot_set_pause(data)
       end
 
       if event == EVENT_VOLUME_UPDATED
-          #cspot_set_volume_remote(data)
       end
 
       if event == EVENT_PLUGIN_INIT
