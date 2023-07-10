@@ -9,6 +9,7 @@ import usePlaybackState from "../../utils/usePlaybackState.hook";
 import Icon from "../ui/Icon";
 import { useDispatch } from "react-redux";
 import { onVolumeChange } from "../../redux/reducers/localPlaybackState";
+import Spinner from "../ui/Spinner";
 
 interface PlaybackStateProps {
   playbackState?: PlaybackState;
@@ -41,6 +42,29 @@ const PlaybackSong = ({ playbackState }: PlaybackStateProps) => {
       <span class="text-app-text-secondary">via {track?.source}</span>
     </div>
   );
+};
+
+const PlaybackStatusControl = (playbackStatus: PlaybackStatus) => {
+  const playbackAPI = useAPI(PlaybackAPI);
+
+  switch (playbackStatus) {
+    case PlaybackStatus.Playing:
+      return (<Icon
+        onClick={() => {
+          playbackAPI.setPaused(true);
+        }} name="pause" />)
+    case PlaybackStatus.Paused:
+      return (<Icon
+        onClick={() => {
+          playbackAPI.setPaused(false);
+        }} name="play" />)
+    case PlaybackStatus.Loading:
+      return <span class="opacity-60"><Icon name="pause"/></span>;
+    case PlaybackStatus.EmptyQueue:
+      return <></>;
+    default:
+      return <></>;
+  }
 };
 
 interface VolumeSliderProps {
@@ -94,7 +118,7 @@ const VolumeSlider = (_props: VolumeSliderProps) => {
           }
         }}
       />
-      <div class="text-sm ml-3">{props.volume}%</div>
+      <div class="text-sm ml-3 w-7 mr-1">{props.volume}%</div>
     </>
   );
 };
@@ -103,18 +127,8 @@ const PlaybackControls = ({ playbackState }: PlaybackStateProps) => {
   const playbackAPI = useAPI(PlaybackAPI);
   return (
     <div class="mr-2">
-      <Icon
-        onClick={() => {
-          playbackAPI.setPaused(
-            playbackState?.settings?.state == PlaybackStatus.Playing
-          );
-        }}
-        name={
-          playbackState?.settings?.state == PlaybackStatus.Playing
-            ? "pause"
-            : "play"
-        }
-      />
+
+      {PlaybackStatusControl(playbackState?.settings?.state ?? PlaybackStatus.EmptyQueue)}
     </div>
   );
 };

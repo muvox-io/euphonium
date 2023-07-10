@@ -24,71 +24,74 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-arrow_left:before {
-  content: "\e908";
-}
-.icon-arrow_right:before {
-  content: "\e909";
-}
-.icon-radio:before {
-  content: "\e900";
-}
-.icon-add:before {
+.icon-lock:before {
   content: "\e901";
 }
-.icon-copy:before {
-  content: "\e902";
-}
-.icon-speaker_group:before {
-  content: "\e903";
-}
-.icon-bluetooth:before {
-  content: "\e904";
-}
-.icon-playlist:before {
-  content: "\e905";
-}
-.icon-speaker:before {
-  content: "\e906";
-}
-.icon-equalize1:before {
-  content: "\e907";
-}
-.icon-pause:before {
-  content: "\e90a";
-}
-.icon-close:before {
-  content: "\e90b";
-}
-.icon-edit:before {
-  content: "\e90c";
-}
-.icon-lock:before {
-  content: "\e90d";
-}
-.icon-home:before {
+.icon-heart_outline:before {
   content: "\e90e";
 }
-.icon-play:before {
+.icon-heart:before {
   content: "\e90f";
 }
-.icon-moon:before {
-  content: "\e910";
+.icon-playlist:before {
+  content: "\e902";
 }
 .icon-search:before {
-  content: "\e986";
+  content: "\e903";
 }
-.icon-settings_sliders:before {
-  content: "\e992";
+.icon-radio:before {
+  content: "\e904";
+}
+.icon-clear:before {
+  content: "\e905";
+}
+.icon-edit:before {
+  content: "\e906";
+}
+.icon-bluetooth:before {
+  content: "\e907";
+}
+.icon-equalizer:before {
+  content: "\e908";
+}
+.icon-music_note:before {
+  content: "\e909";
+}
+.icon-speaker_group:before {
+  content: "\e90a";
+}
+.icon-speaker:before {
+  content: "\e90b";
+}
+.icon-add:before {
+  content: "\e900";
+}
+.icon-info:before {
+  content: "\e90c";
+}
+.icon-home:before {
+  content: "\e90d";
+}
+.icon-music:before {
+  content: "\e911";
+}
+.icon-settings_slider:before {
+  content: "\e993";
 }
 .icon-settings:before {
   content: "\e994";
 }
-.icon-sun:before {
-  content: "\e9d4";
+.icon-brightness:before {
+  content: "\e9d6";
+}
+.icon-play:before {
+  content: "\ea1c";
+}
+.icon-pause:before {
+  content: "\ea1d";
 }
 .icon-volume:before {
-  content: "\ea27";
+  content: "\ea26";
 }
 .icon-volume_mute:before {
   content: "\ea2a";

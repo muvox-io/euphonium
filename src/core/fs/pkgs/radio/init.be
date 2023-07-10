@@ -27,13 +27,38 @@ class RadioPlugin : Plugin
         var radioJSONBody = req.json_body()
         var radios = self.get_favorite_stations()
 
-        # Add received radio
-        radios.push(radioJSONBody)
+        if (radioJSONBody.find("favorite") != nil && radioJSONBody["favorite"] == false)
+          var removeIndex = -1
+
+          # Remove radio from favorites
+          for radio : radios
+            if (radio["url"] == radioJSONBody["url"])
+              removeIndex = radios.find(radio)
+              euphonium.send_notification('info', 'radio', 'Radio removed from favorites', radio['name'])
+            end
+          end
+
+          if removeIndex != -1
+            radios.remove(removeIndex)
+          end
+        else
+          radioJSONBody['favorite'] = true
+          euphonium.send_notification('info', 'radio', 'Radio added to favorites', radioJSONBody['name'])
+
+          # Add received radio
+          radios.push(radioJSONBody)
+        end
 
         # save results
         self.state['favorites'] = json.dump(radios)
         req.write_json(radios)
         self.persist_config()
+      end)
+
+      # Return favorite radios
+      http.handle(HTTP_GET, "/radio/favorite", def (req)
+        var radios = self.get_favorite_stations()
+        req.write_json(radios)
       end)
   end
 
@@ -62,7 +87,6 @@ class RadioPlugin : Plugin
     request['source'] = 'radio'
 
     playback_state.notify_playback(request)
-    playback_state.notify_state(STATE_PLAYING)
 
     playback_state.query_context_uri("radio", request["url"])
   end

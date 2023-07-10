@@ -35,6 +35,7 @@ const playbackApi = EuphoniumApi.injectEndpoints({
         eventSource.removeListener("playback", listener);
       },
     }),
+
     updateVolume: builder.mutation<void, { volume: number; persist: boolean }>({
       query: (body) => ({
         url: "/playback/volume",

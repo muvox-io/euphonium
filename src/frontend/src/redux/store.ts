@@ -6,6 +6,7 @@ import { pluginConfigurationsReducer } from "./reducers/pluginConfigurationsRedu
 import { websocketReducer } from "./reducers/websocketReducer";
 import { notificationsReducer } from "./reducers/notificationsReducer";
 import { localPlaybackStateReducer } from "./reducers/localPlaybackState";
+import { radiobrowserReducer } from "./reducers/radiobrowserReducer";
 
 const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
     modals: modalsReducer,
     pluginConfigurations: pluginConfigurationsReducer,
     notifications: notificationsReducer,
+    radiobrowser: radiobrowserReducer,
     localPlaybackState: localPlaybackStateReducer,
   },
   middleware: (getDefaultMiddleware) =>

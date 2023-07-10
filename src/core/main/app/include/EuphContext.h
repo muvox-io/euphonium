@@ -1,6 +1,7 @@
 #pragma once
 
 // forward declaration of Context
+#include "CoreEvents.h"
 namespace euph {
 struct Context;
 class Connectivity;
@@ -28,27 +29,57 @@ class Connectivity;
 namespace euph {
 // Used to control the state of playback. @TODO: Extend with loading state, error state, and such
 struct PlaybackController {
+  // Loosely bound from ctx, so that we can send out playback state events
+  std::shared_ptr<euph::EventBus> eventBus;
+
+  PlaybackStateEvent::State state = PlaybackStateEvent::State::STOPPED;
+
   std::atomic<bool> isPaused = false;
   std::atomic<bool> requestPause = false;
+  std::atomic<bool> isLoading = false;
+
   std::mutex playbackAccessMutex;
   int currentVolume = 0;
 
   std::function<void(const std::string&)> playbackLockedHandler;
 
+  void setState(PlaybackStateEvent::State state) {
+    this->state = state;
+
+    // Send out event
+    this->eventBus->postEvent(std::make_unique<PlaybackStateEvent>(state));
+  }
+
   void pause() {
     if (!this->isPaused) {
       this->requestPause = true;
     }
+
+    setState(PlaybackStateEvent::State::PAUSED);
   }
 
   void play() {
+    // Always cancel incoming pause request
+    this->requestPause = false;
+
     if (this->isPaused) {
       this->isPaused = false;
-      this->requestPause = false;
     }
+
+    setState(PlaybackStateEvent::State::PLAYING);
+  }
+
+  void setLoading() {
+    setState(PlaybackStateEvent::State::LOADING);
+  }
+
+  void setStopped() {
+    setState(PlaybackStateEvent::State::STOPPED);
   }
 
   void lockPlayback(const std::string& source) {
+    this->play();
+
     if (playbackLockedHandler != NULL) {
       playbackLockedHandler(source);
     }
@@ -81,6 +112,7 @@ struct Context {
     ctx->vm = std::make_shared<berry::VmState>();
     ctx->eventBus = std::make_shared<euph::EventBus>();
     ctx->audioBuffer = std::make_shared<bell::CentralAudioBuffer>(128);
+    ctx->playbackController->eventBus = ctx->eventBus;
     return ctx;
   }
 
@@ -91,6 +123,7 @@ struct Context {
     ctx->vm = std::make_shared<berry::VmState>();
     ctx->audioBuffer = std::make_shared<bell::CentralAudioBuffer>(128);
     ctx->playbackController = std::make_shared<euph::PlaybackController>();
+    ctx->playbackController->eventBus = bus;
     ctx->eventBus = bus;
 
 #ifdef ESP_PLATFORM

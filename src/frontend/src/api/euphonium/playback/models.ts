@@ -30,12 +30,3 @@ export interface PlaybackState {
   settings: PlaybackSettings;
   track: PlaybackTrack | null;
 }
-
-export interface PlaybackRadio {
-  name: string;
-  url: string;
-  favicon: string;
-  codec: string;
-  countrycode: string;
-  bitrate: number;
-}

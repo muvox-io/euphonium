@@ -25,6 +25,11 @@ class PlaybackState
         'hidden': false
       })
     end)
+
+    events.register_native("playbackState", def (data)
+      self.settings['state'] = data['state']
+      self.update_remote()
+    end)
   end
 
   # initializes the current_track object

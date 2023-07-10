@@ -18,6 +18,10 @@ class EuphoniumInstance
             playback_state.update_remote()
           end
         end)
+
+        events.register_native("notification", def (data)
+            self.send_notification(data["type"], data["source"], data["message"], data["submessage"])
+        end)
     end
 
     # Registers a new event handler

@@ -14,8 +14,8 @@ const PluginIconMap = {
   radio: "radio",
   plugin: "playlist",
   general_settings: "settings",
-  hardware: "settings_sliders",
-  portaudio: "settings_sliders",
+  hardware: "settings_slider",
+  portaudio: "settings_slider",
 } as { [key: string]: string };
 
 const SideBarItem = ({ displayName = "", name = "", type = "" }) => {
@@ -30,7 +30,7 @@ const SideBarItem = ({ displayName = "", name = "", type = "" }) => {
               url == hrefUrl ? "text-app-accent" : "text-app-text-secondary "
             }`}
           >
-            <span class="text-2xl -ml-2 mr-1">
+            <span class="text-xl -ml-2 mr-1 h-[30px]">
               <Icon
                 name={PluginIconMap[name] ?? PluginIconMap[type] ?? "home"}
               />
