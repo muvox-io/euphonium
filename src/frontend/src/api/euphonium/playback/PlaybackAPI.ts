@@ -84,20 +84,4 @@ export default class PlaybackAPI {
     });
 
   getRecentlyPlayed = () => this.apiAccessor.fetch<PlaybackTrack[]>("GET", "/playback/recent");
-
-  playRadio = (radio: Station) =>
-    this.apiAccessor.fetch<void>("POST", "/radio/play", {
-      url: radio.url,
-      title: radio.name,
-      iconUrl: radio.favicon
-    });
-
-  markRadioFavorite = (
-    radio: Station
-  ) =>
-    this.apiAccessor.fetch<Station[]>("POST", "/radio/favorite", radio);
-
-  getFavoriteRadios = (
-  ) =>
-    this.apiAccessor.fetch<Station[]>("GET", "/radio/favorite");
 }
