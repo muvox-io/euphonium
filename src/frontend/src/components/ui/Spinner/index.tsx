@@ -2,17 +2,25 @@ import "./Spinner.scss";
 
 export interface SpinnerProps extends JSX.HTMLAttributes {
   showImpulse?: boolean;
-  spinnerSize?: "medium" | "large";
+  spinnerSize?: "medium" | "large" | "small";
 }
 
 const Spinner = ({ showImpulse, spinnerSize, ...props }: SpinnerProps) => {
+  var actualSize = "w-8 h-8";
+
+  switch (spinnerSize) {
+    case "large":
+      actualSize = "w-24 h-24";
+      break;
+    case "small":
+      actualSize = "w-4 h-4";
+      break;
+  }
   return (
     <div {...(props as any)} class={props.class + " relative"}>
       <svg
         role="status"
-        class={`inline ${
-          spinnerSize === "large" ? "w-24 h-24" : "w-8 h-8"
-        } text-gray-200 animate-spin dark:text-gray-600 spinner`}
+        class={`inline ${actualSize} text-gray-200 animate-spin dark:text-gray-600 spinner`}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

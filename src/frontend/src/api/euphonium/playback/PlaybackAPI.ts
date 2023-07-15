@@ -1,4 +1,5 @@
 import APIAccessor from "../../APIAccessor";
+import { Station } from "../../radiobrowser/models";
 import { EqSettings, PlaybackState, PlaybackTrack } from "./models";
 
 const debounce = function <T extends (...args: any[]) => void>(
@@ -84,14 +85,19 @@ export default class PlaybackAPI {
 
   getRecentlyPlayed = () => this.apiAccessor.fetch<PlaybackTrack[]>("GET", "/playback/recent");
 
-  playRadio = (
-    stationName: string,
-    favicon: string,
-    stationUrl: string
-  ) =>
+  playRadio = (radio: Station) =>
     this.apiAccessor.fetch<void>("POST", "/radio/play", {
-      url: stationUrl,
-      title: stationName,
-      iconUrl: favicon
+      url: radio.url,
+      title: radio.name,
+      iconUrl: radio.favicon
     });
+
+  markRadioFavorite = (
+    radio: Station
+  ) =>
+    this.apiAccessor.fetch<Station[]>("POST", "/radio/favorite", radio);
+
+  getFavoriteRadios = (
+  ) =>
+    this.apiAccessor.fetch<Station[]>("GET", "/radio/favorite");
 }

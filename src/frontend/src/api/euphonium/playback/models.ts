@@ -30,4 +30,3 @@ export interface PlaybackState {
   settings: PlaybackSettings;
   track: PlaybackTrack | null;
 }
-

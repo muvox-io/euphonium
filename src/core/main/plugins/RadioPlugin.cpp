@@ -1,4 +1,5 @@
 #include "RadioPlugin.h"
+#include "CoreEvents.h"
 
 using namespace euph;
 
@@ -51,6 +52,8 @@ void RadioPlugin::runTask() {
     playbackURLQueue.wpop(playbackUrl);
     EUPH_LOG(info, TASK, "Received URL %s", playbackUrl.c_str());
     std::scoped_lock playbackLock(runningMutex);
+    // Mark as loading
+    this->ctx->playbackController->setLoading();
 
     try {
       auto req = bell::HTTPClient::get(playbackUrl);
@@ -69,7 +72,7 @@ void RadioPlugin::runTask() {
 
       this->ctx->playbackController->lockPlayback("radio");
       this->ctx->audioBuffer->clearBuffer();
-      
+
       uint32_t trackHash = hashFunc(playbackUrl);
       uint32_t outlen, toWrite, written = 0;
       uint8_t* data;
@@ -77,10 +80,9 @@ void RadioPlugin::runTask() {
       // Guard playback only while song is requested
       while (isRunning) {
         data = codec->decode(container.get(), outlen);
-        if (data == nullptr)
+        if (data == nullptr) {
           continue;
-        if (outlen < 128)
-          continue;
+        }
         toWrite = outlen;
 
         while (toWrite > 0) {
@@ -99,8 +101,15 @@ void RadioPlugin::runTask() {
       ctx->audioBuffer->unlockAccess();
       this->ctx->playbackController->unlockPlayback();
       EUPH_LOG(info, TASK, "Playback finished, buffer unlocked");
-    } catch (...) {
-      EUPH_LOG(info, TASK, "Cannot play requested url");
+    } catch (std::exception& ex) {
+      std::string exceptionMessage = ex.what();
+      this->ctx->playbackController->setStopped();
+      EUPH_LOG(info, TASK, "Cannot play requested url, [%s]", ex.what());
+
+      // Report notification to the UI
+      this->ctx->eventBus->postEvent(std::make_unique<NotificationEvent>(
+          NotificationEvent::Type::ERROR, "radio", "Cannot play requested url",
+          exceptionMessage));
     }
   }
 }

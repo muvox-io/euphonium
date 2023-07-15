@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_map>
 #include "BerryBind.h"
 #include "EventBus.h"
 
@@ -118,6 +119,72 @@ class AudioVolumeEvent : public Event {
     if (this->source == VolumeSource::LOCAL) {
       result["source"] = "local";
     }
+
+    return result;
+  }
+};
+
+class PlaybackStateEvent : public Event {
+ public:
+  enum State { LOADING, PLAYING, PAUSED, STOPPED };
+
+  const std::unordered_map<State, std::string> stateToString = {
+      {State::LOADING, "loading"},
+      {State::PLAYING, "playing"},
+      {State::PAUSED, "paused"},
+      {State::STOPPED, "queue_empty"},
+  };
+
+  State playbackState;
+
+  PlaybackStateEvent(State state) {
+    this->eventType = EventType::VM_MAIN_EVENT;
+    this->subType = "playbackState";
+    this->playbackState = state;
+  }
+
+  berry::map toBerry() override {
+    berry::map result;
+
+    // Map the enum to a string
+    result["state"] = this->stateToString.at(this->playbackState);
+
+    return result;
+  }
+};
+
+class NotificationEvent : public Event {
+ public:
+  enum Type { ERROR, SUCCESS, WARNING, INFO };
+
+  const std::unordered_map<Type, std::string> typeToString = {
+      {Type::ERROR, "error"},
+      {Type::SUCCESS, "success"},
+      {Type::WARNING, "warning"},
+      {Type::INFO, "info"},
+  };
+
+  Type notificationType;
+  std::string message, submessage, source;
+
+  NotificationEvent(Type type, std::string source, std::string message,
+                    std::string submessage) {
+    this->eventType = EventType::VM_MAIN_EVENT;
+    this->subType = "notification";
+    this->notificationType = type;
+    this->message = message;
+    this->source = source;
+    this->submessage = submessage;
+  }
+
+  berry::map toBerry() override {
+    berry::map result;
+
+    // Map the enum to a string
+    result["type"] = this->typeToString.at(this->notificationType);
+    result["message"] = this->message;
+    result["source"] = this->source;
+    result["submessage"] = this->submessage;
 
     return result;
   }
