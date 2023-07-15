@@ -26,9 +26,8 @@ const SideBarItem = ({ displayName = "", name = "", type = "" }) => {
       <Match path={hrefUrl}>
         {({ matches, path, url }: any) => (
           <div
-            class={`text-l md:text-m flex flex-row items-center ${
-              url == hrefUrl ? "text-app-accent" : "text-app-text-secondary "
-            }`}
+            class={`text-l md:text-m flex flex-row items-center ${url == hrefUrl ? "text-app-accent" : "text-app-text-secondary "
+              }`}
           >
             <span class="text-xl -ml-2 mr-1 h-[30px]">
               <Icon
@@ -58,7 +57,7 @@ type CategoryProps = {
 const SideBarCategory = ({ plugins, filterType, header }: CategoryProps) => {
   return (
     <div className="flex flex-col space-y-4 mt-4">
-      <Separator/>
+      <Separator />
       <div className="text-sm text-app-text-secondary md:text-sm font-normal">
         {header}
       </div>
@@ -72,7 +71,7 @@ const SideBarCategory = ({ plugins, filterType, header }: CategoryProps) => {
   );
 };
 
-export default ({ version = "", theme = "", onThemeChange = () => {} }) => {
+export default ({ version = "", theme = "", onThemeChange = () => { } }) => {
   const result = useListPluginsQuery();
   return (
     <div className="flex align-start relative md:w-[220px] md:min-w-[220px] flex-col bg-app-primary p-8 md:p-4 h-screen text-m space-y-2 overflow-y-auto">
@@ -83,8 +82,8 @@ export default ({ version = "", theme = "", onThemeChange = () => {} }) => {
       <ReduxAPIFetcher
         result={result}
       >
-        {({data}) => {
-          if(!data) return (<></>);
+        {({ data }) => {
+          if (!data) return (<></>);
           let plugins = [...data];
           return (
             <>
@@ -109,12 +108,12 @@ export default ({ version = "", theme = "", onThemeChange = () => {} }) => {
             </>
           );
         }}
-    </ReduxAPIFetcher>
+      </ReduxAPIFetcher>
       <div
         onClick={(v) => onThemeChange()}
         class="absolute bg-app-secondary rounded-full w-8 h-8 right-4 bottom-4 flex text-xl items-center justify-center cursor-pointer"
       >
-        <Icon name="moon" />
+        <Icon name="brightness" />
       </div>
     </div>
   );

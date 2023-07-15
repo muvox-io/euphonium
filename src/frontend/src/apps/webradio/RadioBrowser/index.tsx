@@ -37,7 +37,7 @@ const Radio = (station: StationInReducer) => {
           {codec} Codec • {bitrate > 0 ? `${bitrate} kbps • ` : ""} {countrycode}
         </div>
       </div>
-      <div class="flex flex-col border-l border-app-border w-[38px]">
+      <div class="flex flex-col text-white border-l border-app-border w-[38px]">
         <div class={`h-full bg-green-500 hover:opacity-80 border-app-border flex`}>
           <Icon
             onClick={() => {
