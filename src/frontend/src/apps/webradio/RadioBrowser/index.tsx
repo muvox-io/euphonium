@@ -8,46 +8,55 @@ import useAPI from "../../../utils/useAPI.hook";
 import { useDispatch, useSelector } from "react-redux";
 import { RadioBrowserReducerState, StationInReducer, searchStationsByName } from "../../../redux/reducers/radiobrowserReducer";
 import { RootState } from "../../../redux/store";
-import { radioApiEndpoints } from "../../../redux/api/radiobrowser/radioApi";
+import { radioApiEndpoints, usePlayRadioMutation, useMarkStationFavoriteMutation } from "../../../redux/api/radiobrowser/radioApi";
 
 const Radio = (station: StationInReducer) => {
   const dispatch = useDispatch();
+  const [triggerFavorite] = useMarkStationFavoriteMutation();
+  const [playRadio] = usePlayRadioMutation();
+
   const { name, favicon, bitrate, countrycode, codec } = station;
 
   return (
-    <div class="relative">
-      <div class="bg-app-primary cursor-pointer hover:opacity-80 h-[75px] flex flex-row rounded-xl" onClick={() => dispatch(radioApiEndpoints.playRadio.initiate({ url: station.url, title: station.name, iconUrl: station.favicon }) as any)}>
-        <img
-          class="h-[75px] w-[75px] bg-white rounded-xl bg-white border-app-border border shadow-xl object-cover"
-          hidden={!favicon}
-          onError={(e: any) => {
-            e.target.style.display = "none";
-          }}
-          src={
-            favicon ||
-            "https://www.veryicon.com/download/png/media/music-series/sound-wave-1-2?s=256"
-          }
-        />
+    <div class="bg-app-primary cursor-pointer overflow-hidden h-[75px] w-auto flex flex-row rounded-xl" >
+      <img
+        class="h-[75px] w-[75px] bg-white rounded-l-xl bg-white border-app-border border shadow-xl object-cover"
+        hidden={!favicon}
+        onError={(e: any) => {
+          e.target.style.display = "none";
+        }}
+        src={
+          favicon ||
+          "https://www.veryicon.com/download/png/media/music-series/sound-wave-1-2?s=256"
+        }
+      />
 
-        <div class="flex flex-col relative justify-center pl-4 w-full">
-          <div class="font-normal max-w-[70%] -mt-1 mb-2 truncate">{name || 'Unknown station'}</div>
-          <div class="font-regular text-sm truncate text-gray-400">
-            {codec} Codec • {bitrate > 0 ? `${bitrate} kbps • ` : ""} {countrycode}
-          </div>
+      <div class="flex flex-col relative justify-center pl-4 w-full truncate mr-4">
+        <div class="font-normal -mt-1 mb-2 truncate">{name || 'Unknown station'}</div>
+        <div class="font-regular text-sm text-gray-400 truncate">
+          {codec} Codec • {bitrate > 0 ? `${bitrate} kbps • ` : ""} {countrycode}
         </div>
       </div>
-      <div class="bg-app-accent active:opacity-80 text-white w-10 h-10 rounded-full absolute flex -bottom-2 -right-2 cursor-pointer">
-        <div class="mt-[9px] ml-[2px]">
+      <div class="flex flex-col border-l border-app-border w-[38px]">
+        <div class={`h-full bg-green-500 hover:opacity-80 border-app-border flex`}>
+          <Icon
+            onClick={() => {
+              playRadio({ url: station.url, title: station.name, iconUrl: station.favicon })
+            }}
+            name="play"
+          />
+        </div>
+        <div class={`h-full border-t hover:opacity-80 border-app-border ${station.favorite ? "bg-app-accent" : "text-gray-400 bg-app-primary"} flex`}>
           <Icon
             onClick={() => {
               station.favorite = !station.favorite;
-              dispatch(radioApiEndpoints.markStationFavorite.initiate(station) as any);
+              triggerFavorite(station);
             }}
-            name={station.favorite ? "heart" : "heart_outline"}
+            name={station.favorite ? "heart" : "heart"}
           />
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 

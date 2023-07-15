@@ -33,15 +33,25 @@ const mapStationFromRadioBrowser = ({ name, favicon, url_resolved, codec, bitrat
   }
 }
 
-const applyFavoritesToResults = (favorites: StationInReducer[], results: StationInReducer[]): StationInReducer[] => results.map((station) => {
+const removeDuplicateStations = (stations: StationInReducer[]): StationInReducer[] =>
+  stations.reduce((acc: StationInReducer[], station) => {
+    if (!acc.find((s) => s.url === station.url)) {
+      acc.push(station);
+    }
+    return acc
+  }, [])
+
+const applyFavoritesToResults = (favorites: StationInReducer[], results: StationInReducer[]): StationInReducer[] => removeDuplicateStations(results.map((station) => {
   // Check if station is in favorites
   const favorite = favorites.find((fav) => fav.url === station.url);
+  const duplicate = results.find((res) => res.url === station.url && res != station);
 
   return {
     ...station,
     favorite: favorite ? true : false,
+    favicon: duplicate?.favicon || station.favicon
   }
-});
+}))
 
 /**
  * Debounce time for radio search bar in ms.
@@ -58,9 +68,7 @@ export const searchStationsByName = (query: string): ThunkAction<void, RootState
     }
 
     if (query?.length > 0) {
-
-      // @TODO: Add pagination
-      await dispatch(
+      dispatch(
         radioApiEndpoints.getStationsByName.initiate({ name: query, limit: 30, offset: 0 })
       );
     } else {

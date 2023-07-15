@@ -36,6 +36,7 @@ class EventHandler
   def handle_native(event, data)
     if self.native_event_handlers.find(event) == nil
       print("No handler for event: " + event)
+      print(data)
       return
     end
 

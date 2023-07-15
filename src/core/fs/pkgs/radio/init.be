@@ -49,9 +49,9 @@ class RadioPlugin : Plugin
           radios.push(radioJSONBody)
         end
 
+        req.write_json(radios)
         # save results
         self.state['favorites'] = json.dump(radios)
-        req.write_json(radios)
         self.persist_config()
       end)
 

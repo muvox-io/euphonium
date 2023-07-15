@@ -14,7 +14,7 @@ export interface GetStationsByNameArgs {
 
 const radioAPI = EuphoniumApi.injectEndpoints({
   endpoints: (builder) => ({
-    getStationsByName: builder.query<Station[], GetStationsByNameArgs>({
+    getStationsByName: builder.mutation<Station[], GetStationsByNameArgs>({
       query: ({ name, limit, offset }) => ({
         url: `${radioBrowserUrl}/json/stations/byname/${name}?offset=${offset}&limit=${limit}&hidebroken=true`,
         method: "GET"
@@ -27,7 +27,7 @@ const radioAPI = EuphoniumApi.injectEndpoints({
       },
     }),
 
-    markStationFavorite: builder.query<StationInReducer[], StationInReducer>({
+    markStationFavorite: builder.mutation<StationInReducer[], StationInReducer>({
       query: (station) => ({
         url: '/radio/favorite',
         method: "POST",
@@ -64,4 +64,4 @@ const radioAPI = EuphoniumApi.injectEndpoints({
   }),
 });
 
-export const { endpoints: radioApiEndpoints } = radioAPI;
+export const { usePlayRadioMutation, useMarkStationFavoriteMutation, endpoints: radioApiEndpoints } = radioAPI;

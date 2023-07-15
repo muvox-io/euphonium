@@ -9,6 +9,7 @@ import { localPlaybackStateReducer } from "./reducers/localPlaybackState";
 import { radiobrowserReducer } from "./reducers/radiobrowserReducer";
 
 const store = configureStore({
+  devTools: process.env.NODE_ENV !== 'production',
   reducer: {
     [EuphoniumApi.reducerPath]: EuphoniumApi.reducer,
     websocket: websocketReducer,
