@@ -51,13 +51,15 @@ class ResetRestorePlugin : Plugin
         'default': "Factory reset in progress",
       })
     end
+    var backup_group = ctx.create_group('reset', { 'label': 'Backup' })
 
-    group.link_button('backup', {
+
+    backup_group.link_button('backup', {
       'label': "Backup configuration to .tar file",
       'link': "/config_backup",
       'placeholder': 'Backup'
     })
-    var backup_restore = group.file_upload_field('backupRestore', {
+    var backup_restore = backup_group.file_upload_field('backupRestore', {
       'label': "Restore configuration from .tar file",
       'buttonText': "Restore",
       'uploadEndpoint': "/config_backup",
