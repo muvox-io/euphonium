@@ -52,11 +52,19 @@ class ResetRestorePlugin : Plugin
       })
     end
 
-    group.link_button('datasheet', {
+    group.link_button('backup', {
       'label': "Backup configuration to .tar file",
       'link': "/config_backup",
       'placeholder': 'Backup'
     })
+    var backup_restore = group.file_upload_field('backupRestore', {
+      'label': "Restore configuration from .tar file",
+      'buttonText': "Restore",
+      'uploadEndpoint': "/config_backup",
+    })
+    if backup_restore.has_been("upload")
+      core.restart();
+    end
   end
   def perform_factory_reset()
     core.delete_config_files();

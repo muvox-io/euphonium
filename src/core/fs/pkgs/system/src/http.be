@@ -29,6 +29,10 @@ class HTTPRequest
         return json.load(json_body)
     end
 
+    def extract_tar(destPath)
+        self._extract_tar(self.conn_id, destPath)
+    end
+
     def formencoded_body()
         var formencoded_body = self._read_body(self.conn_id)
         var body = {}

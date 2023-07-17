@@ -196,6 +196,8 @@ void HTTPDispatcher::setupBindings() {
                        &HTTPDispatcher::_writeTarResponse, "http");
   ctx->vm->export_this("_read_route_params", this,
                        &HTTPDispatcher::_readRouteParams, "http");
+  ctx->vm->export_this("_extract_tar", this,
+                       &HTTPDispatcher::_extractTar, "http");
   ctx->vm->export_this("_broadcast_websocket", this,
                        &HTTPDispatcher::_broadcastWebsocket, "http");
   ctx->vm->export_this("_register_mdns", this, &HTTPDispatcher::_registerMDNS,
@@ -316,6 +318,16 @@ void HTTPDispatcher::_writeTarResponse(int connId, std::string sourcePath,
   }
   writer.finish();
   this->responseSemaphore->give();
+}
+
+void HTTPDispatcher::_extractTar(int connId, std::string dstPath) {
+  auto conn = this->bindConnections[connId];
+
+  MGInputStreamAdapter streamAdapter(conn);
+  bell::BellTar::reader reader(streamAdapter);
+  std::string path = fmt::format("{}{}", ctx->rootPath, dstPath);
+  EUPH_LOG(debug, TAG, "Extracting tar to %s", path.c_str());
+  reader.extract_all_files(path);
 }
 
 void HTTPDispatcher::_registerMDNS(std::string name, std::string type,

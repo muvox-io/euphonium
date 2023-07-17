@@ -161,5 +161,13 @@ http.handle(HTTP_GET, '/config_backup', def (request)
     request.write_tar("/cfg", "euphonium-backup-" + str(unix_time) + ".tar")
 end)
 
+http.handle(HTTP_POST, '/config_backup', def (request)
+    
+    request.extract_tar("/cfg")
+    request.write_json({
+        'status': 'ok'
+    }, 200)
+end)
+
 # Register for MDNS
 http.register_mdns(general_settings.get_name(), "_http", "_tcp", { "CPath": "/" })

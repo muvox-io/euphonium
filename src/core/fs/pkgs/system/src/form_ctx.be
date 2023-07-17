@@ -130,6 +130,23 @@ class BaseFormContext
         return _FieldContext(field, self.root_context)
     end
 
+    def file_upload_field(id, configuration)
+        var field = {
+            'id': id,
+            'stateKey': id,
+            'type': 'file_upload_field',
+            'label': configuration['label'],
+            'uploadEndpoint': configuration['uploadEndpoint'],
+        }
+        self.safe_copy_field(configuration, field, 'stateKey')
+        self.safe_copy_field(configuration, field, 'buttonText')
+        self.safe_copy_field(configuration, field, 'hint')
+
+
+        self.add(field)
+        return _FieldContext(field, self.root_context)
+    end
+
     def paragraph(id, configuration)
         var field = {
             'id': id,

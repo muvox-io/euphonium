@@ -125,7 +125,24 @@ class HTTPDispatcher: public EventSubscriber {
   void _writeResponse(int connId, std::string body, std::string contentType,
                       int statusCode);
   void _broadcastWebsocket(std::string body);
+  /**
+   * @brief Read files from a directory and respond with a tar file
+   * 
+   * @param connId 
+   * @param sourcePath 
+   * @param filename 
+   */
   void _writeTarResponse(int connId, std::string sourcePath, std::string filename);
+
+  /**
+   * @brief Extract a tar file from the request body to a directory
+   * 
+   * @param connId 
+   * @param dstPath 
+   */
+  void _extractTar(int connId, std::string dstPath);
+
+  
   berry::map _readRouteParams(int connId);
   std::string _readBody(int connId);
   size_t _readContentLength(int connId);

@@ -32,7 +32,8 @@ export enum ConfigurationFieldType {
   BUTTON_FIELD = "button_field",
   MODAL_GROUP = "modal_group",
   PARAGRAPH = "paragraph",
-  TABLE = "table"
+  TABLE = "table",
+  FILE_UPLOAD_FIELD = "file_upload_field",
 }
 
 export interface BaseConfigurationField {
@@ -124,6 +125,14 @@ export interface ConfigurationTable extends ConfigurationFieldWithStateKey {
   table_columns: TableColumn[];
   table_data: string[][];
 }
+
+export interface ConfigurationFileUploadField extends ConfigurationFieldWithStateKey {
+  type: ConfigurationFieldType.FILE_UPLOAD_FIELD;
+  label: string;
+  uploadEndpoint: string;
+  buttonText?: string;
+}
+
 
 export type ConfigurationField =
   | ConfigurationFieldGroup

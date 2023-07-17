@@ -19,6 +19,7 @@ import SelectField from "./fields/SelectField";
 import TextField from "./fields/TextField";
 import Paragraph from "./fields/Paragraph";
 import Table from "./fields/Table";
+import FileUploadField from "./fields/FileUploadField";
 
 export interface FormFieldsProps {
   pluginName: string;
@@ -40,6 +41,7 @@ export const FIELD_COMPONENTS: {
   [ConfigurationFieldType.MODAL_GROUP]: ModalGroup,
   [ConfigurationFieldType.PARAGRAPH]: Paragraph,
   [ConfigurationFieldType.TABLE]: Table,
+  [ConfigurationFieldType.FILE_UPLOAD_FIELD]: FileUploadField,
 };
 
 export default function FormFields({
