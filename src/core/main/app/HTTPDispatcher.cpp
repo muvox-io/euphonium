@@ -1,11 +1,14 @@
 #include "HTTPDispatcher.h"
+#include <fmt/core.h>
 #include <memory>
 #include <string_view>
 #include "BellHTTPServer.h"
+#include "BellTar.h"
 #include "BellUtils.h"
 #include "CoreEvents.h"
 #include "EventBus.h"
 #include "MDNSService.h"
+#include "MGStreamAdapter.h"
 #include "civetweb.h"
 
 using namespace euph;
@@ -189,6 +192,8 @@ void HTTPDispatcher::setupBindings() {
                        &HTTPDispatcher::_readContentLength, "http");
   ctx->vm->export_this("_write_response", this, &HTTPDispatcher::_writeResponse,
                        "http");
+  ctx->vm->export_this("_write_tar_response", this,
+                       &HTTPDispatcher::_writeTarResponse, "http");
   ctx->vm->export_this("_read_route_params", this,
                        &HTTPDispatcher::_readRouteParams, "http");
   ctx->vm->export_this("_broadcast_websocket", this,
@@ -286,6 +291,30 @@ void HTTPDispatcher::_writeResponse(int connId, std::string body,
             "%s\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n",
             statusCode, contentType.c_str());
   mg_write(conn, body.c_str(), body.size());
+  this->responseSemaphore->give();
+}
+
+void HTTPDispatcher::_writeTarResponse(int connId, std::string sourcePath,
+                                       std::string filename) {
+  auto conn = this->bindConnections[connId];
+
+  mg_printf(conn,
+            "HTTP/1.1 200 OK\r\n"
+            "Content-Type: application/x-tar\r\n"
+            "Content-Disposition: attachment; filename=\"%s\"\r\n\r\n",
+            filename.c_str());
+
+  MGStreamAdapter streamAdapter(conn);
+  bell::BellTar::writer writer(streamAdapter);
+  //TODO: support directories
+  auto dirPath = fmt::format("{}{}/", ctx->rootPath, sourcePath);
+  std::vector<std::string> files = this->ctx->storage->listFiles(dirPath);
+  for (auto file : files) {
+    auto fullPath = dirPath + file;
+    std::vector<uint8_t> data = this->ctx->storage->readFileBinary(fullPath);
+    writer.put(file, reinterpret_cast<char*>(data.data()), data.size());
+  }
+  writer.finish();
   this->responseSemaphore->give();
 }
 

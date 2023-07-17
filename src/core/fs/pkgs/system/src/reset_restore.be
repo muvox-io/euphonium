@@ -10,12 +10,12 @@ class ResetRestorePlugin : Plugin
   def make_form(ctx, state)
     var group = ctx.create_group('reset', { 'label': 'Reset' })
 
-    var btn = group.button_field('factoryResetButton', {
+    var factory_reset_btn = group.button_field('factoryResetButton', {
         'label': "Factory reset",
         'buttonText': "Reset",
     })
 
-    if btn.has_been("click")
+    if factory_reset_btn.has_been("click")
       state.setitem("show_factory_reset_modal", true)
     end
 
@@ -51,6 +51,12 @@ class ResetRestorePlugin : Plugin
         'default': "Factory reset in progress",
       })
     end
+
+    group.link_button('datasheet', {
+      'label': "Backup configuration to .tar file",
+      'link': "/config_backup",
+      'placeholder': 'Backup'
+    })
   end
   def perform_factory_reset()
     core.delete_config_files();

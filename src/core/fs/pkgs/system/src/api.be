@@ -1,3 +1,5 @@
+import math
+
 # HTTP Endpoints
 http.handle(HTTP_GET, '/plugins', def (request)
     var result = []
@@ -151,6 +153,12 @@ http.handle(HTTP_POST, '/playback/context', def (request)
         core.query_context_uri(body['uri'])
     end
     request.write_json(playback_state.get_state(), 200)
+end)
+
+
+http.handle(HTTP_GET, '/config_backup', def (request)
+    var unix_time = int(math.floor(core.get_time_ms() / 1000))
+    request.write_tar("/cfg", "euphonium-backup-" + str(unix_time) + ".tar")
 end)
 
 # Register for MDNS

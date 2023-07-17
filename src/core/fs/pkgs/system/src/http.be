@@ -51,6 +51,11 @@ class HTTPRequest
         self.did_write = true
     end
 
+    def write_tar(sourcePath, filename)
+        self._write_tar_response(self.conn_id, sourcePath, filename)
+        self.did_write = true
+    end
+
     def write_raw(body, status, content_type)
         self._write_response(self.conn_id, body, content_type, status ? status : 200)
         self.did_write = true

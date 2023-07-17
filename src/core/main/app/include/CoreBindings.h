@@ -31,7 +31,7 @@ class CoreBindings {
   std::string _getMac();
   void _setDisplayName(std::string name);
   void _queryContextURI(std::string uri);
-  long _getTimeMs();
+  uint64_t _getTimeMs();
   void _deleteConfigFiles();
   void _restart();
   void _clearWifiConfig();
