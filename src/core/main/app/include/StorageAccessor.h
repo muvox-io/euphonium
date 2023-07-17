@@ -19,7 +19,8 @@
 /**
  * @brief StorageAccessor is a class that provides access to the filesystem.
  *
- * The main reason for abstracting this into a separate interface, is to make sure that ESP32 calls all FS operation from one task with stack in the internal ram.
+ * The main reason for abstracting this into a separate interface, 
+ * is to make sure that ESP32 calls all FS operation from one task with stack in the internal ram.
  * This is done to prevent PSRAM memory corruption.
  */
 namespace euph {
