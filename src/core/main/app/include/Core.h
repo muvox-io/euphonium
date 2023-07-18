@@ -1,9 +1,9 @@
 #pragma once
 
-#include <memory>
-#include <string>
 #include <functional>
+#include <memory>
 #include <nlohmann/json.hpp>
+#include <string>
 
 #include "BellUtils.h"
 #include "DecoderGlobals.h"
@@ -14,20 +14,20 @@
 #include "EuphLogger.h"
 #include "EventBus.h"
 
+#include "AudioSourcePlugin.h"
+#include "AudioTask.h"
+#include "CSpotPlugin.h"
+#include "Connectivity.h"
 #include "CoreEvents.h"
+#include "DecoderGlobals.h"
 #include "HTTPDispatcher.h"
+#include "MQTTPlugin.h"
 #include "OTAHandler.h"
 #include "PackageLoader.h"
-#include "StorageAccessor.h"
-#include "Connectivity.h"
 #include "RadioPlugin.h"
-#include "CSpotPlugin.h"
 #include "SnapcastPlugin.h"
-#include "AudioTask.h"
-#include "AudioSourcePlugin.h"
-#include "DecoderGlobals.h"
+#include "StorageAccessor.h"
 #include "SystemPlugin.h"
-#include "MQTTPlugin.h"
 
 namespace euph {
 class Core : public euph::EventSubscriber {
@@ -53,7 +53,9 @@ class Core : public euph::EventSubscriber {
   std::atomic<bool> pluginsInitialized = false;
 
  public:
-  Core(std::shared_ptr<euph::Connectivity> connectivity, std::shared_ptr<euph::EventBus> eventBus, std::shared_ptr<euph::AudioOutput> euphAudioOutput);
+  Core(std::shared_ptr<euph::Connectivity> connectivity,
+       std::shared_ptr<euph::EventBus> eventBus,
+       std::shared_ptr<euph::AudioOutput> euphAudioOutput);
   ~Core();
 
   void initialize();
@@ -64,6 +66,7 @@ class Core : public euph::EventSubscriber {
   void initializePlugins();
 
   // Used in platform implementations to export platform-specific bindings to the vm
-  std::function<void(std::shared_ptr<euph::Context>)> exportPlatformBindings = nullptr;
+  std::function<void(std::shared_ptr<euph::Context>)> exportPlatformBindings =
+      nullptr;
 };
 }  // namespace euph

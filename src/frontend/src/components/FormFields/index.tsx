@@ -2,7 +2,7 @@ import { AnyComponent, FunctionComponent } from "preact";
 import { useSelector } from "react-redux";
 import {
   ConfigurationField,
-  ConfigurationFieldType
+  ConfigurationFieldType,
 } from "../../api/euphonium/plugins/models";
 import { pluginStateReadySelector } from "../../redux/reducers/pluginConfigurationsReducer";
 import useIsMobile from "../../utils/isMobile.hook";
@@ -20,11 +20,11 @@ import TextField from "./fields/TextField";
 import Paragraph from "./fields/Paragraph";
 import Table from "./fields/Table";
 import FileUploadField from "./fields/FileUploadField";
+import Graph from "./fields/Graph";
 
 export interface FormFieldsProps {
   pluginName: string;
   fields: ConfigurationField[];
- 
 }
 
 export const FIELD_COMPONENTS: {
@@ -42,15 +42,13 @@ export const FIELD_COMPONENTS: {
   [ConfigurationFieldType.PARAGRAPH]: Paragraph,
   [ConfigurationFieldType.TABLE]: Table,
   [ConfigurationFieldType.FILE_UPLOAD_FIELD]: FileUploadField,
+  [ConfigurationFieldType.GRAPH]: Graph,
 };
 
-export default function FormFields({
-  fields,
-  pluginName
-}: FormFieldsProps) {
+export default function FormFields({ fields, pluginName }: FormFieldsProps) {
   const isMobile = useIsMobile();
   const isPluginStateReady = useSelector(pluginStateReadySelector(pluginName));
-  if(!isPluginStateReady) return null; // wait for plugin state to be ready between receiving the response and applying the state via redux
+  if (!isPluginStateReady) return null; // wait for plugin state to be ready between receiving the response and applying the state via redux
   return (
     <div class="flex flex-col md:space-y-5">
       {fields

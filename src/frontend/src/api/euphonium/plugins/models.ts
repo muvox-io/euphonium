@@ -13,7 +13,7 @@ export interface PluginEntry {
 export enum TableColumnAlignment {
   LEFT = "left",
   RIGHT = "right",
-  CENTER = "center"
+  CENTER = "center",
 }
 
 export interface TableColumn {
@@ -34,6 +34,7 @@ export enum ConfigurationFieldType {
   PARAGRAPH = "paragraph",
   TABLE = "table",
   FILE_UPLOAD_FIELD = "file_upload_field",
+  GRAPH = "graph",
 }
 
 export interface BaseConfigurationField {
@@ -47,7 +48,7 @@ export interface ConfigurationFieldGroup extends BaseConfigurationField {
   children: ConfigurationField[];
 }
 
-export interface  ConfigurationModalGroup extends BaseConfigurationField {
+export interface ConfigurationModalGroup extends BaseConfigurationField {
   type: ConfigurationFieldType.MODAL_GROUP;
   children: ConfigurationField[];
   title: string;
@@ -76,7 +77,8 @@ export interface ConfigurationFieldText extends ConfigurationFieldWithStateKey {
   hidden?: boolean;
 }
 
-export interface ConfigurationModalConfirmField extends ConfigurationFieldWithStateKey {
+export interface ConfigurationModalConfirmField
+  extends ConfigurationFieldWithStateKey {
   type: ConfigurationFieldType.MODAL_CONFIRM;
   label: string;
   hint?: string;
@@ -86,21 +88,24 @@ export interface ConfigurationModalConfirmField extends ConfigurationFieldWithSt
   cancelValue?: string;
 }
 
-export interface ConfigurationNumberField extends ConfigurationFieldWithStateKey {
+export interface ConfigurationNumberField
+  extends ConfigurationFieldWithStateKey {
   type: ConfigurationFieldType.NUMBER;
   label: string;
   hint?: string;
   default?: number;
 }
 
-export interface CheckboxFieldConfiguration extends ConfigurationFieldWithStateKey {
+export interface CheckboxFieldConfiguration
+  extends ConfigurationFieldWithStateKey {
   type: ConfigurationFieldType.CHECKBOX;
   label: string;
   hint?: string;
   default?: boolean;
 }
 
-export interface SelectFieldConfiguration extends ConfigurationFieldWithStateKey {
+export interface SelectFieldConfiguration
+  extends ConfigurationFieldWithStateKey {
   type: ConfigurationFieldType.SELECT;
   label: string;
   values: string[];
@@ -108,7 +113,8 @@ export interface SelectFieldConfiguration extends ConfigurationFieldWithStateKey
   default?: string;
 }
 
-export interface ConfigurationButtonField extends ConfigurationFieldWithStateKey {
+export interface ConfigurationButtonField
+  extends ConfigurationFieldWithStateKey {
   type: ConfigurationFieldType.BUTTON_FIELD;
   label: string;
   hint?: string;
@@ -126,13 +132,21 @@ export interface ConfigurationTable extends ConfigurationFieldWithStateKey {
   table_data: string[][];
 }
 
-export interface ConfigurationFileUploadField extends ConfigurationFieldWithStateKey {
+export interface ConfigurationFileUploadField
+  extends ConfigurationFieldWithStateKey {
   type: ConfigurationFieldType.FILE_UPLOAD_FIELD;
   label: string;
   uploadEndpoint: string;
   buttonText?: string;
 }
 
+export interface ConfigurationGraph extends BaseConfigurationField {
+  type: ConfigurationFieldType.GRAPH;
+  max_value: number;
+  data: number[];
+  reverse_data?: boolean;
+  label?: string;
+}
 
 export type ConfigurationField =
   | ConfigurationFieldGroup
@@ -146,10 +160,12 @@ export type ConfigurationField =
   | ConfigurationModalGroup
   | ConfigurationParagraph
   | ConfigurationTable
+  | ConfigurationGraph;
 
 export interface PluginConfiguration {
   configSchema: ConfigurationField[];
   themeColor: string;
   displayName: string;
   state: any;
+  refresh_interval: number;
 }

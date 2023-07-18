@@ -1,3 +1,5 @@
+import json
+
 class DevtoolsPlugin : Plugin
   def init()
     self.name = "devtools"
@@ -66,6 +68,42 @@ class DevtoolsPlugin : Plugin
         var data = self.fetch_task_stats_table()
         modal_group.table("system_load", data)
       end
+    end
+    stats = memory_monitor.get_memory_stats()
+  
+    psram_percent = (real(stats["psram_used"]) / real(stats["psram_total"])) * 100
+    internal_percent = (real(stats["internal_ram_used"]) / real(stats["internal_ram_total"])) * 100
+    group.paragraph("memoryStatsPsram", {
+      'text': "PSRAM: " + str(psram_percent) + "% used (" + str(stats["psram_used"]) + " bytes)"
+    })
+    
+
+
+
+    group.graph("psramGraph", {
+      'data': stats["psram_history"],
+      'max_value': stats["psram_total"],
+      'reverse_data': true,
+      'label': 'PSRAM'
+    })
+
+
+    group.paragraph("memoryStatsInternalRam", {
+      'text': "Internal RAM: " + str(internal_percent) + "% used (" + str(stats["internal_ram_used"]) + " bytes)"
+    })
+
+    group.graph("internalGraph", {
+      'data': stats["internal_ram_history"],
+      'max_value': stats["internal_ram_total"],
+      'reverse_data': true,
+      'label': 'Internal RAM'
+    })
+
+    if state.find("show_cpu_stats") == true 
+      ctx.refresh_interval = 0
+    else
+      ctx.refresh_interval = 2000
+    
     end
   end
 end

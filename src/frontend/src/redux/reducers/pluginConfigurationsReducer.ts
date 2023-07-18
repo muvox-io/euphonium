@@ -14,6 +14,7 @@ export interface PluginConfigurationsState {
     [pluginName: string]: {
       state: any;
       dirty: boolean;
+      eventProcessingInProgress: boolean; // to prevent auto-refresh while event is being processed
       scheduledSendStateRequestId: number; // Used to debounce sending state to server
     };
   };
@@ -45,6 +46,11 @@ export const resetScheduledSendStateRequestId = createAction<{
   pluginName: string;
 }>("pluginConfigurations/resetScheduledSendStateRequestId");
 
+export const setEventProcessingInProgress = createAction<{
+  pluginName: string;
+  eventProcessingInProgress: boolean;
+}>("pluginConfigurations/setEventProcessingInProgress");
+
 export interface OnFieldChangedPayload {
   pluginName: string;
   key: string;
@@ -64,35 +70,52 @@ export const onFieldChanged =
     payload: OnFieldChangedPayload
   ): ThunkAction<void, RootState, void, Action> =>
   async (dispatch, getState) => {
-    const { pluginName, key, value, debounce } = payload;
-    const myDebounceId = Math.floor(Math.random() * 1000000) + 1;
-    dispatch(
-      stateKeyChanged({
-        pluginName,
-        key,
-        value,
-        setScheduledSendStateRequestId: myDebounceId,
-      })
-    );
-    if (payload.debounce) {
-      await new Promise((resolve) => setTimeout(resolve, DEBOUNCE_TIME));
+    try {
+      dispatch(
+        setEventProcessingInProgress({
+          pluginName: payload.pluginName,
+          eventProcessingInProgress: true,
+        })
+      );
+
+      const { pluginName, key, value, debounce } = payload;
+      const myDebounceId = Math.floor(Math.random() * 1000000) + 1;
+      dispatch(
+        stateKeyChanged({
+          pluginName,
+          key,
+          value,
+          setScheduledSendStateRequestId: myDebounceId,
+        })
+      );
+      if (payload.debounce) {
+        await new Promise((resolve) => setTimeout(resolve, DEBOUNCE_TIME));
+      }
+      if (
+        (getState() as RootState).pluginConfigurations.states[pluginName]
+          .scheduledSendStateRequestId !== myDebounceId
+      ) {
+        // a newer request has been scheduled, so we don't need to send this one
+        return;
+      }
+      await dispatch(
+        pluginsApiEndpoints.postPluginConfiguration.initiate({
+          pluginName,
+          state: (getState() as RootState).pluginConfigurations.states[
+            pluginName
+          ].state,
+          isPreview: true,
+          events: [],
+        })
+      );
+    } finally {
+      dispatch(
+        setEventProcessingInProgress({
+          pluginName: payload.pluginName,
+          eventProcessingInProgress: false,
+        })
+      );
     }
-    if (
-      (getState() as RootState).pluginConfigurations.states[pluginName]
-        .scheduledSendStateRequestId !== myDebounceId
-    ) {
-      // a newer request has been scheduled, so we don't need to send this one
-      return;
-    }
-    await dispatch(
-      pluginsApiEndpoints.postPluginConfiguration.initiate({
-        pluginName,
-        state: (getState() as RootState).pluginConfigurations.states[pluginName]
-          .state,
-        isPreview: true,
-        events: [],
-      })
-    );
   };
 
 export const onFieldEvent =
@@ -101,21 +124,36 @@ export const onFieldEvent =
     event: PluginInterfaceEvent;
   }): ThunkAction<void, RootState, void, Action> =>
   async (dispatch, getState) => {
-    // stop any debounced state updates
-    dispatch(
-      resetScheduledSendStateRequestId({ pluginName: payload.pluginName })
-    );
+    try {
+      dispatch(
+        setEventProcessingInProgress({
+          pluginName: payload.pluginName,
+          eventProcessingInProgress: true,
+        })
+      );
+      // stop any debounced state updates
+      dispatch(
+        resetScheduledSendStateRequestId({ pluginName: payload.pluginName })
+      );
 
-    await dispatch(
-      pluginsApiEndpoints.postPluginConfiguration.initiate({
-        pluginName: payload.pluginName,
-        state: (getState() as RootState).pluginConfigurations.states[
-          payload.pluginName
-        ].state,
-        isPreview: true,
-        events: [payload.event],
-      })
-    );
+      await dispatch(
+        pluginsApiEndpoints.postPluginConfiguration.initiate({
+          pluginName: payload.pluginName,
+          state: (getState() as RootState).pluginConfigurations.states[
+            payload.pluginName
+          ].state,
+          isPreview: true,
+          events: [payload.event],
+        })
+      );
+    } finally {
+      dispatch(
+        setEventProcessingInProgress({
+          pluginName: payload.pluginName,
+          eventProcessingInProgress: false,
+        })
+      );
+    }
   };
 
 export const pluginStateSelector =
@@ -136,6 +174,14 @@ export const pluginStateReadySelector =
     return pluginState != null;
   };
 
+export const pluginEventProcessingSelector =
+  (pluginName: string) => (state: RootState) => {
+    console.log("PLUGIN NAME", pluginName);
+    const pluginState = state.pluginConfigurations?.states[pluginName];
+    
+    return pluginState?.eventProcessingInProgress || false;
+  };
+
 export const pluginConfigurationsReducer = createReducer(
   initialState,
   (builder) => {
@@ -146,6 +192,7 @@ export const pluginConfigurationsReducer = createReducer(
           state: newState,
           dirty: false,
           scheduledSendStateRequestId: 0,
+          eventProcessingInProgress: false,
         };
       })
       .addCase(stateKeyChanged, (state, action) => {
@@ -168,6 +215,14 @@ export const pluginConfigurationsReducer = createReducer(
           throw new Error(`Plugin ${pluginName} not found`);
         }
         pluginState.scheduledSendStateRequestId = 0;
+      })
+      .addCase(setEventProcessingInProgress, (state, action) => {
+        const { pluginName, eventProcessingInProgress } = action.payload;
+        const pluginState = state.states[pluginName];
+        if (!pluginState) {
+          throw new Error(`Plugin ${pluginName} not found`);
+        }
+        pluginState.eventProcessingInProgress = eventProcessingInProgress;
       });
   }
 );

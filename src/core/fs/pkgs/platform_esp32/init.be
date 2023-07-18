@@ -1,6 +1,7 @@
 core.load("platform_esp32", "src/gpio.be")
 core.load("platform_esp32", "src/i2c.be")
 core.load("platform_esp32", "src/i2s.be")
+core.load("platform_esp32", "src/memory_monitor.be")
 core.load("platform_esp32", "src/boards.be")
 core.load("platform_esp32", "src/devtools.be")
 

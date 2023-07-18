@@ -13,7 +13,7 @@ EuphoniumApp::EuphoniumApp() : bell::Task("app", 24 * 1024, 1, 0) {
   this->connectivity = std::make_shared<ESP32Connectivity>(eventBus);
   this->audioOutput = std::make_shared<euph::I2SAudioOutput>();
   this->statusTask = std::make_shared<euph::StatusLED>(eventBus);
-  this->memoryMonitor = std::make_shared<euph::MemoryMonitorTask>();
+
   this->manufacuringShell = std::make_shared<euph::ManufacuringShell>(eventBus);
   this->eepromDriver = std::make_shared<euph::EEPROMDriver>(0, 0x50);
 
@@ -74,6 +74,8 @@ void EuphoniumApp::runTask() {
                                            std::shared_ptr<euph::Context> ctx) {
     this->core->registerAudioSource(std::make_unique<BluetoothSinkPlugin>(ctx));
     exportDrivers(ctx->vm);
+    this->memoryMonitor = std::make_shared<euph::MemoryMonitorTask>(ctx->vm);
+    this->memoryMonitor->setupBindings();
   };
 
   core->handleEventLoop();

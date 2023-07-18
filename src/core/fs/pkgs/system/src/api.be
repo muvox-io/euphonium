@@ -33,7 +33,8 @@ http.handle(HTTP_GET, '/plugins/:name', def (request)
                 'displayName': plugin.display_name,
                 'themeColor': plugin.theme_color,
                 'configSchema': ctx.children,
-                'state': plugin.state
+                'state': plugin.state,
+                'refresh_interval': ctx.refresh_interval
             }, 200)
             return
         end
@@ -69,7 +70,8 @@ http.handle(HTTP_POST, '/plugins/:name', def (request)
         'displayName': plugin.display_name,
         'themeColor': plugin.theme_color,
         'configSchema': ctx.children,
-        'state': state
+        'state': state,
+        'refresh_interval': ctx.refresh_interval
     }
     request.write_json(result, 200)
 end)

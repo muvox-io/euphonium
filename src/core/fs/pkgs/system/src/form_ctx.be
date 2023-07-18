@@ -168,6 +168,19 @@ class BaseFormContext
         return _FieldContext(field, self.root_context)
     end
 
+    def graph(id, configuration)
+        var field = {
+            'id': id,
+            'type': 'graph',
+            'data': configuration['data'],
+            'max_value': configuration['max_value'],
+        }
+        self.safe_copy_field(configuration, field, 'reverse_data')
+        self.safe_copy_field(configuration, field, 'label')
+        self.add(field)
+        return _FieldContext(field, self.root_context)
+    end
+
     def create_group(id, configuration)
         var field = {
             'id': id,
@@ -239,11 +252,13 @@ class FormContext : BaseFormContext
     var root_context
     var events
     var redraw_requested
+    var refresh_interval
     def init(events)
         self.children = []
         self.root_context = self
         self.events = events == nil ? [] : events
         self.redraw_requested = false
+        self.refresh_interval = 0
     end
 
     def add(field)
