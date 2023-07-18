@@ -176,7 +176,7 @@ export const pluginStateReadySelector =
 
 export const pluginEventProcessingSelector =
   (pluginName: string) => (state: RootState) => {
-    console.log("PLUGIN NAME", pluginName);
+
     const pluginState = state.pluginConfigurations?.states[pluginName];
     
     return pluginState?.eventProcessingInProgress || false;
