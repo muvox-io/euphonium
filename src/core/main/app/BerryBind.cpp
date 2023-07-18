@@ -341,7 +341,7 @@ void VmState::map(const berry::map& berryMap) {
   while (it != berryMap.end()) {
     std::string key = it->first;
     auto value = it->second;
-
+    be_stack_require(vm, 2 + BE_STACK_FREE_MIN);
     if (std::any_cast<std::string>(&value)) {
       string(key);
       string(std::any_cast<std::string>(value));
@@ -357,6 +357,7 @@ void VmState::map(const berry::map& berryMap) {
     } else if (std::any_cast<berry::list>(&value)) {
       string(key);
       list(std::any_cast<berry::list>(value));
+      set_index(2);
     } else if (std::any_cast<int>(&value)) {
       string(key);
       number(std::any_cast<int>(value));
