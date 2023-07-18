@@ -28,7 +28,7 @@
     border: 2px solid var(--accent);
     background: transparent;
   }
-  &:hover:enabled {
+  &:hover:enabled, &span:hover, &a:hover {
     color: var(--text-primary);
     background: var(--accent);
   }

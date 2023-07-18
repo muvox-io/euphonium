@@ -42,6 +42,7 @@ export default function FileUploadField({
         {/** fucking tailwind */}
       </div>
       <UploadButton
+        buttonText={field.buttonText}
         onChange={async (e) => {
           const file = (e as any).target?.files[0];
           if (!file) return;
