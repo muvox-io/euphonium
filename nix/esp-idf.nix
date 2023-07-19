@@ -36,10 +36,10 @@ let
   };
   esptool = python39Packages.buildPythonPackage rec {
     pname = "esptool";
-    version = "4.5.1";
+    version = "4.6.2";
     src = python39Packages.fetchPypi {
       inherit pname version;
-      sha256 = "sha256-4+tZg2Ej5ev3k+9jkxH32FZFUmSH2LHCtRFZtFUQa5o=";
+      sha256 = "sha256-VJ75Pu9C7n6UYs5aU8Ft96DHHZGz934Z7BV0mATN8wA=";
     };
     doCheck = false;
     propagatedBuildInputs = with python39Packages; [
@@ -58,10 +58,11 @@ let
       sha256 = "sha256-sAZQOxgm/kzj4+XaO6UvvtZMr89eP3FER8jkSwDLkvM=";
     };
     doCheck = false;
-    propagatedBuildInputs = with python39Packages; [
+    propagatedBuildInputs = with python310Packages; [
       esptool
       pygdbmi
       construct
+      pyyaml
     ];
   };
   esp-idf-kconfig = python39Packages.buildPythonPackage rec {
