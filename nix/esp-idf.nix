@@ -2,23 +2,24 @@
 , lib
 , fetchFromGitHub
 , python39Packages
+, python310Packages
 , fetchurl
 , pkgs
 ,
 }:
 let
-  idf-component-manager = python39Packages.buildPythonPackage rec {
+  idf-component-manager = python310Packages.buildPythonPackage rec {
     pname = "idf_component_manager";
-    version = "1.2.2";
-    src = python39Packages.fetchPypi {
+    version = "1.3.2";
+    src = python310Packages.fetchPypi {
       inherit pname version;
-      sha256 = "sha256-NnLz4zpNERAFsaeuFhKs0RnYUdIU+uqwVOi7EPY4ByA=";
+      sha256 = "sha256-RPLkaAW3yxx+UirW0qZ2rCg2F8fAF1NyEB+srg+AYbs=";
     };
     doCheck = false;
     configurePhase = ''
       export HOME=$TMP
     '';
-    propagatedBuildInputs = with python39Packages; [
+    propagatedBuildInputs = with python310Packages; [
       packaging
       lockfile
       cachecontrol
@@ -32,30 +33,32 @@ let
       schema
       six
       tqdm
+      contextlib2
     ];
   };
-  esptool = python39Packages.buildPythonPackage rec {
+  esptool = python310Packages.buildPythonPackage rec {
     pname = "esptool";
     version = "4.6.2";
-    src = python39Packages.fetchPypi {
+    src = python310Packages.fetchPypi {
       inherit pname version;
       sha256 = "sha256-VJ75Pu9C7n6UYs5aU8Ft96DHHZGz934Z7BV0mATN8wA=";
     };
     doCheck = false;
-    propagatedBuildInputs = with python39Packages; [
+    propagatedBuildInputs = with python310Packages; [
       bitstring
       cryptography
       ecdsa
       pyserial
       reedsolo
+      pyaml
     ];
   };
-  esp-coredump = python39Packages.buildPythonPackage rec {
+  esp-coredump = python310Packages.buildPythonPackage rec {
     pname = "esp-coredump";
-    version = "1.4.2";
-    src = python39Packages.fetchPypi {
+    version = "1.6.0";
+    src = python310Packages.fetchPypi {
       inherit pname version;
-      sha256 = "sha256-sAZQOxgm/kzj4+XaO6UvvtZMr89eP3FER8jkSwDLkvM=";
+      sha256 = "sha256-YT1np8HtxhlfNB5UHoi1Q/W9b7s5+RonIJjc0AZys80=";
     };
     doCheck = false;
     propagatedBuildInputs = with python310Packages; [
@@ -65,58 +68,70 @@ let
       pyyaml
     ];
   };
-  esp-idf-kconfig = python39Packages.buildPythonPackage rec {
+  esp-idf-kconfig = python310Packages.buildPythonPackage rec {
     pname = "esp-idf-kconfig";
-    version = "1.1.0";
-    src = python39Packages.fetchPypi {
+    version = "1.2.0";
+    src = python310Packages.fetchPypi {
       inherit pname version;
-      sha256 = "sha256-s8ZXt6cf5w2pZSxQNIs/SODAUvHNgxyQ+onaCa7UbFA=";
+      sha256 = "sha256-HD+QlAcHQgwlkKMn0LA24CoNux0IxpORKLYBfYb39JI=";
     };
     doCheck = false;
-    propagatedBuildInputs = with python39Packages; [
+    propagatedBuildInputs = with python310Packages; [
       kconfiglib
     ];
   };
-  esp-idf-monitor = python39Packages.buildPythonPackage rec {
+  esp-idf-monitor = python310Packages.buildPythonPackage rec {
     pname = "esp-idf-monitor";
-    version = "1.0.0";
-    src = python39Packages.fetchPypi {
+    version = "1.1.1";
+    src = python310Packages.fetchPypi {
       inherit pname version;
-      sha256 = "sha256-CrdQI4Lp7TQvmolf3aHuokrQlnrPneemMisG9TGcTls=";
+      sha256 = "sha256-c62X3ZHRShhbAFmuPc/d2keqE9T9SXYIlJTyn32LPaE=";
     };
     doCheck = false;
-    propagatedBuildInputs = with python39Packages; [
+    propagatedBuildInputs = with python310Packages; [
       pyserial
       pyelftools
       esp-coredump
     ];
   };
-  freertos-gdb = python39Packages.buildPythonPackage rec {
+  esp-idf-size = python310Packages.buildPythonPackage rec {
+    pname = "esp-idf-size";
+    version = "0.3.1";
+    src = python310Packages.fetchPypi {
+      inherit pname version;
+      sha256 = "sha256-OzthhzKGjyqDJrmJWs4LMkHz0rAwho+3Pyc2BYFK0EU=";
+    };
+    doCheck = false;
+    propagatedBuildInputs = with python310Packages; [
+      pyaml
+    ];
+  };
+  freertos-gdb = python310Packages.buildPythonPackage rec {
     pname = "freertos-gdb";
     version = "1.0.2";
-    src = python39Packages.fetchPypi {
+    src = python310Packages.fetchPypi {
       inherit pname version;
       sha256 = "sha256-o0ZoTy7OLVnrhSepya+MwaILgJSojs2hfmI86D9C3cs=";
     };
     doCheck = false;
-    propagatedBuildInputs = with python39Packages; [
+    propagatedBuildInputs = with python310Packages; [
       setuptools
       wheel
     ];
   };
   toolchain = pkgs.callPackage ./toolchain.nix { };
-  idf-python-env = (pkgs.python39.withPackages (p: with p; [ pip idf-component-manager esptool esp-coredump esp-idf-monitor esp-idf-kconfig freertos-gdb p.protobuf grpcio-tools ]));
+  idf-python-env = (pkgs.python310.withPackages (p: with p; [ pip idf-component-manager esptool esp-coredump esp-idf-monitor esp-idf-kconfig freertos-gdb p.protobuf grpcio-tools pyparsing esp-idf-size ]));
 in
 stdenv.mkDerivation rec {
   pname = "esp-idf";
-  version = "5.0";
+  version = "5.1";
   src = fetchFromGitHub {
     owner = "espressif";
     repo = "esp-idf";
-    rev = "490216a2ace6dc3e1b9a3f50d265a80481b32f6d";
+    rev = "cbce221e88d52665523093b2b6dd0ebe3f1243f1";
     fetchSubmodules = true;
     name = pname;
-    sha256 = "KiLMD6q1SNO8Hl8ByulpWWCzjv2JWy6H/J1FE0W0UAY=";
+    sha256 = "sha256-IEa9R9VCWvbRjZFRPb2Qq2Qw1RFxsnVALFVgQlBCXMw=";
   };
 
   nativeBuildInputs = [ pkgs.makeWrapper ];
@@ -146,28 +161,28 @@ stdenv.mkDerivation rec {
     runHook preInstall
 
     # Fake venv, idf actually checks this
-    mkdir -p $out/sdk $out/.espressif/python_env/idf5.0_py3.9_env/bin
-    ln -s $(readlink -e $(which python3)) $out/.espressif/python_env/idf5.0_py3.9_env/bin/python
-    touch $out/.espressif/espidf.constraints.v5.0.txt
+    mkdir -p $out/sdk $out/.espressif/python_env/idf${version}_py3.10_env/bin
+    ln -s $(readlink -e $(which python3)) $out/.espressif/python_env/idf${version}_py3.10_env/bin/python
+    touch $out/.espressif/espidf.constraints.v${version}.txt
     cp -r sdk/* $out/sdk
 
     # no .git, inject version
-    echo "v5.0-494-g490216a2ac" >> $out/sdk/version.txt
+    echo "v${version}" >> $out/sdk/version.txt
 
     # prepare wrapper, that includes all idf-related env
-    makeWrapper $out/.espressif/python_env/idf5.0_py3.9_env/bin/python $out/bin/idf.py \
+    makeWrapper $out/.espressif/python_env/idf${version}_py3.10_env/bin/python $out/bin/idf.py \
     --add-flags $out/sdk/tools/idf.py \
     --set IDF_TOOLS_PATH $out/.espressif \
-    --set IDF_PYTHON_ENV_PATH $out/.espressif/python_env/idf5.0_py3.9_env \
+    --set IDF_PYTHON_ENV_PATH $out/.espressif/python_env/idf${version}_py3.10_env \
     --set IDF_PATH $out/sdk/ \
     --set PYTHONPATH ${idf-python-env}/${idf-python-env.sitePackages}:$PYTHONPATH \
     --prefix PATH : "${lib.makeBinPath propagatedBuildInputs}"
 
     # wrapper around esptool.py
-    makeWrapper $out/.espressif/python_env/idf5.0_py3.9_env/bin/python $out/bin/esptool.py \
+    makeWrapper $out/.espressif/python_env/idf${version}_py3.10_env/bin/python $out/bin/esptool.py \
     --add-flags $out/sdk/components/esptool_py/esptool/esptool.py \
     --set IDF_TOOLS_PATH $out/.espressif \
-    --set IDF_PYTHON_ENV_PATH $out/.espressif/python_env/idf5.0_py3.9_env \
+    --set IDF_PYTHON_ENV_PATH $out/.espressif/python_env/idf${version}_py3.10_env \
     --set IDF_PATH $out/sdk/ \
     --prefix PATH : "${lib.makeBinPath propagatedBuildInputs}"
     runHook postInstall

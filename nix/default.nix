@@ -45,7 +45,7 @@ rec {
       export IDF_TOOLS_PATH=${esp-idf}/.espressif
       export IWYU_LLVM_ROOT_PATH=${llvmPackages.libclang.lib}
       export PATH=$IDF_PATH/tools:$PATH
-      export IDF_PYTHON_ENV_PATH=$IDF_TOOLS_PATH/python_env/idf5.0_py3.9_env
+      export IDF_PYTHON_ENV_PATH=$IDF_TOOLS_PATH/python_env/idf5.1_py3.10_env
     '';
   };
 

@@ -2,7 +2,7 @@
 
 let
   platforms = {
-    "x86_64-linux" = "linux-amd64";
+    "x86_64-linux" = "x86_64-linux-gnu";
     "aarch64-linux" = "linux-arm64";
     "armv7l-unknown-linux" = "linux-armel";
     "armv7-unknown-linux" = "linux-armhf";
@@ -18,7 +18,7 @@ let
     runScript = "";
   };
   platformHash = {
-    "linux-amd64" = "0c6z97x9lq5q5x181473zc27kf80i2vgs6kxxf7x2xc2w43q93b9";
+    "x86_64-linux-gnu" = "sha256-TS4C70fxqTpNz9uuzUhq36q0wOJt7qLBjWOFUn85+GQ=";
     "linux-arm64" = "1dw9l485wl64q4dhhpy1mzcdqzkin907hr7q85m78b7m5sn1glp7";
     "linux-armel" = "12qgd7v6yhvcp9vrrv0knys1lcl40jmc1kn6gsqhvz4n8khjdfvg";
     "linux-armhf" = "04hv96gaarwhqa8n36pjx3mz1mqi27kxa6npmz3jljmhlidqhpdh";
@@ -32,10 +32,10 @@ in
 
 stdenv.mkDerivation rec {
   pname = "esp32-toolchain";
-  version = "2022r1";
+  version = "12.2.0_20230208";
 
   src = fetchurl {
-    url = "https://github.com/espressif/crosstool-NG/releases/download/esp-${version}/xtensa-esp32-elf-gcc11_2_0-esp-${version}-${platform}.tar.xz";
+    url = "https://github.com/espressif/crosstool-NG/releases/download/esp-${version}/xtensa-esp32-elf-${version}-${platform}.tar.xz";
     sha256 = toolchainHash;
   };
 
