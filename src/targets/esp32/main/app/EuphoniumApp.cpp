@@ -15,7 +15,7 @@ EuphoniumApp::EuphoniumApp() : bell::Task("app", 24 * 1024, 1, 0) {
   this->statusTask = std::make_shared<euph::StatusLED>(eventBus);
 
   this->manufacuringShell = std::make_shared<euph::ManufacuringShell>(eventBus);
-  this->eepromDriver = std::make_shared<euph::EEPROMDriver>(0, 0x50);
+  this->eepromDriver = std::make_shared<euph::EEPROMDriver>(I2C_NUM_0, 0x50);
 
   this->printBuildInfo();
   startTask();
