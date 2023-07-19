@@ -2,13 +2,14 @@
 
 let
   platforms = {
-    "x86_64-linux" = "linux-amd64";
-    "aarch64-linux" = "linux-arm64";
-    "armv7l-unknown-linux" = "linux-armel";
-    "armv7-unknown-linux" = "linux-armhf";
-    "i686-linux" = "linux-i686";
-    "x86_64-darwin" = "macos";
-    "aarch64-darwin" = "macos-arm64";
+    # nix name -> espressifs release name
+    "x86_64-linux" = "x86_64-linux-gnu";
+    "aarch64-linux" = "aarch64-linux-gnu";
+    "armv7l-unknown-linux" = "arm-linux-gnueabi";
+    "armv7-unknown-linux" = "arm-linux-gnueabihf";
+    "i686-linux" = "i686-linux-gnu";
+    "x86_64-darwin" = "x86_64-apple-darwin";
+    "aarch64-darwin" = "aarch64-apple-darwin";
     "i686-windows" = "win32";
     "x86_64-windows" = "win64";
   };
@@ -18,13 +19,14 @@ let
     runScript = "";
   };
   platformHash = {
-    "linux-amd64" = "0c6z97x9lq5q5x181473zc27kf80i2vgs6kxxf7x2xc2w43q93b9";
-    "linux-arm64" = "1dw9l485wl64q4dhhpy1mzcdqzkin907hr7q85m78b7m5sn1glp7";
-    "linux-armel" = "12qgd7v6yhvcp9vrrv0knys1lcl40jmc1kn6gsqhvz4n8khjdfvg";
-    "linux-armhf" = "04hv96gaarwhqa8n36pjx3mz1mqi27kxa6npmz3jljmhlidqhpdh";
-    "linux-i686" = "1jvf58p96w7kd573dhh1qv8hzl0bmidq6ai1c4h7l80qn82y1y2x";
-    "macos" = "1gq9ai0pf5cvacg9kw6l0nk08s6k01r4n8g4q6z3m7j6aqy8g78w";
-    "macos-arm64" = "0fvw5b9myjj1z298q2j51in9j94qnrhdk1addi4zs1skvjq4jwi9";
+    # espressif release name -> sha256 hash
+    "x86_64-linux-gnu" = "sha256-TS4C70fxqTpNz9uuzUhq36q0wOJt7qLBjWOFUn85+GQ=";
+    "aarch64-linux-gnu" = "sha256-niEaGCtuoDlqQcePUvUdlk54df4nTqnIERG/DbyQxRY=";
+    "arm-linux-gnueabi" = "sha256-Ld2R+5i3mzAEK3kY7vYM8Qx71bHahT6Dtl8pO5beyAA=";
+    "arm-linux-gnueabihf" = "sha256-poOkaFVdy8ts4yoZCEIRDW+FPU1hBNYc8Lyd1Qxr4eY=";
+    "i686-linux-gnu" = "sha256-KSsZ6mGGUIqSP7b9AQOXfgAdTrjneDbH49bObl+n0wU=";
+    "x86_64-apple-darwin" = "sha256-sJ2H/bHcMs0dcYk1Bl75MbEBoU32sXvlZ0jlJkCVW/8=";
+    "aarch64-apple-darwin" = "sha256-9QrKsrIW6UddxTE7PktCTLxw0KvSO6GBiv9KAZFl2o4=";
   };
   platform = platforms.${stdenv.system};
   toolchainHash = platformHash.${platform};
@@ -32,10 +34,10 @@ in
 
 stdenv.mkDerivation rec {
   pname = "esp32-toolchain";
-  version = "2022r1";
+  version = "12.2.0_20230208";
 
   src = fetchurl {
-    url = "https://github.com/espressif/crosstool-NG/releases/download/esp-${version}/xtensa-esp32-elf-gcc11_2_0-esp-${version}-${platform}.tar.xz";
+    url = "https://github.com/espressif/crosstool-NG/releases/download/esp-${version}/xtensa-esp32-elf-${version}-${platform}.tar.xz";
     sha256 = toolchainHash;
   };
 

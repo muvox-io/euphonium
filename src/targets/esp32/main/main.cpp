@@ -39,8 +39,8 @@ void app_main(void) {
 
   // Install I2C port 0
   i2c_config.master.clk_speed = 100000;
-  i2c_param_config(0, &i2c_config);
-  i2c_driver_install(0, I2C_MODE_MASTER, false, false, false);
+  i2c_param_config(I2C_NUM_0, &i2c_config);
+  i2c_driver_install(I2C_NUM_0, I2C_MODE_MASTER, false, false, false);
 
   // Start the app
   auto app = new euph::EuphoniumApp();

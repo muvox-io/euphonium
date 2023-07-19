@@ -26,7 +26,6 @@ extern "C" {
  */
 typedef struct mdns_search_once_s mdns_search_once_t;
 
-
 typedef enum {
     MDNS_EVENT_ENABLE_IP4                   = 1 << 1,
     MDNS_EVENT_ENABLE_IP6                   = 1 << 2,
@@ -34,6 +33,8 @@ typedef enum {
     MDNS_EVENT_ANNOUNCE_IP6                 = 1 << 4,
     MDNS_EVENT_DISABLE_IP4                  = 1 << 5,
     MDNS_EVENT_DISABLE_IP6                  = 1 << 6,
+    MDNS_EVENT_IP4_REVERSE_LOOKUP           = 1 << 7,
+    MDNS_EVENT_IP6_REVERSE_LOOKUP           = 1 << 8,
 } mdns_event_actions_t;
 
 /**
@@ -50,8 +51,8 @@ typedef enum {
  *          Used in mdns_service_add()
  */
 typedef struct {
-    const char * key;                       /*!< item key name */
-    const char * value;                     /*!< item value string */
+    const char *key;                        /*!< item key name */
+    const char *value;                      /*!< item value string */
 } mdns_txt_item_t;
 
 /**
@@ -59,7 +60,7 @@ typedef struct {
  */
 typedef struct mdns_ip_addr_s {
     esp_ip_addr_t addr;                     /*!< IP address */
-    struct mdns_ip_addr_s * next;           /*!< next IP, or NULL for the last IP in the list */
+    struct mdns_ip_addr_s *next;            /*!< next IP, or NULL for the last IP in the list */
 } mdns_ip_addr_t;
 
 /**
@@ -74,25 +75,25 @@ typedef enum {
  * @brief   mDNS query result structure
  */
 typedef struct mdns_result_s {
-    struct mdns_result_s * next;            /*!< next result, or NULL for the last result in the list */
+    struct mdns_result_s *next;             /*!< next result, or NULL for the last result in the list */
 
-    esp_netif_t* esp_netif;                 /*!< ptr to corresponding esp-netif */
+    esp_netif_t *esp_netif;                 /*!< ptr to corresponding esp-netif */
     uint32_t ttl;                           /*!< time to live */
 
     mdns_ip_protocol_t ip_protocol;         /*!< ip_protocol type of the interface (v4/v6) */
     // PTR
-    char * instance_name;                   /*!< instance name */
-    char * service_type;                    /*!< service type */
-    char * proto;                           /*!< srevice protocol */
+    char *instance_name;                    /*!< instance name */
+    char *service_type;                     /*!< service type */
+    char *proto;                            /*!< srevice protocol */
     // SRV
-    char * hostname;                        /*!< hostname */
+    char *hostname;                         /*!< hostname */
     uint16_t port;                          /*!< service port */
     // TXT
-    mdns_txt_item_t * txt;                  /*!< txt record */
+    mdns_txt_item_t *txt;                   /*!< txt record */
     uint8_t *txt_value_len;                 /*!< array of txt value len of each record */
     size_t txt_count;                       /*!< number of txt items */
     // A and AAAA
-    mdns_ip_addr_t * addr;                  /*!< linked list of IP addresses found */
+    mdns_ip_addr_t *addr;                   /*!< linked list of IP addresses found */
 } mdns_result_t;
 
 typedef void (*mdns_query_notify_t)(mdns_search_once_t *search);
@@ -125,7 +126,20 @@ void mdns_free(void);
  *     - ESP_ERR_INVALID_ARG Parameter error
  *     - ESP_ERR_NO_MEM memory error
  */
-esp_err_t mdns_hostname_set(const char * hostname);
+esp_err_t mdns_hostname_set(const char *hostname);
+
+/**
+ * @brief Get the hostname for mDNS server
+ *
+ * @param hostname      pointer to the hostname, it should be allocated
+ *                      and hold at least MDNS_NAME_BUF_LEN chars
+ *
+ * @return
+ *     - ESP_OK success
+ *     - ESP_ERR_INVALID_ARG Parameter error
+ *     - ESP_ERR_INVALID_STATE when mdns is not initialized
+ */
+esp_err_t mdns_hostname_get(char *hostname);
 
 /**
  * @brief  Adds a hostname and address to be delegated
@@ -142,7 +156,22 @@ esp_err_t mdns_hostname_set(const char * hostname);
  *     - ESP_ERR_NO_MEM memory error
  *
  */
-esp_err_t mdns_delegate_hostname_add(const char * hostname, const mdns_ip_addr_t *address_list);
+esp_err_t mdns_delegate_hostname_add(const char *hostname, const mdns_ip_addr_t *address_list);
+
+/**
+ * @brief  Set the address to a delegated hostname
+ *
+ * @param  hostname     Hostname to set
+ * @param  address_list The IP address list of the host
+ *
+ * @return
+ *     - ESP_OK success
+ *     - ESP_ERR_INVALID_STATE mDNS is not running
+ *     - ESP_ERR_INVALID_ARG Parameter error
+ *     - ESP_ERR_NO_MEM memory error
+ *
+ */
+esp_err_t mdns_delegate_hostname_set_address(const char *hostname, const mdns_ip_addr_t *address_list);
 
 /**
  * @brief  Remove a delegated hostname
@@ -157,7 +186,7 @@ esp_err_t mdns_delegate_hostname_add(const char * hostname, const mdns_ip_addr_t
  *     - ESP_ERR_NO_MEM memory error
  *
  */
-esp_err_t mdns_delegate_hostname_remove(const char * hostname);
+esp_err_t mdns_delegate_hostname_remove(const char *hostname);
 
 /**
  * @brief  Query whether a hostname has been added
@@ -169,7 +198,7 @@ esp_err_t mdns_delegate_hostname_remove(const char * hostname);
  *     - false  The hostname has not been added.
  *
  */
-bool mdns_hostname_exists(const char * hostname);
+bool mdns_hostname_exists(const char *hostname);
 
 /**
  * @brief  Set the default instance name for mDNS server
@@ -181,7 +210,7 @@ bool mdns_hostname_exists(const char * hostname);
  *     - ESP_ERR_INVALID_ARG Parameter error
  *     - ESP_ERR_NO_MEM memory error
  */
-esp_err_t mdns_instance_name_set(const char * instance_name);
+esp_err_t mdns_instance_name_set(const char *instance_name);
 
 /**
  * @brief  Add service to mDNS server
@@ -205,7 +234,7 @@ esp_err_t mdns_instance_name_set(const char * instance_name);
  *     - ESP_ERR_NO_MEM memory error
  *     - ESP_FAIL failed to add service
  */
-esp_err_t mdns_service_add(const char * instance_name, const char * service_type, const char * proto, uint16_t port, mdns_txt_item_t txt[], size_t num_items);
+esp_err_t mdns_service_add(const char *instance_name, const char *service_type, const char *proto, uint16_t port, mdns_txt_item_t txt[], size_t num_items);
 
 /**
  * @brief  Add service to mDNS server with a delegated hostname
@@ -230,8 +259,8 @@ esp_err_t mdns_service_add(const char * instance_name, const char * service_type
  *     - ESP_ERR_NO_MEM memory error
  *     - ESP_FAIL failed to add service
  */
-esp_err_t mdns_service_add_for_host(const char * instance_name, const char * service_type, const char * proto,
-                                    const char * hostname, uint16_t port, mdns_txt_item_t txt[], size_t num_items);
+esp_err_t mdns_service_add_for_host(const char *instance_name, const char *service_type, const char *proto,
+                                    const char *hostname, uint16_t port, mdns_txt_item_t txt[], size_t num_items);
 
 /**
  * @brief  Check whether a service has been added.
@@ -244,8 +273,7 @@ esp_err_t mdns_service_add_for_host(const char * instance_name, const char * ser
  *     - true   Correspondding service has been added.
  *     - false  Service not found.
  */
-bool mdns_service_exists(const char * service_type, const char * proto, const char * hostname);
-
+bool mdns_service_exists(const char *service_type, const char *proto, const char *hostname);
 
 /**
  * @brief  Check whether a service has been added.
@@ -274,7 +302,7 @@ bool mdns_service_exists_with_instance(const char *instance, const char *service
  *     - ESP_ERR_NOT_FOUND Service not found
  *     - ESP_ERR_NO_MEM memory error
  */
-esp_err_t mdns_service_remove(const char * service_type, const char * proto);
+esp_err_t mdns_service_remove(const char *service_type, const char *proto);
 
 /**
  * @brief  Remove service from mDNS server with hostname
@@ -290,7 +318,7 @@ esp_err_t mdns_service_remove(const char * service_type, const char * proto);
  *     - ESP_ERR_NOT_FOUND Service not found
  *     - ESP_ERR_NO_MEM memory error
  */
-esp_err_t mdns_service_remove_for_host(const char *instance, const char * service_type, const char * proto, const char *hostname);
+esp_err_t mdns_service_remove_for_host(const char *instance, const char *service_type, const char *proto, const char *hostname);
 
 /**
  * @brief  Set instance name for service
@@ -305,7 +333,7 @@ esp_err_t mdns_service_remove_for_host(const char *instance, const char * servic
  *     - ESP_ERR_NOT_FOUND Service not found
  *     - ESP_ERR_NO_MEM memory error
  */
-esp_err_t mdns_service_instance_name_set(const char * service_type, const char * proto, const char * instance_name);
+esp_err_t mdns_service_instance_name_set(const char *service_type, const char *proto, const char *instance_name);
 
 /**
  * @brief  Set instance name for service with hostname
@@ -322,8 +350,8 @@ esp_err_t mdns_service_instance_name_set(const char * service_type, const char *
  *     - ESP_ERR_NOT_FOUND Service not found
  *     - ESP_ERR_NO_MEM memory error
  */
-esp_err_t mdns_service_instance_name_set_for_host(const char * instance_old, const char * service_type, const char * proto, const char * hostname,
-                                                  const char * instance_name);
+esp_err_t mdns_service_instance_name_set_for_host(const char *instance_old, const char *service_type, const char *proto, const char *hostname,
+        const char *instance_name);
 
 /**
  * @brief  Set service port
@@ -338,7 +366,7 @@ esp_err_t mdns_service_instance_name_set_for_host(const char * instance_old, con
  *     - ESP_ERR_NOT_FOUND Service not found
  *     - ESP_ERR_NO_MEM memory error
  */
-esp_err_t mdns_service_port_set(const char * service_type, const char * proto, uint16_t port);
+esp_err_t mdns_service_port_set(const char *service_type, const char *proto, uint16_t port);
 
 
 /**
@@ -356,8 +384,8 @@ esp_err_t mdns_service_port_set(const char * service_type, const char * proto, u
  *     - ESP_ERR_NOT_FOUND Service not found
  *     - ESP_ERR_NO_MEM memory error
  */
-esp_err_t mdns_service_port_set_for_host(const char * instance, const char * service_type, const char * proto, const char * hostname,
-                                         uint16_t port);
+esp_err_t mdns_service_port_set_for_host(const char *instance, const char *service_type, const char *proto, const char *hostname,
+        uint16_t port);
 
 /**
  * @brief  Replace all TXT items for service
@@ -375,7 +403,7 @@ esp_err_t mdns_service_port_set_for_host(const char * instance, const char * ser
  *     - ESP_ERR_NOT_FOUND Service not found
  *     - ESP_ERR_NO_MEM memory error
  */
-esp_err_t mdns_service_txt_set(const char * service_type, const char * proto, mdns_txt_item_t txt[], uint8_t num_items);
+esp_err_t mdns_service_txt_set(const char *service_type, const char *proto, mdns_txt_item_t txt[], uint8_t num_items);
 
 /**
  * @brief  Replace all TXT items for service with hostname
@@ -395,7 +423,7 @@ esp_err_t mdns_service_txt_set(const char * service_type, const char * proto, md
  *     - ESP_ERR_NOT_FOUND Service not found
  *     - ESP_ERR_NO_MEM memory error
  */
-esp_err_t mdns_service_txt_set_for_host(const char * instance, const char * service_type, const char * proto, const char * hostname,
+esp_err_t mdns_service_txt_set_for_host(const char *instance, const char *service_type, const char *proto, const char *hostname,
                                         mdns_txt_item_t txt[], uint8_t num_items);
 
 /**
@@ -414,7 +442,7 @@ esp_err_t mdns_service_txt_set_for_host(const char * instance, const char * serv
  *     - ESP_ERR_NOT_FOUND Service not found
  *     - ESP_ERR_NO_MEM memory error
  */
-esp_err_t mdns_service_txt_item_set(const char * service_type, const char * proto, const char * key, const char * value);
+esp_err_t mdns_service_txt_item_set(const char *service_type, const char *proto, const char *key, const char *value);
 
 /**
  * @brief  Set/Add TXT item for service TXT record
@@ -432,7 +460,7 @@ esp_err_t mdns_service_txt_item_set(const char * service_type, const char * prot
  *     - ESP_ERR_NO_MEM memory error
  */
 esp_err_t mdns_service_txt_item_set_with_explicit_value_len(const char *service_type, const char *proto,
-                                                            const char *key, const char *value, uint8_t value_len);
+        const char *key, const char *value, uint8_t value_len);
 
 /**
  * @brief  Set/Add TXT item for service TXT record with hostname
@@ -452,8 +480,8 @@ esp_err_t mdns_service_txt_item_set_with_explicit_value_len(const char *service_
  *     - ESP_ERR_NOT_FOUND Service not found
  *     - ESP_ERR_NO_MEM memory error
  */
-esp_err_t mdns_service_txt_item_set_for_host(const char * instance, const char * service_type, const char * proto, const char * hostname,
-                                             const char * key, const char * value);
+esp_err_t mdns_service_txt_item_set_for_host(const char *instance, const char *service_type, const char *proto, const char *hostname,
+        const char *key, const char *value);
 
 /**
  * @brief  Set/Add TXT item for service TXT record with hostname and txt value length
@@ -472,9 +500,9 @@ esp_err_t mdns_service_txt_item_set_for_host(const char * instance, const char *
  *     - ESP_ERR_NOT_FOUND Service not found
  *     - ESP_ERR_NO_MEM memory error
  */
-esp_err_t mdns_service_txt_item_set_for_host_with_explicit_value_len(const char * instance, const char *service_type, const char *proto,
-                                                                     const char *hostname, const char *key,
-                                                                     const char *value, uint8_t value_len);
+esp_err_t mdns_service_txt_item_set_for_host_with_explicit_value_len(const char *instance, const char *service_type, const char *proto,
+        const char *hostname, const char *key,
+        const char *value, uint8_t value_len);
 
 /**
  * @brief  Remove TXT item for service TXT record
@@ -489,7 +517,7 @@ esp_err_t mdns_service_txt_item_set_for_host_with_explicit_value_len(const char 
  *     - ESP_ERR_NOT_FOUND Service not found
  *     - ESP_ERR_NO_MEM memory error
  */
-esp_err_t mdns_service_txt_item_remove(const char * service_type, const char * proto, const char * key);
+esp_err_t mdns_service_txt_item_remove(const char *service_type, const char *proto, const char *key);
 
 /**
  * @brief  Remove TXT item for service TXT record with hostname
@@ -506,8 +534,8 @@ esp_err_t mdns_service_txt_item_remove(const char * service_type, const char * p
  *     - ESP_ERR_NOT_FOUND Service not found
  *     - ESP_ERR_NO_MEM memory error
  */
-esp_err_t mdns_service_txt_item_remove_for_host(const char * instance, const char * service_type, const char * proto, const char * hostname,
-                                                const char * key);
+esp_err_t mdns_service_txt_item_remove_for_host(const char *instance, const char *service_type, const char *proto, const char *hostname,
+        const char *key);
 
 /**
  * @brief  Add subtype for service.
@@ -525,7 +553,7 @@ esp_err_t mdns_service_txt_item_remove_for_host(const char * instance, const cha
  *     - ESP_ERR_NO_MEM memory error
  */
 esp_err_t mdns_service_subtype_add_for_host(const char *instance_name, const char *service_type, const char *proto,
-                                            const char *hostname, const char *subtype);
+        const char *hostname, const char *subtype);
 
 /**
  * @brief  Remove and free all services from mDNS server
@@ -546,7 +574,7 @@ esp_err_t mdns_service_remove_all(void);
  *     - ESP_ERR_INVALID_STATE  search has not finished
  *     - ESP_ERR_INVALID_ARG    pointer to search object is NULL
  */
-esp_err_t mdns_query_async_delete(mdns_search_once_t* search);
+esp_err_t mdns_query_async_delete(mdns_search_once_t *search);
 
 /**
  * @brief Get results from search pointer. Results available as a pointer to the output parameter.
@@ -562,7 +590,7 @@ esp_err_t mdns_query_async_delete(mdns_search_once_t* search);
  *      True if search has finished before or at timeout
  *      False if search timeout is over
  */
-bool mdns_query_async_get_results(mdns_search_once_t* search, uint32_t timeout, mdns_result_t ** results, uint8_t * num_results);
+bool mdns_query_async_get_results(mdns_search_once_t *search, uint32_t timeout, mdns_result_t **results, uint8_t *num_results);
 
 /**
  * @brief  Query mDNS for host or service asynchronousely.
@@ -580,7 +608,7 @@ bool mdns_query_async_get_results(mdns_search_once_t* search, uint32_t timeout, 
  *         NULL otherwise.
  */
 mdns_search_once_t *mdns_query_async_new(const char *name, const char *service_type, const char *proto, uint16_t type,
-                                         uint32_t timeout, size_t max_results, mdns_query_notify_t notifier);
+        uint32_t timeout, size_t max_results, mdns_query_notify_t notifier);
 
 /**
  * @brief  Generic mDNS query
@@ -602,8 +630,8 @@ mdns_search_once_t *mdns_query_async_new(const char *name, const char *service_t
  *     - ESP_ERR_NO_MEM         memory error
  *     - ESP_ERR_INVALID_ARG    timeout was not given
  */
-esp_err_t mdns_query_generic(const char * name, const char * service_type, const char * proto, uint16_t type,
-                             mdns_query_transmission_type_t transmission_type, uint32_t timeout, size_t max_results, mdns_result_t ** results);
+esp_err_t mdns_query_generic(const char *name, const char *service_type, const char *proto, uint16_t type,
+                             mdns_query_transmission_type_t transmission_type, uint32_t timeout, size_t max_results, mdns_result_t **results);
 
 /**
  * @brief  Query mDNS for host or service
@@ -625,14 +653,14 @@ esp_err_t mdns_query_generic(const char * name, const char * service_type, const
  *     - ESP_ERR_NO_MEM         memory error
  *     - ESP_ERR_INVALID_ARG    timeout was not given
  */
-esp_err_t mdns_query(const char * name, const char * service_type, const char * proto, uint16_t type, uint32_t timeout, size_t max_results, mdns_result_t ** results);
+esp_err_t mdns_query(const char *name, const char *service_type, const char *proto, uint16_t type, uint32_t timeout, size_t max_results, mdns_result_t **results);
 
 /**
  * @brief  Free query results
  *
  * @param  results      linked list of results to be freed
  */
-void mdns_query_results_free(mdns_result_t * results);
+void mdns_query_results_free(mdns_result_t *results);
 
 /**
  * @brief  Query mDNS for service
@@ -649,7 +677,7 @@ void mdns_query_results_free(mdns_result_t * results);
  *     - ESP_ERR_NO_MEM         memory error
  *     - ESP_ERR_INVALID_ARG    parameter error
  */
-esp_err_t mdns_query_ptr(const char * service_type, const char * proto, uint32_t timeout, size_t max_results, mdns_result_t ** results);
+esp_err_t mdns_query_ptr(const char *service_type, const char *proto, uint32_t timeout, size_t max_results, mdns_result_t **results);
 
 /**
  * @brief  Query mDNS for SRV record
@@ -666,7 +694,7 @@ esp_err_t mdns_query_ptr(const char * service_type, const char * proto, uint32_t
  *     - ESP_ERR_NO_MEM         memory error
  *     - ESP_ERR_INVALID_ARG    parameter error
  */
-esp_err_t mdns_query_srv(const char * instance_name, const char * service_type, const char * proto, uint32_t timeout, mdns_result_t ** result);
+esp_err_t mdns_query_srv(const char *instance_name, const char *service_type, const char *proto, uint32_t timeout, mdns_result_t **result);
 
 /**
  * @brief  Query mDNS for TXT record
@@ -683,7 +711,43 @@ esp_err_t mdns_query_srv(const char * instance_name, const char * service_type, 
  *     - ESP_ERR_NO_MEM         memory error
  *     - ESP_ERR_INVALID_ARG    parameter error
  */
-esp_err_t mdns_query_txt(const char * instance_name, const char * service_type, const char * proto, uint32_t timeout, mdns_result_t ** result);
+esp_err_t mdns_query_txt(const char *instance_name, const char *service_type, const char *proto, uint32_t timeout, mdns_result_t **result);
+
+/**
+ * @brief Look up delegated services.
+ *
+ * @param  instance         instance name (NULL for uncertain instance)
+ * @param  service_type     service type (_http, _ftp, etc)
+ * @param  proto            service protocol (_tcp, _udp)
+ * @param  max_results      maximum results to be collected
+ * @param  result           pointer to the result of the search
+ *
+ * @return
+ *     - ESP_OK success
+ *     - ESP_ERR_INVALID_STATE  mDNS is not running
+ *     - ESP_ERR_NO_MEM         memory error
+ *     - ESP_ERR_INVALID_ARG    parameter error
+ */
+esp_err_t mdns_lookup_delegated_service(const char *instance, const char *service_type, const char *proto, size_t max_results,
+                                        mdns_result_t **result);
+
+/**
+ * @brief Look up self hosted services.
+ *
+ * @param  instance         instance name (NULL for uncertain instance)
+ * @param  service_type     service type (_http, _ftp, etc)
+ * @param  proto            service protocol (_tcp, _udp)
+ * @param  max_results      maximum results to be collected
+ * @param  result           pointer to the result of the search
+ *
+ * @return
+ *     - ESP_OK success
+ *     - ESP_ERR_INVALID_STATE  mDNS is not running
+ *     - ESP_ERR_NO_MEM         memory error
+ *     - ESP_ERR_INVALID_ARG    parameter error
+ */
+esp_err_t mdns_lookup_selfhosted_service(const char *instance, const char *service_type, const char *proto, size_t max_results,
+        mdns_result_t **result);
 
 /**
  * @brief  Query mDNS for A record
@@ -698,7 +762,7 @@ esp_err_t mdns_query_txt(const char * instance_name, const char * service_type, 
  *     - ESP_ERR_NO_MEM         memory error
  *     - ESP_ERR_INVALID_ARG    parameter error
  */
-esp_err_t mdns_query_a(const char * host_name, uint32_t timeout, esp_ip4_addr_t * addr);
+esp_err_t mdns_query_a(const char *host_name, uint32_t timeout, esp_ip4_addr_t *addr);
 
 #if CONFIG_LWIP_IPV6
 /**
@@ -716,7 +780,7 @@ esp_err_t mdns_query_a(const char * host_name, uint32_t timeout, esp_ip4_addr_t 
  *     - ESP_ERR_NO_MEM         memory error
  *     - ESP_ERR_INVALID_ARG    parameter error
  */
-esp_err_t mdns_query_aaaa(const char * host_name, uint32_t timeout, esp_ip6_addr_t * addr);
+esp_err_t mdns_query_aaaa(const char *host_name, uint32_t timeout, esp_ip6_addr_t *addr);
 #endif
 
 
