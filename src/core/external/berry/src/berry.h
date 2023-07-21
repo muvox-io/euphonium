@@ -54,7 +54,7 @@ typedef BE_INTEGER bint; /**< bint */
 #if BE_USE_SINGLE_FLOAT != 0
   typedef float                 breal; /**< breal */
 #else
-typedef double breal;                  /**< breal */
+typedef double                  breal; /**< breal */
 #endif
 
 
@@ -115,7 +115,7 @@ enum berrorcode {
     #define BERRY_API           __declspec(dllexport)
   #endif
 #else /* other platforms */
-#define BERRY_API             extern
+  #define BERRY_API             extern
 #endif
 
 /**
@@ -472,9 +472,24 @@ typedef bclass_ptr bclass_array[];
  *
  */
 #if BE_DEBUG_VAR_INFO
-#define be_local_const_upval(ins, idx) { "", ins, idx }
+  #define be_local_const_upval(ins, idx) { "", ins, idx }
 #else
   #define be_local_const_upval(ins, idx) { ins, idx }
+#endif
+
+/**
+ * @def BE_DEBUG_SOURCE_FILE
+ * @brief conditional block in bproto depending on compilation options
+ *
+ */
+#if BE_DEBUG_SOURCE_FILE
+  #define PROTO_SOURCE_FILE(n)   \
+    ((bstring*) n),                                         /**< source */
+  #define PROTO_SOURCE_FILE_STR(n)  \
+    be_local_const_str(n##_str_source),                     /**< source */
+#else
+  #define PROTO_SOURCE_FILE(n)
+  #define PROTO_SOURCE_FILE_STR(n)
 #endif
 
 /**
@@ -483,9 +498,9 @@ typedef bclass_ptr bclass_array[];
  *
  */
 #if BE_DEBUG_RUNTIME_INFO
-#define PROTO_RUNTIME_BLOCK   \
-    NULL,     /**< varinfo */ \
-    0,        /**< nvarinfo */
+  #define PROTO_RUNTIME_BLOCK   \
+    NULL,     /**< lineinfo */ \
+    0,        /**< nlineinfo */
 #else
   #define PROTO_RUNTIME_BLOCK
 #endif
@@ -496,7 +511,7 @@ typedef bclass_ptr bclass_array[];
  *
  */
 #if BE_DEBUG_VAR_INFO
-#define PROTO_VAR_INFO_BLOCK   \
+  #define PROTO_VAR_INFO_BLOCK   \
     NULL,     /**< varinfo */  \
     0,        /**< nvarinfo */
 #else
@@ -517,16 +532,16 @@ typedef bclass_ptr bclass_array[];
     BE_IIF(_is_upval)(sizeof(_name##_upvals)/sizeof(bupvaldesc),0),   /**< nupvals */              \
     (_argc),                                                          /**< argc */                 \
     0,                                                                /**< varg */                 \
+    sizeof(_name##_code)/sizeof(uint32_t),                            /**< codesize */             \
+    BE_IIF(_is_const)(sizeof(_name##_ktab)/sizeof(bvalue),0),         /**< nconst */               \
+    BE_IIF(_is_subproto)(sizeof(_name##_subproto)/sizeof(bproto*),0), /**< proto */                \
     NULL,                                                             /**< bgcobject *gray */      \
     BE_IIF(_is_upval)((bupvaldesc*)&_name##_upvals,NULL),             /**< bupvaldesc *upvals */   \
     BE_IIF(_is_const)((bvalue*)&_name##_ktab,NULL),                   /**< ktab */                 \
     BE_IIF(_is_subproto)((struct bproto**)&_name##_subproto,NULL),    /**< bproto **ptab */        \
     (binstruction*) &_name##_code,                                    /**< code */                 \
     be_local_const_str(_name##_str_name),                             /**< name */                 \
-    sizeof(_name##_code)/sizeof(uint32_t),                            /**< codesize */             \
-    BE_IIF(_is_const)(sizeof(_name##_ktab)/sizeof(bvalue),0),         /**< nconst */               \
-    BE_IIF(_is_subproto)(sizeof(_name##_subproto)/sizeof(bproto*),0), /**< proto */                \
-    be_local_const_str(_name##_str_source),                           /**< source */               \
+    PROTO_SOURCE_FILE_STR(_name)                                      /**< source */               \
     PROTO_RUNTIME_BLOCK                                               /**< */                      \
     PROTO_VAR_INFO_BLOCK                                              /**< */                      \
   }
@@ -545,16 +560,16 @@ typedef bclass_ptr bclass_array[];
     BE_IIF(_has_upval)(sizeof(*_upvals)/sizeof(bupvaldesc),0),  /**< nupvals */              \
     (_argc),                                                    /**< argc */                 \
     (_varg),                                                    /**< varg */                 \
+    sizeof(*_code)/sizeof(binstruction),                        /**< codesize */             \
+    BE_IIF(_has_const)(sizeof(*_ktab)/sizeof(bvalue),0),        /**< nconst */               \
+    BE_IIF(_has_subproto)(sizeof(*_protos)/sizeof(bproto*),0),  /**< proto */                \
     NULL,                                                       /**< bgcobject *gray */      \
     (bupvaldesc*) _upvals,                                      /**< bupvaldesc *upvals */   \
     (bvalue*) _ktab,                                            /**< ktab */                 \
     (struct bproto**) _protos,                                  /**< bproto **ptab */        \
     (binstruction*) _code,                                      /**< code */                 \
     ((bstring*) _fname),                                        /**< name */                 \
-    sizeof(*_code)/sizeof(binstruction),                        /**< codesize */             \
-    BE_IIF(_has_const)(sizeof(*_ktab)/sizeof(bvalue),0),        /**< nconst */               \
-    BE_IIF(_has_subproto)(sizeof(*_protos)/sizeof(bproto*),0),  /**< proto */                \
-    ((bstring*) _source),                                       /**< source */               \
+    PROTO_SOURCE_FILE(_source)                                  /**< source */               \
     PROTO_RUNTIME_BLOCK                                         /**< */                      \
     PROTO_VAR_INFO_BLOCK                                        /**< */                      \
   }
@@ -1068,6 +1083,34 @@ BERRY_API bbool be_isclass(bvm *vm, int index);
  * @return true/false
  */
 BERRY_API bbool be_isinstance(bvm *vm, int index);
+
+/**
+ * @fn bool be_ismapinstance(bvm*, int)
+ * @note FFI function
+ * @brief value in virtual stack is instance
+ *
+ * This function returns whether the value indexed by the parameter index in the virtual stack is
+ * an instance of class map (or derived). If it is, it returns 1, otherwise it returns 0
+ *
+ * @param vm virtual machine instance virtual machine instance
+ * @param index value index
+ * @return true/false
+ */
+BERRY_API bbool be_ismapinstance(bvm *vm, int index);
+
+/**
+ * @fn bool be_ismapinstance(bvm*, int)
+ * @note FFI function
+ * @brief value in virtual stack is instance
+ *
+ * This function returns whether the value indexed by the parameter index in the virtual stack is
+ * an instance of class list (or derived). If it is, it returns 1, otherwise it returns 0
+ *
+ * @param vm virtual machine instance virtual machine instance
+ * @param index value index
+ * @return true/false
+ */
+BERRY_API bbool be_islistinstance(bvm *vm, int index);
 
 /**
  * @fn bool be_ismodule(bvm*, int)
@@ -2021,6 +2064,9 @@ BERRY_API void be_exit(bvm *vm, int status);
  * @param except
  * @param msg
  */
+#ifdef __GNUC__
+__attribute__((noreturn))
+#endif
 BERRY_API void be_raise(bvm *vm, const char *except, const char *msg);
 
 /**

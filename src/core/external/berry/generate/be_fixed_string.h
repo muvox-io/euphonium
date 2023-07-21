@@ -3,7 +3,7 @@
 static be_define_const_map_slots(m_libstring_map) {
     { be_const_key(count, 4), be_const_func(str_count) },
     { be_const_key(byte, 6), be_const_func(str_byte) },
-    { be_const_key(format, 8), be_const_func(str_format) },
+    { be_const_key(format, 8), be_const_func(be_str_format) },
     { be_const_key(split, -1), be_const_func(str_split) },
     { be_const_key(toupper, -1), be_const_func(str_toupper) },
     { be_const_key(char, -1), be_const_func(str_char) },

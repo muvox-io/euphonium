@@ -45,7 +45,10 @@ class HTTPRequest
     end
 
     def write_json(body, status)
-        var json_body = json.dump(body ? body : { 'status': 'error' })
+        if body == nil
+            raise 'write_json', 'body is nil'
+        end
+        var json_body = json.dump(body)
         self._write_response(self.conn_id, json_body, "application/json", status ? status : 200)
         self.did_write = true
     end
@@ -89,7 +92,9 @@ class HTTP
     def handle_event(req_data)
         var request = HTTPRequest(req_data['conn_id'])
         try
-            self.handlers[req_data['handler_id']](request)
+            var handler = self.handlers[req_data['handler_id']]
+            
+            handler(request)
         except .. as e,m
             print('exception in http handler: ' + e + ': ' + m)
             debug.traceback()

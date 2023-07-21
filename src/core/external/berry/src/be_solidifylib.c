@@ -31,7 +31,7 @@ extern const bclass be_class_map;
     be_vector_count(&(vm)->gbldesc.builtin.vlist)
 
 #ifndef INST_BUF_SIZE
-#define INST_BUF_SIZE   288
+#define INST_BUF_SIZE   768
 #endif
 
 #define logfmt(...)                                     \
@@ -136,7 +136,7 @@ static void m_solidify_map(bvm *vm, bbool str_literal, bmap * map, const char *c
 #if BE_INTGER_TYPE == 2
             logfmt("        { be_const_key_int(%lli, %i), ", node->key.v.i, key_next);
 #else
-            logfmt("        { be_const_key_int(%li, %i), ", node->key.v.i, key_next);
+            logfmt("        { be_const_key_int(%i, %i), ", node->key.v.i, key_next);
 #endif
             m_solidify_bvalue(vm, str_literal, &node->value, class_name, NULL, fout);
         } else {
@@ -179,14 +179,14 @@ static void m_solidify_bvalue(bvm *vm, bbool str_literal, bvalue * value, const 
 #if BE_INTGER_TYPE == 2
         logfmt("be_const_int(%lli)", var_toint(value));
 #else
-        logfmt("be_const_int(%li)", var_toint(value));
+        logfmt("be_const_int(%i)", var_toint(value));
 #endif
         break;
     case BE_INDEX:
 #if BE_INTGER_TYPE == 2
         logfmt("be_const_var(%lli)", var_toint(value));
 #else
-        logfmt("be_const_var(%li)", var_toint(value));
+        logfmt("be_const_var(%i)", var_toint(value));
 #endif
         break;
     case BE_REAL:
@@ -283,8 +283,12 @@ static void m_solidify_proto_inner_class(bvm *vm, bbool str_literal, bproto *pr,
     if (pr->nconst > 0) {
         for (int k = 0; k < pr->nconst; k++) {
             if (var_type(&pr->ktab[k]) == BE_CLASS) {
-                // output the class
-                m_solidify_subclass(vm, str_literal, (bclass*) var_toobj(&pr->ktab[k]), fout);
+                if ((k == 0) && (pr->varg & BE_VA_STATICMETHOD)) {
+                    // it is the implicit '_class' variable from a static method, don't dump the class
+                } else {
+                    // output the class
+                    m_solidify_subclass(vm, str_literal, (bclass*) var_toobj(&pr->ktab[k]), fout);
+                }
             }
         }
     }
@@ -416,6 +420,9 @@ static void m_solidify_closure(bvm *vm, bbool str_literal, bclosure *cl, const c
 static void m_solidify_subclass(bvm *vm, bbool str_literal, bclass *cl, void* fout)
 {
     const char * class_name = str(cl->name);
+
+    /* pre-declare class to support '_class' implicit variable */
+    logfmt("\nextern const bclass be_class_%s;\n", class_name);
 
     /* iterate on members to dump closures */
     if (cl->members) {
