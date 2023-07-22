@@ -323,13 +323,11 @@ void HTTPDispatcher::_writeTarResponse(int connId, std::string sourcePath,
 void HTTPDispatcher::_extractTar(int connId, std::string dstPath) {
   auto conn = this->bindConnections[connId];
 
-  this->ctx->storage->executeFromTask([&]() {
-    MGInputStreamAdapter streamAdapter(conn);
-    bell::BellTar::reader reader(streamAdapter);
-    std::string path = fmt::format("{}{}", ctx->rootPath, dstPath);
-    EUPH_LOG(debug, TAG, "Extracting tar to %s", path.c_str());
-    reader.extract_all_files(path);
-  });
+  MGInputStreamAdapter streamAdapter(conn);
+  bell::BellTar::reader reader(streamAdapter);
+  std::string path = fmt::format("{}{}", ctx->rootPath, dstPath);
+  EUPH_LOG(debug, TAG, "Extracting tar to %s", path.c_str());
+  reader.extract_all_files(path);
 }
 
 void HTTPDispatcher::_registerMDNS(std::string name, std::string type,
