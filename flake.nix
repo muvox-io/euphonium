@@ -34,6 +34,7 @@
           frontend = pkgs.euphonium.frontend;
           fs-esp32 = pkgs.euphonium.fs-esp32;
           app-esp32 = pkgs.euphonium.app-esp32;
+          euphoniumcli = pkgs.euphonium.euphoniumcli;
         };
 
         devShells = {
