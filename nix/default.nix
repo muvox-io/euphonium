@@ -67,7 +67,7 @@ rec {
 
     nativeBuildInputs = with pkgs; [ esp-idf fs-esp32 pkg-config bash python39 ];
 
-    # Patch nanopb shebangs to refer ot provided python
+    # Patch nanopb shebangs to refer to provided python
     postPatch = ''
       patchShebangs src/core/external/bell/external/nanopb/generator/*
     '';
@@ -100,5 +100,39 @@ rec {
       cp flash_args $out/
     '';
     dontConfigure = true;
+  };
+
+  # build target cli
+  euphoniumcli = stdenv.mkDerivation {
+    name = "euphoniumcli";
+    src = ../.;
+    dontConfigure = true;
+    nativeBuildInputs = with pkgs; [
+      avahi
+      avahi-compat
+      cmake
+      python3
+      python3Packages.protobuf
+      python3Packages.setuptools
+      unstable.mbedtls
+      portaudio
+      protobuf
+    ];
+    # Patch nanopb shebangs to refer to provided python
+    postPatch = ''
+      patchShebangs src/core/external/bell/external/nanopb/generator/*
+    '';
+    buildPhase = ''
+      cd src/targets/cli
+      cmake . -DCMAKE_SKIP_BUILD_RPATH=ON
+      make -j $NIX_BUILD_CORES
+    '';
+    installPhase = ''
+      mkdir -p $out/bin
+      cp euphoniumcli $out/bin
+
+      mkdir -p $out/lib
+      cp euphonium/bell/external/opencore-aacdec/libopencore-aacdec.so $out/lib
+    '';
   };
 }
