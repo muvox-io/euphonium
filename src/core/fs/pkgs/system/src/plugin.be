@@ -73,7 +73,7 @@ class Plugin
                     'source': self.name,
                 }
             )
-            print("asdf")
+          
             self.on_event(EVENT_CONFIG_UPDATED, self.state)
         end
     end
