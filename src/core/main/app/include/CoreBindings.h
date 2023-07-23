@@ -25,7 +25,6 @@ class CoreBindings {
   std::string _loadConfig(std::string pluginName);
   uint64_t _getTimestamp();
   bool _saveConfig(std::string pluginName, std::string cfg);
-  void _confirmOnboarding();
   void _setNativeVolume(int volume);
   void _triggerPause(bool isPaused);
   std::string _getMac();

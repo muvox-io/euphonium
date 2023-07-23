@@ -3,6 +3,16 @@
 #include "BellUtils.h"
 #include "CoreEvents.h"
 
+#include <filesystem>
+#include <fstream>
+#include <streambuf>
+
+
+#include <dirent.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+
 #ifdef ESP_PLATFORM
 #include "esp_system.h"
 #else
@@ -27,8 +37,6 @@ void CoreBindings::setupBindings() {
   ctx->vm->export_this("platform", this, &CoreBindings::_getPlatform, "core");
   ctx->vm->export_this("load", this, &CoreBindings::_loadScript, "core");
   ctx->vm->export_this("load_config", this, &CoreBindings::_loadConfig, "core");
-  ctx->vm->export_this("confirm_onboarding", this,
-                       &CoreBindings::_confirmOnboarding, "core");
   ctx->vm->export_this("save_config", this, &CoreBindings::_saveConfig, "core");
   ctx->vm->export_this("get_time_ms", this, &CoreBindings::_getTimeMs, "core");
   ctx->vm->export_this("trigger_pause", this, &CoreBindings::_triggerPause,
@@ -86,8 +94,10 @@ void CoreBindings::_loadScript(std::string pkg, std::string path) {
   EUPH_LOG(debug, TAG, "Loading script [%s]", scriptPath.c_str());
 
   try {
-    std::string scriptBody = this->ctx->storage->readFile(scriptPath);
 
+    std::ifstream t(scriptPath);
+    std::string scriptBody((std::istreambuf_iterator<char>(t)),
+                           std::istreambuf_iterator<char>());
     this->ctx->vm->execute_string(scriptBody, scriptPath);
   } catch (...) {
     EUPH_LOG(error, TAG, "Failed to load script: %s", scriptPath.c_str());
@@ -101,7 +111,13 @@ std::string CoreBindings::_loadConfig(std::string pluginName) {
   EUPH_LOG(debug, TAG, "Loading config for [%s]", pluginName.c_str());
 
   try {
-    std::string configBody = this->ctx->storage->readFile(configPath);
+    std::ifstream t(configPath);
+    if (t.fail()) {
+      EUPH_LOG(debug, TAG, "Config file not found: %s", configPath.c_str());
+      return "{}";
+    }
+    std::string configBody((std::istreambuf_iterator<char>(t)),
+                           std::istreambuf_iterator<char>());
     return configBody;
   } catch (...) {
     EUPH_LOG(error, TAG, "Failed to load config: %s", configPath.c_str());
@@ -117,17 +133,20 @@ bool CoreBindings::_saveConfig(std::string pluginName, std::string cfg) {
   EUPH_LOG(debug, TAG, "Saving config for [%s]", pluginName.c_str());
 
   try {
-    this->ctx->storage->writeFile(configPath, cfg);
+    std::ofstream t(configPath);
+    if (t.fail()) {
+      EUPH_LOG(error, TAG, "Failed to open config file: %s",
+               configPath.c_str());
+      return false;
+    }
+    t << cfg;
+    t.close();
     return true;
   } catch (...) {
     EUPH_LOG(error, TAG, "Failed to write config: %s", configPath.c_str());
   }
 
   return false;
-}
-
-void CoreBindings::_confirmOnboarding() {
-  this->ctx->storage->writeFile(".configured", "");
 }
 
 std::string CoreBindings::_getMac() {
@@ -154,16 +173,18 @@ void CoreBindings::_sleepMS(int ms) {
 }
 
 void CoreBindings::_deleteConfigFiles() {
-  std::vector<std::string> files =
-      this->ctx->storage->listFiles(fmt::format("{}/cfg/", ctx->rootPath));
-  for (auto file : files) {
-    // skip files not ending with .json
-    if (this->ctx->storage->strEndsWith(file, ".json") == false) {
+  std::string path = fmt::format("{}/cfg/", ctx->rootPath);
+  BELL_LOG(debug, TAG, "Deleting config files in: %s", path.c_str());
+   struct dirent *entry;
+    DIR *dir = opendir(path.c_str());
+  while ((entry = readdir(dir)) != NULL) {
+    std::string filename = entry->d_name;
+    if (filename == "." || filename == "..") {
       continue;
     }
-    auto fullPath = fmt::format("{}/cfg/{}", ctx->rootPath, file);
-    BELL_LOG(debug, TAG, "Deleting config file: %s", fullPath.c_str());
-    this->ctx->storage->deleteFile(fullPath);
+    std::string filepath = path + filename;
+   
+    remove(filepath.c_str());
   }
 }
 
@@ -177,7 +198,6 @@ void CoreBindings::_restart() {
 }
 
 void CoreBindings::_clearWifiConfig() {
-  this->ctx->storage->executeFromTask([this]() {
-     this->ctx->connectivity->clearConfig();
-  });
+  this->ctx->storage->executeFromTask(
+      [this]() { this->ctx->connectivity->clearConfig(); });
 }

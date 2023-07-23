@@ -4,7 +4,9 @@ class ResetRestorePlugin : Plugin
     self.theme_color = "#1DB954"
     self.display_name = "Reset & Restore"
     self.type = "system"
-    self.state = {}
+    self.state = {
+      'clearWifi': true,
+    }
     # self.fetch_config()
   end
   def make_form(ctx, state)
@@ -26,6 +28,11 @@ class ResetRestorePlugin : Plugin
       modal_group.paragraph("factoryResetConfirmText", {
         'text': "Are you sure you want to reset the device to factory defaults?",
       })
+      modal_group.checkbox_field('clearWifi', {
+        'label': "Clear WiFi credentials",
+        'default': true,
+        'group': 'mqtt'
+      })
       var confirm_button = modal_group.button_field("factoryResetConfirmButton", {
         'label': "Confirm",
         'buttonText': "Confirm",
@@ -41,7 +48,7 @@ class ResetRestorePlugin : Plugin
       if confirm_button.has_been("click")
         state.setitem("show_factory_reset_modal", nil)
         state.setitem("factory_reset_in_progress", true)
-        self.perform_factory_reset()
+        self.perform_factory_reset(state.find("clearWifi"))
         ctx.request_redraw() # we need to redraw the form to remove the modal, otherwise it will be stuck
       end
     end
@@ -68,9 +75,12 @@ class ResetRestorePlugin : Plugin
       core.restart();
     end
   end
-  def perform_factory_reset()
+  def perform_factory_reset(clearWifi)
     core.delete_config_files();
-    wifi.clear_config();
+    if clearWifi == true
+      wifi.clear_config();
+    end
+   
     core.restart();
   end
 end
