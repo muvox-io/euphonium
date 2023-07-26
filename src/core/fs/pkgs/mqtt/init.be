@@ -8,7 +8,7 @@ class MQTTPlugin : Plugin
   var current_status
   def init()
       self.apply_default_values()
-
+    
       self.name = "mqtt"
       self.theme_color = "#1DB954"
       self.display_name = "MQTT"
@@ -20,26 +20,24 @@ class MQTTPlugin : Plugin
       self.current_status = MQTT_STATE_DISABLED
     
       events.register_native("mqtt_publish_received", def (data)
-        print(data)
         if self.subscriptions.find(data["topic"]) != nil
+          var mqtt_callback = self.subscriptions[data["topic"]]
           # call subscription with received data
-          self.subscriptions[data["topic"]](data["message"])
+          mqtt_callback(data["message"])
         end
       end)
   end
 
   def make_form(ctx, state)
-      
       var group = ctx.create_group('mqtt', { 'label': 'General' })
 
       group.checkbox_field('enable', {
           'label': "Connect to MQTT broker",
-          'default': "false",
+          'default': false,
           'group': 'mqtt'
       })
 
       if state.find('enable') != nil && state['enable']
-        
         group.text_field('brokerUrl', {
           'label': "Broker host url",
           'default': "",
@@ -51,18 +49,26 @@ class MQTTPlugin : Plugin
           'default': 1883,
           'group': 'mqtt'
         })
-        
-        group.text_field('username', {
-          'label': "Username",
-          'default': "",
+
+        group.checkbox_field('authorize', {
+          'label': "Authorize with broker",
+          'default': false,
           'group': 'mqtt'
         })
 
-        group.text_field('password', {
-          'label': "Password",
-          'default': "",
-          'group': 'mqtt'
-        })
+        if state.find('authorize') != nil && state['authorize']
+          group.text_field('username', {
+            'label': "Username",
+            'default': "",
+            'group': 'mqtt'
+          })
+
+          group.text_field('password', {
+            'label': "Password",
+            'default': "",
+            'group': 'mqtt'
+          })
+        end
       end
       self.add_apply_button(ctx, state)
   end
@@ -90,11 +96,20 @@ class MQTTPlugin : Plugin
     if event == EVENT_CONFIG_UPDATED || event == EVENT_PLUGIN_INIT
       if self.state.find("enable") != nil && self.state.find("enable")
         
-        if self.state.find("brokerUrl") == nil || self.state.find("brokerPort") == nil || self.state.find("username") == nil || self.state.find("password") == nil
+        if self.state.find("brokerUrl") == nil
           self.current_status = MQTT_STATE_INVALID_CONFIG
           return
         end
-        self._connect(self.state["brokerUrl"], int(self.state["brokerPort"]), self.state["username"], self.state["password"])
+
+        mqtt_username = ""
+        mqtt_password = ""
+
+        if self.state.find("authorize") != nil && self.state["authorize"]
+          mqtt_username = self.state["username"]
+          mqtt_password = self.state["password"]
+        end
+
+        self._connect(self.state["brokerUrl"], int(self.state["brokerPort"]), mqtt_username, mqtt_password)
         self.setup_basic_handlers()
       end
       if self.state.find("enable") != nil && !self.state.find("enable")

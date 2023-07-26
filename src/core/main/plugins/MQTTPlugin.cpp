@@ -59,6 +59,11 @@ void MQTTPlugin::runTask() {
 
       EUPH_LOG(info, TASK, "Broker connected, waiting for messages");
 
+      // Report notification to the UI
+      this->ctx->eventBus->postEvent(std::make_unique<NotificationEvent>(
+          NotificationEvent::Type::INFO, "mqtt", "MQTT broker connected",
+          this->host));
+
       // Holds incoming message request
       MessageRequest request;
 
