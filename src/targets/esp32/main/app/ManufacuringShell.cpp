@@ -12,7 +12,7 @@ using namespace euph;
 #include "sdkconfig.h"
 
 ManufacuringShell::ManufacuringShell(std::shared_ptr<euph::EventBus> eventBus)
-    : bell::Task("ManufacuringShell", 2 * 1024, 0, 0) {
+    : bell::Task("ManufacuringShell", 3 * 1024, 0, 0) {
   this->eventBus = eventBus;
   startTask();
 }

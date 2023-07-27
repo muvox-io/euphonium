@@ -1,5 +1,7 @@
 #include "AudioTask.h"
+#include <fstream>
 #include <memory>
+#include <ostream>
 #include "CoreEvents.h"
 
 #include "AudioPipeline.h"
@@ -20,10 +22,18 @@ AudioTask::AudioTask(std::shared_ptr<euph::Context> ctx,
   // Try to load DSP pipeline;
   std::string defaultPipeline = "{ \"transforms\": [] }";
 
-  try {
-    defaultPipeline =
-        this->ctx->storage->readFile(this->ctx->rootPath + this->pipelinePath);
-  } catch (...) {}
+  // Load pipeline file
+  auto pipelineFile = std::ifstream(this->ctx->rootPath + this->pipelinePath);
+  if (pipelineFile.is_open()) {
+    // read file size
+    pipelineFile.seekg(0, std::ios::end);
+
+    // Resize string holding pipeline info to file size
+    defaultPipeline.resize(pipelineFile.tellg());
+    pipelineFile.seekg(0, std::ios::beg);
+    pipelineFile.read(&defaultPipeline[0], defaultPipeline.size());
+    pipelineFile.close();
+  }
 
   this->loadDSPFromString(defaultPipeline);
 
@@ -88,8 +98,10 @@ void AudioTask::loadDSPFromString(const std::string& str) {
   cJSON_Delete(root);
 
   try {
-    this->ctx->storage->writeFile(this->ctx->rootPath + this->pipelinePath,
-                                  str);
+    auto pipelineFile = std::ofstream(this->ctx->rootPath + this->pipelinePath,
+                                      std::ios::trunc);
+    pipelineFile << str;
+    pipelineFile.close();
   } catch (...) {
     EUPH_LOG(error, TASK, "Failed to write pipeline to disk");
   }

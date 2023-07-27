@@ -198,6 +198,7 @@ void CoreBindings::_restart() {
 }
 
 void CoreBindings::_clearWifiConfig() {
-  this->ctx->storage->executeFromTask(
-      [this]() { this->ctx->connectivity->clearConfig(); });
+  // @TODO bring back
+  // this->ctx->storage->executeFromTask(
+  //     [this]() { this->ctx->connectivity->clearConfig(); });
 }

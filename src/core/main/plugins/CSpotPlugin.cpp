@@ -128,6 +128,7 @@ void CSpotPlugin::handleCSpotEvent(
     std::unique_ptr<cspot::SpircHandler::Event> event) {
   switch (event->eventType) {
     case cspot::SpircHandler::EventType::PLAY_PAUSE:
+      
       if (std::get<bool>(event->data)) {
         this->ctx->playbackController->pause();
       } else {

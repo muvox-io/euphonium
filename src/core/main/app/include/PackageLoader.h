@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ghc_filesystem.h>
 #include <fmt/core.h>
 #include <fstream>
 #include <memory>
@@ -25,7 +26,6 @@ class PackageLoader {
    */
   void loadValidPackages();
 
-
   /**
    * @brief Loads a package under a given hook into the VM
    * 
@@ -37,7 +37,7 @@ class PackageLoader {
   const std::string TAG = "package-loader";
   std::shared_ptr<euph::Context> ctx;
   std::vector<PackageInfo> packages;
-  
+
   std::vector<std::string> validHooks = {"system", "plugin"};
 };
 }  // namespace euph

@@ -49,24 +49,22 @@ void Core::initialize() {
   // Register HTTP handlers for OTA, update packages if necessary
   this->otaHandler->initialize(this->http->getServer());
 
-  // // Check if contains X509 SSL bundle
-  // this->ctx->storage->executeFromTask([this]() {
-  //   std::ifstream bundleFile(this->ctx->rootPath +
-  //                            "/pkgs/system/x509_crt_bundle");
+  // Check if contains X509 SSL bundle
 
-  //   if (bundleFile.is_open()) {
-  //     EUPH_LOG(info, this->TAG, "SSL bundle read successfully, attaching");
-  //     std::vector<uint8_t> bundleContents(
-  //         (std::istreambuf_iterator<char>(bundleFile)),
-  //         std::istreambuf_iterator<char>());
+  std::ifstream bundleFile(this->ctx->rootPath +
+                           "/pkgs/system/x509_crt_bundle");
 
-  //     bell::X509Bundle::init(bundleContents.data(), bundleContents.size());
-  //   } else {
-  //     EUPH_LOG(
-  //         info, this->TAG,
-  //         "WARNING: SSL bundle not found, booting without SSL verification");
-  //   }
-  // });
+  if (bundleFile.is_open()) {
+    EUPH_LOG(info, this->TAG, "SSL bundle read successfully, attaching");
+    std::vector<uint8_t> bundleContents(
+        (std::istreambuf_iterator<char>(bundleFile)),
+        std::istreambuf_iterator<char>());
+
+    bell::X509Bundle::init(bundleContents.data(), bundleContents.size());
+  } else {
+    EUPH_LOG(info, this->TAG,
+             "WARNING: SSL bundle not found, booting without SSL verification");
+  }
 
   // For handling source switching
   this->ctx->playbackController->playbackLockedHandler =
@@ -138,7 +136,9 @@ void Core::initializePlugins() {
   connectivity->displayNameLoaded(this->ctx->displayName);
 
   // Only initialize plugins when connected completely
-  if ((connectivity->data.state == Connectivity::State::CONNECTED || connectivity->data.state == Connectivity::State::CONNECTED_NO_INTERNET ) &&
+  if ((connectivity->data.state == Connectivity::State::CONNECTED ||
+       connectivity->data.state ==
+           Connectivity::State::CONNECTED_NO_INTERNET) &&
       !pluginsInitialized) {
     // Initialize plugins
     auto event = std::make_unique<GenericVmEvent>("plugins_ready");

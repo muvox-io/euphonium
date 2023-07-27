@@ -14,7 +14,7 @@
 
 namespace euph {
 
-class HTTPDispatcher: public EventSubscriber {
+class HTTPDispatcher : public EventSubscriber {
 
  private:
   const std::string TAG = "http";
@@ -54,6 +54,12 @@ class HTTPDispatcher: public EventSubscriber {
   std::mutex httpRequestMutex;
 
   std::shared_ptr<bell::BellHTTPServer> server;
+
+  // Tries to write a file under provided path to the connection, returns true if the file was found and written
+  bool tryToServeFile(struct mg_connection* conn, std::string path);
+
+  // Returns true if the provided string ends with the provided suffix
+  bool strEndsWith(const std::string& str, const std::string& suffix);
 
  public:
   HTTPDispatcher(std::shared_ptr<euph::Context> ctx);
@@ -125,6 +131,7 @@ class HTTPDispatcher: public EventSubscriber {
   void _writeResponse(int connId, std::string body, std::string contentType,
                       int statusCode);
   void _broadcastWebsocket(std::string body);
+
   /**
    * @brief Read files from a directory and respond with a tar file
    * 
@@ -132,7 +139,8 @@ class HTTPDispatcher: public EventSubscriber {
    * @param sourcePath 
    * @param filename 
    */
-  void _writeTarResponse(int connId, std::string sourcePath, std::string filename);
+  void _writeTarResponse(int connId, std::string sourcePath,
+                         std::string filename);
 
   /**
    * @brief Extract a tar file from the request body to a directory
@@ -142,7 +150,6 @@ class HTTPDispatcher: public EventSubscriber {
    */
   void _extractTar(int connId, std::string dstPath);
 
-  
   berry::map _readRouteParams(int connId);
   std::string _readBody(int connId);
   size_t _readContentLength(int connId);

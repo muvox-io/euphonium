@@ -10,9 +10,13 @@ set(CSPOT_EXTERNAL_BELL "bell"
   CACHE INTERNAL ""
 )
 
+# External libraries
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/bell ${CMAKE_CURRENT_BINARY_DIR}/bell)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/berry ${CMAKE_CURRENT_BINARY_DIR}/berry)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/cspot/cspot ${CMAKE_CURRENT_BINARY_DIR}/cspot)
+
+# Include external header libraries
+include_directories("external/filesystem")
 
 # Source glob
 file(GLOB SOURCES "main/app/*.cpp" "main/app/*.c" "main/plugins/*.cpp" "main/plugins/*.c" "main/multiroom/*.c" "main/multiroom/*.cpp")
@@ -38,10 +42,10 @@ include_directories("main/multiroom/include")
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 if(ESP_PLATFORM)
-  list(APPEND EXTRA_REQ_LIBS "idf::app_update")
+  list(APPEND EXTRA_REQ_LIBS "idf::app_update" "idf::esp_littlefs")
 endif()
 
 add_library(euphonium STATIC ${SOURCES})
 
 target_link_libraries(euphonium PUBLIC cspot bell berry ${EXTRA_REQ_LIBS})
-target_include_directories(euphonium PUBLIC "main/app/include" "main/plugins/include" "main/multiroom/include" "protos" bell cspot ${EXTRA_REQ_LIBS} ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(euphonium PUBLIC "external/filesystem" "main/app/include" "main/plugins/include" "main/multiroom/include" "protos" bell cspot ${EXTRA_REQ_LIBS} ${CMAKE_CURRENT_BINARY_DIR})

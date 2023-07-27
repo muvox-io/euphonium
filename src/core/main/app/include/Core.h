@@ -26,7 +26,6 @@
 #include "PackageLoader.h"
 #include "RadioPlugin.h"
 #include "SnapcastPlugin.h"
-#include "StorageAccessor.h"
 #include "SystemPlugin.h"
 
 namespace euph {

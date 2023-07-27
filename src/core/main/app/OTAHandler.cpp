@@ -74,60 +74,62 @@ static int fieldGet(const char* key, const char* value, size_t valuelen,
       }
     }
 #ifdef ESP_PLATFORM
-    if (context->type == OTAHandler::OTAUploadContext::Type::APP) {
-      esp_err_t err = ESP_OK;
+    // if (context->type == OTAHandler::OTAUploadContext::Type::APP) {
+    //   esp_err_t err = ESP_OK;
 
-      if (context->otaBuffer.size() == 0) {
-        // Requires access to Flash, run from storage task
-        context->ctx->storage->executeFromTask([&context, &err]() {
-          // OTA update start
-          if (context->currentSize == 0) {
-            const esp_partition_t* updatePartition =
-                esp_ota_get_next_update_partition(NULL);
-            assert(updatePartition != NULL);
+    //   if (context->otaBuffer.size() == 0) {
+    //     // Requires access to Flash, run from storage task
+    //     // @TODO: -> OTA Logic will get moved to a separate task, along with the new API integration
+    //     // context->ctx->storage->executeFromTask([&context, &err]() {
+    //     //   // OTA update start
+    //     //   if (context->currentSize == 0) {
+    //     //     const esp_partition_t* updatePartition =
+    //     //         esp_ota_get_next_update_partition(NULL);
+    //     //     assert(updatePartition != NULL);
 
-            err = esp_ota_begin(updatePartition, OTA_WITH_SEQUENTIAL_WRITES,
-                                &context->otaUpdateHandle);
-            if (err != ESP_OK) {
-              esp_ota_abort(context->otaUpdateHandle);
-            }
-          }
-        });
-      }
+    //     //     err = esp_ota_begin(updatePartition, OTA_WITH_SEQUENTIAL_WRITES,
+    //     //                         &context->otaUpdateHandle);
+    //     //     if (err != ESP_OK) {
+    //     //       esp_ota_abort(context->otaUpdateHandle);
+    //     //     }
+    //     //   }
+    //     // });
+    //   }
 
-      context->otaBuffer.insert(context->otaBuffer.end(), value,
-                                value + valuelen);
+    //   context->otaBuffer.insert(context->otaBuffer.end(), value,
+    //                             value + valuelen);
 
-      if (context->otaBuffer.capacity() - context->otaBuffer.size() <
-          valuelen) {
-        // Requires access to Flash, run from storage task
-        context->ctx->storage->executeFromTask([&context, &err]() {
-          EUPH_LOG(info, "OTA", "About to write %d bytes",
-                   context->otaBuffer.size());
-          err = esp_ota_write(context->otaUpdateHandle, &context->otaBuffer[0],
-                              context->otaBuffer.size());
-          if (err != ESP_OK) {
-            esp_ota_abort(context->otaUpdateHandle);
-          } else {
-            EUPH_LOG(info, "OTA", "Written, %d bytes", context->currentSize);
-            context->otaBuffer.clear();
-          }
-        });
-      }
+    //   if (context->otaBuffer.capacity() - context->otaBuffer.size() <
+    //       valuelen) {
+    //     // @TODO: -> OTA Logic will get moved to a separate task, along with the new API integration
+    //     // // Requires access to Flash, run from storage task
+    //     // EUPH_LOG(info, "OTA", "About to write %d bytes",
+    //     //          context->otaBuffer.size());
+    //     // err = esp_ota_write(context->otaUpdateHandle, &context->otaBuffer[0],
+    //     //                     context->otaBuffer.size());
+    //     // if (err != ESP_OK) {
+    //     //   esp_ota_abort(context->otaUpdateHandle);
+    //     // } else {
+    //     //   EUPH_LOG(info, "OTA", "Written, %d bytes", context->currentSize);
+    //     //   context->otaBuffer.clear();
+    //     // }
+    //   }
 
-      if (err != ESP_OK) {
-        // Abort the upload
-        return MG_FORM_FIELD_HANDLE_ABORT;
-      }
-    }
+    //   if (err != ESP_OK) {
+    //     // Abort the upload
+    //     return MG_FORM_FIELD_HANDLE_ABORT;
+    //   }
+    // }
 #endif
 
-    euphCtx->storage->writeFileBytes(
+    std::ofstream pkgFile(
         euphCtx->rootPath + DEFAULT_PKG_UPDATE_PATH,
-        std::vector<uint8_t>(value, value + valuelen),
-        context->currentSize > 0);
+        context->currentSize > 0 ? std::ios::app : std::ios::trunc);
+
+    pkgFile.write(value, valuelen);
 
     context->currentSize += valuelen;
+
     return MG_FORM_FIELD_HANDLE_GET;
   }
 
@@ -136,25 +138,30 @@ static int fieldGet(const char* key, const char* value, size_t valuelen,
 
 std::string OTAHandler::validatePackage() {
   // Needs to be ran from the storage task's thread
-  this->ctx->storage->executeFromTask([this]() {
-    std::ifstream pkgArchive(this->ctx->rootPath + DEFAULT_PKG_UPDATE_PATH,
-                             std::ios::binary);
+  std::ifstream pkgArchive(this->ctx->rootPath + DEFAULT_PKG_UPDATE_PATH,
+                           std::ios::binary);
+
+  if (pkgArchive.is_open()) {
     bell::BellTar::reader tarArchive(pkgArchive);
     // Remove directory if it exists
-
     tarArchive.extract_all_files(ctx->rootPath + DEFAULT_PKG_EXTRACT_PATH);
 
     std::ifstream manifestFile(
         ctx->rootPath + DEFAULT_PKG_EXTRACT_PATH + "/manifest.json",
         std::ios::binary);
-  });
-  // Unpack the package
-  ctx->storage->extractTar(ctx->rootPath + DEFAULT_PKG_UPDATE_PATH,
-                           ctx->rootPath + DEFAULT_PKG_EXTRACT_PATH);
 
-  // Ensure the manifest exists
-  return this->ctx->storage->readFile(ctx->rootPath + DEFAULT_PKG_EXTRACT_PATH +
-                                      "/manifest.json");
+    if (!manifestFile.is_open()) {
+      return "";
+    }
+
+    // Read manifest file into std::stringstream
+    std::stringstream manifestBuffer;
+    manifestBuffer << manifestFile.rdbuf();
+
+    return manifestBuffer.str();
+  }
+
+  return "";
 }
 
 void OTAHandler::initialize(std::shared_ptr<bell::BellHTTPServer> server) {
@@ -185,41 +192,41 @@ void OTAHandler::initialize(std::shared_ptr<bell::BellHTTPServer> server) {
         }
 
 #ifdef ESP_PLATFORM
-        if (context->type == OTAUploadContext::Type::APP) {
-          // OTA update end, validate and restart. This requires access to flash, so we need to run it from storage's task
-          this->ctx->storage->executeFromTask([&context, &server, &conn]() {
-            esp_ota_write(context->otaUpdateHandle, context->otaBuffer.data(),
-                          context->otaBuffer.size());
-            auto err = esp_ota_end(context->otaUpdateHandle);
-            if (err != ESP_OK) {
-              if (err == ESP_ERR_OTA_VALIDATE_FAILED) {
-                EUPH_LOG(info, "OTA",
-                         "Image validation failed, image is corrupted");
-              } else {
-                EUPH_LOG(info, "OTA", "esp_ota_end failed (%s)!",
-                         esp_err_to_name(err));
-              }
-              mg_printf(conn, "{\"status\": \"error\"}");
-              return server->makeEmptyResponse();
-            }
-            const esp_partition_t* updatePartition =
-                esp_ota_get_next_update_partition(NULL);
-            assert(updatePartition != NULL);
+        // if (context->type == OTAUploadContext::Type::APP) {
+        //   // OTA update end, validate and restart. This requires access to flash, so we need to run it from storage's task
+        //   // this->ctx->storage->executeFromTask([&context, &server, &conn]() {
+        //   //   esp_ota_write(context->otaUpdateHandle, context->otaBuffer.data(),
+        //   //                 context->otaBuffer.size());
+        //   //   auto err = esp_ota_end(context->otaUpdateHandle);
+        //   //   if (err != ESP_OK) {
+        //   //     if (err == ESP_ERR_OTA_VALIDATE_FAILED) {
+        //   //       EUPH_LOG(info, "OTA",
+        //   //                "Image validation failed, image is corrupted");
+        //   //     } else {
+        //   //       EUPH_LOG(info, "OTA", "esp_ota_end failed (%s)!",
+        //   //                esp_err_to_name(err));
+        //   //     }
+        //   //     mg_printf(conn, "{\"status\": \"error\"}");
+        //   //     return server->makeEmptyResponse();
+        //   //   }
+        //   //   const esp_partition_t* updatePartition =
+        //   //       esp_ota_get_next_update_partition(NULL);
+        //   //   assert(updatePartition != NULL);
 
-            err = esp_ota_set_boot_partition(updatePartition);
-            if (err != ESP_OK) {
-              EUPH_LOG(info, "OTA", "esp_ota_set_boot_partition failed (%s)!",
-                       esp_err_to_name(err));
-              mg_printf(conn, "{\"status\": \"error\"}");
-              return server->makeEmptyResponse();
-            } else {
-              mg_printf(conn, "{\"status\": \"ok\"}");
-            }
+        //   //   err = esp_ota_set_boot_partition(updatePartition);
+        //   //   if (err != ESP_OK) {
+        //   //     EUPH_LOG(info, "OTA", "esp_ota_set_boot_partition failed (%s)!",
+        //   //              esp_err_to_name(err));
+        //   //     mg_printf(conn, "{\"status\": \"error\"}");
+        //   //     return server->makeEmptyResponse();
+        //   //   } else {
+        //   //     mg_printf(conn, "{\"status\": \"ok\"}");
+        //   //   }
 
-            EUPH_LOG(info, "OTA", "OTA success, rebooting...");
-            esp_restart();
-          });
-        }
+        //   //   EUPH_LOG(info, "OTA", "OTA success, rebooting...");
+        //   //   esp_restart();
+        //   // });
+        // }
 #endif
         return server->makeEmptyResponse();
       });
@@ -255,12 +262,12 @@ void OTAHandler::initialize(std::shared_ptr<bell::BellHTTPServer> server) {
         return server->makeEmptyResponse();
       });
 
-  // Check if contains update manifest
-  ctx->storage->executeFromTask([this]() {
-    std::ifstream updateManifest(this->ctx->rootPath + "/update.json");
+  // // Check if contains update manifest
+  // ctx->storage->executeFromTask([this]() {
+  //   std::ifstream updateManifest(this->ctx->rootPath + "/update.json");
 
-    if (updateManifest.is_open()) {
-      EUPH_LOG(info, this->TAG, "OTA manifest detected");
-    }
-  });
+  //   if (updateManifest.is_open()) {
+  //     EUPH_LOG(info, this->TAG, "OTA manifest detected");
+  //   }
+  // });
 }

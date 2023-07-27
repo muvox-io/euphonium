@@ -14,7 +14,6 @@ class Connectivity;
 #include "BerryBind.h"
 #include "Connectivity.h"
 #include "EventBus.h"
-#include "StorageAccessor.h"
 
 /**
  * @brief The main context of the application.
@@ -22,7 +21,6 @@ class Connectivity;
  * 
  * Notably:
  * - buffer -> Instance of CentralAudioBuffer
- * - storage -> Instance of the StorageAccessor, thats should be used to access the filesystem
  * - vm -> Instance of the VM, that should be used to run the scripts
  * - eventBus -> Instance of the EventBus, that should be used to communicate between the different parts of the system
 */
@@ -91,7 +89,6 @@ struct PlaybackController {
 };
 
 struct Context {
-  std::shared_ptr<euph::StorageAccessor> storage;
   std::shared_ptr<berry::VmState> vm;
   std::shared_ptr<euph::EventBus> eventBus;
   std::shared_ptr<bell::CentralAudioBuffer> audioBuffer;
@@ -108,7 +105,6 @@ struct Context {
    */
   static std::shared_ptr<euph::Context> create() {
     auto ctx = std::make_shared<euph::Context>();
-    ctx->storage = std::make_shared<euph::StorageAccessor>();
     ctx->vm = std::make_shared<berry::VmState>();
     ctx->eventBus = std::make_shared<euph::EventBus>();
     ctx->audioBuffer = std::make_shared<bell::CentralAudioBuffer>(128);
@@ -119,7 +115,6 @@ struct Context {
   static std::shared_ptr<euph::Context> createWithBus(
       std::shared_ptr<euph::EventBus> bus) {
     auto ctx = std::make_shared<euph::Context>();
-    ctx->storage = std::make_shared<euph::StorageAccessor>();
     ctx->vm = std::make_shared<berry::VmState>();
     ctx->audioBuffer = std::make_shared<bell::CentralAudioBuffer>(128);
     ctx->playbackController = std::make_shared<euph::PlaybackController>();

@@ -1,5 +1,6 @@
 #include "HTTPDispatcher.h"
 #include <fmt/core.h>
+#include <fstream>
 #include <memory>
 #include <string_view>
 #include "BellHTTPServer.h"
@@ -10,6 +11,7 @@
 #include "MDNSService.h"
 #include "MGStreamAdapter.h"
 #include "civetweb.h"
+#include "ghc_filesystem.h"
 
 using namespace euph;
 
@@ -149,6 +151,68 @@ std::shared_ptr<bell::BellHTTPServer> HTTPDispatcher::getServer() {
   return this->server;
 }
 
+bool HTTPDispatcher::strEndsWith(const std::string& fullString,
+                                 const std::string& suffix) {
+  if (fullString.length() >= suffix.length()) {
+    return (0 == fullString.compare(fullString.length() - suffix.length(),
+                                    suffix.length(), suffix));
+  } else {
+    return false;
+  }
+}
+
+bool HTTPDispatcher::tryToServeFile(struct mg_connection* conn,
+                                    std::string path) {
+  // Prefix of package in the fs
+  std::string webPrefix =
+      fmt::format("{}/pkgs/web/dist/{}", ctx->rootPath, path);
+
+  std::string contentType = "text/plain";
+
+  // Deduce content-type
+  if (strEndsWith(webPrefix, ".html")) {
+    contentType = "text/html";
+  } else if (strEndsWith(webPrefix, ".js")) {
+    contentType = "application/javascript";
+  } else if (strEndsWith(webPrefix, ".css")) {
+    contentType = "text/css";
+  }
+
+  // Frontend is packed into .gz files, that are served with gzip encoding, even if client requests path without .gz
+  bool isGzip = false;
+
+  auto assetFile = std::ifstream(webPrefix);
+  if (!assetFile.is_open()) {
+    // If the file doesn't exist, try to check if a .gz version exists
+    webPrefix = fmt::format("{}/pkgs/web/dist/{}.gz", ctx->rootPath, path);
+    assetFile = std::ifstream(webPrefix);
+    isGzip = true;
+  }
+
+  if (!assetFile.is_open()) {
+    return false;
+  }
+
+  // Get the file size
+  assetFile.seekg(0, std::ios::end);
+  auto fileSize = assetFile.tellg();
+  assetFile.seekg(0, std::ios::beg);
+
+  // Write the headers
+  std::string extraHeaders = isGzip ? "Content-Encoding: gzip\r\n" : "";
+  mg_printf(conn,
+            "HTTP/1.1 %d OK\r\nContent-Type: "
+            "%s\r\n%sContent-Length: %d\r\nConnection: close\r\n\r\n",
+            200, contentType.c_str(), extraHeaders.c_str(), (int)fileSize);
+
+  // Transfer the file
+  MGStreamAdapter streamAdapter(conn);
+  streamAdapter << assetFile.rdbuf();
+  streamAdapter.flush();
+
+  return true;
+}
+
 void HTTPDispatcher::serveWeb(struct mg_connection* conn) {
   const char* hostHeader = mg_get_header(conn, "Host");
   if (hostHeader != nullptr && this->isRunningAPMode) {
@@ -176,11 +240,14 @@ void HTTPDispatcher::serveWeb(struct mg_connection* conn) {
   }
 
   EUPH_LOG(info, TAG, "Web access URI %s", filePath.c_str());
+  bool found = this->tryToServeFile(conn, filePath);
 
-  // Prefix of package in the fs
-  std::string webPrefix =
-      fmt::format("{}/pkgs/web/dist/{}", ctx->rootPath, filePath);
-  this->ctx->storage->readFileToSocket(webPrefix, conn);
+  if (!found) {
+    mg_printf(conn,
+              "HTTP/1.1 404 Not found\r\nContent-Type: text/html"
+              "\r\nConnection: close\r\n\r\n"
+              "404 not found");
+  }
 }
 
 void HTTPDispatcher::setupBindings() {
@@ -310,13 +377,23 @@ void HTTPDispatcher::_writeTarResponse(int connId, std::string sourcePath,
   bell::BellTar::writer writer(streamAdapter);
   //TODO: support directories
   auto dirPath = fmt::format("{}{}/", ctx->rootPath, sourcePath);
-  std::vector<std::string> files = this->ctx->storage->listFiles(dirPath);
-  for (auto file : files) {
-    auto fullPath = dirPath + file;
-    std::vector<uint8_t> data = this->ctx->storage->readFileBinary(fullPath);
-    writer.put(file, reinterpret_cast<char*>(data.data()), data.size());
+
+  for (const auto& entry : ghc::filesystem::directory_iterator(dirPath)) {
+    if (entry.is_directory()) {
+      continue;
+    }
+
+    std::vector<char> fileBuffer;
+    std::ifstream fileStream(entry.path());
+
+    std::copy(std::istream_iterator<char>(fileStream),
+              std::istream_iterator<char>(), std::back_inserter(fileBuffer));
+
+    writer.put(entry.path().filename(),
+               reinterpret_cast<char*>(fileBuffer.data()), fileBuffer.size());
   }
   writer.finish();
+
   this->responseSemaphore->give();
 }
 
