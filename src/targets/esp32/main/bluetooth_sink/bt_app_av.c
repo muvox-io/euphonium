@@ -94,8 +94,9 @@ static const char* s_a2d_audio_state_str[] = {"Suspended", "Stopped",
 static esp_avrc_rn_evt_cap_mask_t s_avrc_peer_rn_cap;
 /* AVRC target notification capability bit mask */
 static _lock_t s_volume_lock;
-static uint8_t s_volume = 0; /* local volume value */
-static bool s_volume_notify; /* notify volume change or not */
+static uint8_t s_volume = 0;        /* local volume value */
+static bool s_volume_notify;        /* notify volume change or not */
+static uint8_t s_remote_volume = 0; /* value of last remote volume event */
 
 /********************************
  * STATIC FUNCTION DEFINITIONS
@@ -172,7 +173,7 @@ static void bt_av_notify_evt_handler(uint8_t event_id,
 }
 
 static void volume_set_by_controller(uint8_t volume) {
-  uint8_t volume_percent = (uint8_t) ((uint32_t)volume * 100 / 0x7f);
+  uint8_t volume_percent = (uint8_t)((uint32_t)volume * 100 / 0x7f);
 
   ESP_LOGI(BT_RC_TG_TAG, "Volume is set by remote controller to: %d%%",
            volume_percent);
@@ -521,7 +522,16 @@ void bt_app_rc_tg_cb(esp_avrc_tg_cb_event_t event,
     case ESP_AVRC_TG_CONNECTION_STATE_EVT:
     case ESP_AVRC_TG_REMOTE_FEATURES_EVT:
     case ESP_AVRC_TG_PASSTHROUGH_CMD_EVT:
-    case ESP_AVRC_TG_SET_ABSOLUTE_VOLUME_CMD_EVT:
+    case ESP_AVRC_TG_SET_ABSOLUTE_VOLUME_CMD_EVT: {
+      int volume_percent = (int)param->set_abs_vol.volume * 100 / 0x7f;
+      if (s_remote_volume != volume_percent) {
+        s_remote_volume = volume_percent;
+        // Dispatch the volume event
+        bt_app_work_dispatch(bt_av_hdl_avrc_tg_evt, event, param,
+                             sizeof(esp_avrc_tg_cb_param_t), NULL);
+      }
+      break;
+    }
     case ESP_AVRC_TG_REGISTER_NOTIFICATION_EVT:
     case ESP_AVRC_TG_SET_PLAYER_APP_VALUE_EVT:
       bt_app_work_dispatch(bt_av_hdl_avrc_tg_evt, event, param,
