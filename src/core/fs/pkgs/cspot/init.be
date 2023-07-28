@@ -8,6 +8,15 @@ class CSpotPlugin : Plugin
       self.type = "plugin"
 
       self.fetch_config()
+
+      events.register(EVENT_PLAYBACK_STATE_UPDATE, def (data)
+        # Handle playback state updates
+        if data == STATE_PAUSED
+            self._set_pause(true)
+        elif data == STATE_PLAYING
+            self._set_pause(false)
+        end
+      end)
   end
 
   def member(name)
@@ -82,10 +91,6 @@ class CSpotPlugin : Plugin
         if (self.state.find('authData') != nil && self.state['authData'] != "")
             # self._authenticate_json(self.state['authData'])
         end
-      end
-
-      if event == EVENT_SET_PAUSE
-          # cspot_set_pause(data)
       end
 
       if event == EVENT_VOLUME_UPDATED

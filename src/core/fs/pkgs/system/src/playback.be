@@ -84,6 +84,9 @@ class PlaybackState
     end
 
     self.update_remote()
+
+    # Broadcast playback event
+    events.handle(EVENT_PLAYBACK_STATE_UPDATE, state)
   end
 
   # Called in order to send current state to the websocket connection

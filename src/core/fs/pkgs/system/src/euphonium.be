@@ -75,8 +75,6 @@ class EuphoniumInstance
         # persistor.persist("configuration/playback.config.json", json.dump(self.playback_state))
     end
 
-
-
     # Returns plugin with given name
     def get_plugin(name)
         for plugin : self.plugins

@@ -63,6 +63,7 @@ class CSpotPlugin : public AudioSourcePlugin,
   // Return spotify's status, used for zeroconf auto discovery
   std::string _getSpotifyInfo();
   std::string _authenticateZeroconf(berry::map info);
+  void _setPause(bool isPaused);
   void _authenticateSaved(std::string authData);
   void _startPlugin(std::string name);
 };

@@ -1,3 +1,5 @@
+EVENT_PLAYBACK_STATE_UPDATE = "playback_state_update"
+
 # Event handler allows for communication between native-berry, and berry-berry
 class EventHandler
   # Internal event handlers are closures that will be called when an event is received from the berry side.
@@ -20,8 +22,14 @@ class EventHandler
   end
 
   def handle(event, data)
-    if self.internal_handlers.find(event) != nil
-      self.internal_handlers[event](data)
+    if self.internal_handlers.find(event) == nil
+      print("No internal handler for event: " + event)
+      print(data)
+      return
+    end
+
+    for handler : self.internal_handlers[event]
+      handler(data)
     end
   end
 

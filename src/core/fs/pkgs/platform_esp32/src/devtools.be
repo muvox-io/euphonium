@@ -77,16 +77,12 @@ class DevtoolsPlugin : Plugin
       'text': "PSRAM: " + str(psram_percent) + "% used (" + str(stats["psram_used"]) + " bytes)"
     })
     
-
-
-
     group.graph("psramGraph", {
       'data': stats["psram_history"],
       'max_value': stats["psram_total"],
       'reverse_data': true,
       'label': 'PSRAM'
     })
-
 
     group.paragraph("memoryStatsInternalRam", {
       'text': "Internal RAM: " + str(internal_percent) + "% used (" + str(stats["internal_ram_used"]) + " bytes)"

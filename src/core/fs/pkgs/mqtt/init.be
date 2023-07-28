@@ -90,6 +90,31 @@ class MQTTPlugin : Plugin
 
   def setup_basic_handlers()
     # TODO - set MQTT handlers here
+    self.subscribe("euphonium/playback/toggle", def (data)
+      var current_state = playback_state.get_state()['settings']
+      print(current_state)
+
+      # Toggle play / pause
+      if current_state['state'] == STATE_PLAYING
+        playback_state.notify_state(STATE_PAUSED)
+      elif current_state['state'] == STATE_PAUSED
+         playback_state.notify_state(STATE_PLAYING)
+      end
+    end)
+
+    self.subscribe("euphonium/playback/volume_up", def (data)
+      var current_volume = playback_state.get_state()['settings']['volume']
+
+      # Increase volume by provided step
+      euphonium.apply_volume(current_volume + int(data))
+    end)
+
+    self.subscribe("euphonium/playback/volume_down", def (data)
+      var current_volume = playback_state.get_state()['settings']['volume']
+
+      # Increase volume by provided step
+      euphonium.apply_volume(current_volume - int(data))
+    end)
   end
 
   def on_event(event, data)

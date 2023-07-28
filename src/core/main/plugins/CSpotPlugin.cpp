@@ -171,6 +171,12 @@ void CSpotPlugin::handleCSpotEvent(
   }
 }
 
+void CSpotPlugin::_setPause(bool isPaused) {
+  if (this->spircHandler != nullptr) {
+    this->spircHandler->setPause(isPaused);
+  }
+}
+
 void CSpotPlugin::initializeBindings() {
   EUPH_LOG(info, TASK, "Initializing bindings");
   ctx->vm->export_this("_run_plugin", this, &CSpotPlugin::_startPlugin,
@@ -179,6 +185,7 @@ void CSpotPlugin::initializeBindings() {
                        "cspot");
   ctx->vm->export_this("_authenticate_zeroconf", this,
                        &CSpotPlugin::_authenticateZeroconf, "cspot");
+  ctx->vm->export_this("_set_pause", this, &CSpotPlugin::_setPause, "cspot");
   ctx->vm->export_this("_authenticate_json", this,
                        &CSpotPlugin::_authenticateSaved, "cspot");
 }
