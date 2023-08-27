@@ -1,4 +1,4 @@
-{ stdenv, lib, buildFHSUserEnv, makeWrapper, fetchurl }:
+{ stdenv, pkgs, lib, fetchurl, autoPatchelfHook }:
 
 let
   platforms = {
@@ -13,11 +13,7 @@ let
     "i686-windows" = "win32";
     "x86_64-windows" = "win64";
   };
-  fhsEnv = if stdenv.isDarwin then {} else buildFHSUserEnv {
-    name = "esp32-toolchain-env";
-    targetPkgs = pkgs: with pkgs; [ zlib ];
-    runScript = "";
-  };
+
   platformHash = {
     # espressif release name -> sha256 hash
     "x86_64-linux-gnu" = "sha256-TS4C70fxqTpNz9uuzUhq36q0wOJt7qLBjWOFUn85+GQ=";
@@ -29,6 +25,7 @@ let
     "aarch64-apple-darwin" = "sha256-9QrKsrIW6UddxTE7PktCTLxw0KvSO6GBiv9KAZFl2o4=";
   };
   platform = platforms.${stdenv.system};
+
   toolchainHash = platformHash.${platform};
 in
 
@@ -41,22 +38,12 @@ stdenv.mkDerivation rec {
     sha256 = toolchainHash;
   };
 
-  buildInputs = [ makeWrapper ];
+  nativeBuildInputs = if stdenv.isLinux then [autoPatchelfHook] else [];
 
-  phases = [ "unpackPhase" "installPhase" ];
+  buildInputs = with pkgs; [ zlib stdenv.cc.cc.lib ];
 
-  # FHS env not supported on darwin, although nix darwin is inherently impure so it does not matter
-  installPhase = if stdenv.isDarwin then ''
+  installPhase = ''
     cp -r . $out
-  '' else ''
-    cp -r . $out
-    for FILE in $(ls $out/bin); do
-      FILE_PATH="$out/bin/$FILE"
-      if [[ -x $FILE_PATH ]]; then
-        mv $FILE_PATH $FILE_PATH-unwrapped
-        makeWrapper ${fhsEnv}/bin/esp32-toolchain-env $FILE_PATH --add-flags "$FILE_PATH-unwrapped"
-      fi
-    done
   '';
 
   meta = with lib; {
