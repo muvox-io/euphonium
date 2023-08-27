@@ -19,7 +19,7 @@ BluetoothSinkPlugin::BluetoothSinkPlugin(std::shared_ptr<euph::Context> ctx)
 
     while (toWrite > 0) {
       written = this->ctx->audioBuffer->writePCM(data + (dataLength - toWrite),
-                                                 toWrite, 0);
+                                                 toWrite, 0, currentSampleRate);
       toWrite -= written;
 
       // Buffer full, wait
@@ -44,6 +44,10 @@ BluetoothSinkPlugin::BluetoothSinkPlugin(std::shared_ptr<euph::Context> ctx)
             this->ctx->eventBus->postEvent(std::move(event));
           }
         }
+        break;
+      }
+      case A2DPDriver::EventType::PLAYBACK_SAMPLERATE: {
+        this->currentSampleRate = std::get<uint32_t>(event.data);
         break;
       }
       case A2DPDriver::EventType::PLAYBACK_STATE: {

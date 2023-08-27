@@ -12,6 +12,7 @@ class I2SAudioOutput : public euph::AudioOutput {
   int expandFrom = 16;
   int expandTo = 32;
   std::atomic<bool> isReadable = false;
+  bool isInstalled = false;
   std::mutex readingMutex;
 
   size_t bytesWritten = 0;

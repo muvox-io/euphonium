@@ -7,7 +7,7 @@
 using namespace euph;
 
 MQTTPlugin::MQTTPlugin(std::shared_ptr<euph::Context> ctx)
-    : bell::Task("MQTTPlugin", 1024, 0, 0) {
+    : bell::Task("MQTTPlugin", 2 * 1024, 0, 0) {
   this->ctx = ctx;
   this->connectionRequested = std::make_unique<bell::WrappedSemaphore>(5);
   this->client = std::make_unique<bell::MQTTClient>();

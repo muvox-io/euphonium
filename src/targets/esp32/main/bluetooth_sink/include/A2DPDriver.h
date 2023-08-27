@@ -23,6 +23,7 @@ void local_set_volume(uint8_t volume);
 void local_active_audio(bool active);
 void local_metadata_updated(char* artist, char* album, char* title,
                             int duration);
+void local_set_sr(uint32_t samplerate);
 #include "bt_app_av.h"
 #include "bt_app_core.h"
 }
@@ -33,7 +34,7 @@ class A2DPDriver {
   A2DPDriver();
   ~A2DPDriver();
 
-  enum class EventType { VOLUME, PLAYBACK_STATE, PLAYBACK_METADATA };
+  enum class EventType { VOLUME, PLAYBACK_STATE, PLAYBACK_METADATA, PLAYBACK_SAMPLERATE };
 
   struct PlaybackMetadata {
     std::string artist;
@@ -42,7 +43,7 @@ class A2DPDriver {
     int duration;
   };
 
-  typedef std::variant<uint8_t, PlaybackMetadata, bool> EventData;
+  typedef std::variant<uint8_t, PlaybackMetadata, bool, uint32_t> EventData;
   struct Event {
     EventType type;
     EventData data;

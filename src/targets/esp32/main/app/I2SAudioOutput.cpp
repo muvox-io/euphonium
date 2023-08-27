@@ -1,4 +1,5 @@
 #include "I2SAudioOutput.h"
+#include "driver/i2s.h"
 
 using namespace euph;
 
@@ -28,7 +29,11 @@ void I2SAudioOutput::_setReadable(bool isReadable) {
 }
 
 void I2SAudioOutput::configure(uint32_t sampleRate, uint8_t channels,
-                               uint8_t bitwidth) {}
+                               uint8_t bitwidth) {
+  if (isInstalled) {
+    i2s_set_sample_rates((i2s_port_t)0, sampleRate);
+  }
+}
 
 void I2SAudioOutput::setVolume(uint8_t volume) {}
 
@@ -91,6 +96,7 @@ void I2SAudioOutput::_install(int sampleRate, int bitsPerSample,
   }
 
   i2s_driver_install((i2s_port_t)0, &i2s_config, 0, NULL);
+  isInstalled = true;
 }
 void I2SAudioOutput::_setPins(int mck, int bck, int ws, int dataOut) {
   EUPH_LOG(info, "i2s", "Setting pins %d %d %d %d", mck, bck, ws, dataOut);
@@ -107,4 +113,5 @@ void I2SAudioOutput::_setPins(int mck, int bck, int ws, int dataOut) {
 
 void I2SAudioOutput::_uninstall() {
   i2s_driver_uninstall((i2s_port_t)0);
+  isInstalled = false;
 }

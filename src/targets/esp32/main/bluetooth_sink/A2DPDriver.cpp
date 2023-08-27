@@ -187,6 +187,16 @@ void local_active_audio(bool active) {
   }
 }
 
+// Prepare sample rate event, notify listener
+void local_set_sr(uint32_t sr) {
+  euph::A2DPDriver::Event event = {
+      .type = A2DPDriver::EventType::PLAYBACK_SAMPLERATE, .data = sr};
+
+  if (currentPtr != NULL && currentPtr->eventHandler != NULL) {
+    currentPtr->eventHandler(event);
+  }
+}
+
 // Prepare metadata event, notify listener
 void local_metadata_updated(char* artist, char* album, char* title,
                             int duration) {

@@ -49,6 +49,7 @@ extern void local_set_volume(uint8_t volume);
 extern void local_active_audio(bool active);
 extern void local_metadata_updated(char* artist, char* album, char* title,
                                    int duration);
+extern void local_set_sr(uint32_t sr);
 
 /*******************************
  * STATIC FUNCTION DECLARATIONS
@@ -268,7 +269,7 @@ static void bt_av_hdl_a2d_evt(uint16_t event, void* p_param) {
           ch_count = 1;
         }
 
-        // i2s_set_clk(0, sample_rate, 16, ch_count);
+        local_set_sr(sample_rate);
 
         ESP_LOGI(BT_AV_TAG, "Configure audio player: %x-%x-%x-%x",
                  a2d->audio_cfg.mcc.cie.sbc[0], a2d->audio_cfg.mcc.cie.sbc[1],
