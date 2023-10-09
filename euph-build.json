@@ -1,8 +1,0 @@
-{
-    "webPath": "src/euphonium/web",
-    "fsPath": "src/euphonium/fs",
-    "fsDefaultsPath": "fs-defaults",
-    "targetESP32AppPath": "src/targets/esp32/app",
-    "targetCLIPath": "src/targets/cli",
-    "outputDir": "build"
-}
