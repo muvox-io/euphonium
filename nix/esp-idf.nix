@@ -1,9 +1,7 @@
 { stdenv
 , lib
 , fetchFromGitHub
-, python39Packages
 , python310Packages
-, fetchurl
 , pkgs
 ,
 }:

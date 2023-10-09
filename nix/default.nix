@@ -49,6 +49,23 @@ rec {
     '';
   };
 
+  littlefs-python =  pkgs.python310Packages.buildPythonPackage rec {
+    pname = "littlefs-python";
+    version = "0.8.0";
+    src = pkgs.python310Packages.fetchPypi {
+      inherit pname version;
+      sha256 = "sha256-vD1BOfB9H4Yu5yPQkhVOy0/XrP1CNiHnseLfT+L1eyo=";
+    };
+    doCheck = false;
+    buildInputs = with pkgs.python310Packages; [
+      cython
+    ];
+    propagatedBuildInputs = with pkgs.python310Packages; [
+      pytest
+      tox
+    ];
+  };
+
   # Helper for flashing storage partition
   flash-storage = writeShellScriptBin "flash-storage" ''
     #!/bin/bash
@@ -65,7 +82,7 @@ rec {
     name = "euphonium-esp32";
     src = ../.;
 
-    nativeBuildInputs = with pkgs; [ esp-idf fs-esp32 pkg-config bash python39 ];
+    nativeBuildInputs = with pkgs; [ esp-idf fs-esp32 pkg-config bash littlefs-python python310 ];
 
     # Patch nanopb shebangs to refer to provided python
     postPatch = ''
