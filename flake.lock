@@ -18,6 +18,26 @@
         "type": "github"
       }
     },
+    "gk-flasher": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1697454055,
+        "narHash": "sha256-Sl3v4ESl/ShX7m/6HRPr67YnqytXxsuxoM56muTaldQ=",
+        "owner": "muvox-io",
+        "repo": "gk-flasher",
+        "rev": "dce79021a0bf6d6c2134df24892e68179b402072",
+        "type": "github"
+      },
+      "original": {
+        "owner": "muvox-io",
+        "repo": "gk-flasher",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1696697597,
@@ -52,6 +72,7 @@
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
+        "gk-flasher": "gk-flasher",
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable"
       }

@@ -5,13 +5,18 @@
     nixpkgs.url = "nixpkgs/nixos-23.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    gk-flasher = {
+      url = "github:muvox-io/gk-flasher";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, flake-utils }:
+  outputs = { self, nixpkgs, nixpkgs-unstable, flake-utils, gk-flasher }:
     let
       overlay = final: prev: {
         euphonium = (final.callPackage ./nix { });
         unstable = nixpkgs-unstable.legacyPackages.${prev.system};
+        gk-flasher = gk-flasher.packages.${prev.system}.default;
       };
     in
     {

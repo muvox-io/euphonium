@@ -103,6 +103,9 @@ rec {
 
       # build firmware
       idf.py build
+
+      ${pkgs.gk-flasher}/bin/gk-flasher package --package-esp-idf ./build --package-output ./build/euphonium.gk_pkg
+
       runHook postBuild
     '';
     installPhase = ''
@@ -115,6 +118,7 @@ rec {
       cp ota_data_initial.bin $out/ota_data_initial.bin
       cp *-flash_args $out/
       cp flash_args $out/
+      cp euphonium.gk_pkg $out/euphonium.gk_pkg
     '';
     dontConfigure = true;
   };
