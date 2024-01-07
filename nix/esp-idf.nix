@@ -92,6 +92,22 @@ let
       esp-coredump
     ];
   };
+  esp-idf-panic-decoder = python310Packages.buildPythonPackage rec {
+    pname = "esp-idf-panic-decoder";
+    version = "1.0.1";
+    src = python310Packages.fetchPypi {
+      inherit version;
+      pname = "esp_idf_panic_decoder";
+      sha256 = "sha256-fvSr7TRD6aMQQPrs2x98HHW6qwFdy8gWkrQUGddor/8=";
+    };
+    format = "pyproject";
+    doCheck = false;
+    propagatedBuildInputs = with python310Packages; [
+      setuptools
+      wheel
+      pyelftools
+    ];
+  };
   esp-idf-size = python310Packages.buildPythonPackage rec {
     pname = "esp-idf-size";
     version = "0.3.1";
@@ -118,7 +134,7 @@ let
     ];
   };
   toolchain = pkgs.callPackage ./toolchain.nix { };
-  idf-python-env = (pkgs.python310.withPackages (p: with p; [ pip idf-component-manager esptool esp-coredump esp-idf-monitor esp-idf-kconfig freertos-gdb p.protobuf grpcio-tools pyparsing esp-idf-size ]));
+  idf-python-env = (pkgs.python310.withPackages (p: with p; [ pip idf-component-manager esptool esp-coredump esp-idf-monitor esp-idf-kconfig freertos-gdb p.protobuf grpcio-tools pyparsing esp-idf-size esp-idf-panic-decoder ]));
 in
 stdenv.mkDerivation rec {
   pname = "esp-idf";
@@ -126,10 +142,10 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "espressif";
     repo = "esp-idf";
-    rev = "cbce221e88d52665523093b2b6dd0ebe3f1243f1";
+    rev = "482a8fb2d78e3b58eb21b26da8a5bedf90623213";
     fetchSubmodules = true;
     name = pname;
-    sha256 = "sha256-IEa9R9VCWvbRjZFRPb2Qq2Qw1RFxsnVALFVgQlBCXMw=";
+    sha256 = "sha256-uEf3/3NPH+E39VgQ02AbxTG7nmG5bQlhwk/WcTeAUfg=";
   };
 
   nativeBuildInputs = [ pkgs.makeWrapper ];
