@@ -15,4 +15,4 @@ jobs:
     # Usually, this would be called as 'nix build ".?submodules=1#app-esp32" '
     # However, Nix 2.19 has a regression with submodule path handling, hence the odd syntax
     # See https://github.com/NixOS/nix/issues/9530
-    - run: nix build "git+file://$(pwd)?submodules=1#app-esp32" -L
+    - run: nix build "git+file://$(pwd)?shallow=1&submodules=1#app-esp32" -L
