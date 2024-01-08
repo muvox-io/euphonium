@@ -40,9 +40,9 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = if stdenv.isLinux then [autoPatchelfHook] else [];
 
-  phases = [ "unpackPhase" "installPhase" ];
+  phases = if stdenv.isLinux then ["unpackPhase" "configurePhase" "buildPhase" "checkPhase" "installPhase" "fixupPhase" ] else [ "unpackPhase" "installPhase" ];
 
-  dontStrip = true;
+  dontStrip = !stdenv.isLinux;
 
   buildInputs = with pkgs; [ zlib stdenv.cc.cc.lib ];
 
