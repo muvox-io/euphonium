@@ -2,6 +2,7 @@
 
 // forward declaration of Context
 #include "CoreEvents.h"
+#include "WrappedSemaphore.h"
 namespace euph {
 struct Context;
 class Connectivity;
@@ -35,8 +36,9 @@ struct PlaybackController {
   std::atomic<bool> isPaused = false;
   std::atomic<bool> requestPause = false;
   std::atomic<bool> isLoading = false;
+  std::atomic<bool> isLocked = false;
 
-  std::mutex playbackAccessMutex;
+  std::unique_ptr<bell::WrappedSemaphore> playbackAccessSemaphore;
   int currentVolume = 0;
 
   std::function<void(const std::string&)> playbackLockedHandler;
@@ -76,16 +78,23 @@ struct PlaybackController {
   }
 
   void lockPlayback(const std::string& source) {
+    if (isLocked) return;
+    playbackAccessSemaphore->wait();
+
+    isLocked = true;
+
     this->play();
 
     if (playbackLockedHandler != NULL) {
       playbackLockedHandler(source);
     }
-
-    playbackAccessMutex.lock();
   }
 
-  void unlockPlayback() { playbackAccessMutex.unlock(); }
+  void unlockPlayback() {
+    if (!isLocked) return;
+    isLocked = false;
+    playbackAccessSemaphore->give();
+  }
 };
 
 struct Context {
@@ -109,6 +118,8 @@ struct Context {
     ctx->eventBus = std::make_shared<euph::EventBus>();
     ctx->audioBuffer = std::make_shared<bell::CentralAudioBuffer>(128);
     ctx->playbackController->eventBus = ctx->eventBus;
+    ctx->playbackController->playbackAccessSemaphore = std::make_unique<bell::WrappedSemaphore>(1);
+    ctx->playbackController->playbackAccessSemaphore->give();
     return ctx;
   }
 
@@ -119,6 +130,8 @@ struct Context {
     ctx->audioBuffer = std::make_shared<bell::CentralAudioBuffer>(128);
     ctx->playbackController = std::make_shared<euph::PlaybackController>();
     ctx->playbackController->eventBus = bus;
+    ctx->playbackController->playbackAccessSemaphore = std::make_unique<bell::WrappedSemaphore>(1);
+    ctx->playbackController->playbackAccessSemaphore->give();
     ctx->eventBus = bus;
 
 #ifdef ESP_PLATFORM
