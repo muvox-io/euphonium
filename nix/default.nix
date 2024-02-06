@@ -104,8 +104,11 @@ rec {
       # build firmware
       idf.py build
 
-      ${pkgs.gk-flasher}/bin/gk-flasher package --package-esp-idf ./build --package-output ./build/euphonium.gk_pkg
-
+      ${pkgs.gk-flasher}/bin/gk-flasher package \
+        --package-esp-idf ./build \
+        --package-output ./build/euphonium.gk_pkg \
+        --muvox-api-hardware-project-identifier MUVOX \
+        --version dev
       runHook postBuild
     '';
     installPhase = ''
