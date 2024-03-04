@@ -133,19 +133,32 @@ let
       wheel
     ];
   };
+  pyclang = python310Packages.buildPythonPackage rec {
+    pname = "pyclang";
+    version = "0.4.2";
+    src = python310Packages.fetchPypi {
+      inherit pname version;
+      sha256 = "sha256-vuDZ5yEhyDpCmkXoC+Gr2X5vMK5B46HnktcvBONjxXM=";
+    };
+    doCheck = false;
+    propagatedBuildInputs = with python310Packages; [
+      setuptools
+      wheel
+    ];
+  };
   toolchain = pkgs.callPackage ./toolchain.nix { };
-  idf-python-env = (pkgs.python310.withPackages (p: with p; [ pip idf-component-manager esptool esp-coredump esp-idf-monitor esp-idf-kconfig freertos-gdb p.protobuf grpcio-tools pyparsing esp-idf-size esp-idf-panic-decoder ]));
+  idf-python-env = (pkgs.python310.withPackages (p: with p; [ pip idf-component-manager esptool esp-coredump esp-idf-monitor esp-idf-kconfig freertos-gdb p.protobuf grpcio-tools pyparsing esp-idf-size esp-idf-panic-decoder pyclang ]));
 in
 stdenv.mkDerivation rec {
   pname = "esp-idf";
-  version = "5.1";
+  version = "5.2";
   src = fetchFromGitHub {
     owner = "espressif";
     repo = "esp-idf";
-    rev = "482a8fb2d78e3b58eb21b26da8a5bedf90623213";
+    rev = "11eaf41b37267ad7709c0899c284e3683d2f0b5e";
     fetchSubmodules = true;
     name = pname;
-    sha256 = "sha256-uEf3/3NPH+E39VgQ02AbxTG7nmG5bQlhwk/WcTeAUfg=";
+    sha256 = "sha256-+tAb32TXeMZzU7QiVlRYMKKUCkqGiOIMdL4vzUgGbzA=";
   };
 
   nativeBuildInputs = [ pkgs.makeWrapper ];
