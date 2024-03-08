@@ -18,8 +18,7 @@
         unstable = nixpkgs-unstable.legacyPackages.${prev.system};
         gk-flasher = gk-flasher.packages.${prev.system}.default;
       };
-    in
-    {
+    in {
       overlays.default = overlay;
     } // flake-utils.lib.eachDefaultSystem (system:
       let
@@ -38,7 +37,9 @@
         packages = {
           frontend = pkgs.euphonium.frontend;
           fs-esp32 = pkgs.euphonium.fs-esp32;
-          app-esp32 = pkgs.euphonium.app-esp32;
+          app-esp32 = (pkgs.euphonium.app-esp32 {
+            appVersion = self.rev or self.dirtyRev or "dirty";
+          });
           euphoniumcli = pkgs.euphonium.euphoniumcli;
         };
 
@@ -47,8 +48,7 @@
           frontend = pkgs.euphonium.shell-frontend;
         };
 
-      in
-      {
+      in {
         inherit apps devShells packages;
         checks = packages;
         devShell = devShells.esp32;
