@@ -19,6 +19,10 @@ jobs:
     - name: Upload built package
       uses: actions/upload-artifact@v4
       with:
-        name: euphonium
+        name: euphonium.gk_pkg
         path: |
           ./result/euphonium.gk_pkg
+    - name: Upload package to muvox-api (develop)
+      if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+      run: |
+        nix develop --command gk-flasher upload --package ./result/euphonium.gk_pkg --api-key ${{ secrets.MUVOX_API_KEY }} --api-url https://dashboard.gkindustries.pl

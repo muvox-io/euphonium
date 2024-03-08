@@ -63,11 +63,11 @@
         "poetry2nix": "poetry2nix"
       },
       "locked": {
-        "lastModified": 1707253577,
-        "narHash": "sha256-T0TRAa4+b/5qa1CxQ2Z5ccV99qVTMZgFiTTnL1SenTU=",
+        "lastModified": 1709938596,
+        "narHash": "sha256-sTVpNjS5H9otznZRsnQXMX2nhhvyB9D1msJTCgLhAeI=",
         "owner": "muvox-io",
         "repo": "gk-flasher",
-        "rev": "d0fcbea9a5d05686dc896042dcc78e9fa0670394",
+        "rev": "71348265fd086f4d6118a0d30aed9a64b7b9c909",
         "type": "github"
       },
       "original": {
