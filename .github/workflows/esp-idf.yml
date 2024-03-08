@@ -25,4 +25,4 @@ jobs:
     - name: Upload package to muvox-api (develop)
       if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
       run: |
-        nix develop --command gk-flasher upload --package ./result/euphonium.gk_pkg --api-key ${{ secrets.MUVOX_API_KEY }} --api-url https://dashboard.gkindustries.pl
+        nix develop --command gk-flasher upload --package ./result/euphonium.gk_pkg --api-key ${{ secrets.MUVOX_API_KEY }} --url https://dashboard.gkindustries.pl
