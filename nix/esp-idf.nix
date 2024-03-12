@@ -120,6 +120,16 @@ let
     doCheck = false;
     propagatedBuildInputs = with python310Packages; [ setuptools wheel ];
   };
+  pyclang = python310Packages.buildPythonPackage rec {
+    pname = "pyclang";
+    version = "0.4.2";
+    src = python310Packages.fetchPypi {
+      inherit pname version;
+       sha256 = "sha256-vuDZ5yEhyDpCmkXoC+Gr2X5vMK5B46HnktcvBONjxXM=";
+    };
+    doCheck = false;
+  };
+
   toolchain = pkgs.callPackage ./toolchain.nix { };
   idf-python-env = (pkgs.python310.withPackages (p:
     with p; [
@@ -136,17 +146,18 @@ let
       esp-idf-size
       esp-idf-panic-decoder
       filelock
+      pyclang
     ]));
 in stdenv.mkDerivation rec {
   pname = "esp-idf";
-  version = "5.1";
+  version = "5.2.1";
   src = fetchFromGitHub {
     owner = "espressif";
     repo = "esp-idf";
-    rev = "482a8fb2d78e3b58eb21b26da8a5bedf90623213";
+    rev = "a322e6bdad4b6675d4597fb2722eea2851ba88cb";
     fetchSubmodules = true;
     name = pname;
-    sha256 = "sha256-uEf3/3NPH+E39VgQ02AbxTG7nmG5bQlhwk/WcTeAUfg=";
+    sha256 = "sha256-0WwDcasG7JjRJIaZyjWTobKhZXUi4pcSHFMtTbBJE1g=";
   };
 
   patches = [ ./neutralize-python-dependency-checks.patch ];
@@ -184,6 +195,7 @@ in stdenv.mkDerivation rec {
     mkdir -p $out/sdk $out/.espressif/python_env/idf${version}_py3.10_env/bin
     ln -s $(readlink -e $(which python3)) $out/.espressif/python_env/idf${version}_py3.10_env/bin/python
     touch $out/.espressif/espidf.constraints.v${version}.txt
+    touch $out/.espressif/espidf.constraints.v5.2.txt
     cp -r sdk/* $out/sdk
 
     # no .git, inject version

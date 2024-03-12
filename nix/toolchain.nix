@@ -16,13 +16,13 @@ let
 
   platformHash = {
     # espressif release name -> sha256 hash
-    "x86_64-linux-gnu" = "sha256-TS4C70fxqTpNz9uuzUhq36q0wOJt7qLBjWOFUn85+GQ=";
+    "x86_64-linux-gnu" = "sha256-uufaI+qFFvt+QmQPRCDE3R6/1kGJoU/DMNc+Fzs6A4s=";
     "aarch64-linux-gnu" = "sha256-niEaGCtuoDlqQcePUvUdlk54df4nTqnIERG/DbyQxRY=";
     "arm-linux-gnueabi" = "sha256-Ld2R+5i3mzAEK3kY7vYM8Qx71bHahT6Dtl8pO5beyAA=";
     "arm-linux-gnueabihf" = "sha256-poOkaFVdy8ts4yoZCEIRDW+FPU1hBNYc8Lyd1Qxr4eY=";
     "i686-linux-gnu" = "sha256-KSsZ6mGGUIqSP7b9AQOXfgAdTrjneDbH49bObl+n0wU=";
     "x86_64-apple-darwin" = "sha256-sJ2H/bHcMs0dcYk1Bl75MbEBoU32sXvlZ0jlJkCVW/8=";
-    "aarch64-apple-darwin" = "sha256-9QrKsrIW6UddxTE7PktCTLxw0KvSO6GBiv9KAZFl2o4=";
+    "aarch64-apple-darwin" = "sha256-aHJD5cvvt88FYD7/vdb95XaflNr/flGfW75h9DxMDvY=";
   };
   platform = platforms.${stdenv.system};
 
@@ -31,10 +31,10 @@ in
 
 stdenv.mkDerivation rec {
   pname = "esp32-toolchain";
-  version = "12.2.0_20230208";
+  version = "13.2.0_20230928";
 
   src = fetchurl {
-    url = "https://github.com/espressif/crosstool-NG/releases/download/esp-${version}/xtensa-esp32-elf-${version}-${platform}.tar.xz";
+    url = "https://github.com/espressif/crosstool-NG/releases/download/esp-${version}/xtensa-esp-elf-${version}-${platform}.tar.xz";
     sha256 = toolchainHash;
   };
 

@@ -82,7 +82,7 @@ void HTTPDispatcher::initialize() {
 
   this->server->registerWS(
       "/repl",
-      [this](struct mg_connection* conn, char* data, size_t dataSize) {
+      [this](const struct mg_connection* conn, char* data, size_t dataSize) {
         // Convert the data to a string
         std::string dataString(data, dataSize);
 
@@ -90,12 +90,16 @@ void HTTPDispatcher::initialize() {
         auto event = std::make_unique<VmRawCommandEvent>(dataString);
         this->ctx->eventBus->postEvent(std::move(event));
       },
-      [this](struct mg_connection* conn, bell::BellHTTPServer::WSState state) {
+      [this](const struct mg_connection* conn,
+             bell::BellHTTPServer::WSState state) {
         switch (state) {
           case bell::BellHTTPServer::WSState::READY: {
             EUPH_LOG(debug, TAG, "REPL websocket connection open");
             std::scoped_lock lock(this->websocketConnectionsMutex);
-            this->replWebsocketConnections.push_back(conn);
+            // Drop constness here, because civetweb calls callbacks with const pointers
+            // but we need to store the connection for later use
+            this->replWebsocketConnections.push_back(
+                (struct mg_connection*)conn);
             break;
           }
           case bell::BellHTTPServer::WSState::CLOSED: {
@@ -124,12 +128,15 @@ void HTTPDispatcher::initialize() {
         auto event = std::make_unique<VmWebsocketEvent>(dataString);
         this->ctx->eventBus->postEvent(std::move(event));
       },
-      [this](struct mg_connection* conn, bell::BellHTTPServer::WSState state) {
+      [this](const struct mg_connection* conn,
+             bell::BellHTTPServer::WSState state) {
         switch (state) {
           case bell::BellHTTPServer::WSState::READY: {
             EUPH_LOG(debug, TAG, "Websocket connection open");
             std::scoped_lock lock(this->websocketConnectionsMutex);
-            this->websocketConnections.push_back(conn);
+            // Drop constness here, because civetweb calls callbacks with const pointers
+            // but we need to store the connection for later use
+            this->websocketConnections.push_back((struct mg_connection*)conn);
             break;
           }
           case bell::BellHTTPServer::WSState::CLOSED: {
