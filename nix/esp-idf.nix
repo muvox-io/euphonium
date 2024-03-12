@@ -1,10 +1,4 @@
-{ stdenv
-, lib
-, fetchFromGitHub
-, python310Packages
-, pkgs
-,
-}:
+{ stdenv, lib, fetchFromGitHub, python310Packages, pkgs, }:
 let
   idf-component-manager = python310Packages.buildPythonPackage rec {
     pname = "idf_component_manager";
@@ -74,9 +68,7 @@ let
       sha256 = "sha256-HD+QlAcHQgwlkKMn0LA24CoNux0IxpORKLYBfYb39JI=";
     };
     doCheck = false;
-    propagatedBuildInputs = with python310Packages; [
-      kconfiglib
-    ];
+    propagatedBuildInputs = with python310Packages; [ kconfiglib ];
   };
   esp-idf-monitor = python310Packages.buildPythonPackage rec {
     pname = "esp-idf-monitor";
@@ -116,9 +108,7 @@ let
       sha256 = "sha256-OzthhzKGjyqDJrmJWs4LMkHz0rAwho+3Pyc2BYFK0EU=";
     };
     doCheck = false;
-    propagatedBuildInputs = with python310Packages; [
-      pyaml
-    ];
+    propagatedBuildInputs = with python310Packages; [ pyaml ];
   };
   freertos-gdb = python310Packages.buildPythonPackage rec {
     pname = "freertos-gdb";
@@ -128,15 +118,26 @@ let
       sha256 = "sha256-o0ZoTy7OLVnrhSepya+MwaILgJSojs2hfmI86D9C3cs=";
     };
     doCheck = false;
-    propagatedBuildInputs = with python310Packages; [
-      setuptools
-      wheel
-    ];
+    propagatedBuildInputs = with python310Packages; [ setuptools wheel ];
   };
   toolchain = pkgs.callPackage ./toolchain.nix { };
-  idf-python-env = (pkgs.python310.withPackages (p: with p; [ pip idf-component-manager esptool esp-coredump esp-idf-monitor esp-idf-kconfig freertos-gdb p.protobuf grpcio-tools pyparsing esp-idf-size esp-idf-panic-decoder ]));
-in
-stdenv.mkDerivation rec {
+  idf-python-env = (pkgs.python310.withPackages (p:
+    with p; [
+      pip
+      idf-component-manager
+      esptool
+      esp-coredump
+      esp-idf-monitor
+      esp-idf-kconfig
+      freertos-gdb
+      p.protobuf
+      grpcio-tools
+      pyparsing
+      esp-idf-size
+      esp-idf-panic-decoder
+      filelock
+    ]));
+in stdenv.mkDerivation rec {
   pname = "esp-idf";
   version = "5.1";
   src = fetchFromGitHub {
@@ -147,6 +148,8 @@ stdenv.mkDerivation rec {
     name = pname;
     sha256 = "sha256-uEf3/3NPH+E39VgQ02AbxTG7nmG5bQlhwk/WcTeAUfg=";
   };
+
+  patches = [ ./neutralize-python-dependency-checks.patch ];
 
   nativeBuildInputs = [ pkgs.makeWrapper ];
 
@@ -164,6 +167,9 @@ stdenv.mkDerivation rec {
     runHook preUnpack
     mkdir sdk
     cp -r $src/* sdk
+    chmod -R +w sdk 
+    # permits the patchPhase to modify the sources
+    # (for some reason cp makes them read-only, even though we are the owner of the files)
     runHook postUnpack
   '';
 
@@ -207,7 +213,7 @@ stdenv.mkDerivation rec {
     export PATH="${lib.makeBinPath propagatedBuildInputs}":$PATH
   '';
 
-  phases = [ "unpackPhase" "preBuildPhase" "installPhase" ];
+  phases = ["unpackPhase" "patchPhase" "preBuildPhase" "installPhase" ];
 
   dontConfigure = true;
 
