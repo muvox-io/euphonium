@@ -224,8 +224,8 @@ void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
     uint16_t apCount = 0;
     memset(scanInfo, 0, sizeof(scanInfo));
 
-    ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&number, scanInfo));
     ESP_ERROR_CHECK(esp_wifi_scan_get_ap_num(&apCount));
+    ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&number, scanInfo));
 
     jsonBody["networks"] = nlohmann::json::array();
 
