@@ -113,6 +113,7 @@ in rec {
           --package-esp-idf ./build \
           --package-output ./build/euphonium.gk_pkg \
           --muvox-api-hardware-project-identifier MUVOX \
+          --release-channels dev \
           --version dev-${appVersion}
         runHook postBuild
       '';
