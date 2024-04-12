@@ -2,6 +2,7 @@
 
 // forward declaration of Context
 #include "CoreEvents.h"
+#include "EmergencyMode.h"
 #include "WrappedSemaphore.h"
 namespace euph {
 struct Context;
@@ -15,6 +16,7 @@ class Connectivity;
 #include "BerryBind.h"
 #include "Connectivity.h"
 #include "EventBus.h"
+#include "EmergencyMode.h"
 
 /**
  * @brief The main context of the application.
@@ -103,6 +105,7 @@ struct Context {
   std::shared_ptr<bell::CentralAudioBuffer> audioBuffer;
   std::shared_ptr<euph::PlaybackController> playbackController;
   std::shared_ptr<euph::Connectivity> connectivity;
+  std::shared_ptr<euph::EmergencyMode> emergencyMode;
 
   // Display name of the device, gets replaced by user setting later on
   std::string displayName = "Euphonium";
@@ -120,6 +123,7 @@ struct Context {
     ctx->playbackController->eventBus = ctx->eventBus;
     ctx->playbackController->playbackAccessSemaphore = std::make_unique<bell::WrappedSemaphore>(1);
     ctx->playbackController->playbackAccessSemaphore->give();
+    ctx->emergencyMode = std::make_shared<euph::EmergencyMode>();
     return ctx;
   }
 
@@ -133,6 +137,7 @@ struct Context {
     ctx->playbackController->playbackAccessSemaphore = std::make_unique<bell::WrappedSemaphore>(1);
     ctx->playbackController->playbackAccessSemaphore->give();
     ctx->eventBus = bus;
+    ctx->emergencyMode = std::make_shared<euph::EmergencyMode>();
 
 #ifdef ESP_PLATFORM
     ctx->rootPath = "/fs";

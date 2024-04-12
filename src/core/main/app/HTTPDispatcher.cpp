@@ -236,6 +236,10 @@ void HTTPDispatcher::serveWeb(struct mg_connection* conn) {
     }
   }
 
+  if (this->ctx->emergencyMode->tryServe(conn)) {
+    return;
+  }
+
   auto reqInfo = mg_get_request_info(conn);
   std::string_view uri = std::string_view(reqInfo->local_uri);
 
