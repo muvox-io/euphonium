@@ -1,4 +1,5 @@
 #include "PackageLoader.h"
+#include "BerryBind.h"
 
 using namespace euph;
 
@@ -68,7 +69,7 @@ void PackageLoader::loadWithHook(const std::string& hook) {
       std::stringstream initCodeBuffer;
       initCodeBuffer << initCodeFile.rdbuf();
 
-      ctx->vm->execute_string(initCodeBuffer.str(), pkg.name);
+      ctx->vm->execute_string(initCodeBuffer.str(), initPath);
     }
   }
 }

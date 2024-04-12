@@ -1,10 +1,12 @@
 #include "BerryBind.h"
 #include <stdio.h>
+#include <memory>
+#include "EuphLogger.h"
+#include "be_debug.h"
 
 using namespace berry;
 
 berry::moduleMap berry::moduleLambdas;
-
 
 VmState::VmState(bvm* vm) : vm(vm) {}
 
@@ -24,9 +26,8 @@ static char stdoutLineBuffer[256] = {0};
 
 VmState::VmState() {
 #ifdef __linux__
-  stdoutRedirect = fopencookie(this, "w", (cookie_io_functions_t) {
-    .write  = berryStdoutLinux
-  });
+  stdoutRedirect = fopencookie(
+      this, "w", (cookie_io_functions_t){.write = berryStdoutLinux});
 #else
   stdoutRedirect = funopen(this, NULL, &berryStdoutBSD, NULL, NULL);
 #endif
@@ -98,52 +99,176 @@ int VmState::call(bvm* vm) {
   return (*function)(l);
 }
 
-std::pair<int, std::string> VmState::debug_get_lineinfo() {
-  int line = -1;
-  std::string file;
-
-  be_save_stacktrace(vm);
-  bcallsnapshot* cf;
-  bcallsnapshot* base = (bcallsnapshot*)be_stack_base(&vm->tracestack);
-  bcallsnapshot* top = (bcallsnapshot*)be_stack_top(&vm->tracestack);
-
-  cf = top;
-  // decrease callstack until we find nearest closure
-  while (!var_isclosure(&cf->func) && cf >= base) {
-    cf--;
-  }
-  cf--;
-
-  // if we found a closure, get its line info and source name
-  if (var_isclosure(&cf->func)) {
-    bclosure* cl = (bclosure*)var_toobj(&cf->func);
-    auto proto = cl->proto;
-    blineinfo* it = (blineinfo*)proto->lineinfo;
-
-    if (it) {
-      line = it->linenumber;
-      file = std::string(be_str2cstr(cl->proto->source));
-    }
-  }
-
-  return std::make_pair(line, file);
-}
-
-bool VmState::execute_string(const std::string& data,
+void VmState::execute_string(const std::string& data,
                              const std::string& tag = "script") {
   // create an array
   if (be_loadbuffer(vm, tag.c_str(), data.c_str(), data.size()) == 0) {
     if (be_pcall(vm, 0) != 0) {
-      be_dumpexcept(vm);
-      return false;
+
+      auto errorMessage = dumpException();
+
+      bell::bellGlobalLogger->error(tag, 0, TAG, "Berry error: %s",
+                                    errorMessage.c_str());
+      if (stdoutCallback != nullptr) {
+        stdoutCallback(errorMessage.c_str(), errorMessage.size());
+        stdoutCallback("\n", 1);
+      }
+      throw BerryErrorException(errorMessage);
+      
     }
   } else {
-    be_dumpexcept(vm);
-    return false;
+    auto errorMessage = dumpException();
+    bell::bellGlobalLogger->error(tag, 0, TAG, "Berry error: %s",
+                                  errorMessage.c_str());
+    if (stdoutCallback != nullptr) {
+      stdoutCallback(errorMessage.c_str(), errorMessage.size());
+      stdoutCallback("\n", 1);
+    }
+     throw BerryErrorException(errorMessage);
   }
   be_pop(vm, 1);
+}
 
-  return true;
+/**
+ * @brief Native function pushed to the berry stack that a value as a string.
+ * 
+ * @param vm 
+ * @param esc 
+ * @return int 
+ */
+static int _dvfunc(bvm* vm) {
+  const char* s = be_tostring(vm, 1);
+  std::string* exceptionMsg = (std::string*)be_tocomptr(vm, 2);
+  *exceptionMsg += s;
+  be_return_nil(vm);
+}
+
+int VmState::dumpValue(int index, std::string& exceptionMsg) {
+  int res, top = be_top(vm) + 1;
+  index = be_absindex(vm, index);
+  be_pushntvfunction(vm, _dvfunc);
+  be_pushvalue(vm, index);
+  be_pushcomptr(vm, std::addressof(exceptionMsg));
+  res = be_pcall(vm, 2); /* using index to store result */
+  be_remove(vm, top);    /* remove '_dumpvalue' function */
+  be_remove(vm, top);    /* remove the value */
+  be_remove(vm, top);    /* remove the exception message  pointer */
+  if (res == BE_EXCEPTION) {
+    be_dumpexcept(vm);
+  }
+  return res;
+}
+
+std::string VmState::dumpException() {
+  std::string exceptionMsg;
+  do {
+
+    /* print exception value */
+    if (dumpValue(-2, exceptionMsg))
+      break;
+
+    exceptionMsg += ": ";
+    /* print exception argument */
+    if (dumpValue(-1, exceptionMsg))
+      break;
+    exceptionMsg += "\n";
+    /* print stack traceback */
+    exceptionMsg += traceStack();
+
+  } while (0);
+  if (exceptionMsg.ends_with("\n")) {
+    exceptionMsg = exceptionMsg.substr(0, exceptionMsg.size() - 1);
+  }
+  be_pop(vm, 2); /* pop the exception value & argument */
+  return exceptionMsg;
+}
+
+// Copied from be_debug.c
+static inline void repair_stack(bvm* vm) {
+  bcallsnapshot* cf;
+  bcallsnapshot* base =
+      static_cast<bcallsnapshot*>(be_stack_base(&vm->tracestack));
+  bcallsnapshot* top =
+      static_cast<bcallsnapshot*>(be_stack_top(&vm->tracestack));
+  /* Because the native function does not push `ip` to the
+     * stack, the ip on the native function frame corresponds
+     * to the previous Berry closure. */
+  for (cf = top; cf >= base; --cf) {
+    if (!var_isclosure(&cf->func)) {
+      /* the last native function stack frame has the `ip` of
+             * the previous Berry frame */
+      binstruction* ip = cf->ip;
+      /* skip native function stack frames */
+      for (; cf >= base && !var_isclosure(&cf->func); --cf)
+        ;
+      /* fixed `ip` of Berry closure frame near native function frame */
+      if (cf >= base)
+        cf->ip = ip;
+    }
+  }
+}
+
+static inline std::string sourceinfo(bproto* proto, binstruction* ip) {
+
+  std::string result;
+#if BE_DEBUG_RUNTIME_INFO
+  char buf[24];
+  be_assert(proto != NULL);
+  if (proto->lineinfo && proto->nlineinfo) {
+    blineinfo* it = proto->lineinfo;
+    blineinfo* end = it + proto->nlineinfo;
+    int pc = cast_int(ip - proto->code - 1); /* now vm->ip has been increased */
+    for (; it < end && pc > it->endpc; ++it)
+      ;
+    snprintf(buf, sizeof(buf), ":%d:", it->linenumber);
+#if BE_DEBUG_SOURCE_FILE
+    result += be_str2cstr(proto->source);
+#endif
+    result += buf;
+  } else {
+    result += "<unknown source>:";
+  }
+#else
+  (void)proto;
+  (void)ip;
+  result += "<unknown source>:";
+#endif
+
+  return result;
+}
+
+std::string VmState::traceStack() {
+  std::string result;
+  EUPH_LOG(error, TAG, "traceStack()");
+  if (be_stack_count(&vm->tracestack)) {
+    EUPH_LOG(error, TAG, "   ...OK");
+    repair_stack(vm);
+    bcallsnapshot* cf;
+    bcallsnapshot* base =
+        static_cast<bcallsnapshot*>(be_stack_base(&vm->tracestack));
+    bcallsnapshot* top =
+        static_cast<bcallsnapshot*>(be_stack_top(&vm->tracestack));
+    result += "stack traceback:\n";
+    for (cf = top; cf >= base; --cf) {
+      if (cf <= top - 10 && cf >= base + 10) {
+        if (cf == top - 10)
+          result += "\t...\n";
+        continue;
+      }
+      if (var_isclosure(&cf->func)) {
+        bclosure* cl = static_cast<bclosure*>(var_toobj(&cf->func));
+        result += "\t";
+        result += sourceinfo(cl->proto, cf->ip);
+        result += " in function `";
+        result += be_str2cstr(cl->proto->name);
+        result += "'\n";
+
+      } else {
+        result += "\t<native>: in native function\n";
+      }
+    }
+  }
+  return result;
 }
 
 void VmState::lambda(std::function<int(VmState&)>* function,

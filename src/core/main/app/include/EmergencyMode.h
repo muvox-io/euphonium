@@ -1,8 +1,11 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
+#include <shared_mutex>
 #include <string>
-
+#include <atomic>
+#include <shared_mutex>
 #include "civetweb.h"
 
 namespace euph {
@@ -38,8 +41,9 @@ class EmergencyMode {
  * @brief Enable emergency mode with a specific reason.
  * 
  * @param reason The reason why emergency mode has been activated.
+ * @param message Optional message displayed on the emergency mode page, with additional information.
  */
-  void trip(EmergencyModeReason reason);
+  void trip(EmergencyModeReason reason, const std::string& message = "");
 
   /**
     * @brief Serve the emergency mode page, if emergency mode is active.
@@ -59,6 +63,8 @@ class EmergencyMode {
   static std::string getReasonString(EmergencyModeReason reason);
 
  private:
-  EmergencyModeReason reason = EmergencyModeReason::NOT_ACTIVE;
+  std::atomic<EmergencyModeReason> reason = EmergencyModeReason::NOT_ACTIVE;
+  std::string message;
+  std::shared_mutex messageMutex;
 };
 }  // namespace euph

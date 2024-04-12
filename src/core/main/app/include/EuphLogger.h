@@ -93,7 +93,22 @@ class EuphoniumLogger : public bell::AbstractLogger {
   };
 
   void printFilename(std::string filename, std::stringstream& logStr) {
-    std::string basenameStr(filename.substr(filename.rfind("/") + 1));
+    bool isBeFile = filename.ends_with(".be");
+    std::string basenameStr;
+    if (isBeFile) {
+      //last 2 parts of the path
+      size_t lastSlash = filename.rfind("/");
+      if (lastSlash == std::string::npos) {
+        lastSlash = 0;
+      }
+      size_t secondLastSlash = filename.rfind("/", lastSlash - 1);
+      if (secondLastSlash == std::string::npos) {
+        secondLastSlash = 0;
+      }
+      basenameStr = filename.substr(secondLastSlash + 1);
+    } else {
+      basenameStr = (filename.substr(filename.rfind("/") + 1));
+    }
     logStr << basenameStr;
     unsigned long hash = 5381;
     for (char const& c : basenameStr) {

@@ -1,32 +1,45 @@
 #include "EmergencyMode.h"
+#include <shared_mutex>
 #include <string>
 #include "EuphLogger.h"
 
 using namespace euph;
 
-EmergencyMode::EmergencyMode() {}
+EmergencyMode::EmergencyMode() {
+  EUPH_LOG(info, "EmergencyMode",
+           "std::atomic<EmergencyModeReason>::is_lock_free() = %d",
+           std::atomic<EmergencyModeReason>{}.is_lock_free());
+}
 
 bool EmergencyMode::isActive() const {
   return this->reason != EmergencyModeReason::NOT_ACTIVE;
 }
 
-void EmergencyMode::trip(EmergencyModeReason reason) {
+void EmergencyMode::trip(EmergencyModeReason reason,
+                         const std::string& message) {
+  EUPH_LOG(error, "EmergencyMode", "===============================");
   EUPH_LOG(error, "EmergencyMode", "Tripped emergency mode with reason: %s",
            getReasonString(reason).c_str());
+  EUPH_LOG(error, "EmergencyMode", "===============================");
   this->reason = reason;
+  std::unique_lock<std::shared_mutex> lock(this->messageMutex);
+  this->message = message;
 }
 
 bool EmergencyMode::tryServe(struct mg_connection* conn) {
   if (!this->isActive()) {
     return false;
   }
-
+  std::shared_lock<std::shared_mutex> lock(this->messageMutex);
   // Serve the emergency mode page
   mg_printf(conn,
             "HTTP/1.1 200 OK\r\n"
             "Content-Type: text/html\r\n"
             "Connection: close\r\n\r\n"
-            "Emergency mode!");
+            "Emergency mode!<br>\n"
+            "Reason: %s<br>\n"
+            "Message: <br><pre>%s</pre>",
+            getReasonString(this->reason).c_str(), this->message.c_str());
 
   return true;
 }

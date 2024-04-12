@@ -1,6 +1,8 @@
 #include "Core.h"
 #include <memory>
+#include "BerryBind.h"
 #include "CoreEvents.h"
+#include "EmergencyMode.h"
 #include "EventBus.h"
 #include "OTAHandler.h"
 #include "URLParser.h"
@@ -115,16 +117,22 @@ void Core::initialize() {
         return this->http->getServer()->makeJsonResponse(state.dump());
       });
 
-  // Load system packages
-  this->pkgLoader->loadWithHook("system");
-  this->pkgLoader->loadWithHook("plugin");
+  try {
+
+    // Load system packages
+    this->pkgLoader->loadWithHook("system");
+    this->pkgLoader->loadWithHook("plugin");
 
 #ifdef ESP_PLATFORM
-  this->pkgLoader->loadWithHook("plugin_esp32");
-  this->pkgLoader->loadWithHook("platform_esp32");
+    this->pkgLoader->loadWithHook("plugin_esp32");
+    this->pkgLoader->loadWithHook("platform_esp32");
 #else
-  this->pkgLoader->loadWithHook("platform_desktop");
+    this->pkgLoader->loadWithHook("platform_desktop");
 #endif
+
+  } catch (berry::BerryErrorException& e) {
+    this->ctx->emergencyMode->trip(EmergencyModeReason::BERRY_INIT_ERROR, e.what());
+  }
 
   // Initialize HTTP
   this->http->initialize();

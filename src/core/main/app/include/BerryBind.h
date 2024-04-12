@@ -6,29 +6,28 @@
 #include <exception>
 #include <functional>
 #include <iostream>
-#include <unordered_map>
 #include <string>
 #include <tuple>
 #include <type_traits>
+#include <unordered_map>
 #include <vector>
 
 extern "C" {
-#include "berry.h"
 #include <be_debug.h>
 #include <be_exec.h>
 #include <be_gc.h>
 #include <be_string.h>
-#include <berry_conf.h>
 #include <be_strlib.h>
 #include <be_vector.h>
 #include <be_vm.h>
+#include <berry_conf.h>
+#include "berry.h"
 }
 
 #undef str
 
 #include "BellUtils.h"
 #include "EuphLogger.h"
-
 
 namespace berry {
 typedef std::unordered_map<std::string, std::any> map;
@@ -42,8 +41,20 @@ berry::map to_map(std::unordered_map<std::string, T> inputMap) {
   }
   return berryMap;
 }
+
+class BerryErrorException : public std::exception {
+ public:
+  BerryErrorException(const std::string& message) : message(message) {}
+
+  const char* what() const noexcept override { return message.c_str(); }
+
+ private:
+  std::string message;
+};
+
 class VmState {
  private:
+  static constexpr std::string TAG = "core-bindings";
   bool del;
   bvm* vm;
   FILE* stdoutRedirect;
@@ -115,6 +126,13 @@ class VmState {
     }
   };
 
+  /**
+   * @brief Used by dumpException to print the exception message.
+   *
+   * @return int Whether the operation was successful
+   */
+  int dumpValue(int index, std::string& out);
+
  public:
   VmState();
   VmState(bvm* vm);
@@ -122,9 +140,30 @@ class VmState {
 
   bvm* raw_ptr() { return vm; }
 
-  std::pair<int, std::string> debug_get_lineinfo();
   void stdoutIntercept(const char* buf, ssize_t len);
-  bool execute_string(const std::string& string, const std::string& tag);
+  /**
+   * @brief Executes a string of Berry code.
+   * @throws BerryErrorException if a berry error occurs during execution
+   *
+   * @param string The berry code to execute
+   * @param tag The tag to use for logging and stack traces (original source file name is recommended)
+   */
+  void execute_string(const std::string& string, const std::string& tag);
+
+  /**
+   * @brief Returns the current exception message as a string. Additionally, it
+   * sends it to stdoutCallback if it is set.
+   *
+   * This is an alternative to be_dumpexcept
+   */
+  std::string dumpException();
+
+  /**
+   * @brief Returns the current stack trace as a string. 
+   * 
+   * @return std::string The stack trace
+   */
+  std::string traceStack();
 
   void lambda(std::function<int(VmState&)>* function, const std::string& name,
               const std::string& module = "");
@@ -296,7 +335,8 @@ class VmState {
   StdoutCallback stdoutCallback = NULL;
 };
 
-typedef std::unordered_map<std::string, std::function<int(berry::VmState&)>*> moduleMap;
+typedef std::unordered_map<std::string, std::function<int(berry::VmState&)>*>
+    moduleMap;
 
 extern berry::moduleMap moduleLambdas;
 
