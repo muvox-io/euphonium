@@ -113,6 +113,7 @@ void Core::initialize() {
             {"connectivity", this->connectivity->getData().toJson()},
             {"version", "0.1.0"},
             {"onboarding", false},
+            {"emergencyMode", ctx->emergencyMode->getJsonStatus()},
         };
         return this->http->getServer()->makeJsonResponse(state.dump());
       });
@@ -131,7 +132,8 @@ void Core::initialize() {
 #endif
 
   } catch (berry::BerryErrorException& e) {
-    this->ctx->emergencyMode->trip(EmergencyModeReason::BERRY_INIT_ERROR, e.what());
+    this->ctx->emergencyMode->trip(EmergencyModeReason::BERRY_INIT_ERROR,
+                                   e.what());
   }
 
   // Initialize HTTP

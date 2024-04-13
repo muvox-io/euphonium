@@ -7,6 +7,7 @@
 #include <atomic>
 #include <shared_mutex>
 #include "civetweb.h"
+#include <nlohmann/json.hpp>
 
 namespace euph {
 
@@ -53,6 +54,19 @@ class EmergencyMode {
     * @return false If the page was not served, caller should continue processing the request.
     */
   bool tryServe(struct mg_connection* conn);
+
+  /**
+   * @brief Get the status of the emergency mode as a JSON object.
+   * To be used as part of the /system/info endpoint.
+   *
+   * The json object contains the following fields:
+   * - active: true if emergency mode is active, false otherwise
+   * - reason: the reason why emergency mode is active (null if not active)
+   * - message: an optional message with additional information (null if not active)
+   * 
+   * @return nlohmann::json Status information.
+   */
+  nlohmann::json getJsonStatus();
 
   /**
    * @brief Returns a human-readable string for the given emergency mode reason.

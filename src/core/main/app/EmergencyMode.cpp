@@ -48,6 +48,23 @@ bool EmergencyMode::tryServe(struct mg_connection* conn) {
   return true;
 }
 
+nlohmann::json EmergencyMode::getJsonStatus() {
+  nlohmann::json status;
+  bool isActive = this->isActive();
+  status["active"] = isActive;
+
+  if (isActive) {
+    status["reason"] = getReasonString(this->reason);
+    std::shared_lock<std::shared_mutex> lock(this->messageMutex);
+    status["message"] = this->message;
+  } else {
+    status["reason"] = nullptr;
+    status["message"] = nullptr;
+  }
+
+  return status;
+}
+
 std::string EmergencyMode::getReasonString(EmergencyModeReason reason) {
 
 #define CASE_RETURN_STR(x)     \
