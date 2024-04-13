@@ -114,7 +114,6 @@ void VmState::execute_string(const std::string& data,
         stdoutCallback("\n", 1);
       }
       throw BerryErrorException(errorMessage);
-      
     }
   } else {
     auto errorMessage = dumpException();
@@ -124,7 +123,7 @@ void VmState::execute_string(const std::string& data,
       stdoutCallback(errorMessage.c_str(), errorMessage.size());
       stdoutCallback("\n", 1);
     }
-     throw BerryErrorException(errorMessage);
+    throw BerryErrorException(errorMessage);
   }
   be_pop(vm, 1);
 }
