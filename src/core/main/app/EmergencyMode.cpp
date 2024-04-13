@@ -5,6 +5,11 @@
 
 using namespace euph;
 
+namespace euph {
+extern unsigned char emergencyModeHtml[];
+extern unsigned int emergencyModeHtml_len;
+}  // namespace euph
+
 EmergencyMode::EmergencyMode() {
   EUPH_LOG(info, "EmergencyMode",
            "std::atomic<EmergencyModeReason>::is_lock_free() = %d",
@@ -35,11 +40,10 @@ bool EmergencyMode::tryServe(struct mg_connection* conn) {
   mg_printf(conn,
             "HTTP/1.1 200 OK\r\n"
             "Content-Type: text/html\r\n"
-            "Connection: close\r\n\r\n"
-            "Emergency mode!<br>\n"
-            "Reason: %s<br>\n"
-            "Message: <br><pre>%s</pre>",
-            getReasonString(this->reason).c_str(), this->message.c_str());
+            "Content-Length: %d\r\n"
+            "Connection: close\r\n\r\n",
+            emergencyModeHtml_len);
+  mg_write(conn, emergencyModeHtml, emergencyModeHtml_len);
 
   return true;
 }

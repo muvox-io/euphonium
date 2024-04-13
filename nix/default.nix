@@ -49,7 +49,7 @@ in rec {
   # Esp32 devshell
   shell-esp32 = pkgs.mkShell {
     packages = with pkgs;
-      [ unstable.mbedtls avahi avahi-compat portaudio littlefs-python gk-flasher ]
+      [ unstable.mbedtls avahi avahi-compat portaudio littlefs-python gk-flasher minify ]
       ++ [ llvmPackages.libcxxClang llvmPackages.libclang llvmPackages.libllvm ]
       ++ lib.optionals stdenv.isDarwin
       (with darwin.apple_sdk.frameworks; [ CoreFoundation CoreServices ]);
@@ -87,6 +87,7 @@ in rec {
         bash
         littlefs-python
         python310
+        minify
       ];
 
       # Patch nanopb shebangs to refer to provided python
@@ -147,6 +148,7 @@ in rec {
       unstable.mbedtls
       portaudio
       protobuf
+      minify
     ];
     # Patch nanopb shebangs to refer to provided python
     postPatch = ''

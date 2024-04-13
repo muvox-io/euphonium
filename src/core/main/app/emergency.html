@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!--
+      This file is minified & embedded into the firmware binary.
+      It can only use inline styles and scripts, and should be kept as small as possible.
+      Only endpoints defined in C++ code can be used, since the filesystem 
+      might be corrupted and berry scripts can't be executed.
+    -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Euphonium emergency mode</title>
+
+    <style>
+      body {
+        background-color: #f0f0f0;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .container h1 {
+        font-size: 2rem;
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Emergency mode</h1>
+
+      <p>Activated due to: <strong id="emergencyModeReason"></strong></p>
+      <p>Technical information:</p>
+      <pre>
+        <code id="emergencyModeMessage">
+          
+        </code>
+      </pre>
+    </div>
+    <script>
+      (() => {
+        const $ = document.querySelector.bind(document);
+        const $$ = document.querySelectorAll.bind(document);
+        fetch("/system/info")
+          .then((res) => res.json())
+          .then((data) => {
+            const emergencyMode = data.emergencyMode;
+            $("#emergencyModeReason").textContent = emergencyMode.reason;
+            $("#emergencyModeMessage").textContent = emergencyMode.message;
+          });
+      })();
+    </script>
+  </body>
+</html>
