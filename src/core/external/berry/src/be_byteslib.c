@@ -309,6 +309,17 @@ static size_t buf_add_buf(buf_impl* attr, buf_impl* attr2)
     return attr->len;
 }
 
+static size_t buf_add_raw(buf_impl* attr, const void* buf_raw, int32_t len)
+{
+    uint8_t *buf = (uint8_t*) buf_raw;
+    if ((len > 0) && (attr->len + len <= attr->size)) {
+        for (int32_t i = 0; i < len; i++) {
+            attr->bufptr[attr->len++] = buf[i];
+        }
+    }
+    return attr->len;
+}
+
 static uint8_t buf_get1(buf_impl* attr, int offset)
 {
     if ((offset >= 0) && (offset < attr->len)) {
@@ -354,6 +365,40 @@ static uint16_t buf_get2_be(buf_impl* attr, size_t offset)
         return attr->bufptr[offset+1] | (attr->bufptr[offset] << 8);
     }
     return 0;
+}
+
+static uint32_t buf_get3_le(buf_impl* attr, size_t offset)
+{
+    if ((int32_t)offset + 2 < attr->len) {
+        return attr->bufptr[offset] | (attr->bufptr[offset+1] << 8) | (attr->bufptr[offset+2] << 16);
+    }
+    return 0;
+}
+
+static uint32_t buf_get3_be(buf_impl* attr, size_t offset)
+{
+    if ((int32_t)offset + 2 < attr->len) {
+        return attr->bufptr[offset+2] | (attr->bufptr[offset+1] << 8) | (attr->bufptr[offset] << 16);
+    }
+    return 0;
+}
+
+static void buf_set3_le(buf_impl* attr, size_t offset, uint32_t data)
+{
+    if ((int32_t)offset + 2 < attr->len) {
+        attr->bufptr[offset] = data & 0xFF;
+        attr->bufptr[offset+1] = (data >> 8) & 0xFF;
+        attr->bufptr[offset+2] = (data >> 16) & 0xFF;
+    }
+}
+
+static void buf_set3_be(buf_impl* attr, size_t offset, uint32_t data)
+{
+    if ((int32_t)offset + 2 < attr->len) {
+        attr->bufptr[offset+2] = data & 0xFF;
+        attr->bufptr[offset+1] = (data >> 8) & 0xFF;
+        attr->bufptr[offset] = (data >> 16) & 0xFF;
+    }
 }
 
 static void buf_set4_le(buf_impl* attr, size_t offset, uint32_t data)
@@ -832,12 +877,18 @@ static int m_get(bvm *vm, bbool sign)
             case 2:     ret = buf_get2_le(&attr, idx);
                         if (sign) { ret = (int16_t)(uint16_t) ret; }
                         break;
+            case 3:     ret = buf_get3_le(&attr, idx);
+                        if (sign & (ret & 0x800000)) { ret = ret | 0xFF000000; }
+                        break;
             case 4:     ret = buf_get4_le(&attr, idx);    break;
             case -2:    ret = buf_get2_be(&attr, idx);
                         if (sign) { ret = (int16_t)(uint16_t) ret; }
                         break;
+            case -3:    ret = buf_get3_be(&attr, idx);
+                        if (sign & (ret & 0x800000)) { ret = ret | 0xFF000000; }
+                        break;
             case -4:    ret = buf_get4_be(&attr, idx);    break;
-            default:    be_raise(vm, "type_error", "size must be -4, -2, -1, 0, 1, 2 or 4.");
+            default:    be_raise(vm, "type_error", "size must be -4, -3, -2, -1, 0, 1, 2, 3 or 4.");
         }
         be_pop(vm, argc - 1);
         if (vsize != 0) {
@@ -911,10 +962,12 @@ static int m_set(bvm *vm)
             case -1:    /* fallback below */
             case 1:     buf_set1(&attr, idx, value);      break;
             case 2:     buf_set2_le(&attr, idx, value);   break;
+            case 3:     buf_set3_le(&attr, idx, value);   break;
             case 4:     buf_set4_le(&attr, idx, value);   break;
             case -2:    buf_set2_be(&attr, idx, value);   break;
+            case -3:    buf_set3_be(&attr, idx, value);   break;
             case -4:    buf_set4_be(&attr, idx, value);   break;
-            default:    be_raise(vm, "type_error", "size must be -4, -2, -1, 0, 1, 2 or 4.");
+            default:    be_raise(vm, "type_error", "size must be -4, -3, -2, -1, 0, 1, 2, 3 or 4.");
         }
         be_pop(vm, argc - 1);
         m_write_attributes(vm, 1, &attr);  /* update attributes */
@@ -945,6 +998,32 @@ static int m_setfloat(bvm *vm)
         be_pop(vm, argc - 1);
         m_write_attributes(vm, 1, &attr);  /* update attributes */
         be_return_nil(vm);
+    }
+    be_return_nil(vm);
+}
+
+/*
+ * Add a 32 bits float
+ * `addfloat(value:real or int [, big_endian:bool]) -> instance`
+ * 
+ */
+static int m_addfloat(bvm *vm)
+{
+    int argc = be_top(vm);
+    buf_impl attr = bytes_check_data(vm, 4); /* we reserve 4 bytes anyways */
+    check_ptr(vm, &attr);
+    if (attr.fixed) { be_raise(vm, BYTES_RESIZE_ERROR, BYTES_RESIZE_MESSAGE); }
+    if (argc >=2 && (be_isint(vm, 2) || be_isreal(vm, 2))) {
+        float val_f = (float) be_toreal(vm, 2);
+        int32_t* val_i = (int32_t*) &val_f;
+        bbool be = bfalse;
+        if (argc >= 3) {
+            be = be_tobool(vm, 3);
+        }
+        if (be) { buf_add4_be(&attr, *val_i); } else { buf_add4_le(&attr, *val_i); }
+        be_pop(vm, argc - 1);
+        m_write_attributes(vm, 1, &attr);  /* update attributes */
+        be_return(vm);
     }
     be_return_nil(vm);
 }
@@ -1169,17 +1248,26 @@ static int m_merge(bvm *vm)
     int argc = be_top(vm);
     buf_impl attr = m_read_attributes(vm, 1); /* no resize yet */
     check_ptr(vm, &attr);
-    if (argc >= 2 && be_isbytes(vm, 2)) {
-        buf_impl attr2 = m_read_attributes(vm, 2);
-        check_ptr(vm, &attr2);
+    if (argc >= 2 && (be_isbytes(vm, 2) || be_isstring(vm, 2))) {
+        const uint8_t * buf;
+        int32_t buf_len;
+        if (be_isbytes(vm, 2)) {
+            buf_impl attr2 = m_read_attributes(vm, 2);
+            check_ptr(vm, &attr2);
+            buf = attr2.bufptr;
+            buf_len = attr2.len;
+        } else {
+            buf = (const uint8_t *)be_tostring(vm, 2);
+            buf_len = strlen((const char *)buf);
+        }
 
         /* allocate new object */
-        bytes_new_object(vm, attr.len + attr2.len);
+        bytes_new_object(vm, attr.len + buf_len);
         buf_impl attr3 = m_read_attributes(vm, -1);
         check_ptr(vm, &attr3);
 
         buf_add_buf(&attr3, &attr);
-        buf_add_buf(&attr3, &attr2);
+        buf_add_raw(&attr3, buf, buf_len);
 
         m_write_attributes(vm, -1, &attr3);  /* update instance */
         be_return(vm); /* return self */
@@ -1207,11 +1295,21 @@ static int m_connect(bvm *vm)
     buf_impl attr = m_read_attributes(vm, 1);
     check_ptr(vm, &attr);
     if (attr.fixed) { be_raise(vm, BYTES_RESIZE_ERROR, BYTES_RESIZE_MESSAGE); }
-    if (argc >= 2 && (be_isbytes(vm, 2) || be_isint(vm, 2))) {
+    if (argc >= 2 && (be_isbytes(vm, 2) || be_isint(vm, 2) || be_isstring(vm, 2))) {
         if (be_isint(vm, 2)) {
             bytes_resize(vm, &attr, attr.len + 1); /* resize */
             buf_add1(&attr, be_toint(vm, 2));
             m_write_attributes(vm, 1, &attr);  /* update instance */
+            be_pushvalue(vm, 1);
+            be_return(vm); /* return self */
+        } else if (be_isstring(vm, 2)) {
+            const char *str = be_tostring(vm, 2);
+            size_t str_len = strlen(str);
+            if (str_len > 0) {
+                bytes_resize(vm, &attr, attr.len + str_len); /* resize */
+                buf_add_raw(&attr, str, str_len);
+                m_write_attributes(vm, 1, &attr);  /* update instance */
+            }
             be_pushvalue(vm, 1);
             be_return(vm); /* return self */
         } else {
@@ -1224,7 +1322,7 @@ static int m_connect(bvm *vm)
             be_return(vm); /* return self */
         }
     }
-    be_raise(vm, "type_error", "operand must be bytes or int");
+    be_raise(vm, "type_error", "operand must be bytes or int or string");
     be_return_nil(vm); /* return self */
 }
 
@@ -1689,6 +1787,7 @@ void be_load_byteslib(bvm *vm)
         { "setbytes", m_setbytes },
         { "getfloat", m_getfloat },
         { "setfloat", m_setfloat },
+        { "addfloat", m_addfloat },
         { "item", m_item },
         { "setitem", m_setitem },
         { "size", m_size },
@@ -1696,6 +1795,7 @@ void be_load_byteslib(bvm *vm)
         { "clear", m_clear },
         { "reverse", m_reverse },
         { "copy", m_copy },
+        { "append", m_connect },
         { "+", m_merge },
         { "..", m_connect },
         { "==", m_equal },
@@ -1733,6 +1833,7 @@ class be_class_bytes (scope: global, name: bytes) {
     geti, func(m_geti)
     getfloat, func(m_getfloat)
     setfloat, func(m_setfloat)
+    addfloat, func(m_addfloat)
     set, func(m_set)
     seti, func(m_set)
     setbytes, func(m_setbytes)
@@ -1743,6 +1844,7 @@ class be_class_bytes (scope: global, name: bytes) {
     clear, func(m_clear)
     reverse, func(m_reverse)
     copy, func(m_copy)
+    append, func(m_connect)
     +, func(m_merge)
     .., func(m_connect)
     ==, func(m_equal)
