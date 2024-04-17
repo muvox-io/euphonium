@@ -34,6 +34,7 @@ class CoreBindings {
   void _deleteConfigFiles();
   void _restart();
   void _clearWifiConfig();
+  void _tripEmergencyMode(std::string message);
 
  private:
   const std::string TAG = "core-bindings";

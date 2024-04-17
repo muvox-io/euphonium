@@ -21,7 +21,16 @@ enum class EmergencyModeReason {
      */
   NOT_ACTIVE = 0,
 
+  /**
+   * @brief A berry error has occured while initializing scripts.
+   * 
+   */
   BERRY_INIT_ERROR = 1,
+
+  /**
+   * @brief Emeregency mode tripped manually by the user.
+   */
+  MANUAL_TRIP = 2,
 };
 
 /**

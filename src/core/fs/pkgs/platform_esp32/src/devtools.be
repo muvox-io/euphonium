@@ -45,7 +45,7 @@ class DevtoolsPlugin : Plugin
   end
 
   def make_form(ctx, state)
-    var group = ctx.create_group('devtools', { 'label': 'Devtools' })
+    var group = ctx.create_group('statistics', { 'label': 'Statistics' })
 
     var system_load_btn = group.button_field('cpuStatsBtn', {
         'label': "Get CPU statistics",
@@ -99,8 +99,19 @@ class DevtoolsPlugin : Plugin
       ctx.refresh_interval = 0
     else
       ctx.refresh_interval = 2000
-    
     end
+    
+    var testing_group = ctx.create_group('testing', { 'label': 'Testing' })
+
+    var trip_emergency_mode_btn = testing_group.button_field('tripEmergencyModeBtn', {
+        'label': "Trip emergency mode",
+        'buttonText': "Trip",
+    })
+
+    if trip_emergency_mode_btn.has_been("click")
+      core.trip_emergency_mode("Tripped from devtools page")
+    end
+
   end
 end
 

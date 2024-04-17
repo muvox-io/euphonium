@@ -2,16 +2,15 @@
 #include <memory>
 #include "BellUtils.h"
 #include "CoreEvents.h"
+#include "EmergencyMode.h"
 
 #include <filesystem>
 #include <fstream>
 #include <streambuf>
 
-
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 
 #ifdef ESP_PLATFORM
 #include "esp_system.h"
@@ -56,6 +55,8 @@ void CoreBindings::setupBindings() {
 
   ctx->vm->export_this("clear_config", this, &CoreBindings::_clearWifiConfig,
                        "wifi");
+  ctx->vm->export_this("trip_emergency_mode", this,
+                       &CoreBindings::_tripEmergencyMode, "core");
 }
 
 std::string CoreBindings::_getPlatform() {
@@ -175,15 +176,15 @@ void CoreBindings::_sleepMS(int ms) {
 void CoreBindings::_deleteConfigFiles() {
   std::string path = fmt::format("{}/cfg/", ctx->rootPath);
   BELL_LOG(debug, TAG, "Deleting config files in: %s", path.c_str());
-   struct dirent *entry;
-    DIR *dir = opendir(path.c_str());
+  struct dirent* entry;
+  DIR* dir = opendir(path.c_str());
   while ((entry = readdir(dir)) != NULL) {
     std::string filename = entry->d_name;
     if (filename == "." || filename == "..") {
       continue;
     }
     std::string filepath = path + filename;
-   
+
     remove(filepath.c_str());
   }
 }
@@ -201,4 +202,8 @@ void CoreBindings::_clearWifiConfig() {
   // @TODO bring back
   // this->ctx->storage->executeFromTask(
   //     [this]() { this->ctx->connectivity->clearConfig(); });
+}
+
+void CoreBindings::_tripEmergencyMode(std::string message) {
+  this->ctx->emergencyMode->trip(EmergencyModeReason::MANUAL_TRIP, message);
 }

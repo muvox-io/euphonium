@@ -73,6 +73,7 @@ std::string EmergencyMode::getReasonString(EmergencyModeReason reason) {
   switch (reason) {
     CASE_RETURN_STR(NOT_ACTIVE);
     CASE_RETURN_STR(BERRY_INIT_ERROR);
+    CASE_RETURN_STR(MANUAL_TRIP);
   }
 
   return "__FIXME_UNKNOWN_ENUM_VALUE__";
