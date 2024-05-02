@@ -88,6 +88,7 @@ in rec {
         littlefs-python
         python310
         minify
+        vim # for xxd
       ];
 
       # Patch nanopb shebangs to refer to provided python
