@@ -110,6 +110,7 @@ class Connectivity {
 
   virtual void registerHandlers(std::shared_ptr<bell::BellHTTPServer> http) = 0;
 
-  virtual void clearConfig() = 0;
+
+  virtual void requestClearConfig() = 0;
 };
 }  // namespace euph

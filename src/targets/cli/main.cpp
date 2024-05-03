@@ -133,7 +133,7 @@ class FakeConnectivity : public euph::Connectivity, public bell::Task {
       sendStateUpdate();
     }
   }
-  void clearConfig() override {
+  void requestClearConfig() override {
   }
 };
 

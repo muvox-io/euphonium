@@ -10,6 +10,27 @@
 
 using namespace euph;
 
+/**
+ * @brief Internal event base for dispatching custom events to the ESP32 event loop.
+ *
+ * 
+ */
+ESP_EVENT_DEFINE_BASE(EUPH_ESP32_CONNECTIVITY_EVENT);
+
+/**
+ * @brief Event types for EUPH_ESP32_CONNECTIVITY_EVENT.
+ * 
+ */
+enum class EuphEsp32ConnectivityEvent : int32_t {
+
+  /**
+   * @brief Request to clear the WiFi configuration. It will be cleared from the NVS storage.
+   *
+   * The configuration is cleared from the event handler, because it is not safe to access the NVS storage from a PSRAM task.
+   */
+  CLEAR_CONFIG,
+};
+
 static void wifiEventHandler(void* arg, esp_event_base_t event_base,
                              int32_t event_id, void* event_data) {
   ESP32Connectivity* self = static_cast<ESP32Connectivity*>(arg);
@@ -88,6 +109,12 @@ void ESP32Connectivity::persistConfig() {
   }
 }
 
+void ESP32Connectivity::requestClearConfig()  {
+  ESP_ERROR_CHECK(esp_event_post(EUPH_ESP32_CONNECTIVITY_EVENT,
+                                 (int32_t)EuphEsp32ConnectivityEvent::CLEAR_CONFIG,
+                                 NULL, 0, portMAX_DELAY));
+}
+
 void ESP32Connectivity::clearConfig() {
   esp_err_t err;
   std::unique_ptr<nvs::NVSHandle> handle =
@@ -120,6 +147,8 @@ void ESP32Connectivity::initializeWiFiStack() {
       WIFI_EVENT, ESP_EVENT_ANY_ID, &wifiEventHandler, this, NULL));
   ESP_ERROR_CHECK(esp_event_handler_instance_register(
       IP_EVENT, IP_EVENT_STA_GOT_IP, &wifiEventHandler, this, NULL));
+  ESP_ERROR_CHECK(esp_event_handler_instance_register(
+      EUPH_ESP32_CONNECTIVITY_EVENT, ESP_EVENT_ANY_ID, &wifiEventHandler, this, NULL));
 
   ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
 }
@@ -317,6 +346,9 @@ void ESP32Connectivity::handleEvent(esp_event_base_t event_base,
         }
       }
     }
+  } else if (event_base == EUPH_ESP32_CONNECTIVITY_EVENT &&
+             event_id == (int32_t)EuphEsp32ConnectivityEvent::CLEAR_CONFIG) {
+    this->clearConfig();
   }
 }
 

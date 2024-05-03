@@ -191,6 +191,7 @@ void CoreBindings::_deleteConfigFiles() {
 
 void CoreBindings::_restart() {
   EUPH_LOG(info, TAG, "Restarting the application...");
+  BELL_SLEEP_MS(100);  // Wait for any unfinished asynchronous business
 #ifdef ESP_PLATFORM
   esp_restart();
 #else
@@ -199,9 +200,7 @@ void CoreBindings::_restart() {
 }
 
 void CoreBindings::_clearWifiConfig() {
-  // @TODO bring back
-  // this->ctx->storage->executeFromTask(
-  //     [this]() { this->ctx->connectivity->clearConfig(); });
+  this->ctx->connectivity->requestClearConfig();
 }
 
 void CoreBindings::_tripEmergencyMode(std::string message) {
