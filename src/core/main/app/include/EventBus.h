@@ -18,7 +18,7 @@ enum class EventType : uint32_t {
   CONNECTIVITY_EVENT,
   WEBSOCKET_EVENT,
   PLAYBACK_EVENT,
-  CONNECTIVITY_REQUEST_EVENT,
+  EMERGENCY_MODE,
 };
 
 class Event {

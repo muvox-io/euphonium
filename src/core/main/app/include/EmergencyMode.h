@@ -8,6 +8,8 @@
 #include <string>
 #include "civetweb.h"
 
+#include "EventBus.h"
+
 namespace euph {
 
 /**
@@ -48,7 +50,7 @@ enum class EmergencyModeReason {
  */
 class EmergencyMode {
  public:
-  EmergencyMode();
+  EmergencyMode(std::weak_ptr<euph::EventBus> eventBus);
 
   bool isActive() const;
 
@@ -91,6 +93,7 @@ class EmergencyMode {
   static std::string getReasonString(EmergencyModeReason reason);
 
  private:
+  std::weak_ptr<euph::EventBus> eventBus;
   std::atomic<EmergencyModeReason> reason = EmergencyModeReason::NOT_ACTIVE;
   std::string message;
   std::shared_mutex messageMutex;

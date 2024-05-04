@@ -123,7 +123,7 @@ struct Context {
     ctx->playbackController->eventBus = ctx->eventBus;
     ctx->playbackController->playbackAccessSemaphore = std::make_unique<bell::WrappedSemaphore>(1);
     ctx->playbackController->playbackAccessSemaphore->give();
-    ctx->emergencyMode = std::make_shared<euph::EmergencyMode>();
+    ctx->emergencyMode = std::make_shared<euph::EmergencyMode>(ctx->eventBus);
     return ctx;
   }
 
@@ -137,7 +137,7 @@ struct Context {
     ctx->playbackController->playbackAccessSemaphore = std::make_unique<bell::WrappedSemaphore>(1);
     ctx->playbackController->playbackAccessSemaphore->give();
     ctx->eventBus = bus;
-    ctx->emergencyMode = std::make_shared<euph::EmergencyMode>();
+    ctx->emergencyMode = std::make_shared<euph::EmergencyMode>(ctx->eventBus);
 
 #ifdef ESP_PLATFORM
     ctx->rootPath = "/fs";

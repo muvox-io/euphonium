@@ -1,6 +1,7 @@
 #include "EmergencyMode.h"
 #include <shared_mutex>
 #include <string>
+#include "CoreEvents.h"
 #include "EuphLogger.h"
 
 using namespace euph;
@@ -10,8 +11,8 @@ extern unsigned char emergencyModeHtml[];
 extern unsigned int emergencyModeHtml_len;
 }  // namespace euph
 
-EmergencyMode::EmergencyMode() {
-}
+EmergencyMode::EmergencyMode(std::weak_ptr<euph::EventBus> eventBus)
+    : eventBus(eventBus) {}
 
 bool EmergencyMode::isActive() const {
   return this->reason != EmergencyModeReason::NOT_ACTIVE;
@@ -24,6 +25,11 @@ void EmergencyMode::trip(EmergencyModeReason reason,
            getReasonString(reason).c_str());
   EUPH_LOG(error, "EmergencyMode", "===============================");
   this->reason = reason;
+  if (std::shared_ptr<euph::EventBus> bus = this->eventBus.lock()) {
+    EUPH_LOG(error, "EmergencyMode", "Posting EmergencyModeTrippedEvent");
+    auto evt = std::make_unique<EmergencyModeTrippedEvent>(reason);
+    bus->postEvent(std::move(evt));
+  }
   std::unique_lock<std::shared_mutex> lock(this->messageMutex);
   this->message = message;
 }

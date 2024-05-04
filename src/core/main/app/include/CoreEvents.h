@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include "BerryBind.h"
+#include "EmergencyMode.h"
 #include "EventBus.h"
 
 namespace euph {
@@ -189,4 +190,23 @@ class NotificationEvent : public Event {
     return result;
   }
 };
+
+class EmergencyModeTrippedEvent : public Event {
+ public:
+  EmergencyModeReason reason;
+
+  EmergencyModeTrippedEvent(EmergencyModeReason reason) {
+    this->eventType = EventType::EMERGENCY_MODE;
+    this->subType = "tripped";
+    this->reason = reason;
+  }
+
+  berry::map toBerry() override {
+    berry::map result;
+    result["reason"] = (int)this->reason;
+    result["reason_str"] = EmergencyMode::getReasonString(this->reason);
+    return result;
+  }
+};
+
 }  // namespace euph
