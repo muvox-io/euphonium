@@ -11,9 +11,6 @@ extern unsigned int emergencyModeHtml_len;
 }  // namespace euph
 
 EmergencyMode::EmergencyMode() {
-  EUPH_LOG(info, "EmergencyMode",
-           "std::atomic<EmergencyModeReason>::is_lock_free() = %d",
-           std::atomic<EmergencyModeReason>{}.is_lock_free());
 }
 
 bool EmergencyMode::isActive() const {
@@ -74,6 +71,7 @@ std::string EmergencyMode::getReasonString(EmergencyModeReason reason) {
     CASE_RETURN_STR(NOT_ACTIVE);
     CASE_RETURN_STR(BERRY_INIT_ERROR);
     CASE_RETURN_STR(MANUAL_TRIP);
+    CASE_RETURN_STR(LOADING_BERRY_HOOK_FAILED);
   }
 
   return "__FIXME_UNKNOWN_ENUM_VALUE__";

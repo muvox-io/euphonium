@@ -56,8 +56,9 @@ void PackageLoader::loadValidPackages() {
   }
 }
 
-void PackageLoader::loadWithHook(const std::string& hook) {
+void PackageLoader::loadWithHook(const std::string& hook, bool packageRequired) {
   EUPH_LOG(info, TAG, "Loading packages with hook: %s", hook.c_str());
+  bool found = false;
   for (auto pkg : this->packages) {
     if (pkg.initHook == hook) {
       EUPH_LOG(info, TAG, "Loading package: %s", pkg.name.c_str());
@@ -66,10 +67,20 @@ void PackageLoader::loadWithHook(const std::string& hook) {
 
       // Read init code file
       std::ifstream initCodeFile(initPath);
+      if (initCodeFile.fail()) {
+        EUPH_LOG(error, TAG, "Failed to load berry script: %s", initPath.c_str());
+        throw PackageLoaderFileNotFoundException("Failed to load berry script: " + initPath);
+      }
       std::stringstream initCodeBuffer;
       initCodeBuffer << initCodeFile.rdbuf();
 
       ctx->vm->execute_string(initCodeBuffer.str(), initPath);
+      found = true;
     }
+  }
+
+  if (packageRequired && !found) {
+    EUPH_LOG(error, TAG, "No packages found for hook: %s, but a package is required.", hook.c_str());
+    throw PackageLoaderFileNotFoundException("No packages found for hook: " + hook + ", but a package is required.");
   }
 }

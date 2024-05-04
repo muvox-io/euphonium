@@ -1,13 +1,12 @@
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <mutex>
+#include <nlohmann/json.hpp>
 #include <shared_mutex>
 #include <string>
-#include <atomic>
-#include <shared_mutex>
 #include "civetweb.h"
-#include <nlohmann/json.hpp>
 
 namespace euph {
 
@@ -28,9 +27,15 @@ enum class EmergencyModeReason {
   BERRY_INIT_ERROR = 1,
 
   /**
+    * @brief Could not load packages for a given berry hook.
+    * 
+    */
+  LOADING_BERRY_HOOK_FAILED = 2,
+
+  /**
    * @brief Emeregency mode tripped manually by the user.
    */
-  MANUAL_TRIP = 2,
+  MANUAL_TRIP = 3,
 };
 
 /**

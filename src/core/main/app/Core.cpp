@@ -121,18 +121,21 @@ void Core::initialize() {
   try {
 
     // Load system packages
-    this->pkgLoader->loadWithHook("system");
+    this->pkgLoader->loadWithHook("system", true);
     this->pkgLoader->loadWithHook("plugin");
 
 #ifdef ESP_PLATFORM
     this->pkgLoader->loadWithHook("plugin_esp32");
-    this->pkgLoader->loadWithHook("platform_esp32");
+    this->pkgLoader->loadWithHook("platform_esp32", true);
 #else
-    this->pkgLoader->loadWithHook("platform_desktop");
+    this->pkgLoader->loadWithHook("platform_desktop", true);
 #endif
 
   } catch (berry::BerryErrorException& e) {
     this->ctx->emergencyMode->trip(EmergencyModeReason::BERRY_INIT_ERROR,
+                                   e.what());
+  } catch(PackageLoaderFileNotFoundException& e) {
+    this->ctx->emergencyMode->trip(EmergencyModeReason::LOADING_BERRY_HOOK_FAILED,
                                    e.what());
   }
 
