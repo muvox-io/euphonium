@@ -15,8 +15,9 @@ class Connectivity;
 
 #include "BerryBind.h"
 #include "Connectivity.h"
-#include "EventBus.h"
 #include "EmergencyMode.h"
+#include "EventBus.h"
+#include "ServiceTask.h"
 
 /**
  * @brief The main context of the application.
@@ -28,6 +29,9 @@ class Connectivity;
  * - eventBus -> Instance of the EventBus, that should be used to communicate between the different parts of the system
 */
 namespace euph {
+
+class ServiceTask;
+
 // Used to control the state of playback. @TODO: Extend with loading state, error state, and such
 struct PlaybackController {
   // Loosely bound from ctx, so that we can send out playback state events
@@ -71,16 +75,13 @@ struct PlaybackController {
     setState(PlaybackStateEvent::State::PLAYING);
   }
 
-  void setLoading() {
-    setState(PlaybackStateEvent::State::LOADING);
-  }
+  void setLoading() { setState(PlaybackStateEvent::State::LOADING); }
 
-  void setStopped() {
-    setState(PlaybackStateEvent::State::STOPPED);
-  }
+  void setStopped() { setState(PlaybackStateEvent::State::STOPPED); }
 
   void lockPlayback(const std::string& source) {
-    if (isLocked) return;
+    if (isLocked)
+      return;
     playbackAccessSemaphore->wait();
 
     isLocked = true;
@@ -93,7 +94,8 @@ struct PlaybackController {
   }
 
   void unlockPlayback() {
-    if (!isLocked) return;
+    if (!isLocked)
+      return;
     isLocked = false;
     playbackAccessSemaphore->give();
   }
@@ -106,26 +108,10 @@ struct Context {
   std::shared_ptr<euph::PlaybackController> playbackController;
   std::shared_ptr<euph::Connectivity> connectivity;
   std::shared_ptr<euph::EmergencyMode> emergencyMode;
+  std::shared_ptr<euph::ServiceTask> serviceTask;
 
   // Display name of the device, gets replaced by user setting later on
   std::string displayName = "Euphonium";
-
-  /**
-   * @brief Creates a context with the default utilities
-   * 
-   * @return std::shared_ptr<euph::Context> fresh context
-   */
-  static std::shared_ptr<euph::Context> create() {
-    auto ctx = std::make_shared<euph::Context>();
-    ctx->vm = std::make_shared<berry::VmState>();
-    ctx->eventBus = std::make_shared<euph::EventBus>();
-    ctx->audioBuffer = std::make_shared<bell::CentralAudioBuffer>(128);
-    ctx->playbackController->eventBus = ctx->eventBus;
-    ctx->playbackController->playbackAccessSemaphore = std::make_unique<bell::WrappedSemaphore>(1);
-    ctx->playbackController->playbackAccessSemaphore->give();
-    ctx->emergencyMode = std::make_shared<euph::EmergencyMode>(ctx->eventBus);
-    return ctx;
-  }
 
   static std::shared_ptr<euph::Context> createWithBus(
       std::shared_ptr<euph::EventBus> bus) {
@@ -134,10 +120,12 @@ struct Context {
     ctx->audioBuffer = std::make_shared<bell::CentralAudioBuffer>(128);
     ctx->playbackController = std::make_shared<euph::PlaybackController>();
     ctx->playbackController->eventBus = bus;
-    ctx->playbackController->playbackAccessSemaphore = std::make_unique<bell::WrappedSemaphore>(1);
+    ctx->playbackController->playbackAccessSemaphore =
+        std::make_unique<bell::WrappedSemaphore>(1);
     ctx->playbackController->playbackAccessSemaphore->give();
     ctx->eventBus = bus;
     ctx->emergencyMode = std::make_shared<euph::EmergencyMode>(ctx->eventBus);
+    ctx->serviceTask = std::make_shared<euph::ServiceTask>(ctx);
 
 #ifdef ESP_PLATFORM
     ctx->rootPath = "/fs";
