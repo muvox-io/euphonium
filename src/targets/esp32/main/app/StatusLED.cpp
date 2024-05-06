@@ -1,9 +1,10 @@
 #include "StatusLED.h"
+#include <chrono>
 
 using namespace euph;
 
 StatusLED::StatusLED(std::shared_ptr<euph::EventBus> eventBus)
-    : bell::Task("StatusLED", 2 * 1024, 0, 0) {
+    : bell::Task("StatusLED", 2 * 1024, 0, 0), statusUpdated(0) {
   this->eventBus = eventBus;
   this->setupTimer();
   this->updateLEDChannel(LEDC_CHANNEL_0, STATUS_R);
@@ -12,8 +13,7 @@ StatusLED::StatusLED(std::shared_ptr<euph::EventBus> eventBus)
 
   this->currentStatus = this->definitions[StatusEvent::WIFI_NO_CONFIG];
 
-  this->statusUpdated = std::make_unique<bell::WrappedSemaphore>(10);
-  this->statusUpdated->give();
+  this->statusUpdated.release();
 
   ledc_fade_func_install(0);
 
@@ -59,13 +59,13 @@ void StatusLED::handleEvent(std::unique_ptr<Event>& event) {
     auto emergencyMode = static_cast<EmergencyModeTrippedEvent*>(event.get());
     switchCurrentStatus(this->definitions[StatusEvent::EMERGENCY_MODE]);
   }
-  this->statusUpdated->give();
+  this->statusUpdated.release();
 }
 
 void StatusLED::switchCurrentStatus(ModeDefinition newStatus) {
   if (newStatus.prio >= this->currentStatus.prio) {
     this->currentStatus = newStatus;
-    this->statusUpdated->give();
+    this->statusUpdated.release();
   }
 }
 
@@ -94,7 +94,7 @@ void StatusLED::runTask() {
   bool breathingInverted = false;
 
   while (true) {
-    this->statusUpdated->twait();
+    this->statusUpdated.try_acquire_for(std::chrono::milliseconds(10));
     int fadeDutyR = this->currentStatus.r * (1 << 12) / 255;
     int fadeDutyG = this->currentStatus.g * (1 << 12) / 255;
     int fadeDutyB = this->currentStatus.b * (1 << 12) / 255;

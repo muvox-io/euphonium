@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <semaphore>
 #include <unordered_map>
 #include <utility>
 
@@ -8,7 +9,6 @@
 #include <driver/ledc.h>
 
 #include <BellTask.h>
-#include <WrappedSemaphore.h>
 
 #include "Connectivity.h"
 #include "EventBus.h"
@@ -84,7 +84,7 @@ class StatusLED : public bell::Task, public euph::EventSubscriber {
 
  private:
   std::shared_ptr<euph::EventBus> eventBus;
-  std::unique_ptr<bell::WrappedSemaphore> statusUpdated;
+  std::counting_semaphore<10> statusUpdated;
 
   void setupTimer();
   void updateLEDChannel(ledc_channel_t channel, int gpioNum);
