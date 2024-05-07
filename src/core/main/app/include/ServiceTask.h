@@ -87,7 +87,7 @@ class ServiceTask : public bell::Task {
 
  private:
   const char* TAG = "ServiceTask";
-  std::shared_ptr<euph::Context> ctx;
+  std::weak_ptr<euph::Context> ctx;
   std::unique_ptr<ServiceJob> currentJob;
   std::mutex busyMutex;
   std::binary_semaphore jobSemaphore;

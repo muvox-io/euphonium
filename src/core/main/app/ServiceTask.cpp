@@ -6,6 +6,8 @@ using namespace euph;
 
 void ServiceJob::reportProgress(std::shared_ptr<euph::Context> ctx,
                                 float progress) {
+
+  EUPH_LOG(info, jobTypeName(), "Progress: %f", progress);
   // TODO: broadcast event bus messages
 }
 
@@ -20,7 +22,7 @@ void ServiceTask::runTask() {
       try {
         EUPH_LOG(info, TAG, "Running job %s",
                  currentJob->jobTypeName().c_str());
-        // currentJob->run(ctx);
+        currentJob->run(ctx.lock());
         if (currentJob->nextJob) {
           submitJob(std::move(currentJob->nextJob));
         }
