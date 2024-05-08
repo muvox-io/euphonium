@@ -4,6 +4,7 @@
 #include "CoreEvents.h"
 #include "EmergencyMode.h"
 #include "EventBus.h"
+#include "LocalOTAEndpoints.h"
 #include "OTAHandler.h"
 #include "URLParser.h"
 #include "X509Bundle.h"
@@ -50,6 +51,8 @@ void Core::initialize() {
 
   // Register HTTP handlers for OTA, update packages if necessary
   this->otaHandler->initialize(this->http->getServer());
+
+  registerLocalOTAEndpoints(*this->http->getServer(), this->ctx);
 
   // Check if contains X509 SSL bundle
 
@@ -134,9 +137,9 @@ void Core::initialize() {
   } catch (berry::BerryErrorException& e) {
     this->ctx->emergencyMode->trip(EmergencyModeReason::BERRY_INIT_ERROR,
                                    e.what());
-  } catch(PackageLoaderFileNotFoundException& e) {
-    this->ctx->emergencyMode->trip(EmergencyModeReason::LOADING_BERRY_HOOK_FAILED,
-                                   e.what());
+  } catch (PackageLoaderFileNotFoundException& e) {
+    this->ctx->emergencyMode->trip(
+        EmergencyModeReason::LOADING_BERRY_HOOK_FAILED, e.what());
   }
 
   // Initialize HTTP

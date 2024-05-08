@@ -37,6 +37,16 @@
         font-size: 0.9rem;
         overflow-x: auto;
       }
+      summary {
+        cursor: pointer;
+        margin-bottom: 0.5rem;
+      }
+      details {
+        margin-top: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 1rem;
+      }
     </style>
   </head>
   <body>
@@ -50,6 +60,16 @@
           
         </code>
       </pre>
+
+      <h2>Repair options</h2>
+      <details>
+        <summary>Upload new filesystem image</summary>
+        <div>
+          Select .tar file:
+          <input type="file" id="file" accept=".tar" />
+          <button type="button" id="upload-fs">Upload</button>
+        </div>
+      </details>
     </div>
     <script>
       (() => {
@@ -62,6 +82,22 @@
             $("#emergencyModeReason").textContent = emergencyMode.reason;
             $("#emergencyModeMessage").textContent = emergencyMode.message;
           });
+
+        $("#upload-fs").addEventListener("click", () => {
+          const file = $("#file").files[0];
+          if (!file) {
+            alert("Please select a file");
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("fs", file);
+
+          fetch("/api/emergency-mode/filesystem-update", {
+            method: "POST",
+            body: formData,
+          }).then((res) => res.json());
+        });
       })();
     </script>
   </body>

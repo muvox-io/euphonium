@@ -9,9 +9,10 @@ namespace euph {
  * @brief Unpacks a tar archive with a filesystem OTA update.
  * 
  */
-class UpdateFilesystemServiceJob : euph::ServiceJob {
+class UpdateFilesystemServiceJob : public euph::ServiceJob {
  public:
   UpdateFilesystemServiceJob(std::string archivePath);
+
   virtual std::string jobTypeName() override;
   virtual void run(std::shared_ptr<euph::Context> ctx) override;
 

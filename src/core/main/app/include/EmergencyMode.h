@@ -2,12 +2,10 @@
 
 #include <atomic>
 #include <memory>
-#include <mutex>
 #include <nlohmann/json.hpp>
 #include <shared_mutex>
 #include <string>
 #include "civetweb.h"
-
 #include "EventBus.h"
 
 namespace euph {
@@ -64,6 +62,8 @@ class EmergencyMode {
 
   /**
     * @brief Serve the emergency mode page, if emergency mode is active.
+    *
+    * To be used as a hook in the HTTP server, before trying to serve files from the filesystem.
     * 
     * @param conn The connection to serve the page to.
     * @return true If the page was served, caller should return from the request handler.

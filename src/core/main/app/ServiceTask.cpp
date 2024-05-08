@@ -12,7 +12,9 @@ void ServiceJob::reportProgress(std::shared_ptr<euph::Context> ctx,
 }
 
 ServiceTask::ServiceTask(std::weak_ptr<euph::Context> ctx)
-    : bell::Task("ServiceTask", 1024 * 16, 1, 0), ctx(ctx), jobSemaphore(0) {}
+    : bell::Task("ServiceTask", 1024 * 16, 1, 0), ctx(ctx), jobSemaphore(0) {
+  startTask();
+}
 
 void ServiceTask::runTask() {
   while (true) {

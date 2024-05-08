@@ -25,6 +25,7 @@ void UpdateFilesystemServiceJob::run(std::shared_ptr<euph::Context> ctx) {
   size_t fileSize = std::filesystem::file_size(path);
   size_t progressReportStep = fileSize / 100;  // Report progress every 1%
 
+  EUPH_LOG(info, jobTypeName(), "Archive size: %d", fileSize);
   // Open the file
   std::ifstream fileStream(archivePath, std::ios::in | std::ios::binary);
 

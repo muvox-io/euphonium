@@ -74,7 +74,8 @@ class StatusLED : public bell::Task, public euph::EventSubscriber {
 
   };
 
-  ModeDefinition currentStatus = {.r = 70,
+  ModeDefinition currentStatus = {.prio = 0,
+                                  .r = 70,
                                   .g = 30,
                                   .b = 0,
                                   .behaviour = Behaviour::BREATHING};
