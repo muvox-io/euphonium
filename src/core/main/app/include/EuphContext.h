@@ -3,12 +3,14 @@
 // forward declaration of Context
 #include "CoreEvents.h"
 #include "EmergencyMode.h"
+#include "FirmwareImageUpdater.h"
 #include "WrappedSemaphore.h"
 namespace euph {
 struct Context;
 class Connectivity;
 }  // namespace euph
 
+#include <functional>
 #include <memory>
 
 #include "CentralAudioBuffer.h"
@@ -112,6 +114,14 @@ struct Context {
 
   // Display name of the device, gets replaced by user setting later on
   std::string displayName = "Euphonium";
+
+  /**
+   * @brief Function that creates a new instance of the FirmwareImageUpdater for the specific platform.
+   * Can be nullptr if the platform does not support firmware image updates. 
+   * Should be set by exportPlatformBindings of Core.
+   */
+  std::function<std::unique_ptr<FirmwareImageUpdater>()>
+      firmwareImageUpdaterFactory;
 
   static std::shared_ptr<euph::Context> createWithBus(
       std::shared_ptr<euph::EventBus> bus) {

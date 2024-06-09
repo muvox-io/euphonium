@@ -1,5 +1,6 @@
 #include "EuphoniumApp.h"
 #include "BellUtils.h"
+#include "ESP32FirmwareImageUpdater.h"
 #include "esp_app_format.h"
 #include "esp_ota_ops.h"
 #include "esp_partition.h"
@@ -76,6 +77,10 @@ void EuphoniumApp::runTask() {
     exportDrivers(ctx->vm);
     this->memoryMonitor = std::make_shared<euph::MemoryMonitorTask>(ctx->vm);
     this->memoryMonitor->setupBindings();
+
+    ctx->firmwareImageUpdaterFactory = [this]() {
+      return std::make_unique<ESP32FirmwareImageUpdater>();
+    };
   };
 
   core->handleEventLoop();

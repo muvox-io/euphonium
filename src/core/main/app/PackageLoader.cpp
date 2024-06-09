@@ -1,4 +1,5 @@
 #include "PackageLoader.h"
+#include <fmt/core.h>
 #include "BerryBind.h"
 
 using namespace euph;

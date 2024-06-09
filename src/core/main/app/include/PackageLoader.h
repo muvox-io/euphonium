@@ -1,6 +1,5 @@
 #pragma once
 
-#include <fmt/core.h>
 #include <ghc_filesystem.h>
 #include <exception>
 #include <fstream>

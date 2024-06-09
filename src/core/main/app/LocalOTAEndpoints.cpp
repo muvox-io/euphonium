@@ -18,6 +18,11 @@ struct FilesystemUpdateContext {
   std::ofstream file;
 };
 
+/**
+ * @brief Function to filter the incoming form
+ * fields for the filesystem update endpoint.
+ * @see mg_form_data_handler
+ */
 static int filesystemUpdateFieldFound(const char* key, const char* filename,
                                       char* path, size_t pathlen,
                                       void* userData) {
@@ -35,6 +40,10 @@ static int filesystemUpdateFieldFound(const char* key, const char* filename,
   return MG_FORM_FIELD_STORAGE_SKIP;
 }
 
+/**
+ * @brief Function to handle the incoming form fields for the filesystem update
+ * @see mg_form_data_handler
+ */
 static int filesystemUpdateFieldGet(const char* key, const char* value,
                                     size_t valuelen, void* userData) {
 
@@ -70,7 +79,7 @@ void euph::registerLocalOTAEndpoints(bell::BellHTTPServer& server,
           EUPH_LOG(error, TAG, "Could not lock context.");
           return server.makeEmptyResponse();
         }
-       
+
         const struct mg_request_info* req_info = mg_get_request_info(conn);
         std::string tmpDir = ctx->rootPath + "/tmp";
 
