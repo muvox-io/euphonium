@@ -23,5 +23,6 @@ class ESP32FirmwareImageUpdater : public FirmwareImageUpdater {
  private:
   size_t bytesWritten = 0;
   esp_ota_handle_t otaHandle;
+  const esp_partition_t* partitionToWrite;
 };
 }  // namespace euph

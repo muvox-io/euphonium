@@ -51,7 +51,6 @@ class FirmwareImageUpdater {
   /**
      * @brief Abort the OTA transaction.
      * Do not switch to the updated firmware (the partition can be clobbered if this is called after writeData()).
-     * @throw FirmwareImageUpdaterException if the OTA transaction cannot be aborted.
      */
   virtual void abort() = 0;
 

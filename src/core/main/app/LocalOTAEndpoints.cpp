@@ -2,7 +2,10 @@
 #include <filesystem>
 #include <fstream>
 #include <memory>
+#include <semaphore>
+#include "FirmwareImageUpdater.h"
 #include "UpdateFilesystemServiceJob.h"
+#include "UpdateFirmwareFromUploadServiceJob.h"
 
 using namespace euph;
 
@@ -80,7 +83,6 @@ void euph::registerLocalOTAEndpoints(bell::BellHTTPServer& server,
           return server.makeEmptyResponse();
         }
 
-        const struct mg_request_info* req_info = mg_get_request_info(conn);
         std::string tmpDir = ctx->rootPath + "/tmp";
 
         FilesystemUpdateContext context{.hasValidFile = false,
@@ -99,7 +101,6 @@ void euph::registerLocalOTAEndpoints(bell::BellHTTPServer& server,
         struct mg_form_data_handler fdh = {filesystemUpdateFieldFound,
                                            filesystemUpdateFieldGet, NULL,
                                            &context};
-        (void)req_info;
 
         int ret = mg_handle_form_request(conn, &fdh);
         if (context.file.is_open()) {
@@ -127,6 +128,38 @@ void euph::registerLocalOTAEndpoints(bell::BellHTTPServer& server,
                   "HTTP/1.1 200 OK\r\nContent-Type: "
                   "application/json\r\nConnection: close\r\n\r\n");
         mg_printf(conn, "{}");
+
+        return server.makeEmptyResponse();
+      });
+
+  server.registerPost(
+      "/api/emergency-mode/firmware-image-update",
+      [&server, ctxPtr](struct mg_connection* conn) {
+        auto ctx = ctxPtr.lock();
+        if (!ctx) {
+          EUPH_LOG(error, TAG, "Could not lock context.");
+          return server.makeEmptyResponse();
+        }
+
+        if (!ctx->firmwareImageUpdaterFactory) {
+          EUPH_LOG(error, TAG, "Firmware image updater factory not set.");
+          return server.makeJsonResponse(
+              "{\"status\": \"error\", \"message\":\"Firmware image update  "
+              "is "
+              "not available on this platform.\"}",
+              404);
+        }
+
+        std::binary_semaphore update_done(0);
+
+        bool job_submitted = ctx->serviceTask->submitJob(
+            std::make_unique<UpdateFirmwareFromUploadServiceJob>(conn,
+                                                                 update_done));
+        EUPH_LOG(info, TAG, "Firmware image update job submitted.");
+        update_done
+            .acquire();  // Wait for the job to finish (the response will be sent by it)
+
+        EUPH_LOG(info, TAG, "Firmware image update job finished.");
 
         return server.makeEmptyResponse();
       });

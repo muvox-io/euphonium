@@ -2,19 +2,20 @@
 #include "EuphLogger.h"
 #include "esp_err.h"
 #include "fmt/core.h"
+
 using namespace euph;
 
 ESP32FirmwareImageUpdater::ESP32FirmwareImageUpdater()
     : FirmwareImageUpdater() {
-  const esp_partition_t* partition = esp_ota_get_next_update_partition(NULL);
-  if (partition == NULL) {
+  partitionToWrite = esp_ota_get_next_update_partition(NULL);
+  if (partitionToWrite == NULL) {
     throw FirmwareImageUpdaterException("No OTA partition found for update");
   }
   EUPH_LOG(info, "ESP32FirmwareImageUpdater", "Starting ota with partition %s",
-           partition->label);
+           partitionToWrite->label);
 
   esp_err_t err =
-      esp_ota_begin(partition, OTA_WITH_SEQUENTIAL_WRITES, &otaHandle);
+      esp_ota_begin(partitionToWrite, OTA_WITH_SEQUENTIAL_WRITES, &otaHandle);
   if (err != ESP_OK) {
     throw FirmwareImageUpdaterException(
         fmt::format("Failed to start OTA: {}", esp_err_to_name(err)).c_str());
@@ -39,6 +40,13 @@ void ESP32FirmwareImageUpdater::finalize() {
   if (err != ESP_OK) {
     throw FirmwareImageUpdaterException(
         fmt::format("Failed to finalize OTA: {}", esp_err_to_name(err))
+            .c_str());
+  }
+
+  err = esp_ota_set_boot_partition(partitionToWrite);
+  if (err != ESP_OK) {
+    throw FirmwareImageUpdaterException(
+        fmt::format("Failed to set boot partition: {}", esp_err_to_name(err))
             .c_str());
   }
 }

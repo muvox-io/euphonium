@@ -52,7 +52,6 @@
   <body>
     <div class="container">
       <h1>Emergency mode</h1>
-
       <p>Activated due to: <strong id="emergencyModeReason"></strong></p>
       <p>Technical information:</p>
       <pre>
@@ -68,6 +67,15 @@
           Select .tar file:
           <input type="file" id="file" accept=".tar" />
           <button type="button" id="upload-fs">Upload</button>
+        </div>
+      </details>
+
+      <details>
+        <summary>Upload new firmware image</summary>
+        <div>
+          Select .bin file:
+          <input type="file" id="firmware-file" accept=".bin" />
+          <button type="button" id="upload-firmware">Upload</button>
         </div>
       </details>
     </div>
@@ -89,11 +97,25 @@
             alert("Please select a file");
             return;
           }
-
           const formData = new FormData();
           formData.append("fs", file);
 
           fetch("/api/emergency-mode/filesystem-update", {
+            method: "POST",
+            body: formData,
+          }).then((res) => res.json());
+        });
+
+        $("#upload-firmware").addEventListener("click", () => {
+          const file = $("#firmware-file").files[0];
+          if (!file) {
+            alert("Please select a file");
+            return;
+          }
+          const formData = new FormData();
+          formData.append("firmware", file);
+
+          fetch("/api/emergency-mode/firmware-image-update", {
             method: "POST",
             body: formData,
           }).then((res) => res.json());
