@@ -112,6 +112,15 @@ class DevtoolsPlugin : Plugin
       core.trip_emergency_mode("Tripped from devtools page")
     end
 
+    var trigger_crash_btn = testing_group.button_field('triggerCrashButton', {
+        'label': "Trigger crash",
+        'buttonText': "Crash now",
+    })
+
+    if trigger_crash_btn.has_been("click")
+      core.trigger_crash()
+    end
+
   end
 end
 

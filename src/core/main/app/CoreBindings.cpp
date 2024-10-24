@@ -57,6 +57,8 @@ void CoreBindings::setupBindings() {
                        "wifi");
   ctx->vm->export_this("trip_emergency_mode", this,
                        &CoreBindings::_tripEmergencyMode, "core");
+  ctx->vm->export_this("trigger_crash", this,
+                       &CoreBindings::_triggerCrash, "core");
 }
 
 std::string CoreBindings::_getPlatform() {
@@ -205,4 +207,10 @@ void CoreBindings::_clearWifiConfig() {
 
 void CoreBindings::_tripEmergencyMode(std::string message) {
   this->ctx->emergencyMode->trip(EmergencyModeReason::MANUAL_TRIP, message);
+}
+
+void CoreBindings::_triggerCrash() {
+  EUPH_LOG(error, TAG, "Triggering crash from berry...");
+  int *p = 0;
+  *p = 0;
 }
